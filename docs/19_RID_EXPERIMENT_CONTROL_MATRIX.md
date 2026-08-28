@@ -42,11 +42,11 @@ level.
 
 | Surface | Owner and path | Read | Write | Current disposition |
 | --- | --- | --- | --- | --- |
-| Global Broadcast RID master | same-family current SDK `RIDCtrlEnable -> rid_ctrl_enable_0`; live Mini 5 Pro owner pending | fixed F7/F8 probe implemented; no live reply yet | fixed F9 path implemented behind successful baseline read | `STATIC LOCKED`; this is now a concrete candidate rather than an absent-name search, but Mini 5 Pro admission is unresolved |
+| Global Broadcast RID master | same-family current SDK `RIDCtrlEnable -> rid_ctrl_enable_0`; live Mini 5 Pro owner pending | direct target routes failed metadata with positive controls; both third-party Binder routes failed known-height positive control before target | fixed F9 path exists but remained locked and unsent | `STATIC LOCKED`; all known generic attach routes are closed for this session; reopen only with an official owner or verified WA150 handler |
 | RID/EID working status | product-139 `RidImportModule`, natural `0x11/0x1C` push | support/normal flags, area, failure | none | `PASSIVE OWNER`; no GET builder and onboard normal is not RF truth |
 | Regional capability | product-139 interpretation of the same push | US bit 0, Cloud bit 10, EU/Japan/France bits 11/12/13 in explicit mode | none | `PASSIVE OWNER`; show capability separately from real area and RF standard |
 | RID health/diagnostics | FC health manager plus Remote ID delegate | working/idle/location/firmware/no-broadcast/unsupported/unknown | none | `PASSIVE OWNER`; preserve the raw failure class without coordinates |
-| Broadcast start/stop timing | aircraft firmware plus independent receiver | event timeline not yet implemented | no safe trigger | `STATIC LOCKED`; one prior motor-start/RF observation exists, but no synchronized motor/onboard/RF read path or timeline is implemented |
+| Broadcast start/stop timing | aircraft firmware plus independent receiver | A-024 Binder listener was false-negative while the independent detector confirmed real motor-on RID | no safe trigger | `READ-ONLY LIVE`; use the independent receiver for RF truth and do not repeat the tested Binder listener |
 | Operator-location health | RC/Android location provider -> link -> aircraft | permission, age, accuracy, RID failure class | no current selector or coordinate setter | `PASSIVE OWNER`; privacy-reduced status only, never location spoofing |
 | Aircraft/UAS identity | FC/device identity and compliance derivation | static get/listen-only candidate; no admitted live read | no current setter found | `STATIC LOCKED`; live route, privacy-safe read, and actual RF Basic ID correspondence remain unclosed |
 | RF bearer | aircraft BLE/Wi-Fi scheduler | external receiver observation | no selector found | `READ-ONLY LIVE`; show only an independently observed bearer, never infer it from China cloud tracking masks |
@@ -75,7 +75,7 @@ has no getter/readback, and is explicitly excluded from the RID configuration ca
 
 | Surface | Exact or bounded path | Readback / restore boundary | Current disposition |
 | --- | --- | --- | --- |
-| Independent RID control | current same-family `RIDCtrlEnable` maps to `rid_ctrl_enable_0`, hash `0x3CBD864F`, FLYC `03/F7-F9`, default route `0x82 -> 0x92` | self-developed RC 2 Binder client performs F7 metadata, F8 baseline, one F9 change, F8 readback, and baseline restore; live F7/F8 reply and RF A-B-A remain pending | `STATIC LOCKED`; fixed APK is staged, and a successful F7/F8 will promote this row directly to a bounded live transaction candidate |
+| Independent RID control | current same-family `RIDCtrlEnable` maps to `rid_ctrl_enable_0`, hash `0x3CBD864F`, FLYC `03/F7-F9`, default route `0x82 -> 0x92` | direct target routes returned status `03` with controls; A-024 Binder legacy/modern known-height controls both timed out, so target and all F9 operations were gated off | `STATIC LOCKED`; known generic routes are exhausted; no live baseline or RF A-B-A exists and only a new official owner/verified handler can reopen the row |
 | France EID | product-139 `0x03/0x77`; GET `[02]`, SET off/on `[00]`/`[01]`; GET ACK `[result,state]` | static destination `0x92` may be runtime-overridden; two artificial live GET routes returned no canonical ACK; persistence/RF untested | `STATIC LOCKED`; the Mac app may show conditional `unavailable`, not a switch |
 | EASA OPID | product-139 `0x03/0x78`; GET `[02]`, DELETE `[01]`, SET `[00][0x10][16B]`; SDK validates 20-character input | dynamic HostID; original string must be backed up; empty restore requires DELETE; live route/persistence/RF remain open | `STATIC LOCKED`; display only masked present/empty/unknown when a safe owner exists |
 | Japan DIPS credential | current `0x11/0x4B` three-part registration/key/nonce SET and QUERY; DELETE is three zero SETs | non-atomic credential; requires all-three backup, verify, and restore; contains sensitive material | `MANAGED`; current live route/readback/restore gates remain closed, and the UI must never log or expose key/nonce/editor/delete |
@@ -95,7 +95,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 
 | Surface | Facts | Current disposition |
 | --- | --- | --- |
-| FlySafe type-6 `RID_UNLOCK` | signed account/FC-bound inventory and enable state; product eligibility, live support/version/session, genuine item, restore, and RF effect remain open | `MANAGED`; official-owner masked inventory only, never fabricate/upload/replay a license |
+| FlySafe type-6 `RID_UNLOCK` | exact `0x11/0x11` inventory and `0x11/0x12` set-enable wire; retained official design maps an enabled region-matched license to `NO_BROADCAST`, but the app-side consumer itself only changes SDK status | `MANAGED`; first implement masked read-only inventory, never fabricate/upload/replay a license, and require aircraft-side plus RF proof before calling it a switch |
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
@@ -144,17 +144,19 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
-2. Add a privacy-reduced synchronized timeline for motor state, onboard RID state, receiver RF
-   first/last seen, bearer, and message-type presence.
-3. Close a safe official-owner access route for the natural `0x11/0x1C` push without opening a
-   second RC-local broker client.
-4. Locate the dependency that owns the external China UOM status mappings and Sync helper, then
+2. Add a bounded read-only modern FlySafe inventory query through the existing system Binder;
+   report only type-6 count/level/enabled/valid and preserve unavailable versus empty.
+3. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,
+   inventory readback, restoration, and final readback; keep the license ID process-private.
+4. Correlate the controlled state with operator-started motor-on independent RF. The tested
+   `0x11/0x1C` Binder listener is false-negative and must not be reused as truth.
+5. Locate the dependency that owns the external China UOM status mappings and Sync helper, then
    close runtime function-ID `0x6C` admission; keep identifier editing locked until live
    baseline/restore/RF gates are met.
-5. Close OPID/Japan runtime Characteristics and read-only admission; never retain credential data.
-6. Pursue verified WA150 `0802` plaintext or legitimate on-device production-owner evidence to find
+6. Close OPID/Japan runtime Characteristics and read-only admission; never retain credential data.
+7. Pursue verified WA150 `0802` plaintext or legitimate on-device production-owner evidence to find
    the actual broadcaster, motor/GNSS gates, region format selector, and any firmware-level control.
-7. In parallel, implement a separately reviewed synthetic OpenDroneID source adapter for fields
+8. In parallel, implement a separately reviewed synthetic OpenDroneID source adapter for fields
    that a DJI aircraft cannot safely or legitimately expose as free-form controls.
 
 No current surface in this matrix is admitted as a stable Mini 5 Pro RID transmitter switch or

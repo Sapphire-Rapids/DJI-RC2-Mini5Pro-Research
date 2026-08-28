@@ -31,11 +31,16 @@ Every hypothesis below is testable and remains separate from factual findings.
 ## H-04 — stable control via genuine type-6 `RID_UNLOCK`
 
 - Known facts: signed account/FC-bound type 6 exists in public MSDK schema, has EU/China levels,
-  and matching enabled license can produce `NO_BROADCAST` in static delegate logic.
+  and the preserved delegate design maps a matching enabled license to `NO_BROADCAST`. That app-side
+  branch only mutates an SDK status object; it sends no Key/native/DUML command. Current native
+  inventory/set-enable endpoints are `0x11/0x11` and `0x11/0x12`, with product-139 receiver `0x92`.
 - Hypothesis: a genuine, eligible Mini 5 Pro license can be inventoried, enabled/disabled, restored,
-  reflected in working status, and observed over RF.
+  consumed by the aircraft-side RID broadcaster, and observed over RF.
 - Missing: server eligibility, genuine record, live support/version, exact route, current baseline,
-  FC acceptance, rollback, and independent RF A-B-A.
+  FC acceptance, aircraft-side consumer, rollback, and independent RF A-B-A.
+- Next discriminator: a bounded read-only modern V3/V4 inventory query through the existing system
+  Binder. Only a canonical response containing a genuine type-6 record can admit a later same-item
+  baseline/readback/restore experiment.
 - Current state: `UNKNOWN`.
 
 ## H-05 — reason for legacy inventory timeout
@@ -49,13 +54,15 @@ Every hypothesis below is testable and remains separate from factual findings.
 
 ## H-06 — motor-state transition and `0x11/0x1C`
 
-- Known facts: no strict candidate in motors-off windows; independent receiver-visible RID began
-  after operator-initiated motor start.
+- Known facts: A-024's third-party Binder listener was accepted and ran 30 seconds but received zero
+  callbacks while an independent detector confirmed RID after operator-initiated motor start.
 - Hypotheses: the push requires official subscription, a motor/flight state transition, valid GPS/
   operator position, or a combination.
-- Distinguishing evidence: time-aligned passive onboard status and independent receiver capture
-  across powered, motors-off, motor-start, and stable-position stages.
-- Current state: `UNKNOWN`.
+- Distinguishing evidence: only an official in-process observer or a different validated onboard
+  health source, time-aligned with independent RF. Repeating the same Binder listener cannot
+  discriminate the hypotheses.
+- Current state: `NEGATIVE` for the tested Binder listener as a truth source; official owner behavior
+  remains `UNKNOWN`.
 
 ## H-07 — login-dependent 30/50 m effective restriction
 
@@ -278,6 +285,9 @@ Every hypothesis below is testable and remains separate from factual findings.
 - Follow-on if positive: capture baseline, write the opposite Boolean once with F9, confirm by F8,
   restore the captured baseline, and confirm again. Reconnect persistence and motor-on independent
   RF A-B-A are separate observations.
-- Current state: direct routes are `NEGATIVE` for F7 metadata retrieval with same-session positive
-  controls (C-141). `0.3.0-research` has been copied to RC 2 removable storage; installation,
-  execution, Binder-modern result, and RF effect have not yet been recorded.
+- Current state: direct legacy routes are `NEGATIVE` for target F7 metadata with same-session
+  positive controls (C-141). Installed A-024 then showed that both tested third-party Binder routes
+  fail the known-height F7 positive control with `ECode 1` (C-145), so code correctly did not send
+  target F7/F8/F9. This hypothesis is no longer actionable through the known generic attach routes.
+  It remains open only for a materially different official in-process owner/authenticated route or
+  a verified WA150 handler; RF effect has never been tested.

@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.3.3 - 2026-08-29
+
+### Added
+
+- Added C-142/C-143 from the installed A-023 read-only Binder probe: service and callback ABI were
+  reached, but target F7 ended in `ECode 1` after about 3.1 seconds; adjacent RC331 maps that class
+  to retry exhaustion. No F8/F9 or RF effect occurred.
+- Registered replacement artifact A-024 `0.4.1-research`, including serialized operation gates,
+  per-route maximum-height F7/F8 positive control, validated Boolean metadata/readback/rollback,
+  and one full-window passive `0x11/0x1C` state timeline.
+- Added C-144 for the A-024 final-artifact audit: 25 unit tests, lint with zero errors, two
+  byte-identical clean builds, no permissions/native libraries, v2 signature, and alignment checks.
+- Added C-145 from the installed A-024 live result: legacy `0A:05 -> 03:00` and modern
+  `02:04 -> 12:04` Binder routes both failed the known-height F7 positive control with `ECode 1` and
+  no data after about 3.1 seconds. Target F7/F8/F9 were correctly not sent.
+- Added C-146 from the motor-on experiment: the accepted 30-second Binder `0x11/0x1C` listener
+  delivered zero callbacks while an independent detector confirmed real RID RF, closing that
+  listener as a false-negative truth/readback path.
+- Added C-147--C-149 for the official minimum status parser, the type-6 region-matched
+  `NO_BROADCAST` design semantics, and the exact current product-139 inventory/set-enable wire.
+- Changed the active implementation path to a bounded read-only modern `0x11/0x11` inventory query;
+  `0x11/0x12` remains absent and prohibited until a genuine type-6 baseline exists.
+- Updated the blocker, handoff, experiment matrix, artifact state, hypothesis, timeline, README, and
+  AGENTS contract to close generic parameter attach variants and promote passive status,
+  diagnostics, type-6 inventory, and WA150 `0802/E3` ownership as the active dependency chain.
+
+### Provenance
+
+- The two user-supplied result photographs were used only to transcribe redacted protocol outcomes;
+  PID, UID, device identity, and image files are not committed.
+- A-023/A-024 APKs and all implementation source remain outside this documentation-only repository.
+- No target F7, F8, F9, reset, account action, license action, firmware write, or RF claim is made.
+
 ## 0.3.2 - 2026-08-28
 
 ### Added

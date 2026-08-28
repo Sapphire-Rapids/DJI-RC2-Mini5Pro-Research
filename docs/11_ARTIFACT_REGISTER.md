@@ -34,7 +34,8 @@
 | A-020 | Drone-Hacks desktop application；input-sample；`2.0.29.0` | `24,011,848` | `9813d6a9d7ba137066712ecfebd2c397bfbe5516d546c6d5f95d23014e06f996` | `STATIC`；只从 MSI 静态提取；从未执行；排除且不分发 |
 | A-021 | Drone-Hacks TypeScript binding generator；input-sample；`2.0.29.0` | `11,522,632` | `84eecdf2329635bf9856a9ea002c9696d4222cd56cafdc101c9f19bea809e652` | `STATIC`；只从 MSI 静态提取；从未执行；排除且不分发 |
 | A-022 | SKYROVER official Android application；input-sample；`1.2.0` / code `102001130` | `405,543,495` | `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8` | `STATIC`；只离线分析；从未安装或执行；排除且不分发 |
-| A-023 | FindUAS RC 2 RID Admin；self-developed；`0.3.0-research` | `64,745` | `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` | `STATIC`；已复制到 RC 2 removable storage，尚未确认安装/运行；当前 fixed live candidate，不进入本 documentation repo |
+| A-023 | FindUAS RC 2 RID Admin；self-developed；`0.3.0-research` | `64,745` | `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` | `OBSERVED`；已安装并执行一次只读 Binder F7 probe；无 F9；已由 A-024 取代且从 removable storage 清理；不进入本 documentation repo |
+| A-024 | FindUAS RC 2 RID Admin；self-developed；`0.4.1-research` | `92,569` | `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95` | `OBSERVED`；已安装并执行只读双路 positive-control 与 30 秒 listener；target 未发送、无 F9；listener 经独立 RF 对照判为假阴性；由下一 inventory 版本取代；不进入本 documentation repo |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -138,9 +139,24 @@ A-023 是 clean-room self-developed Android artifact，package
 clean build、manifest/permission、zipalign、APK v2 signature 和 decompiled-final 检查；不包含
 permission、native library、socket、shell 或 background service。固定 command allow-list 为
 France EID `03/77`、OPID `03/78` 和 `rid_ctrl_enable_0` 的 `03/F7-F9`；RID route 固定为
-`0x82 -> 0x92`，使用 RC 2 `protocol` Binder service。它已复制到 RC 2 removable storage，
-但尚未确认 exact APK 的安装、启动、Binder transaction 或 FC reply，因此工件审计不能改写为
-live device evidence。
+`0x82 -> 0x92`，使用 RC 2 `protocol` Binder service。它随后已安装并执行一次固定只读 F7：
+service lookup、Binder transaction 与 callback exception layer 均完成，目标以 `ECode 1`
+结束，未取得 F7 ACK，也未发送 F9。因为该版本没有同路由已知参数正对照，结果不能提升为
+parameter-absence 结论。A-023 已被替换并从 removable storage 清理；本地可重建工件不进入仓库。
+
+A-024 是当前替代工件，package 与 signer 不变。它先在每个候选 Binder route 上执行
+maximum-height F7/F8 正对照，只有正对照成功才解释 `rid_ctrl_enable_0`；所有操作串行，F9 只有在
+target metadata、attribute、range 和 Boolean baseline 均闭合后才解锁，写后使用重复 F8 readback，
+歧义时恢复操作前值。它还通过 transaction 2 注册一次只读 `0x11/0x1C` listener，完整记录
+30 秒有界状态时间线，并在保存结果后终止自身进程以触发 Binder-death 清理。最终 APK 经 25 项
+unit tests、lint（0 errors，12 warnings）、两次 byte-identical clean build、manifest/permission、
+zipalign、APK v2 signature 和 native-library 检查；无声明 permission 或 native library。它已以
+短文件名 `RID-Admin.apk` 复制到 RC 2 removable storage，随后已确认安装并运行一次参数 probe。
+legacy `0A:05 -> 03:00` 与 modern `02:04 -> 12:04` 两路 maximum-height F7 正对照均在约
+3.1 秒后以 `ECode 1` 结束且无 data；代码按门禁没有发送 target F7/F8/F9。随后 transaction-2
+listener 在 9 ms 内被接受并运行完整 30 秒，但 callback/valid/malformed/state count 全为 0；
+操作者在窗口内起桨，独立检测器确认飞机实际播报 RID。故该 listener 被归类为假阴性，不再作为
+readback oracle。应用按设计在保存后关闭；未观察到由此造成的 DJI Fly/link 异常。
 
 APK signer certificate SHA-256：
 `37896e5a80772e39edad4bdf3ce7f19d2b6e1352a701c48c70edc10c97b2b224`。

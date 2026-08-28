@@ -79,13 +79,19 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **payload：** handler 把七字节映射为 bit 0 `isRidSupport`、bit 1 `isEidSupport`、bit 8
   `isRidNormal`、bit 9 `isEidNormal`、`int32le(payload+2)` area code 和 `payload[6]` failure
   value。最后一项同时写入旧拼写 `failResion` 与修正后的 `failReason`。该 handler 只检查
-  response/payload 非空，未见长度门禁；自写 parser 必须自行严格要求七字节最小长度。
+  response/payload 非空，未见长度门禁；自写 parser 必须自行严格要求七字节最小长度，并保留
+  trailing bytes。七字节是官方函数消费的最小前缀，不是 wire 永远恰好七字节的证明（C-147）。
 - **地区支持派生：** product-139 注册 US=`bit0`、Cloud=`bit10`；EU/France/Japan 为向后兼容的
   default-true 解释：只有 bit10=1 且相应 bit11/13/12=0 时才为 false。五个 Java key 都是
   GET+LISTEN、无 SET，只由同一 push 更新。China 不在这组 support bit 中，属于独立
   OID/UOM/UTMISS 平面。bits 8/9 仅经完整状态模型暴露，其余未命名 bit 没有找到业务 consumer。
 - **边界/不证明：** 它不是 setter；`isRidNormal` 或 `WORKING` 不证明独立 RF reception。live motors-off
   未见 push 也不证明 unsupported。由于没有 GET builder，它也不是可主动轮询的 read-only query。
+- **live third-party Binder result：** A-024 的 transaction-2 listener 在 9 ms 内被 framework 接受，
+  完整运行 30,000 ms，但 callback、有效帧与异常帧均为 0。操作者在窗口内正常起桨，同一实验的
+  独立检测设备确认飞机确实播报 RID。因此该 listener 对本设置是**假阴性**，不能再作为控制面板
+  readback oracle，也不能用“零回调”否定 RF。它不否定 DJI Fly 自己的 in-process observer 或
+  其他 onboard health 源（C-146）。
 - **公开依据：** [状态、账号与限飞层](04_STATE_ACCOUNT_LIMITS.md#remote-id-工作状态)。
 - **隐私/分发：** 不保存 raw status payload。
 
@@ -130,7 +136,7 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 
 ### RID-002C：独立 `RIDCtrlEnable` 已闭合到固定 FC 参数
 
-- **证据状态：STATIC/HYPOTHESIS**（C-136--C-138）
+- **证据状态：STATIC/HYPOTHESIS/OBSERVED**（C-136--C-145）
 - **对象/版本：** 官网当前 SKYROVER `1.2.0`，package `com.sky.dronemaster`。输入 APK
   SHA-256 为 `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8`；
   只在排除工作区静态分析，不在本仓库分发。
@@ -154,6 +160,12 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   height/distance/distance-enable 与 aircraft height 正对照均成功返回 F7 metadata 和 F8
   value。直接把 static modern `0x82 -> 0x92` 用到 USB 时，目标和已知 height control 都无
   response，因此该 timeout 只否定 direct-USB route，不回答 Binder route。未发送 F8/F9。
+- **Binder live result：** A-023 首次证明第三方 APK 可完成 service lookup、manager
+  transaction 与 callback exception layer，但 target F7 约 3.1 秒后返回 `ECode 1`。A-024
+  随后先发送 known maximum-height F7：legacy `0A:05 -> 03:00` 与 modern
+  `02:04 -> 12:04` 两条 Binder route 都在约 3.1 秒后返回同一 `ECode 1` 且无 data。精确代码
+  因两个正对照失败而停止，target F7、F8、F9 均未发送，按钮保持锁定。adjacent RC331
+  `ActQueue` 将 `ECode 1` 映射为重试耗尽。电机未启动不是该配置路由实验的解释变量。
 - **同族全量盘点：** RID 命名的 FCConfig `_0` 参数只发现 `rid_ctrl_enable_0`。其他真实
   writable 面均属于专用协议：France EID `03/77`、OPID `03/78`、Japan registration
   `11/4B`，以及无 GET/readback、schema 不公开的 `odm_rid_cloud_control -> 00/DD` opaque
@@ -164,12 +176,17 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   `0x82` transport、`0x92` destination 和 `03/F9` 形式；其 feature/hash 不同，不能当 RID
   接受证据。公开 MSDK V5 有区域 strategy 与 status getter，但普通 RID 没有 enable setter，
   只有 France EID 暴露 setter。
-- **实现状态：** clean-room Android `0.3.0-research` 只允许固定 EID/OPID/RID command，
-  RID 按钮使用 RC 2 已解析的 `protocol` Binder service 和 modern `0x82 -> 0x92` route。
-  F7/F8 成功会保存本次 Boolean baseline；F9 后立即 F8 读回，恢复按钮写回同一 baseline。
-  APK 已复制到 RC 2 removable storage；尚未记录安装、执行或 Binder command reply。
-- **下一步：** 先取 F7/F8 完整回包。若成功，执行一次 baseline -> opposite -> readback ->
-  baseline -> final readback；随后在接收器在线、由操作者起桨的条件下做独立 RF A-B-A。
+- **实现状态：** clean-room Android A-024 `0.4.1-research` 串行执行、正对照门禁和写入门禁均
+  已在实机按预期工作；没有 target request 或 write 泄漏。它的完整 30 秒本地 `0x11/0x1C`
+  listener 已由独立 RF 对照判定为假阴性，不再列为核心 readback 路径。
+- **当前结论：** current direct legacy routes 对 target 已是 positive-controlled negative；raw
+  modern USB route 与两条第三方 Binder route 均无法通过 known-height positive control。因此
+  不再重复 generic F7/F8 attach 或仅改变 sender/receiver 的盲试。只有发现 official in-process
+  owner、已验证的新 route，或取得 WA150 plaintext handler 后才重开该 exact parameter。
+- **下一步：** 直接查询真实 type-6 inventory，并追踪其 official enable state 到
+  `NO_BROADCAST`/0802 policy owner 的因果链；并行追 WA150 `0802` broadcaster。不要重复
+  protocol-Binder `0x11/0x1C` listener。任何未来控制点仍须 baseline/readback/restore 和独立
+  RF A-B-A。
 - **隐私/分发：** 只公开固定参数事实、self-developed APK hash 和脱敏结果；不提交 SKYROVER
   APK、shared library、反编译输出、设备标识或 raw private capture。
 
@@ -335,6 +352,13 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **事实：** 官方 schema 定义 `RID_UNLOCK == 6`；level 1 为 European，level 2 为 China。V2、V3、
   V4 选择不同的 signed onboard data 和 wire session。DJI Fly 的 upload-then-enable callback 只在
   upload success 后调用 enable。
+- **控制语义：** MSDK 5.18 保留的 `DefaultUASDelegate` 实现只在 license type 为
+  `RID_UNLOCK`、`enabled=true`、level 与当前 area strategy 匹配时派生
+  `isRidLicenseOpened=true`：level 1 只匹配 European，level 2 只匹配 China。若产品构造 gate
+  `isRidLicenseSupport` 也为 true，`updateRemoteIDStatus()` 直接输出
+  `broadcastRemoteIdEnabled=false`、state `NO_BROADCAST`，跳过普通地区状态计算（C-148）。这使
+  type-6 成为目前最直接的“许可启用 -> 免播报”设计证据；US/FAA 没有对应 level。该 supplied
+  class 有 leading-return 保护布局，所以仍须 current Mini 5 Pro dynamic/RF 证明。
 - **边界/不证明：** type-6 不是本地 Boolean，不能合成、修改、重放或伪造。静态架构不证明当前
   Mini 5 Pro 有资格、已有真实许可、FC 接受或 enable 后 RF 变化。
 - **公开依据：** DJI 官方 FlySafe/Cloud API/MSDK；前述公开
@@ -364,11 +388,33 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **事实：** query `PackType 0x38` 映射到 `0x11/0x11`；set-enable `PackType 0x39` 映射到
   `0x11/0x12`。V2 使用单字节 index；V3/V4 使用 group info/paging 与 protobuf/status parser。
   product/version 可改变 receiver route；runtime product 139 的静态 product-tree fallback 最终选择
-  `0x92`，前提是 live runtime product 确认等于 139。
+  `0x92`，前提是 live runtime product 确认等于 139。V3/V4 start body 为 `[00,01]`，page N 为
+  `[00,(N<<1)&ff]`；ACK 第一字节是 protocol result，后续 group/record body 分别为 protobuf
+  `LicenseGroupInfo` 与 `status_bitmap + License`。`License.data` oneof field 7 才是 RID，其内部
+  level 是 field 1；domain type 6 与 protobuf field 7 是两个命名空间（C-149）。
+- **current DJI Fly model boundary：** current native transport 能传递 signed onboard blob 并
+  执行 generic query/set-enable，但已恢复的 1.21.10 server JSON/model switch 只识别 type 0..4，
+  不原生解释 type 6 level。独立只读 parser 必须按 FC protobuf 严格分类，不能依赖 Fly UI 正确
+  命名 type 6。
 - **边界/不证明：** numeric command 已知不等于可安全 hand-build。support/version push、session owner、
   route、真实许可、readback/restore 和独立 RF 效果仍未实证。
 - **公开依据：** 前述公开 state/firmware research。
 - **隐私/分发：** 不提供 sender、license ID、signed payload 或可执行 sender。
+
+### RID-008C：现代只读 inventory 是当前最短判别实验
+
+- **证据状态：HYPOTHESIS/IMPLEMENTED-OFFLINE**
+- **固定请求：** 通过既有 system `protocol` Binder 使用 sender type/index `2/4`、receiver
+  `18/4`，只允许 `0x11/0x11`。先发 V3/V4 start `[00,01]`；只有 canonical success group
+  response 才按声明 count 有界读取 page，强制正常 result-1 terminator、无 duplicate ID、无 selector
+  wrap。该版本禁止并且不实现 `0x11/0x12`。
+- **输出边界：** 只显示 query available/unavailable、总数、type-6 数量、level、enabled、valid 和
+  uninterpreted status bits；不输出或持久化 license ID、SN、user ID、描述、时间、签名或 blob。
+- **判别：** canonical inventory 中没有 genuine type 6，则这条 managed switch 路线在当前 FC
+  停止；存在 type 6 才允许后续单独实现同一 ID 的 baseline -> transition -> readback -> restore。
+  Binder failure 只能报告“modern query unavailable”，不能报告 inventory empty。
+- **最终真值：** 即便 readback 显示 type-6 enabled，仍要由操作者起桨并让独立检测器做
+  enabled/disabled/restored 的 RF A-B-A，才能证明 Mini 5 Pro 实际广播受它控制。
 
 ### RID-008B：旧式固定 inventory request 超时
 

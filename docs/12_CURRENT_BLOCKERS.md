@@ -236,46 +236,51 @@ Pro free-form RID editor.
 
 ## B-20 — live `rid_ctrl_enable_0` admission and RF closure
 
-The earlier absence of a concrete global-control name is no longer the immediate blocker. Current
-same-family static evidence now closes `RIDCtrlEnable -> rid_ctrl_enable_0 -> 0x3CBD864F ->
-03/F7-F9`, and A-023 implements the fixed RC 2 Binder path.
+Current same-family static evidence closes `RIDCtrlEnable -> rid_ctrl_enable_0 -> 0x3CBD864F ->
+03/F7-F9`, but every known generic access route is now bounded by live evidence.
 
 Both previously validated direct routes have now answered F7 with one-byte status `0x03` while
 same-session known-parameter controls succeeded (C-141). Raw USB `0x82 -> 0x92` is not an alternate
-answer because its maximum-height positive control also timed out. The unresolved scope is now only
-the actual RC 2 `protocol` Binder modern route.
+answer because its maximum-height positive control also timed out. A-023 reached the RC 2
+`protocol` Binder callback but target F7 ended in `ECode 1` without a same-route control (C-142).
+A-024 then tested both legacy and modern Binder routes with known maximum height; both positive
+controls ended in `ECode 1` after about 3.1 seconds, so target F7/F8/F9 were not sent (C-145).
 
 Missing:
 
-- confirmation that exact A-023 is installed and running on RC 2;
-- one complete copied result from **探测并读取 RIDCtrlEnable（只读）** containing Binder lookup,
-  transaction, callback, F7 ACK, and—if admitted—F8 ACK;
-- if F7/F8 succeeds, one baseline -> opposite F9 -> F8 readback -> baseline F9 -> final F8 loop;
+- a materially different official in-process owner/authenticated route or verified WA150 handler;
+- read-only genuine type-6 inventory/support/version state, without retaining license material;
+- aircraft-side evidence that changing the genuine type-6 enabled state is consumed by the RID
+  broadcaster rather than only reflected in an SDK status object;
+- only after a new owner path passes a same-route positive control: target metadata/value baseline,
+  opposite-state write/readback, baseline restore, and final readback;
 - reconnect/power-cycle persistence classification;
 - external detector online plus operator-initiated motor-on RF A-B-A.
 
-Effect: this is the shortest active dependency. A Binder one-byte nonzero F7 status would close the
-remaining current Mini 5 Pro route for this exact hash. A positive F7/F8 permits the internal
-reversible write test immediately; it still requires the later motor-on receiver observation to
-establish actual broadcast behavior.
+Effect: known generic F7/F8 attach routes are closed for the current session. The third-party
+`0x11/0x1C` Binder listener is also closed as a false-negative oracle by independent RF evidence
+(C-146). Do not repeat either route family without a new owner fact. The shortest active dependency
+is now a modern read-only type-6 inventory query, followed by same-item controlled enable-state
+readback/restore and WA150 `0802` aircraft-side ownership. Static discovery of another setter is
+insufficient without baseline, readback, restore, persistence, and RF observation.
 
 ## Dependency order
 
 The evidence dependencies are:
 
 ```text
-install/run A-023
-  -> fixed F7 metadata for 0x3CBD864F
-  -> fixed F8 Boolean baseline
-  -> one F9/F8 transition
-  -> F9/F8 restore
-  -> reconnect persistence
-  -> operator-started motor-on independent RF A-B-A
+bounded modern 11/11 inventory query via existing system Binder
+  -> privacy-reduced genuine type-6 level/enabled/valid baseline
+  -> prove exact same-item 11/12 response and 11/11 readback/restore design
+  -> verified 0802/aircraft-side consumer or independent RF effect
+  -> one reversible transition + restore
+  -> reconnect persistence + independent RF A-B-A
 ```
 
-If the first F7 returns a canonical nonzero status, continue with passive `0x11/0x1C` ownership and
-verified WA150 plaintext/firmware analysis. Do not repeat the old generic attach chain merely to
-answer the same fixed parameter question.
+The F7 route matrix is closed at the generic attach level, and the tested Binder status listener is
+closed as a truth source. Continue with exact type-6 inventory/state and verified WA150
+plaintext/firmware analysis. Do not repeat the old generic attach or listener chains merely to
+answer the same fixed questions.
 
 ```text
 exact live identity

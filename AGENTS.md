@@ -130,17 +130,40 @@ Later retractions override earlier progress summaries.
     `EIDSwitch`, and exact native evidence maps it to FC parameter `rid_ctrl_enable_0`, hash
     `0x3CBD864F`, through `0x03/F7-F9` with default modern route `0x82 -> 0x92`. DJI Fly `1.21.10`
     lacks the same strings, so Mini 5 Pro support is a live F7/F8 question, not a static transfer.
-    A-023 is the fixed clean-room Binder client for that question; it has been copied to RC 2
-    removable storage but installation, execution, command replies, and RF effects are not yet
-    observed. If F7/F8 succeeds, record the baseline and proceed directly to one F9/readback/restore
-    loop; if F7 returns a nonzero one-byte status, record that bounded negative and do not reinterpret
-    France EID or AirSense as substitutes.
+    A-023 was the first fixed clean-room Binder client for that question. It was installed and run;
+    Binder lookup, transaction 1, callback transaction 4, and exception parsing succeeded, but the
+    target F7 ended in callback `ECode 1` after about 3.1 seconds without an F7 ACK. This is not a
+    parameter-absence result because that build lacked a same-route positive control. Do not
+    reinterpret France EID or AirSense as substitutes.
 24. Live direct F7 is now closed for hash `0x3CBD864F`: RC 2 routed `0xAA -> 0x03` and
     aircraft-direct `0x0A -> 0x03` both returned one-byte status `03`, while same-session known
     height/distance controls succeeded. Direct USB `0x82 -> 0x92` also failed a known-height
     positive control, so it is not evidence about parameter support. Do not repeat raw USB route
-    variants; the only remaining current-session admission result is A-023 through the RC 2
-    `protocol` Binder modern route.
+    variants. A-024 `0.4.1-research` is the replacement current candidate: it first requires a
+    maximum-height F7/F8 positive control on a Binder route before interpreting the RID target,
+    serializes operations, keeps F9 locked behind validated metadata/range/baseline, and adds one
+    full-window passive `0x11/0x1C` timeline. It was installed and both legacy and modern Binder
+    routes failed the known-height F7 positive control with `ECode 1` after about 3.1 seconds; code
+    therefore did not send target F7/F8/F9. The passive timeline result remains pending.
+25. Adjacent RC331 `ActQueue` maps callback `ECode 1` to request retry exhaustion. This explains the
+    observed A-023/A-024 terminal class but does not prove exact v07 byte identity, packet
+    transmission, receiver support, parameter absence, or RF state. C-145 closes the two tested
+    third-party Binder parameter routes for the current session; do not repeat generic route/address
+    variants without a materially new official owner or verified firmware handler.
+26. A-024's transaction-2 `0x11/0x1C` listener was accepted and ran the full 30-second window but
+    delivered zero callbacks while the operator started the motors and an independent detector
+    confirmed real RID RF. Treat this exact third-party Binder listener as a false-negative route;
+    do not repeat it or use its zero count as off/unsupported/no-RF evidence. The official
+    in-process observer remains a separate unknown.
+27. Official MSDK 5.18 consumes a seven-byte minimum `0x11/0x1C` prefix but does not enforce a
+    payload-length gate. Independent parsers require at least seven bytes and retain trailing bytes;
+    never state that the wire packet is proven to be exactly seven bytes.
+28. The preserved MSDK `DefaultUASDelegate` implementation maps an enabled, area-matched type-6
+    `RID_UNLOCK` to `broadcastRemoteIdEnabled=false` and `NO_BROADCAST` when its product gate is
+    true. This is design/static evidence with a protected leading-return layout, not proof that the
+    current Mini 5 Pro executes it. Current native inventory/set-enable endpoints are `0x11/0x11`
+    and `0x11/0x12`, with product-139 receiver `0x92`; query only through a bounded read-only probe,
+    never invent or expose license IDs or send set-enable before a genuine baseline exists.
 
 ## Privacy and redaction
 

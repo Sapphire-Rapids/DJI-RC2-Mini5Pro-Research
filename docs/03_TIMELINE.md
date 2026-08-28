@@ -275,3 +275,59 @@ work when a report did not contain a more precise timestamp.
   other mutation was sent.
 - `NEGATIVE` only for route usability: raw USB `0x82 -> 0x92` timed out for both the candidate and a
   known height control. This leaves the RC 2 `protocol` Binder modern route unresolved.
+
+### 2026-08-28 follow-up — installed A-023 Binder F7 result
+
+- `OBSERVED`: exact A-023 `0.3.0-research` was installed and opened on RC 2. Its process label was
+  resolved through the intended compatibility path; the live Binder was alive and reported
+  descriptor `com.dji.protocol.IProtocolManager`.
+- `OBSERVED`: manager transaction 1 and callback transaction 4 both returned through their Binder
+  exception layers. The fixed target command was `03/F7` for hash `0x3CBD864F`.
+- `OBSERVED`: after approximately 3.1 seconds the callback returned failure `ECode 1`; no F7 ACK
+  payload, F8, F9, reset, or other mutation followed.
+- `STATIC`: adjacent RC331 `ActQueue` emits `ECode 1` after the queued request exhausts retries.
+- Boundary: A-023 did not run a same-Binder-route known-parameter positive control. The result proves
+  Binder lookup and callback delivery, not healthy target routing, parameter absence, unsupported
+  RID, or any RF state.
+
+### 2026-08-28 to 2026-08-29 — A-024 positive-control and passive-timeline replacement
+
+- `STATIC`: A-024 `0.4.1-research` tries the validated legacy Binder route before modern routing and
+  requires a maximum-height F7/F8 positive control before it interprets the RID target reply.
+- `STATIC`: candidate writes are serialized and remain locked until exact F7 metadata, read/write
+  attribute, 0/1 range, and F8 Boolean baseline are all available. Write verification uses repeated
+  F8 samples and restores the pre-operation value after ambiguity.
+- `STATIC`: a local transaction-2 `0x11/0x1C` listener records the complete 30-second window as a
+  bounded state-change timeline. The app synchronously saves the result and intentionally exits so
+  Binder death removes the listener despite adjacent RC331's cross-process removal defect.
+- `STATIC`: 25 unit tests, lint with zero errors, two byte-identical clean builds, package/version,
+  no-permission, signature, zipalign, and no-native-library checks passed. Final artifact is 92,569
+  bytes with SHA-256 `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95`.
+- `OBSERVED`: A-024 was copied to RC 2 removable storage as `RID-Admin.apk`; only superseded
+  self-developed FindUAS APK copies were removed.
+- `OBSERVED`: with the aircraft linked and motors off, legacy Binder route `0A:05 -> 03:00` and
+  modern Binder route `02:04 -> 12:04` each sent the known maximum-height F7 positive control. Both
+  returned callback `ECode 1`, no data, after approximately 3.1 seconds.
+- `OBSERVED/STATIC`: the exact code stopped after both positive controls failed, so target hash
+  `0x3CBD864F`, F8, and F9 were not sent and the write buttons remained locked. This closes the two
+  exact third-party Binder parameter routes in that session, not the target parameter or an official
+  in-process owner path.
+- `OBSERVED`: the separate transaction-2 `0x11/0x1C` listener was accepted in 9 ms and ran the full
+  30,000 ms, but callback, valid-frame, malformed-frame, and state counts were all zero. The operator
+  started the motors during that window and an independent detector confirmed that the aircraft was
+  broadcasting RID. This makes the tested third-party Binder listener a false-negative path; it does
+  not negate the RF observation or close DJI Fly's own in-process observer.
+
+### 2026-08-29 — FlySafe type-6 control-semantics closure
+
+- `STATIC`: official MSDK 5.18 retained logic maps an enabled `RID_UNLOCK` whose level matches the
+  current EU/China area strategy to `broadcastRemoteIdEnabled=false` and `NO_BROADCAST` when the
+  product capability gate is true. US has no type-6 level and its delegate disables this gate.
+- `STATIC`: that consumer branch only mutates the SDK status object; it contains no Key write,
+  native call, or additional DUML request. Any physical RF suppression must therefore be consumed
+  inside the aircraft after the FC's genuine signed-license enabled state changes.
+- `STATIC`: current native inventory/set-enable endpoints are `0x11/0x11` and `0x11/0x12`; product
+  139 resolves to receiver `0x92`. V3/V4 group and record protobuf layouts are now strict-parser
+  inputs. No current genuine type-6 ID, enabled baseline, mutation, restore, or RF effect exists.
+- Implementation direction changed to a bounded, privacy-reduced, read-only modern inventory query.
+  The next APK version must not implement or send `0x11/0x12` until inventory proves a genuine item.

@@ -426,3 +426,35 @@ stronger conclusion that cannot be drawn.
   parameter.
 - Does not establish: the official name of status `0x03`, absence behind the RC 2 `protocol` Binder
   route, absence in every firmware/product, or any RF behavior.
+
+## N-44 — third-party RC 2 Binder parameter routes
+
+- Status: `NEGATIVE` for two exact Binder parameter routes in the current session; underlying live
+  evidence is C-142/C-145 and adjacent error interpretation is C-143.
+- Preconditions: RC 2 `07.00.0100`, linked Mini 5 Pro, motors off, installed A-024
+  `0.4.1-research`; live service Binder alive with expected descriptor and Binder exception layers
+  completing.
+- Positive control: known maximum-height hash `0x0371238A`, expected parameter name
+  `g_config.flying_limit.max_height`, command `03/F7`.
+- Routes/results: legacy `0A:05 -> 03:00` returned callback `ECode 1` with no data after about
+  3.1 seconds; modern `02:04 -> 12:04` returned the same class and timing. Neither positive control
+  passed.
+- Gate result: the exact client stopped before target hash `0x3CBD864F`; no target F7, F8, F9,
+  reset, or other mutation was sent and the write controls remained locked.
+- Adjacent interpretation: RC331 `ActQueue` uses `ECode 1` after request retry exhaustion.
+- Does not establish: target parameter absence, a relation to motors-off state, global failure of
+  every Binder command, exact v07 `ActQueue` byte identity, or failure of an official DJI in-process
+  owner/authenticated route. Do not repeat these two generic parameter routes without a materially
+  new owner/routing fact.
+
+## N-45 — third-party Binder `0x11/0x1C` as RID truth
+
+- Status: `NEGATIVE` for this exact listener as a readback/RF oracle; the live evidence is C-146.
+- Preconditions: installed A-024, linked RC 2 and Mini 5 Pro, transaction-2 listener accepted in
+  9 ms, full 30,000 ms window, operator-started motors, and an independent detector available.
+- Result: the listener received zero callbacks and zero valid or malformed frames, while the
+  independent detector confirmed real aircraft RID broadcast in the same experiment.
+- Consequence: do not repeat this protocol-Binder listener or use its zero count as off,
+  unsupported, no-RID, or no-RF evidence. It cannot validate a future switch transition.
+- Does not establish: that DJI Fly's in-process official observer is silent, that the FC never emits
+  `0x11/0x1C`, or that other health/HMS channels cannot report RID state.

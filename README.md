@@ -3,7 +3,7 @@
 [![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-28 的实机观察、
+这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-29 的实机观察、
 固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题。
 
 档案中的产品名称只用于说明研究对象。项目与 DJI 无隶属、授权或背书关系。
@@ -43,13 +43,18 @@
   和 F9 framing，其参数与功能不同。
 - Product-139 的 France EID 静态路径已闭合到 `0x03/0x77`，但它是法国专用 EID，不是
   global RID。两个固定人工 USB GET 路由均未获得 canonical ACK；DJI Fly 私有 owner 路径未实测。
-- FlySafe type-6 `RID_UNLOCK` 是账号/FC 绑定的签名许可类别，具备 enable-state 语义；当前
-  Mini 5 Pro 是否有资格、是否存在真实许可、FC 是否接受及 RF 是否变化均为 `UNKNOWN`。
+- FlySafe type-6 `RID_UNLOCK` 是账号/FC 绑定的签名许可类别。官方 MSDK 5.18 保留实现会在
+  产品 gate 为真、license 已 enabled 且 EU/China level 匹配当前 area strategy 时，把状态直接
+  置为 `broadcastRemoteIdEnabled=false` / `NO_BROADCAST`。current native inventory/set-enable
+  wire 已闭合为 `0x11/0x11` / `0x11/0x12`，product-139 receiver 为 `0x92`。这证明了设计语义，
+  但 Mini 5 Pro 是否有资格、是否存在真实许可、当前 runtime 是否执行该分支及 RF 是否变化仍为
+  `UNKNOWN`。
 - DJI Fly `1.21.10` 的中国 OID `setReportEnable` 已闭合为 App/RC 网络上报 gate：关闭时跳过
   云提交并 direct-success，但不写飞机 BLE/Wi-Fi 广播。当前 exact setter 复查仍只找到 France
   EID wrapper，没有 product-139 ODID/OpenDroneID/global RF setter。
-- 起桨前的受限观察窗没有收到严格 `0x11/0x1C` RID working-status；已知现场观察表明该机型
-  起桨后才开始实际 RID 播报。缺少同步 onboard status + 独立接收器 RF 记录。
+- A-024 的 30 秒 `0x11/0x1C` Binder listener 已实测：framework 接受监听，但在操作者起桨且
+  独立检测设备确认真实 RID RF 的同一实验中仍为零 callback。因此该第三方 Binder listener 是
+  假阴性路径，不再作为 readback oracle，也不再重复；它不否定 DJI Fly 自身 observer。
 - DJI Fly `1.21.10` 的 product-139 主 abstraction 确实挂载 `RidImportModule`；它把
   `0x11/0x1C` 注册成只监听的七字节 RID/EID 状态，没有 GET、SET 或 action。独立的
   `0x00/0xDD` cloud-control key 只有 SET，ACK 只确认请求并缓存原值，不是 applied-state readback。
@@ -60,14 +65,23 @@
 - RC 2 标准 ADB 在 RSA 认证前停止：主机 `CNXN` 已发出，设备不返回 ADB 包。相邻 unstripped
   `adbd` 含 production `CNXN` drop gate，可解释现象但不等同于精确 live v07 二进制证明。
 - 当前 Android admission probe v0.10 通过离线工件审计，但尚未复制、安装或运行于 RC 2。
-- 固定 clean-room 管理客户端 `0.3.0-research` 已完成 `RIDCtrlEnable` F7/F8/F9、baseline、
-  readback 和 restore 流程，最终 APK SHA-256 为
-  `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59`，并已复制到 RC 2
-  removable storage；安装、运行和 live reply 尚未记录。
+- 固定 clean-room 管理客户端 `0.3.0-research` 已安装并执行：live `protocol` Binder lookup、
+  manager transaction 和 callback exception layer 均成功，但 target F7 在约 3.1 秒后以
+  `ECode 1` 结束，没有 F7 ACK，也没有发送 F9。相邻 RC331 `ActQueue` 将该错误映射为重试耗尽；
+  因该版本没有同路由已知参数正对照，这不是 parameter-absence 结论。
+- 替代客户端 `0.4.1-research`（SHA-256
+  `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95`）先要求每条 Binder
+  route 的 maximum-height F7/F8 正对照，再解释 target；它还增加完整 30 秒只读
+  `0x11/0x1C` 状态时间线。25 项测试、lint 0 errors、两次逐字节相同构建及 APK 审计通过，
+  已安装运行。legacy `0A:05 -> 03:00` 与 modern `02:04 -> 12:04` 正对照均以 `ECode 1`
+  timeout，故 target F7/F8/F9 未发送；passive timeline 后续已由独立 RF 对照判为假阴性。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
-  连 height control 也 timeout，因此现在只剩 staged APK 的 `protocol` Binder
-  `0x82 -> 0x92` 结果；未发送 F9。
+  连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
+  A-024 又证明两条 Binder route 连 height 正对照都失败，因此 current generic-parameter
+  attach 路线已关闭；target 从未发送，未发送 F9。下一主线是通过 system Binder 只读查询现代
+  FlySafe type-6 inventory，并追其 enable state 到 `NO_BROADCAST`/真实 RF 的因果链；并行继续
+  WA150 `0802` broadcaster/policy owner。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
 - NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 authenticated Base64 envelope、

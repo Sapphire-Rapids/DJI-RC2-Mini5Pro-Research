@@ -377,4 +377,66 @@ probe and kept F9/FA unreachable. RC 2 routed and aircraft-direct legacy endpoin
 one-byte F7 status `03`; immediately adjacent known height/distance controls returned valid F7/F8.
 The static modern `0x82 -> 0x92` tuple was then tested directly on USB, but a known maximum-height
 control also timed out. This separated a real direct-route parameter retrieval failure from an
-unusable raw-USB modern route and reduced the remaining live test to the RC 2 Binder client.
+unusable raw-USB modern route and, at that stage, reduced the remaining live test to the RC 2
+Binder client. Section 23 records the later Binder result.
+
+## 23. Live Binder result and positive-control/passive-timeline revision
+
+The exact A-023 client was installed and its fixed read-only RID target probe was run. The result
+was transcribed without publishing PID, UID, device identity, or raw packet content. The intended
+process-label compatibility path resolved a live `com.dji.protocol.IProtocolManager` Binder;
+manager transaction 1, callback transaction 4, and both exception layers completed. The target
+`03/F7` for hash `0x3CBD864F` then ended with callback `ECode 1` after about 3.1 seconds and produced
+no F7 ACK. No F8, F9, reset, or other mutation followed.
+
+Adjacent RC331 `ActQueue` was checked to interpret only the callback class: that implementation
+emits `ECode 1` after retries are exhausted. Because A-023 did not first exercise a known parameter
+over the same Binder route, the observation was recorded as a transport/protocol timeout rather
+than parameter absence.
+
+A-024 `0.4.1-research` was then built as the replacement. It serializes operations and probes known
+maximum height with F7/F8 on each candidate route before sending the target F7. Target F9 remains
+locked until exact metadata identity, read/write attribute, width, range, and a Boolean F8 baseline
+are all established. Any admitted write uses repeated readback and a captured pre-operation value
+for rollback/restore.
+
+Separately, the exact adjacent Binder listener ABI was implemented for a local-only transaction-2
+filter on `0x11/0x1C`. One process-lifetime listener records the full 30-second window, folds only
+adjacent identical semantic states on the same actual route, preserves A-B-A transitions and
+malformed/failure events, synchronously persists a bounded result, and then terminates the APK
+process so Binder death performs deterministic cleanup. This workaround follows the adjacent
+RC331 removal implementation, which compares cross-process wrapper identity and may acknowledge a
+transaction-5 removal without deleting the listener.
+
+Twenty-five unit tests, lint with zero errors, two byte-identical clean builds, manifest,
+permission, signer, alignment, and native-library checks passed. The final 92,569-byte artifact
+with SHA-256 `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95`
+was copied to RC 2 removable storage. Installation and the dual-route known-height positive-control
+experiment subsequently completed: both routes returned `ECode 1`, so target requests stayed gated
+off. The listener then completed its full 30-second window after a 9 ms registration acceptance but
+received no callback. The operator started the motors and an independent detector confirmed actual
+RID RF in the same experiment. The tested Binder listener was therefore classified as a false
+negative and removed from the active readback plan; the RF observation was not reinterpreted through
+the empty callback set. No device write occurred.
+
+## 24. FlySafe type-6 control-semantics and modern inventory path
+
+The official MSDK 5.18 retained consumer was followed from `LicenseDataRID.level` through
+`FlySafeHelper` and `FlyZoneManager` into `DefaultUASDelegate`. The retained body requires type 6,
+enabled state, and level/area match; when the product gate is true it emits
+`broadcastRemoteIdEnabled=false` and `NO_BROADCAST`. The same branch contains no Key write, native
+call, or DUML send, so it was recorded as app-side design/status evidence rather than physical RF
+control. If physical suppression exists, the aircraft must consume the signed license state changed
+by FlySafe `SetEnable`.
+
+Current DJI Fly and MSDK native implementations were then cross-compared: inventory and set-enable
+are `0x11/0x11` and `0x11/0x12`; product 139 resolves to receiver `0x92`; V3/V4 begin with `[00,01]`
+and return group/status-plus-protobuf records. A strict offline parser distinguishes domain type 6
+from protobuf oneof field 7, caps page/count/field/length/varint behavior, and does not expose raw
+IDs or identity fields.
+
+The next executable was scoped to a single read-only modern inventory function through the already
+used system Binder. It allows `0x11/0x11` only, starts with the V3/V4 group query, bounds page
+selection below wrap, and reports only aggregate type-6 level/enabled/valid state. `0x11/0x12` is
+not implemented in this stage. Only a canonical genuine type-6 result can admit the later
+baseline-transition-readback-restore experiment and motor-on independent RF A-B-A.

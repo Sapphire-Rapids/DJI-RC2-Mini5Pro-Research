@@ -25,7 +25,7 @@ older “install v0.8” or “V2.3 in progress” instruction into a current pr
 
 ## Topic entry points
 
-### Immediate path: independent `RIDCtrlEnable`
+### Closed generic-attach path: independent `RIDCtrlEnable`
 
 Read RID-002C in [05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md), H-27 in
 [10_HYPOTHESES_AND_UNKNOWNS.md](10_HYPOTHESES_AND_UNKNOWNS.md), and B-20 in
@@ -39,14 +39,20 @@ Current exact anchors:
 - parameter hash: `0x3CBD864F`, wire LE `4F 86 BD 3C`;
 - commands: FLYC `03/F7` metadata, `03/F8` read, `03/F9` write;
 - static modern default route: sender type/index `2/4` (`0x82`) to receiver `18/4` (`0x92`);
-- A-023 `0.3.0-research` implements this fixed route over RC 2's `protocol` Binder service and has
-  been copied to removable storage.
+- A-023 reached the Binder callback path but target F7 ended in `ECode 1` without a same-route
+  positive control.
+- A-024 `0.4.1-research` was installed and tested known maximum height on legacy
+  `0A:05 -> 03:00` and modern `02:04 -> 12:04` Binder routes. Both returned `ECode 1` with no data
+  after about 3.1 seconds, so exact code did not send target F7/F8/F9.
 
-Next action is one tap on **探测并读取 RIDCtrlEnable（只读）**, followed by **复制当前结果**.
-Interpret the full Binder/ACK diagnostic before changing code. If F7 metadata and F8 baseline both
-succeed, use the existing opposite-state and restore buttons for one A/B/A loop; do not replace this
-with another generalized admission probe. If F7 returns a one-byte nonzero status, record a bounded
-Mini 5 Pro negative for this exact hash/route and move to passive status/firmware ownership.
+Do not repeat the generic F7 attach route or change only sender/receiver tuples. Reopen this exact
+parameter only after finding a materially different official in-process owner/authenticated route
+or a verified WA150 handler. The immediate action is now the A-024 passive timeline:
+
+1. one motors-off 30-second `0x11/0x1C` window;
+2. one 30-second window with operator-started motors and a stop before window end;
+3. correlate only privacy-reduced status/route/timing, then move to RID diagnostics, genuine type-6
+   inventory, and WA150 `0802/E3` ownership.
 
 ### RID working status
 
@@ -150,10 +156,19 @@ Static mappings:
 - query `PackType 0x38 -> 0x11/0x11`;
 - set-enable `PackType 0x39 -> 0x11/0x12`;
 - V2 one-byte index query; V3/V4 group/status-protobuf flow;
-- type 6 `RID_UNLOCK`, levels 1 EU and 2 China.
+- product-139 final receiver `0x92` for V2/V3/V4;
+- type 6 `RID_UNLOCK`, levels 1 EU and 2 China;
+- retained official consumer design maps enabled + region-matched + product-supported type 6 to
+  `broadcastRemoteIdEnabled=false` / `NO_BROADCAST`, but that branch only changes the SDK status
+  object and does not itself send an aircraft command.
 
-Missing: live support/version, exact route, genuine account item, same-item baseline/restore, and RF.
-Never create or publish license material.
+Immediate implementation target: one bounded, read-only modern V3/V4 query through the existing
+system `protocol` Binder, route `2/4 -> 18/4`, command `0x11/0x11`, starting with `[00,01]`. It must
+not implement/send `0x11/0x12`, must cap pages below selector wrap, and must output only aggregate
+type-6 level/enabled/valid state. A transport failure is “query unavailable,” not “empty inventory.”
+
+Missing: live support/version, canonical Binder response, genuine account item, aircraft-side
+consumer, same-item baseline/restore, and RF. Never create or publish license material.
 
 ### Region and RF policy
 
