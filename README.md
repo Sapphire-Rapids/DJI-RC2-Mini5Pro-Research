@@ -105,16 +105,20 @@
   `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`；63 tests、两次
   byte-identical clean build、lint 0 errors/13 warnings、v2/zipalign、零权限及无
   native/network/socket/shell path 通过。它已 staged 为 `FindUAS_A026_GATE.apk` 并跨 MTP 会话确认
-  readback hash/唯一短名/size；用户随后明确报告安装完成，但启动、执行、passive gate、query 与结果
-  仍未知。external Binder route/window 仍只是 token 代理；
+  readback hash/唯一短名/size；用户随后明确报告安装并按既定流程运行。60,003 ms 窗口内
+  `03/09` 与 `03/42` 均 `seen=0/usable=0`，所有 callback 分类计数均为 0，gate 为
+  `GATE_UNOBSERVED`，所以 fail-closed 路径正确保持 `11/11 request count=0`（C-165）。这只说明
+  本次 third-party Binder passive listener 没形成观察面，不表示飞机 unsupported、无 entitlement、
+  empty inventory、RID off 或无 RF。external Binder route/window 仍只是 token 代理；
   external Developer Assistant 也不受内部 allow-list，且 APK 保留 gated F9/EID/OPID writes，因此是
   Admin 而非全局 read-only。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
   A-024 又证明两条 Binder route 连 height 正对照都失败，因此 current generic-parameter
-  attach 路线已关闭；target 从未发送，未发送 F9。下一主线是首次运行 exact A-026，先读 passive
-  gate，只有 permit 才做一次 system-Binder modern FlySafe type-6 inventory；同时由所有者在 official FlySafe 只确认 RID
+  attach 路线已关闭；target 从未发送，未发送 F9。Exact A-026 的首次 passive gate 运行也已闭合为
+  `GATE_UNOBSERVED`/zero-query，不能重复解释为设备能力阴性。下一主线是寻找 materially different
+  official in-process/current-state owner 或安全 replay/trigger；同时由所有者在 official FlySafe 只确认 RID
   card 与 Mini 5 Pro RID product selector 两个 yes/no。只有 canonical genuine type 6 才继续追
   enable state 到 `NO_BROADCAST`/真实 RF；并行继续 WA150 `0802` broadcaster/policy owner。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception

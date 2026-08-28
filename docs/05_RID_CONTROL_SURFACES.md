@@ -531,10 +531,11 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   又已出现独立 RF 对照下的假阴性。故未来即使观察到两个 push，同 sender + 同 bounded window 也只是一
   个 session proxy；若没观察到，结论仍是 observer unavailable，而不是设备不支持。
 
-### RID-008F：A-026 已离线实现 gate-aware query，但尚无实机运行结果
+### RID-008F：A-026 首次实机 gate 为 unobserved，query 保持零发送
 
 - **证据状态：** 设计理由为 `INFERENCE`（C-159）；实现和 final artifact audit 为 `STATIC`
-  （C-160/C-161）；MTP 交付和用户报告安装为 `OBSERVED`（C-162/C-164）。
+  （C-160/C-161）；MTP 交付和用户报告安装为 `OBSERVED`（C-162/C-164）；首次 bounded gate
+  运行是窄范围 `NEGATIVE`（C-165）。
 - **对象/版本：** self-developed A-026，versionCode 9、versionName
   `0.6.0-flysafe-gated`。
 - **passive gate：** 同一 transaction-2 listener 同时接收 `03/09` version 与 `03/42` support。只有
@@ -559,11 +560,16 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   library 及无 inspected network/socket/shell path 全部通过。
 - **设备状态：** 已通过 MTP 写入 removable SD `Download` 为 `FindUAS_A026_GATE.apk`；同会话
   readback SHA 一致，重新建立 MTP 会话后确认只有一个该短名且 size 为 `135,525` bytes。没有记录
-  object/storage/USB/device serial。用户随后明确报告 A-026 安装完成（C-164），但没有确认启动、执行、
-  passive gate、permit、query 或任何结果。
-- **边界：** 若 A-026 未看到 push，仍只能报告 third-party observer unavailable；full-route proxy 不等于
-  DJI internal device token。即便 canonical inventory 成功，也只闭合返回清单，不闭合 official product
-  eligibility、aircraft-side consumer 或 RF effect。
+  object/storage/USB/device serial。用户随后明确报告 A-026 安装完成（C-164）并按既定 gate flow 运行。
+- **live result：** 60,003 ms 完整窗口结束时为 `GATE_UNOBSERVED`；`03/09` 为
+  `seen=0/usable=0/version=UNOBSERVED`，`03/42` 为
+  `seen=0/usable=0/supported=UNOBSERVED`，valid/ignored/malformed/failure callback 均为 0。
+  因 gate 未准入，`11/11 request count=0`；这也直接验证了本次 fail-closed 行为（C-165）。
+- **边界：** 本次只证明 third-party Binder passive listener 未形成观察面；不能写成 aircraft
+  unsupported、no entitlement、empty inventory、RID off/no RF，也不能否定 official in-process
+  observer。full-route proxy 不等于 DJI internal device token。没有 query/write、motor action、独立 RF
+  对照、raw frame、identifier 或 license material。即便未来 canonical inventory 成功，也只闭合返回清单，
+  不闭合 official product eligibility、aircraft-side consumer 或 RF effect。
 
 ### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
 

@@ -20,7 +20,8 @@ Dynamic bundle separation adds C-133 through C-135. The independent same-family 
 chain, Mini 5 Pro admission experiment, full current inventory, and public-prior-art boundary add
 C-136 through C-140. A-025's bounded modern FlySafe inventory lane and final-artifact audit add
 C-150/C-151; the exact current-Fly field-7 and aircraft-consumer boundaries add C-152/C-153;
-A-026's gated implementation/audit/delivery add C-160--C-162; user-reported installation adds C-164.
+A-026's gated implementation/audit/delivery add C-160--C-162; user-reported installation adds C-164,
+and its first live gate-unobserved/zero-query result adds C-165.
 
 ## 2. Implementation levels
 
@@ -97,7 +98,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 
 | Surface | Facts | Current disposition |
 | --- | --- | --- |
-| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; passive `03/09` version + `03/42` support gates; A-026 implements/audits the fail-closed gate; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; A-025 is user-reported installed but unexecuted; A-026 is audited/staged/user-reported installed but not confirmed run; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
+| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; passive `03/09` version + `03/42` support gates; A-026 implements/audits the fail-closed gate and its first live window ended gate-unobserved/zero-query; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; A-025 is user-reported installed but unexecuted; A-026's first live result closes only its third-party passive observation window, not support/entitlement/inventory/RID/RF; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
@@ -118,9 +119,10 @@ The official manager first derives version from passive `03/09` and support from
 A-025 skips this gate and assumes V3/V4, so failure/noncanonical completion is not unsupported or
 empty inventory. Exact A-026 classifies both on a complete-route proxy and sends no inventory request
 unless support=true plus version 1/2 are usable. Its final artifact/audit and staged readback are
-closed (C-160--C-162), and user-reported installation is C-164, but execution/live result are not;
-external Binder cannot see DJI's device
-token, so missing pushes remain unknown. Developer Assistant and retained gated F9/EID/OPID writes
+closed (C-160--C-162), and user-reported installation is C-164. Its first 60,003 ms run observed
+neither gate nor any callback class; it correctly issued zero `11/11` requests (C-165). External
+Binder cannot see DJI's device token, so missing pushes remain unknown rather than unsupported,
+no-entitlement, empty inventory, or RID-off. Developer Assistant and retained gated F9/EID/OPID writes
 remain outside the claim that the new FlySafe lane is read-only.
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing
@@ -171,10 +173,11 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
-2. Run exact audited and user-reported-installed A-026's bounded passive `03/09 + 03/42` admission
-   phase; in parallel, the owner checks only the official RID-card and Mini 5 Pro RID-selector
-   visibility booleans.
-3. Only when support=true and version is V3/V4, run one bounded read-only modern FlySafe inventory
+2. Treat exact A-026's completed first `GATE_UNOBSERVED`/zero-query run as a third-party observer
+   negative; do not repeat it unchanged. Recover a materially different official in-process/current-
+   state owner or safe replay/trigger; in parallel, the owner checks only the official RID-card and
+   Mini 5 Pro RID-selector visibility booleans.
+3. Only when support=true and version is V3/V4 through an admitted current-state path, run one bounded read-only modern FlySafe inventory
    query through the existing system Binder; report only type-6 count/level/enabled/valid and
    preserve unavailable versus empty.
 4. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,

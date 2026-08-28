@@ -491,5 +491,23 @@ stronger conclusion that cannot be drawn.
   usable support=true plus version 1/2 are observed (C-160/C-161). Because external Binder lacks
   DJI's device token and `11/1C` previously delivered a false negative, absent gate pushes remain
   observer-unavailable, not device-unsupported. A-026 is staged with verified readback/unique short
-  name (C-162), and the operator reported installation complete (C-164); execution, passive
-  callbacks, permit, and query result remain unconfirmed.
+  name (C-162), and the operator reported installation complete (C-164). Its first instructed
+  60,003 ms run then observed neither gate push nor any callback class; fail-closed admission issued
+  zero `11/11` requests (C-165).
+
+## N-48 — A-026 third-party passive FlySafe gate was unobserved in its first live run
+
+- Status: `NEGATIVE` for exact A-026 `0.6.0-flysafe-gated` on the recorded RC 2 firmware; machine
+  claim C-165.
+- Preconditions/route: the installed audited artifact was run following the instructed bounded gate
+  flow. Its system-Binder transaction-2 listener remained open for the complete 60,003 ms window;
+  no inventory write or active gate request was part of the design.
+- Result: `GATE_UNOBSERVED`; `03/09` and `03/42` each had `seen=0` and `usable=0`, their values remained
+  `UNOBSERVED`, and valid/ignored/malformed/failure-callback counts were all zero. Because admission
+  failed closed, no permit existed and `11/11 request count=0`.
+- What it closes: this exact third-party passive listener did not form a usable observation surface
+  in that run. Repeating the same window without a materially new official owner, safe replay/trigger,
+  or route fact is low information.
+- What it does not close: aircraft RID support, genuine type-6 entitlement, inventory contents,
+  enabled state, motor-gated Broadcast RID RF, or the official in-process observer. No write, motor
+  action, independent RF receiver observation, raw frame, identifier, or license material occurred.

@@ -57,12 +57,13 @@ A-025 remains the fixed V3/V4 baseline but the user has now reported its install
 launch, execution, and result remain unknown (C-150/C-151/C-154/C-163). Do not run it merely to
 produce another ambiguous negative because it lacks the current-connection support/version gate.
 
-A-026 `0.6.0-flysafe-gated` / code 9 is the current exact candidate (C-160--C-162, C-164). Its `135,525`-byte
+A-026 `0.6.0-flysafe-gated` / code 9 is the current exact candidate (C-160--C-165). Its `135,525`-byte
 APK SHA-256 is `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`.
 It is staged as removable-SD `Download/FindUAS_A026_GATE.apk`; same-session readback SHA matched and
 a new MTP session confirmed one unique short name with the registered size. The operator subsequently
-reported installation complete; launch, execution, passive callbacks, permit, query, and result are
-not user-confirmed.
+reported installation complete and ran the instructed bounded gate flow. The 60,003 ms window ended
+`GATE_UNOBSERVED`: both gate inputs and every callback-class count were zero, so no permit was issued
+and `11/11 request count=0` (C-165).
 
 A-026 uses one tx2 listener for `03/09 + 03/42`, requires complete actual-route equality, and signs no
 same-process permit on malformed/failure/conflict/deadline/cancel. Only support=true plus V3/V4
@@ -75,10 +76,12 @@ zipalign, zero `uses-permission`, and no native/network/socket/shell path passed
 Admin APK: external Developer Assistant is outside the internal allow-list, and gated F9/EID/OPID
 writes remain. Never call the whole APK read-only.
 
-The next bounded action is the first user-run passive gate step. Treat an
-absent/malformed gate as observer unavailable, not unsupported. External Binder cannot see DJI's
-device token; full-route/window equality is only a proxy. Only if A-026 displays the admitted
-V3/V4 result should the same process run its one bounded query.
+That first passive gate step is now complete and negative only for this third-party observation
+surface. Treat the absent gate as observer unavailable, not unsupported/no-entitlement/no-RID.
+External Binder cannot see DJI's device token; full-route/window equality is only a proxy. Do not
+repeat the identical passive window without a materially new official in-process/current-state owner,
+safe replay/trigger, or route fact. Only an admitted V3/V4-equivalent state may lead to one bounded
+query.
 Only a canonical count-consistent result containing a genuine type-6 record may advance to a
 separately reviewed same-ID baseline/readback/restore design; RF truth still requires
 operator-initiated motors and the independent detector.
@@ -212,14 +215,15 @@ field 7, or enabled state to WA150 `0802`, motor/armed state, or BLE/Wi-Fi enabl
 `0x92` is not firmware-module identity.
 
 A-025 is user-reported installed but has no execution/result. Exact A-026 implements and audits the
-passive `03/09 + 03/42` gate, is staged, and is user-reported installed, but has no confirmed run or
-result. Defaults
-`255/false` and missed pushes remain unknown. A-026 sends the fixed query only after its same-process
-V3/V4 permit; it still cannot turn observer absence into unsupported state.
+passive `03/09 + 03/42` gate, was staged/installed, and completed one 60,003 ms live run with
+`GATE_UNOBSERVED` and zero `11/11` requests (C-165). Defaults `255/false` and missed pushes remain
+unknown. A-026 sends the fixed query only after its same-process V3/V4 permit; this run therefore
+cannot turn observer absence into unsupported state.
 
-Missing: the two owner-visible official eligibility booleans, live passive support/version, canonical
-Binder response, genuine account item, FC import, aircraft-side consumer, same-item baseline/restore,
-and RF. If separate approved instrumentation obtains raw unknown field-7 bytes, keep them only in
+Missing: the two owner-visible official eligibility booleans, a materially different official-owner
+support/version surface or safe replay/trigger, canonical Binder response, genuine account item, FC
+import, aircraft-side consumer, same-item baseline/restore, and RF. If separate approved
+instrumentation obtains raw unknown field-7 bytes, keep them only in
 excluded private evidence; never create, transfer, or publish license material.
 
 ### Region and RF policy

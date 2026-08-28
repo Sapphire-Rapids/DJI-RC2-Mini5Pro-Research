@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.6 - 2026-08-29
+
+### Added
+
+- Added C-165 from the first live A-026 gate run. The instructed 60,003 ms window ended
+  `GATE_UNOBSERVED`: `03/09` and `03/42` were both unseen/unusable, every reported callback-class
+  count was zero, and fail-closed admission kept `11/11` request count at zero.
+- Updated A-026 device-use state to `installed-and-run-gate-unobserved-zero-query` and propagated the
+  result through the evidence/artifact registers, timeline, RID surfaces, negative results,
+  hypotheses, blockers, handoff, control matrix, README, and agent handoff rules.
+
+### Provenance
+
+- This is a narrow third-party Binder passive-listener negative. It is not evidence that the
+  aircraft lacks RID support, a type-6 entitlement is absent, inventory is empty, RID/RF was off,
+  or the official in-process observer cannot receive the pushes. No raw frame, identifier, license
+  material, write, motor action, or independent RF observation is recorded.
+
 ## 0.3.5 - 2026-08-29
 
 ### Added

@@ -300,7 +300,7 @@ Every hypothesis below is testable and remains separate from factual findings.
   It remains open only for a materially different official in-process owner/authenticated route or
   a verified WA150 handler; RF effect has never been tested.
 
-## H-28 — third-party Binder can observe both FlySafe admission pushes（C-157--C-162, C-164）
+## H-28 — third-party Binder can observe both FlySafe admission pushes（C-157--C-165）
 
 - Known facts: the exact official lifecycle passively derives unlock version from current-token
   `03/09` and support from `03/42`; cache defaults are ambiguous and no active trigger or replay was
@@ -309,14 +309,15 @@ Every hypothesis below is testable and remains separate from factual findings.
 - Hypothesis: one bounded third-party Binder listener window can receive usable copies of both
   pushes on one complete actual route proxy while the official owner remains connected, allowing
   A-026 to distinguish V3/V4-ready from unobserved/unusable/unsupported/unknown/V2.
-- Distinguishing evidence: after user-confirmed installation, one passive window reporting only
-  seen/usable/version/support/result-class and no raw payload or identity. If both gates are usable,
-  the same process may consume the permit for one bounded canonical `11/11` completion.
+- Distinguishing evidence: after user-confirmed installation, the first passive window reported only
+  seen/usable/version/support/result-class and no raw payload or identity. Neither gate nor any
+  callback class was observed; the gate stayed `GATE_UNOBSERVED` and no `11/11` was sent (C-165).
 - False-negative rule: no callback, one missing push, malformed payload, conflicting values, or
   sender change means observer unavailable/invalidated, not FC unsupported. External Binder cannot
   see DJI's device token, and the earlier `11/1C` listener already proved that listener acceptance
   does not guarantee delivery.
-- Current state: `STATIC` implementation/artifact plus `OBSERVED` staged delivery and user-reported
-  installation exist for exact A-026 `0.6.0-flysafe-gated` (C-160--C-162, C-164). Execution,
-  passive callbacks, permit, inventory query, and result remain `UNKNOWN`; therefore the hypothesis
-  itself is not confirmed.
+- Current state: the exact A-026 implementation/artifact, staged delivery, installation, and first
+  live run are recorded (C-160--C-165). The first run is negative for this third-party passive
+  observation surface, not a device-capability result. H-28 remains unconfirmed outside that window,
+  but another identical passive run is not the next discriminator; a materially different official
+  in-process/current-state owner or safe replay/trigger is required.

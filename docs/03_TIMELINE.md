@@ -424,6 +424,19 @@ work when a report did not contain a more precise timestamp.
   `FindUAS_A026_GATE.apk`; same-session readback SHA matched, and a new MTP session confirmed one
   unique short-name entry with the registered size. No object/storage/USB/device serial is retained.
 - `OBSERVED`: the operator subsequently reported that A-026 installation completed (C-164).
-- Boundary: this user report establishes installation only. Launch, execution, passive gate, permit,
-  Binder query/result, inventory, license, state, and RF remain `UNKNOWN`; no package-manager
-  telemetry or private device identifier is retained.
+- Boundary at that checkpoint: the user report established installation only; no package-manager
+  telemetry or private device identifier was retained.
+
+### 2026-08-29 — first A-026 live gate run
+
+- `NEGATIVE`: after installation, the operator ran exact A-026 following the instructed bounded gate
+  flow. The listener window completed at 60,003 ms with `GATE_UNOBSERVED` (C-165).
+- `OBSERVED` values within that negative: `03/09` Area Info was `seen=0`, `usable=0`,
+  `version=UNOBSERVED`; `03/42` WhiteList Info was `seen=0`, `usable=0`,
+  `supported=UNOBSERVED`. Valid, ignored, malformed, and failure-callback counts were each zero.
+- Fail-closed behavior held: no permit was issued and `11/11 request count=0`. No inventory query,
+  write, motor action, independent RF observation, raw frame, identifier, or license material formed
+  part of the run.
+- Boundary: this run establishes only that the third-party system-Binder passive listener did not
+  form an observation surface in that window. It does not establish aircraft non-support, absent
+  type-6 entitlement, empty inventory, RID off/no RF, or absence of the official in-process observer.

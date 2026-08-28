@@ -185,10 +185,12 @@ Later retractions override earlier progress summaries.
 31. Current official FlySafe derives unlock version from passive current-token `03/09` Area Info and
     support from `03/42` WhiteList Info. Defaults `255/false`, missed/late/unusable pushes, and no
     replay are unknown, not unsupported. A-025 skips this gate and assumes V3/V4, so failure or a
-    noncanonical completion is not an empty-inventory or no-entitlement result. Exact A-026 now
-    observes both in one bounded complete-route proxy window before admitting one `11/11`; its final
-    artifact is audited, staged, and user-reported installed, but launch/run/result remain unknown;
-    external Binder cannot see DJI's device token.
+    noncanonical completion is not an empty-inventory or no-entitlement result. Exact A-026 observes
+    both in one bounded complete-route proxy window before admitting one `11/11`; in its first live
+    60,003 ms run, neither push nor any callback class was observed, the gate remained
+    `GATE_UNOBSERVED`, and the fail-closed sender issued zero `11/11` requests (C-165). This closes
+    only that third-party passive-listener run, not aircraft support, entitlement, inventory, RID,
+    RF, or the official in-process observer; external Binder cannot see DJI's device token.
 32. Type-6 acquisition is the official FlySafe website background/product/device approval path,
     followed by DJI Fly's logged-in signed-group download, FC-SN/version/target-matched import,
     aircraft inventory, and existing-ID action. Normal Remote-ID registration and generic
@@ -200,10 +202,11 @@ Later retractions override earlier progress summaries.
     `11/11` only for support=true plus V3/V4. Two clean builds, 63 tests, lint 0 errors/13 warnings,
     v2 signature, zipalign, zero permissions, and no native/network/socket/shell path passed. It is
     staged as `FindUAS_A026_GATE.apk` with matching readback and new-session unique short-name/size
-    confirmation; the operator subsequently reported installation complete (C-164), but launch,
-    execution, passive callbacks, query, and result remain unknown. External Developer Assistant is
-    outside its sender allow-list, and retained gated F9/EID/OPID writes make it Admin rather than
-    globally read-only.
+    confirmation; the operator subsequently reported installation complete (C-164) and ran its
+    bounded gate flow (C-165). That run completed with both gate inputs unobserved, zero callbacks of
+    every reported class, and zero `11/11` requests. External Developer Assistant is outside its
+    sender allow-list, and retained gated F9/EID/OPID writes make it Admin rather than globally
+    read-only.
 
 ## Privacy and redaction
 

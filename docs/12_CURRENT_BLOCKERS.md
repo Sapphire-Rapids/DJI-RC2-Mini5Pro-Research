@@ -274,8 +274,11 @@ V3/V4 request. Thus a failure or noncanonical completion is a possible false neg
 no-license result (C-157/C-158). A-026 now implements the bounded passive gate and admits one fixed
 V3/V4 request only after usable support=true and version 1/2; its exact final artifact passed the
 recorded audit and was staged as unique `FindUAS_A026_GATE.apk` with matching readback SHA and size
-(C-159--C-162). The operator subsequently reported installation complete (C-164), but execution,
-passive visibility, permit, query, and result remain unknown.
+(C-159--C-162). The operator subsequently reported installation complete (C-164) and completed the
+first instructed 60,003 ms gate run. It ended `GATE_UNOBSERVED`, with both gate pushes and every
+callback class at zero; fail-closed admission therefore sent no `11/11` (C-165). This closes only
+that third-party passive observation window, not aircraft support, entitlement, inventory, RID/RF,
+or the official in-process observer.
 The external Developer Assistant remains outside its internal allow-list, and retained gated
 F9/EID/OPID controls make A-026 an Admin artifact rather than globally read-only.
 
@@ -288,8 +291,9 @@ BLE/Wi-Fi broadcaster (C-153). This does not close encrypted aircraft firmware.
 Missing:
 
 - a materially different official in-process owner/authenticated route or verified WA150 handler;
-- one first A-026 launch/passive gate window that distinguishes unobserved/unusable/unsupported/
-  version state before any inventory request;
+- a materially different official in-process/current-state owner or safe replay/trigger for the
+  FlySafe support/version state; the first A-026 passive window is already closed as unobserved and
+  should not be repeated unchanged;
 - one canonical, privacy-reduced genuine type-6 inventory baseline without retaining license material;
 - aircraft-side evidence that changing the genuine type-6 enabled state is consumed by the RID
   broadcaster rather than only reflected in an SDK status object;
@@ -305,9 +309,11 @@ status bits, and result class.
 Effect: known generic F7/F8 attach routes are closed for the current session. The third-party
 `0x11/0x1C` Binder listener is also closed as a false-negative oracle by independent RF evidence
 (C-146). Do not repeat either route family without a new owner fact. The shortest active dependency
-is now running the exact audited and user-reported-installed A-026 and first reading its passive gate
-result, while the owner independently checks only the two official website eligibility booleans. Only if A-026 issues
-a permit may the same process run its one bounded `11/11` query. Same-item enable-state
+is now recovering a materially different official in-process/current-state support/version owner or
+safe replay/trigger, while the owner independently checks only the two official website eligibility
+booleans. The first A-026 gate run already returned unobserved with zero query (C-165); do not turn
+it into a support or entitlement result. Only a future admitted same-session path may run one bounded
+`11/11` query. Same-item enable-state
 readback/restore and WA150 `0802` aircraft-side ownership follow only after a genuine canonical
 record.
 Static discovery of another setter is
@@ -318,8 +324,9 @@ insufficient without baseline, readback, restore, persistence, and RF observatio
 The evidence dependencies are:
 
 ```text
-exact A-026 first run
-  -> bounded passive 03/09 + 03/42 gate (or equivalent official-owner state)
+exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
+  -> materially different official-owner state or safe replay/trigger
+  -> bounded usable 03/09 + 03/42 equivalent state
   -> support=true + version V3/V4 in one connection proxy
   -> one bounded 11/11 inventory query via existing system Binder
   -> privacy-reduced genuine type-6 level/enabled/valid baseline

@@ -37,7 +37,7 @@
 | A-023 | FindUAS RC 2 RID Admin；self-developed；`0.3.0-research` | `64,745` | `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` | `OBSERVED`；已安装并执行一次只读 Binder F7 probe；无 F9；已由 A-024 取代且从 removable storage 清理；不进入本 documentation repo |
 | A-024 | FindUAS RC 2 RID Admin；self-developed；`0.4.1-research` | `92,569` | `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95` | `OBSERVED`；已安装并执行只读双路 positive-control 与 30 秒 listener；target 未发送、无 F9；listener 经独立 RF 对照判为假阴性；由下一 inventory 版本取代；不进入本 documentation repo |
 | A-025 | FindUAS RC 2 RID Admin；self-developed；`0.5.0-flysafe-readonly` / code 8 | `111,889` | `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80` | `OBSERVED`；exact final-artifact audit；MTP/readback 已闭合，用户随后明确报告安装完成；启动、执行与结果仍未知；由 A-026 取代；不进入本 documentation repo |
-| A-026 | FindUAS RC 2 RID Admin；self-developed；`0.6.0-flysafe-gated` / code 9 | `135,525` | `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4` | `OBSERVED`；exact final-artifact audit；MTP/readback/新会话唯一短名与 size 已闭合，用户随后明确报告安装完成；启动、执行与结果仍未知；current gate-aware FlySafe candidate；不进入本 documentation repo |
+| A-026 | FindUAS RC 2 RID Admin；self-developed；`0.6.0-flysafe-gated` / code 9 | `135,525` | `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4` | `OBSERVED`；exact final-artifact audit；`installed-and-run-gate-unobserved-zero-query`；首次 60,003 ms gate 窗口无任何 callback、无 permit、无 `11/11`；current gate-aware FlySafe candidate；不进入本 documentation repo |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -218,8 +218,13 @@ allow-list 约束；APK 也继续保留各自受原有门禁约束的 F9、Franc
 `FindUAS_A026_GATE.apk`。同一会话读回 SHA-256 与登记值一致；重新建立 MTP 会话后的目录清单又确认
 仅有一个该短名且 size 为 `135,525` bytes。此处不记录 object/storage/USB/device serial。该交付只证明
 staged-file identity/uniqueness（C-162）。用户随后明确报告“A-026 APK 安装完成”，因此安装记为
-`OBSERVED`（C-164）；这不证明启动、执行、passive callback、permit、Binder query/result、inventory、
-state 或 RF，以上仍为 `UNKNOWN`，且不记录 package-manager telemetry 或 private device identifier。
+`OBSERVED`（C-164）。其后按既定流程完成首次 60,003 ms gate run：`03/09`、`03/42` 和所有 callback
+分类计数均为 0，结果 `GATE_UNOBSERVED`，所以 fail-closed sender 的 `11/11 request count=0`
+（C-165）。artifact device-use state 因此为 `installed-and-run-gate-unobserved-zero-query`。这只证明
+本次 third-party passive listener 没形成观察面；不证明 aircraft unsupported、无 entitlement、empty
+inventory、RID off/no RF 或 official in-process observer 缺失。没有记录 package-manager telemetry、
+private device identifier、raw frame 或 license material；也没有 write、motor action 或 independent RF
+observation。
 
 ## 12. 更新与一致性检查
 
