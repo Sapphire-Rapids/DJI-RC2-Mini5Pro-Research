@@ -24,6 +24,13 @@ here does not imply that all of its claims were accepted.
   at `8186e19241c913318b140bf37c5eafba005f1e7c`.
   Used for area-code strategy, Airlink/FC synchronization, legacy key models, cloud-control writers,
   and generated mappings. It is prior/static source, not a live RC 2 binary identity.
+- [SKYROVER current official APK](https://s.uavflightserver.com/TnWJndtfwf0VvUVJxke/skyrover.apk),
+  version `1.2.0` / code `102001130`, APK SHA-256
+  `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8`.
+  Used only for independently written static facts about `RIDCtrlEnable`,
+  `rid_ctrl_enable_0`, dynamic capability probing, and F7/F8/F9 transport. The APK, native libraries,
+  DEX, and decompilation output are not redistributed, and same-family SDK support is not Mini 5 Pro
+  live support.
 - [DJI-Link](https://github.com/Kolya080808/DJI-Link/tree/13b357f405149674a33e3285780885728f52cafe)
   at `13b357f405149674a33e3285780885728f52cafe`.
   Used to corroborate DUML/hash-command families and RID-status command naming. Documentation/runtime

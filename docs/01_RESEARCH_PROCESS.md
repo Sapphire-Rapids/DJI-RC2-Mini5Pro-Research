@@ -326,6 +326,48 @@ was used locally; no vendor disassembly was copied into the repository.
 
 This pass corrected an earlier assumption that all 18 GET-request bytes were zero-initialized: only
 the `[01,02]` prefix is visibly written. It separately closed the result/value reply offsets and the
-conditional function ID `0x6C` admission of `UOMV1`. External helper bodies were kept `UNKNOWN`
-instead of inferred from the instantiated generic template. No GET, Sync action, network request, or
-device operation was executed.
+conditional function ID `0x6C` admission of `UOMV1`. A follow-up exact pass then closed the helper at
+the high-level trust boundary: Sync and cancellation both depend on China-only server validation
+before a server-derived result is synchronized through the D1 aircraft lane. Endpoint details,
+account material, opaque response content, live acceptance, and applied RF effect remain excluded or
+unknown. No GET, Sync/cancel action, network request, or device operation was executed.
+
+## 21. Dynamic RID bundle and AirSense-candidate separation
+
+The exact `RidCaptureV1::CreateCharacteristics`, `BindKey`, full `CommonFcAbs` function-discovery
+callback switch, general discovery request type, and current AirSense registrations/callers were
+cross-checked in DJI Fly 1.21.10. The resulting inventory was normalized by access class rather than
+by name: four listen-only capabilities, one Japan action, one result getter, two GET+SET identity
+surfaces, and one SET-only location stream.
+
+The full callback switch corrected a preliminary off-by-one interpretation: raw function ID `0x37`
+creates `RidCaptureV1`, while `0x38` creates unofficial-battery authentication. The general
+function-discovery transport `0x00/0xB8`, the AirSense command `0x11/0x37`, and FlySafe
+`PackType 0x38` were treated as separate namespaces. Current `0x11/0x0C`, `0x11/0x37`, and
+`0x11/0x39` paths were then positively identified as AirSense/ADSB surfaces and excluded from RID
+configuration attribution.
+
+Only independently written names, access classes, owners, and boundaries enter the public archive.
+No vendor decompilation was copied; no function-discovery, AirSense, D1, account-server, or device
+request was executed.
+
+## 22. Current same-family `RIDCtrlEnable` recovery and implementation
+
+The official current SKYROVER Android distribution was downloaded from its direct vendor URL,
+hashed, and analyzed offline. High-level model registration, characteristic flags, connection-time
+visibility logic, and the native key/config mapping were followed independently. The complete chain
+closed as Boolean GET/SET/Listen `RIDCtrlEnable`, distinct from France `EIDSwitch`, mapped to FC
+parameter `rid_ctrl_enable_0` and FLYC F7/F8/F9. The parameter hash was independently recomputed as
+`0x3CBD864F` using the already corroborated DJI hash algorithm.
+
+An allow-listed clean-room Android client was then implemented on the already recovered RC 2
+`protocol` Binder ABI. The fixed path uses modern sender/receiver `0x82 -> 0x92`, F7 metadata and F8
+value reads, F7-derived value encoding, F9 write, immediate F8 readback, and a captured per-session
+baseline for restore. Offline tests exercised success, status errors, identity mismatch, width/type
+mismatch, both F8 layouts, Boolean rejection, and write encoding. The final artifact was checked at
+manifest, permission, signature, alignment, DEX, command constant, and clean-build levels before it
+was copied to RC 2 removable storage.
+
+This process did not copy vendor implementation code or distribute vendor artifacts. Static
+same-family support was kept separate from Mini 5 Pro support: the next evidence is one live fixed
+F7/F8 result from the exact client, not another broad symbol search or a France-EID substitution.

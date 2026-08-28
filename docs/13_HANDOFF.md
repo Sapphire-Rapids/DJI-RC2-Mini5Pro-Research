@@ -25,6 +25,29 @@ older “install v0.8” or “V2.3 in progress” instruction into a current pr
 
 ## Topic entry points
 
+### Immediate path: independent `RIDCtrlEnable`
+
+Read RID-002C in [05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md), H-27 in
+[10_HYPOTHESES_AND_UNKNOWNS.md](10_HYPOTHESES_AND_UNKNOWNS.md), and B-20 in
+[12_CURRENT_BLOCKERS.md](12_CURRENT_BLOCKERS.md).
+
+Current exact anchors:
+
+- current SKYROVER `1.2.0` exposes Boolean GET/SET/Listen `RIDCtrlEnable` separately from France
+  `EIDSwitch`;
+- native mapping: `RIDCtrlEnable -> rid_ctrl_enable_0`;
+- parameter hash: `0x3CBD864F`, wire LE `4F 86 BD 3C`;
+- commands: FLYC `03/F7` metadata, `03/F8` read, `03/F9` write;
+- static modern default route: sender type/index `2/4` (`0x82`) to receiver `18/4` (`0x92`);
+- A-023 `0.3.0-research` implements this fixed route over RC 2's `protocol` Binder service and has
+  been copied to removable storage.
+
+Next action is one tap on **探测并读取 RIDCtrlEnable（只读）**, followed by **复制当前结果**.
+Interpret the full Binder/ACK diagnostic before changing code. If F7 metadata and F8 baseline both
+succeed, use the existing opposite-state and restore buttons for one A/B/A loop; do not replace this
+with another generalized admission probe. If F7 returns a one-byte nonzero status, record a bounded
+Mini 5 Pro negative for this exact hash/route and move to passive status/firmware ownership.
+
 ### RID working status
 
 Read:

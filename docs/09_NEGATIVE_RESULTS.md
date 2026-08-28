@@ -380,9 +380,24 @@ stronger conclusion that cannot be drawn.
 - Status: `NEGATIVE` for broadcast-switch attribution; the current getter/admission chain is
   `STATIC` (C-131/C-132).
 - Positive fact: conditionally loaded `UOMV1` exposes a `0x11/0xD1` status GET and a separate Sync
-  action that connects device parameters, a DeviceCenter network query, and a device check result.
-- Result: the surface reports/synchronizes China real-name authentication state. It has no setter,
-  baseline, restore, or evidence of controlling BLE/Wi-Fi Broadcast RID output.
+  action that connects device parameters, China-only DeviceCenter account/server validation, D1
+  application of server-derived state, and a device check result. Official cancellation is likewise
+  server-mediated before D1 synchronization.
+- Result: the surface reports/synchronizes China real-name authentication state. It has no generic
+  local setter or offline restore and no evidence of controlling BLE/Wi-Fi Broadcast RID output.
 - Does not establish: whether the current Mini 5 Pro runtime inventory admits function ID `0x6C`,
-  whether authenticated state influences a separate aircraft policy, or how the external helper maps
-  every device result. Key absence and returned `UNSUPPORTED` must remain distinct.
+  whether the server accepts the current account/device state, whether the final value is applied or
+  persists, or whether authentication influences a separate aircraft policy. Key absence and returned
+  `UNSUPPORTED` must remain distinct.
+
+## N-41 — current AirSense tuples as RID controls
+
+- Status: `NEGATIVE` for RID attribution; exact current AirSense ownership is `STATIC` (C-135).
+- Positive facts: `0x11/0x0C` is a read/write AirSense traffic-receive switch; inherited
+  `0x11/0x37` is an ADSB agent switch with readback but no current RID/DIPS/EID caller; and
+  `0x11/0x39` is a set-only synthetic traffic-target test action.
+- Result: all three are excluded from the RID configuration catalog. In particular, command
+  `0x11/0x37` is unrelated to function-discovery ID `0x37` even though the numbers match.
+- Does not establish: that WA150 firmware rejects every raw request or that the inherited agent
+  switch has no undocumented live side effect. Those questions require a separate passive trace and
+  AirSense-specific experiment; they do not justify a RID toggle.

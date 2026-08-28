@@ -14,7 +14,8 @@ Japan DIPS `C-015`；type-6 architecture/eligibility/inventory `C-016`--`C-018`�
 inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C-078`；stable control
 未闭合 `C-053`；中国 OID network-report gate 与 current exact setter re-audit `C-106`--`C-109`；
 legacy DroneID Detection `C-119`--`C-122`；地区身份/位置 `C-123`--`C-128`；China UOM
-reply/status/admission `C-130`--`C-132`。
+reply/status/admission `C-130`--`C-132`；动态 RID bundle 与 namespace `C-133` / `C-134`；
+AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C-136`--`C-138`。
 
 ## 总结矩阵
 
@@ -22,6 +23,9 @@ reply/status/admission `C-130`--`C-132`。
 | --- | --- | --- | --- |
 | RID-001 | ordinary Broadcast Remote ID | `NEGATIVE` | 未发现当前跨地区 Boolean 总开关 |
 | RID-002 | onboard working status | `STATIC` | product-139 RID module 监听 `0x11/0x1C`；无 GET/SET/action |
+| RID-002A | dynamic RID characteristic bundle | `STATIC` | function-discovery ID `0x37` 准入九项 mixed-access inventory；live admission 未知 |
+| RID-002B | AirSense/ADS-B lookalikes | `STATIC/NEGATIVE` | `0x11/0x0C`、`0x11/0x37`、`0x11/0x39` 均为非 RID 表面 |
+| RID-002C | independent `RIDCtrlEnable` | `STATIC/HYPOTHESIS` | same-family current SDK maps a dynamic Boolean to fixed FC hash; Mini 5 Pro F7/F8 result pending |
 | RID-003 | France EID | `STATIC` | `0x03/0x77` 是法国专用 GET/SET schema |
 | RID-004 | France EID live artificial routes | `NEGATIVE` | 两个固定 GET 路由均为 unavailable |
 | RID-005 | EASA OPID | `STATIC` | `0x03/0x78` 是身份数据 GET/SET/DELETE |
@@ -82,6 +86,75 @@ reply/status/admission `C-130`--`C-132`。
   未见 push 也不证明 unsupported。由于没有 GET builder，它也不是可主动轮询的 read-only query。
 - **公开依据：** [状态、账号与限飞层](04_STATE_ACCOUNT_LIMITS.md#remote-id-工作状态)。
 - **隐私/分发：** 不保存 raw status payload。
+
+### RID-002A：`RidCaptureV1` 是动态准入的九项 mixed-access bundle
+
+- **证据状态：STATIC**（C-133、C-134）
+- **对象/版本：** 精确 DJI Fly 1.21.10 `libsdk_jni.so` 的 `RidCaptureV1` registration 与
+  `CommonFcAbs` function-discovery callback。
+- **准入事实：** callback 原始 function ID `0x37` 构造并绑定 `RidCaptureV1`；相邻 ID `0x38`
+  构造的是 `UnofficialBatteryAuthenticationV1`。SDK 的 `0x00/0xB8` 是通用 function-discovery
+  transport，不是 RID 专属 GET。它们又都不同于 `0x11/0x37` ADSB command 与 FlySafe
+  `PackType 0x38`。
+- **九项 inventory：** 四个 listen-only capability 是 `IsCloudRIDSupported`、
+  `IsEURidSupported`、`IsFREidSupported`、`IsJapaneseRidSupported`；Japan 平面包含
+  `RIDRegistedInfo` action 与 `RIDImportResult` getter；`OperatorRegistrationNumber` 和
+  `EIDSwitch` 为 GET+SET；`UploadMobileDevicePosition` 为 SET-only。
+- **边界/不证明：** 这是四项只监听、一个 action、一个 getter、两个 GET+SET 与一个单向上传的
+  混合包，不是九个可写设置，也没有提供 US/global Broadcast RID Boolean。静态 product-139
+  身份不证明 live Mini 5 Pro inventory 已报告 ID `0x37`，缓存 replay 也不能替代当前会话准入。
+- **UI 处置：** 在读取 official same-owner runtime inventory/key-existence 前，九项均保持
+  `STATIC LOCKED`。任何静态可写项仍需 baseline、规范 ACK、独立 readback、restore、persistence
+  与起桨后独立 RF A-B-A；位置流没有设备侧 baseline/readback，必须单独作为隐私敏感遥测输入。
+- **隐私/分发：** 只发布名称、access type 与边界；不发布 identity、credential、coordinate、
+  raw inventory 或 decompilation output。
+
+### RID-002B：三个 current ADSB/AirSense tuple 不是 RID 配置
+
+- **证据状态：STATIC**；对 RID attribution 为有界 `NEGATIVE`（C-135）。
+- **`0x11/0x0C`：** product-139 当前注册的 AirSense/ADS-B traffic receive enable，具备 GET、
+  SET 与读回；它控制接收侧告警业务，不是飞机 Broadcast RID transmitter。
+- **`0x11/0x37`：** 从 UAV77 混入 product-139 的 `ADSBSwitch`，具备 GET、SET 与读回，但当前
+  业务层没有 RID、DIPS 或 EID caller。此处 `0x37` 是 command ID，绝不能与 RID function ID
+  `0x37` 混为一谈。
+- **`0x11/0x39`：** AirSense synthetic-target test action，写入位置、速度与角度测试数据，无
+  配置 GET/readback；它向接收告警链注入合成交通目标，不向外广播 RID。
+- **其他词典候选：** current exact typed/key/UI surface 对 `0x11/0x05`、`0x06`、`0x0F`、
+  `0x1A`、`0x35` 均未找到完整 ctor、handler、registration、caller 与 product-139 admission。
+- **边界/不证明：** current application attribution 不证明 WA150 firmware 必然拒绝所有 raw
+  request，也没有闭合 `0x11/0x37` 的 live RF 副作用。它足以把这三项永久排除出 RID 配置 UI；
+  后续只允许被动 trace 或在单独 AirSense 研究中重新建证据。
+- **隐私/分发：** 未执行上述 command；不保留 flight ID、测试坐标或 raw packet。
+
+### RID-002C：独立 `RIDCtrlEnable` 已闭合到固定 FC 参数
+
+- **证据状态：STATIC/HYPOTHESIS**（C-136--C-138）
+- **对象/版本：** 官网当前 SKYROVER `1.2.0`，package `com.sky.dronemaster`。输入 APK
+  SHA-256 为 `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8`；
+  只在排除工作区静态分析，不在本仓库分发。
+- **高层特征事实：** `RIDCtrlEnable` 是 Boolean，支持 GET、SET、Listen，且与
+  `EIDSwitch`、`OperatorRegistrationNumber` 分开注册。应用在飞机连接后执行新的 GET：成功才
+  显示开关，参数 GET 错误则隐藏，其他错误会重试。因此这是运行时能力探测，不是硬编码机型或
+  地区清单。
+- **native/transport 事实：** KeyValue `RIDCtrlEnable` 映射到 FC 参数
+  `rid_ctrl_enable_0`。其 DJI hash 为 `0x3CBD864F`，wire little-endian 为
+  `4F 86 BD 3C`。命令族是 FLYC metadata `0x03/0xF7`、read `0x03/0xF8`、write
+  `0x03/0xF9`；静态 default route 为 app type/index `2/4` (`0x82`) 到 FC type/index
+  `18/4` (`0x92`)。F7 回包是 value type/width 的实机权威来源。
+- **与 France EID 的区别：** 该链不是 `0x03/0x77` France `EIDSwitch`，也不是
+  `0x11/0x1C` listen-only RID health push。它是目前找到的第一个名称、Boolean 高层语义、底层
+  固定参数、GET/SET 和应用 UI 行为能够连成一条链的独立 RID control candidate。
+- **Mini 5 Pro 当前边界：** 精确 DJI Fly `1.21.10` native 未出现同名 KeyValue/FC parameter；
+  这只说明 DJI Fly 没有内置该 wrapper，不说明 WA150 飞控一定没有参数。最短判别实验固定为
+  hash `0x3CBD864F` 的一次 F7，成功后一次 F8；F7 返回一字节错误时，不再发送 F8/F9。
+- **实现状态：** clean-room Android `0.3.0-research` 只允许固定 EID/OPID/RID command，
+  RID 按钮使用 RC 2 已解析的 `protocol` Binder service 和 modern `0x82 -> 0x92` route。
+  F7/F8 成功会保存本次 Boolean baseline；F9 后立即 F8 读回，恢复按钮写回同一 baseline。
+  APK 已复制到 RC 2 removable storage；尚未记录安装、执行或 command reply。
+- **下一步：** 先取 F7/F8 完整回包。若成功，执行一次 baseline -> opposite -> readback ->
+  baseline -> final readback；随后在接收器在线、由操作者起桨的条件下做独立 RF A-B-A。
+- **隐私/分发：** 只公开固定参数事实、self-developed APK hash 和脱敏结果；不提交 SKYROVER
+  APK、shared library、反编译输出、设备标识或 raw private capture。
 
 ## France Electronic ID
 
@@ -176,11 +249,15 @@ reply/status/admission `C-130`--`C-132`。
 - **runtime admission：** `UOMV1` 只在 common FC runtime function discovery 接纳 function ID
   `0x6C` 且相应 flag 为 1 后创建；这时才注册 `UOMRealNameStatus` getter 和
   `SyncUOMRealNameStatus` action。静态 product-139 身份不能证明 live Mini 5 Pro inventory 已接纳。
-- **sync boundary：** action 进入外部 helper，并在已恢复部分中衔接 device parameters、
-  DeviceCenter network query 和 device check result。它涉及账户/网络/实名状态，没有 setter、
-  baseline 或 restore 语义；key 未加载必须与返回 `UNSUPPORTED` 分开显示。
-- **处置：** 只允许在官方 runtime key 已存在时显示脱敏枚举状态；不得把 Sync action包装成
-  RID 广播开关或可逆配置。
+- **sync boundary：** exact helper chain 已闭合为服务端中介流程：先收集设备参数，经中国区
+  DeviceCenter 账号/实名校验取得服务端结果，再通过同一 D1 aircraft lane 应用一段 opaque
+  server-derived state；最终 device check response 才形成同步结果。官方 cancel action 同样先等
+  服务端成功，再发起 D1 cancellation synchronization。
+- **边界：** 这不是任意本地 setter。sync/cancel 都依赖 official account-server state；cancel
+  也不是离线 restore。live `0x6C` admission、认证结果、最终 applied readback、重启持久性和
+  Broadcast RID/RF 影响均未闭合；key 未加载必须与返回 `UNSUPPORTED` 分开显示。
+- **处置：** 只允许在官方 runtime key 已存在时显示脱敏枚举状态；不得把 Sync 或 cancel
+  包装成 RID 广播开关、离线配置或可逆事务。
 
 ### RID-005C：位置、UAS ID 与电话必须分面解释
 

@@ -248,3 +248,35 @@ Every hypothesis below is testable and remains separate from factual findings.
   `UNSUPPORTED`.
 - Current state: `UNKNOWN`; static product-139 identity does not establish live admission, and no
   raw `0x11/0xD1` probe is authorized by this hypothesis.
+
+## H-26 — live Mini 5 Pro admits `RidCaptureV1`（C-133、C-134）
+
+- Known facts: exact current native code maps raw function-discovery ID `0x37` to the nine-entry
+  `RidCaptureV1` bundle and maps adjacent ID `0x38` to unofficial-battery authentication. The SDK's
+  `0x00/0xB8` transport downloads a general function inventory and may replay cached state; it is not
+  an RID-specific one-bit getter.
+- Hypothesis: the current Mini 5 Pro session may report ID `0x37` with the required version/flag and
+  expose some or all official RID keys through the same owner already initialized by DJI Fly.
+- Distinguishing evidence: an official same-owner read-only function-inventory or key-existence
+  result bound to the exact current session, with cache provenance separated from a fresh device
+  response. Only after admission may a privacy-reduced getter be considered.
+- Current state: `UNKNOWN`. This hypothesis does not authorize a handcrafted `0x00/0xB8` request,
+  reuse command `0x11/0x37`, infer admission from product number, or enable any setter/action.
+
+## H-27 — Mini 5 Pro exposes `rid_ctrl_enable_0`（C-136--C-138）
+
+- Known facts: SKYROVER `1.2.0` independently exposes a Boolean GET/SET/Listen
+  `RIDCtrlEnable`, maps it to FC parameter `rid_ctrl_enable_0`, and uses hash `0x3CBD864F` through
+  FLYC F7/F8/F9. Its application probes GET capability after connection before showing the switch.
+  DJI Fly `1.21.10` does not contain the same two names.
+- Hypothesis: the current Mini 5 Pro FC may still expose the parameter even though DJI Fly does not
+  register a wrapper for it.
+- Distinguishing evidence: from the installed RC 2 client, one fixed `03/F7` response for hash
+  `0x3CBD864F`; on success, one fixed `03/F8` response whose echoed hash, width, and Boolean value
+  match the F7 metadata. A one-byte nonzero F7 response rejects the transfer-by-name hypothesis for
+  this current product/session without issuing F9.
+- Follow-on if positive: capture baseline, write the opposite Boolean once with F9, confirm by F8,
+  restore the captured baseline, and confirm again. Reconnect persistence and motor-on independent
+  RF A-B-A are separate observations.
+- Current state: `UNKNOWN`. `0.3.0-research` has been copied to RC 2 removable storage; installation,
+  execution, Binder result, FC reply, and RF effect have not yet been recorded.

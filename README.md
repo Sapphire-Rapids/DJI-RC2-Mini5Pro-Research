@@ -34,8 +34,10 @@
 
 ## 当前结论摘要
 
-- 没有发现一个跨 FAA/US、法国 EID、EASA OPID、欧盟 C0、日本 DIPS、中国 OID 与普通
-  Broadcast Remote ID 的当前普通 Boolean 总开关。
+- Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
+  为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
+  EID、OPID、DIPS 和 China OID 分开。DJI Fly `1.21.10` 没有同名 wrapper，因此 Mini 5 Pro
+  是否支持仍由当前实机 F7/F8 决定，不能仅凭静态同族 SDK 宣称已实现。
 - Product-139 的 France EID 静态路径已闭合到 `0x03/0x77`，但它是法国专用 EID，不是
   global RID。两个固定人工 USB GET 路由均未获得 canonical ACK；DJI Fly 私有 owner 路径未实测。
 - FlySafe type-6 `RID_UNLOCK` 是账号/FC 绑定的签名许可类别，具备 enable-state 语义；当前
@@ -55,6 +57,10 @@
 - RC 2 标准 ADB 在 RSA 认证前停止：主机 `CNXN` 已发出，设备不返回 ADB 包。相邻 unstripped
   `adbd` 含 production `CNXN` drop gate，可解释现象但不等同于精确 live v07 二进制证明。
 - 当前 Android admission probe v0.10 通过离线工件审计，但尚未复制、安装或运行于 RC 2。
+- 固定 clean-room 管理客户端 `0.3.0-research` 已完成 `RIDCtrlEnable` F7/F8/F9、baseline、
+  readback 和 restore 流程，最终 APK SHA-256 为
+  `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59`，并已复制到 RC 2
+  removable storage；安装、运行和 live reply 尚未记录。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
 - NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 authenticated Base64 envelope、

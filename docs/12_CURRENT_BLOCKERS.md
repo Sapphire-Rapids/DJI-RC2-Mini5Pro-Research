@@ -234,9 +234,43 @@ OPID, UOM identifiers, full serials, coordinates, telephone data, signed license
 must not enter public logs or editable fixtures. No current static schema is admitted as a Mini 5
 Pro free-form RID editor.
 
+## B-20 — live `rid_ctrl_enable_0` admission and RF closure
+
+The earlier absence of a concrete global-control name is no longer the immediate blocker. Current
+same-family static evidence now closes `RIDCtrlEnable -> rid_ctrl_enable_0 -> 0x3CBD864F ->
+03/F7-F9`, and A-023 implements the fixed RC 2 Binder path.
+
+Missing:
+
+- confirmation that exact A-023 is installed and running on RC 2;
+- one complete copied result from **探测并读取 RIDCtrlEnable（只读）** containing Binder lookup,
+  transaction, callback, F7 ACK, and—if admitted—F8 ACK;
+- if F7/F8 succeeds, one baseline -> opposite F9 -> F8 readback -> baseline F9 -> final F8 loop;
+- reconnect/power-cycle persistence classification;
+- external detector online plus operator-initiated motor-on RF A-B-A.
+
+Effect: this is the shortest active dependency. A one-byte nonzero F7 status closes only current
+Mini 5 Pro admission of this exact hash/route. A positive F7/F8 permits the internal reversible
+write test immediately; it still requires the later motor-on receiver observation to establish
+actual broadcast behavior.
+
 ## Dependency order
 
 The evidence dependencies are:
+
+```text
+install/run A-023
+  -> fixed F7 metadata for 0x3CBD864F
+  -> fixed F8 Boolean baseline
+  -> one F9/F8 transition
+  -> F9/F8 restore
+  -> reconnect persistence
+  -> operator-started motor-on independent RF A-B-A
+```
+
+If the first F7 returns a canonical nonzero status, continue with passive `0x11/0x1C` ownership and
+verified WA150 plaintext/firmware analysis. Do not repeat the old generic attach chain merely to
+answer the same fixed parameter question.
 
 ```text
 exact live identity

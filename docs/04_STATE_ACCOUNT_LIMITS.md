@@ -191,11 +191,14 @@ unavailable 解释规则 `C-013`，onboard status 与 RF 分离 `C-049`。飞机
 - **证据状态：STATIC**（C-131、C-132）
 - **对象/版本：** DJI Fly 1.21.10 current native `UOMV1` / `UOMRealNameStatusHelper` boundary。
 - **事实：** common FC 只在 runtime function discovery 接纳 function ID `0x6C` 后加载 `UOMV1`；
-  其只读 status getter 通过 `0x11/0xD1` 获取实名状态，而 Sync action衔接设备参数、
-  DeviceCenter 网络查询与设备检查结果。没有 setter。
+  其只读 status getter 通过 `0x11/0xD1` 获取实名状态。Sync action 收集设备参数，经过中国区
+  DeviceCenter 账号/实名校验后，把 server-derived opaque state 经 D1 aircraft lane 应用，再由
+  device check result完成状态映射。官方 cancel action 也先等待服务端成功，再执行 D1
+  cancellation synchronization。
 - **边界/不证明：** key 未加载与 status=`UNSUPPORTED` 是两种不同状态；UOM Sync 成功不证明
-  普通 DJI 账号三层登录均正确，也不证明飞机正在广播标准 RID。外部 helper 的完整 mapping、
-  route 与 exact Mini 5 Pro runtime admission 仍未知。
+  普通 DJI 账号三层登录均正确，也不证明飞机正在广播标准 RID。这里没有 generic local setter；
+  cancel 不是离线 restore。exact Mini 5 Pro runtime admission、认证结果、最终 applied readback、
+  persistence 与 RF 影响仍未知。
 - **隐私/分发：** 只允许状态 enum 或 unavailable；不记录实名标识、opaque device parameters、
   账号、网络响应或 raw payload。
 
@@ -249,7 +252,7 @@ unavailable 解释规则 `C-013`，onboard status 与 RF 分离 `C-049`。飞机
 | 是否完成独立 RF 验证 | `UNKNOWN` | 当前保留记录没有同步 onboard + RF 证据 | 广播 off/on、法规符合性 |
 | 本地账号是否可见为登录 | `UNKNOWN` | 已知本地 Boolean 的实现边界 | 服务端有效或 FC 已同步 |
 | FC 是否报告已有 UUID | `OBSERVED` | 两路均报告 false | RC 2 本地已退出、服务器 token 无效 |
-| China UOM real-name status | `UNKNOWN` | 条件 `UOMV1` getter/schema 已静态闭合 | live `0x6C` admission、当前实名状态或 RID RF 输出 |
+| China UOM real-name status | `UNKNOWN` | 条件 getter 与 server-mediated Sync/cancel 链已静态闭合 | live `0x6C` admission、认证结果、applied readback、当前实名状态或 RID RF 输出 |
 | 普通高度/距离配置 | `OBSERVED` | 500 m / 5000 m / distance disabled | effective 30/50 cap 不存在 |
 | effective real-name limit | `UNKNOWN` | 已恢复候选 read-only status 面 | 当前是否正在生效 |
 

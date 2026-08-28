@@ -33,6 +33,8 @@
 | A-019 | Drone-Hacks Windows MSI；input-sample；`2.0.29` | `16,289,792` | `a4c3867e34235a74b5df37ae81bc19f80a988e26e47b408947224e6c8247fd8d` | `STATIC`；与官网下载 MSI 相同且签名有效；从未安装或执行；排除且不分发 |
 | A-020 | Drone-Hacks desktop application；input-sample；`2.0.29.0` | `24,011,848` | `9813d6a9d7ba137066712ecfebd2c397bfbe5516d546c6d5f95d23014e06f996` | `STATIC`；只从 MSI 静态提取；从未执行；排除且不分发 |
 | A-021 | Drone-Hacks TypeScript binding generator；input-sample；`2.0.29.0` | `11,522,632` | `84eecdf2329635bf9856a9ea002c9696d4222cd56cafdc101c9f19bea809e652` | `STATIC`；只从 MSI 静态提取；从未执行；排除且不分发 |
+| A-022 | SKYROVER official Android application；input-sample；`1.2.0` / code `102001130` | `405,543,495` | `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8` | `STATIC`；只离线分析；从未安装或执行；排除且不分发 |
+| A-023 | FindUAS RC 2 RID Admin；self-developed；`0.3.0-research` | `64,745` | `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` | `STATIC`；已复制到 RC 2 removable storage，尚未确认安装/运行；当前 fixed live candidate，不进入本 documentation repo |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -114,7 +116,7 @@ Skymod Technologies LTD。签名只建立来源/完整性边界，不证明功�
 
 ## 9. 输入样本与分发
 
-A-004 至 A-008、A-013、A-015 至 A-021 是 input-sample 或 rejected third-party input。它们不属于本仓库实现，不能提交二进制或复制正文。允许保留的内容只有：
+A-004 至 A-008、A-013、A-015 至 A-022 是 input-sample 或 rejected third-party input。它们不属于本仓库实现，不能提交二进制或复制正文。允许保留的内容只有：
 
 - 公开版本和产品族；
 - 在规范 CSV 明确登记的 public hash；
@@ -124,7 +126,26 @@ A-004 至 A-008、A-013、A-015 至 A-021 是 input-sample 或 rejected third-pa
 
 厂商输入的补充身份只在 [固件与信任边界](07_FIRMWARE_TRUST_BOUNDARY.md) 中作为样本 provenance 描述，不增加本规范 artifact CSV 的行，也不代表本仓库提供样本。
 
-## 10. 更新与一致性检查
+## 10. SKYROVER 与固定 RID 管理客户端
+
+A-022 是从官网 direct download 冻结的 current SKYROVER `1.2.0` 输入。静态分析只用于恢复
+`RIDCtrlEnable` 的高层 access flags、应用 capability-probe 行为、FC parameter mapping 和
+F7/F8/F9 protocol facts。APK、native libraries、DEX 和反编译输出全部留在排除工作区；MIT
+仓库只保留独立表述、exact hash 和公开 URL。
+
+A-023 是 clean-room self-developed Android artifact，package
+`com.finduas.rc2ridadmin`。最终 APK 经 11 项 unit tests、lint（0 errors）、两次 byte-identical
+clean build、manifest/permission、zipalign、APK v2 signature 和 decompiled-final 检查；不包含
+permission、native library、socket、shell 或 background service。固定 command allow-list 为
+France EID `03/77`、OPID `03/78` 和 `rid_ctrl_enable_0` 的 `03/F7-F9`；RID route 固定为
+`0x82 -> 0x92`，使用 RC 2 `protocol` Binder service。它已复制到 RC 2 removable storage，
+但尚未确认 exact APK 的安装、启动、Binder transaction 或 FC reply，因此工件审计不能改写为
+live device evidence。
+
+APK signer certificate SHA-256：
+`37896e5a80772e39edad4bdf3ce7f19d2b6e1352a701c48c70edc10c97b2b224`。
+
+## 11. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.2 - 2026-08-28
+
+### Added
+
+- Recovered the current same-family SKYROVER `1.2.0` independent Boolean `RIDCtrlEnable`, its
+  GET/SET/Listen flags, connection-time capability probe, and separation from France `EIDSwitch`.
+- Closed the native mapping `RIDCtrlEnable -> rid_ctrl_enable_0`, parameter hash `0x3CBD864F`,
+  FLYC `03/F7-F9` family, and static modern `0x82 -> 0x92` route as C-136 and C-137.
+- Added C-138/H-27/B-20 for the decisive Mini 5 Pro F7/F8 admission test and subsequent reversible
+  F9/readback/restore plus motor-on independent RF A-B-A.
+- Registered the exact official input as A-022 and the clean-room fixed RC 2 Binder client
+  `0.3.0-research` as A-023. The client APK was copied to RC 2 removable storage; install/run/live
+  reply remain pending.
+- Updated the control matrix, handoff, source index, timeline, README, AGENTS contract, claim CSV,
+  and artifact CSV so another researcher can continue at the single live F7/F8 step.
+
+### Provenance
+
+- SKYROVER proprietary APK, shared libraries, DEX, and decompilation output remain excluded.
+- The MIT implementation is independently written from protocol facts; no vendor or AGPL source was
+  copied.
+- No live F7/F8/F9 reply or RF effect is claimed by this documentation update.
+
 ## 0.3.1 - 2026-08-28
 
 ### Added

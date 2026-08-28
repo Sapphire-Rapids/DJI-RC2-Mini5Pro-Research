@@ -16,6 +16,8 @@ or applied a value.
 New machine-index claims covered here are C-123 (China UOM), C-124 (EASA OPID), C-125 (Japan DIPS),
 C-126 (app location), C-127 (telephone exclusion), C-128 (compliance identity), and C-129 (separate
 synthetic-source hypothesis). The exact China UOM reply/status closure adds C-130 through C-132.
+Dynamic bundle separation adds C-133 through C-135. The independent same-family `RIDCtrlEnable`
+chain and Mini 5 Pro admission experiment add C-136 through C-138.
 
 ## 2. Implementation levels
 
@@ -39,7 +41,7 @@ level.
 
 | Surface | Owner and path | Read | Write | Current disposition |
 | --- | --- | --- | --- | --- |
-| Global Broadcast RID master | No current owner found | none | none | `OPAQUE BLOCKED`; no cross-region Boolean exists in current readable surfaces |
+| Global Broadcast RID master | same-family current SDK `RIDCtrlEnable -> rid_ctrl_enable_0`; live Mini 5 Pro owner pending | fixed F7/F8 probe implemented; no live reply yet | fixed F9 path implemented behind successful baseline read | `STATIC LOCKED`; this is now a concrete candidate rather than an absent-name search, but Mini 5 Pro admission is unresolved |
 | RID/EID working status | product-139 `RidImportModule`, natural `0x11/0x1C` push | support/normal flags, area, failure | none | `PASSIVE OWNER`; no GET builder and onboard normal is not RF truth |
 | Regional capability | product-139 interpretation of the same push | US bit 0, Cloud bit 10, EU/Japan/France bits 11/12/13 in explicit mode | none | `PASSIVE OWNER`; show capability separately from real area and RF standard |
 | RID health/diagnostics | FC health manager plus Remote ID delegate | working/idle/location/firmware/no-broadcast/unsupported/unknown | none | `PASSIVE OWNER`; preserve the raw failure class without coordinates |
@@ -72,6 +74,7 @@ has no getter/readback, and is explicitly excluded from the RID configuration ca
 
 | Surface | Exact or bounded path | Readback / restore boundary | Current disposition |
 | --- | --- | --- | --- |
+| Independent RID control | current same-family `RIDCtrlEnable` maps to `rid_ctrl_enable_0`, hash `0x3CBD864F`, FLYC `03/F7-F9`, default route `0x82 -> 0x92` | self-developed RC 2 Binder client performs F7 metadata, F8 baseline, one F9 change, F8 readback, and baseline restore; live F7/F8 reply and RF A-B-A remain pending | `STATIC LOCKED`; fixed APK is staged, and a successful F7/F8 will promote this row directly to a bounded live transaction candidate |
 | France EID | product-139 `0x03/0x77`; GET `[02]`, SET off/on `[00]`/`[01]`; GET ACK `[result,state]` | static destination `0x92` may be runtime-overridden; two artificial live GET routes returned no canonical ACK; persistence/RF untested | `STATIC LOCKED`; the Mac app may show conditional `unavailable`, not a switch |
 | EASA OPID | product-139 `0x03/0x78`; GET `[02]`, DELETE `[01]`, SET `[00][0x10][16B]`; SDK validates 20-character input | dynamic HostID; original string must be backed up; empty restore requires DELETE; live route/persistence/RF remain open | `STATIC LOCKED`; display only masked present/empty/unknown when a safe owner exists |
 | Japan DIPS credential | current `0x11/0x4B` three-part registration/key/nonce SET and QUERY; DELETE is three zero SETs | non-atomic credential; requires all-three backup, verify, and restore; contains sensitive material | `MANAGED`; current live route/readback/restore gates remain closed, and the UI must never log or expose key/nonce/editor/delete |

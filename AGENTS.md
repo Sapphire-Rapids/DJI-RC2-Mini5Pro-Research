@@ -126,6 +126,15 @@ Later retractions override earlier progress summaries.
     this tag: runtime function ID `0x6C` must admit the module, its Sync action enters an external
     account/network helper, and it has no setter or restore semantics. Neither surface is an RF
     switch.
+23. Current SKYROVER `1.2.0` adds an independent Boolean `RIDCtrlEnable`, distinct from France
+    `EIDSwitch`, and exact native evidence maps it to FC parameter `rid_ctrl_enable_0`, hash
+    `0x3CBD864F`, through `0x03/F7-F9` with default modern route `0x82 -> 0x92`. DJI Fly `1.21.10`
+    lacks the same strings, so Mini 5 Pro support is a live F7/F8 question, not a static transfer.
+    A-023 is the fixed clean-room Binder client for that question; it has been copied to RC 2
+    removable storage but installation, execution, command replies, and RF effects are not yet
+    observed. If F7/F8 succeeds, record the baseline and proceed directly to one F9/readback/restore
+    loop; if F7 returns a nonzero one-byte status, record that bounded negative and do not reinterpret
+    France EID or AirSense as substitutes.
 
 ## Privacy and redaction
 

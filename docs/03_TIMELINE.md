@@ -240,3 +240,21 @@ work when a report did not contain a more precise timestamp.
   setter or restore semantics, and is not a RID broadcast switch.
 - No UOM request/action was sent, and no real identifier, account data, network response, or raw
   payload was read or retained.
+
+### 2026-08-28 follow-up — independent `RIDCtrlEnable` recovery and fixed client
+
+- `STATIC`: official SKYROVER `1.2.0` was frozen by exact hash. Its current FlyModel exposes a
+  Boolean GET/SET/Listen `RIDCtrlEnable` independently from France `EIDSwitch`, and the UI performs
+  a fresh capability GET after aircraft connection before showing the switch.
+- `STATIC`: exact native mapping closes `RIDCtrlEnable -> rid_ctrl_enable_0`, hash `0x3CBD864F`,
+  FLYC commands `03/F7`, `03/F8`, `03/F9`, and default modern route `0x82 -> 0x92`.
+- `STATIC`: a clean-room RC 2 Binder client `0.3.0-research` was built with a fixed command set,
+  F7 metadata/F8 Boolean parsing, baseline capture, F9 write, authoritative F8 readback, and restore.
+  Eleven unit tests, lint, two byte-identical clean builds, final manifest/permission, signature,
+  zipalign, and decompiled-artifact checks passed.
+- `OBSERVED`: the exact `64,745`-byte APK with SHA-256
+  `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` was copied to RC 2
+  removable storage. Installation, launch, Binder result, F7/F8 reply, F9 action, and RF effect were
+  not observed in this record.
+- The proprietary SKYROVER APK, libraries, and decompilation output remain excluded. No SKYROVER
+  code was copied into the MIT implementation or documentation repository.
