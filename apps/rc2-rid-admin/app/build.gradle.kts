@@ -10,8 +10,8 @@ android {
         applicationId = "com.finduas.rc2ridadmin"
         minSdk = 29
         targetSdk = 29
-        versionCode = 11
-        versionName = "0.7.1-flysafe-direct-diagnostic"
+        versionCode = 12
+        versionName = "0.8.0-flysafe-diagnostic-export"
     }
 
     buildTypes {

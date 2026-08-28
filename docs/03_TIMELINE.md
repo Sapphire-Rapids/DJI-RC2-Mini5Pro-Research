@@ -516,3 +516,21 @@ work when a report did not contain a more precise timestamp.
   not stopped for this experiment and no new ADB response/shell exists. The prepared next session
   first collects live UID/SELinux/properties/hashes; only that output may determine a second-stage
   internal path and one-shot launch (C-179).
+
+### 2026-08-29 — official FlySafe UI route and A-033 staging
+
+- `STATIC`：exact DJI Fly 1.21.10 declares a non-exported
+  `UnlockLicenseManagerActivity`, license-manager actions/resources, and native query/set-enable
+  entry names. Pinned adjacent same-family Java maps the settings entry to that Activity and its
+  aircraft tab to official inventory/action calls (C-180). Exact current protected Java bodies and
+  type-6 rendering remain unknown.
+- `STATIC`：A-033 `0.8.0-flysafe-diagnostic-export` adds zero-permission MediaStore export at
+  `Download/FindUAS/FindUAS_RID_A033_latest.txt` without changing A-028's fixed `11/11` protocol or
+  zero-`11/12` direct-button boundary. Two clean builds were byte-identical; 132 tests, lint
+  0 errors/15 warnings, v2/zipalign and final-artifact checks passed (C-181/A-033).
+- `OBSERVED`：`FindUAS_A033_DIAG_EXPORT.apk` was staged to removable-SD Download and a fresh
+  readback matched `204,449` bytes and SHA-256
+  `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177` (C-182).
+- `UNKNOWN`：A-033 has not been installed or run. The prepared next RID session is manual read-only
+  inspection of DJI Fly's aircraft-license tab, followed by one A-033 diagnostic run; no toggle,
+  motor action, or RF experiment is included.

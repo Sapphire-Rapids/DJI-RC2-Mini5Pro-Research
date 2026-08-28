@@ -44,6 +44,7 @@
 | A-030 | RC331 v07 APEX `adbd`；input-sample；`07.00.0100` | `1,497,232` | `b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422` | `STATIC`；从 exact signed package 离线提取并审计；排除且不分发；只公开 hash |
 | A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `STATIC`；exact package 离线提取并审计；当前实机安装文件 hash 未读回；排除且不分发 |
 | A-032 | RC331 v07 APEX `adbd` CNXN-gate derivative；input-sample；userspace copy | `1,497,232` | `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` | `NOT ADMITTED`；MTP staging/readback 闭合；未复制到内部存储、未 chmod、未执行；vendor derivative 排除且不分发 |
+| A-033 | FindUAS RC 2 RID Admin；self-developed；`0.8.0-flysafe-diagnostic-export` / code 12 | `204,449` | `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177` | `STATIC`；exact audit；MTP staged/readback matched；未安装或运行；sealed APK 排除，源码公开 |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -308,7 +309,24 @@ MTP object、storage、USB 或 device identifier。
 独立描述与准入边界，不包含 A-029/A-030/A-031/A-032 bytes、厂商反编译正文或 patched manifest
 中的本机路径。
 
-## 15. 更新与一致性检查
+## 15. A-033：diagnostic export candidate
+
+A-033 保持 A-028 的 fixed `02:04 -> 12:04`、`0x11/0x11`、V3/V4 selector 与 direct-button
+zero-`0x11/0x12` 边界。新增功能只是把同一 privacy-reduced result 同时写入 app-private external
+files 和 MediaStore `Download/FindUAS/FindUAS_RID_A033_latest.txt`，便于在无 ADB 条件下由文件
+管理器回传。报告不包含 raw reply、license ID、账号、飞机序列号或坐标。
+
+两次 clean build byte-identical；132 tests 通过；lint 0 errors/15 warnings；v2 signature、
+zipalign、zero permissions、no native/network/socket/shell/external-process path 通过。最终工件为
+`204,449` bytes，SHA-256
+`8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`（C-181）。
+
+`OBSERVED`：APK 已通过 MTP staged 为 removable-SD
+`Download/FindUAS_A033_DIAG_EXPORT.apk`；fresh persistent-object readback 的 size/hash 与登记一致
+（C-182）。`UNKNOWN`：没有安装、启动、Binder 结果、inventory、状态改变或 RF 观察。sealed APK
+和 signing material 不入库；独立源码与测试发布在 `apps/rc2-rid-admin`。
+
+## 16. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

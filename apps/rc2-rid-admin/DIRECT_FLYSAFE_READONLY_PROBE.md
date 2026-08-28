@@ -172,19 +172,22 @@ staged as `Download/FindUAS_A028_DIAG.apk`. The operator installed and ran it; t
 protobuf/page/terminator parsing and did not send the set-enable command. This is not evidence of
 an empty inventory, no `RID_UNLOCK`, RID-off state, or RF behavior.
 
-## Unbuilt diagnostic-file successor
+## A-033 diagnostic-file successor
 
 The current source tree additionally writes the terminal result of every active direct `11/11`
 operation to the app-specific external-files path
-`getExternalFilesDir("diagnostics")/latest.txt`. The UI prints the actual absolute path, or only
-the write exception class if the atomic replacement fails. The UTF-8 file uses schema
+`getExternalFilesDir("diagnostics")/latest.txt` and publishes the same result through MediaStore as
+`Download/FindUAS/FindUAS_RID_A033_latest.txt`. The UI prints both locations, or only the write
+exception class for a failed destination. The UTF-8 file uses schema
 `finduas-rc2-rid-direct-diagnostic/v1` and records version, UTC time, fixed operation name, and the
 same complete privacy-reduced result displayed by the Activity. A temporary file is synced and
 atomically moved over `latest.txt`, preserving the previous complete result if replacement fails.
 
 For a direct transport callback failure, the result now includes the privacy-reduced failure text,
 `ccode`/ECode number and the existing redacted Binder/ACK diagnostic. It never includes
-`Reply.data`, a raw payload, an ECode description, a license ID, or protobuf bytes. This source
-change has not been assigned a new release version, installed, or run. A repository-import
-source-only verification build passed 131 JVM tests, lint, and `assembleDebug`; the generated APK
-is excluded and is not a sealed successor artifact.
+`Reply.data`, a raw payload, an ECode description, a license ID, or protobuf bytes. Exact A-033 is
+version `0.8.0-flysafe-diagnostic-export` / code 12, 204,449 bytes, SHA-256
+`8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`. It passed 132 tests,
+lint with zero errors, two byte-identical clean builds, v2 signature, alignment, zero-permission,
+and final-artifact checks. MTP staging/readback matched; it has not been installed or run. The
+generated APK remains excluded while this independently written source is published.

@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.0 - 2026-08-29
+
+### Added
+
+- Registered C-180--C-182 and A-033: exact DJI Fly official license-manager surface, the
+  independently written `0.8.0-flysafe-diagnostic-export` source/artifact audit, and removable-SD
+  MTP staging/readback.
+- Added a file-manager-readable privacy-reduced report at
+  `Download/FindUAS/FindUAS_RID_A033_latest.txt` using zero-permission MediaStore. The fixed direct
+  button remains `0x11/0x11` only and never emits `0x11/0x12`.
+- Added the one-time assisted sequence for manually inspecting DJI Fly's same-process aircraft
+  license list before one A-033 run. The first pass contains no toggle, motor action, or RF test.
+
+### Verification
+
+- A-033 is `204,449` bytes with SHA-256
+  `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`; 132 tests passed, lint
+  reported zero errors and 15 warnings, two clean builds were byte-identical, and signature,
+  alignment, zero-permission, native/network/socket/shell/external-process checks passed.
+- MTP fresh readback matched the registered artifact. The APK is not committed and has not been
+  installed or run; source and tests are published under `apps/rc2-rid-admin`.
+
 ## 0.3.9 - 2026-08-29
 
 ### Added

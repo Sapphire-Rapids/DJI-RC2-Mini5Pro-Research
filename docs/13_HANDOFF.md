@@ -168,6 +168,31 @@ The next read-only change is to display the already existing Reply failure/ecode
 Do not repeat the same black-box request or retain result images, identifiers, raw replies, or
 license material.
 
+### Current candidate: A-033 export plus official DJI Fly UI
+
+A-033 `0.8.0-flysafe-diagnostic-export` / code 12 is C-181/C-182 and A-033. It preserves A-028's
+fixed `02:04 -> 12:04`, `11/11`, V3/V4 selectors and direct-button zero-`11/12` boundary. It adds
+zero-permission MediaStore output at `Download/FindUAS/FindUAS_RID_A033_latest.txt`; reports contain
+the privacy-reduced Reply failure/ECode/callback diagnostic but no raw payload or license identity.
+
+The `204,449`-byte APK SHA-256 is
+`8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`. 132 tests, lint
+0 errors/15 warnings, two byte-identical clean builds, v2/zipalign, zero permissions and no
+native/network/socket/shell/external-process path passed. It is staged as removable-SD
+`Download/FindUAS_A033_DIAG_EXPORT.apk`; fresh readback size/hash matched. It has not been installed
+or run.
+
+Before that external diagnostic, use the materially different official owner identified by C-180.
+Read [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md) and perform its one-time
+manual read-only sequence: DJI Fly -> Profile/Me -> Settings -> `证书列表` / Unlocking License List ->
+`飞机内证书` / Aircraft Unlocking Licenses. Capture the complete result/error and do not toggle a
+row. Then install/run A-033 once and return the public text file. This first pass requires no motor
+start or detector and contains no state change.
+
+Do not interpret a generic row switch as a verified RID switch. Exact current protected Java bodies,
+type-6 rendering, aircraft application, restore semantics and motor-on independent RF A-B-A remain
+open.
+
 ### RID working status
 
 Read:

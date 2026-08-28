@@ -313,17 +313,34 @@ public final class MainActivity extends Activity {
     }
 
     private String writeDirectDiagnostic(String operationResult) {
+        String report;
         try {
-            String report = DirectDiagnosticReport.format(
+            report = DirectDiagnosticReport.format(
                     getPackageManager().getPackageInfo(getPackageName(), 0).versionName,
                     Instant.now().toString(),
                     operationResult);
+        } catch (Exception exception) {
+            return "diagnosticFormat=FAILED:" + exception.getClass().getSimpleName();
+        }
+
+        StringBuilder status = new StringBuilder();
+        try {
             File written = DiagnosticFileStore.writeLatest(
                     getExternalFilesDir("diagnostics"), report);
-            return "diagnosticFile=" + written.getAbsolutePath();
+            status.append("diagnosticPrivate=").append(written.getAbsolutePath());
         } catch (Exception exception) {
-            return "diagnosticWrite=FAILED:" + exception.getClass().getSimpleName();
+            status.append("diagnosticPrivate=FAILED:")
+                    .append(exception.getClass().getSimpleName());
         }
+        try {
+            DiagnosticFileStore.writePublicDownload(this, report);
+            status.append("\ndiagnosticDownload=")
+                    .append(DiagnosticFileStore.publicRelativeLocation());
+        } catch (Exception exception) {
+            status.append("\ndiagnosticDownload=FAILED:")
+                    .append(exception.getClass().getSimpleName());
+        }
+        return status.toString();
     }
 
     private String readDirectFlysafeReadonlyInventory() throws Exception {

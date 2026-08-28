@@ -256,6 +256,18 @@ Details: [09_NEGATIVE_RESULTS.md](09_NEGATIVE_RESULTS.md),
 | C-055 | `UNKNOWN` | No new independent V2.3 post-fix audit conclusion exists | V2.3 remains `NOT ADMITTED` |
 | C-129 | `HYPOTHESIS` | A separate external OpenDroneID source could provide synthetic configurable standards fields | No RF backend/hardware/readback/stop/reception evidence is implemented or admitted |
 
+## Official FlySafe UI and A-033 handoff
+
+| ID | Status | Claim | Boundary |
+| --- | --- | --- | --- |
+| C-180 | `STATIC` | Exact DJI Fly 1.21.10 declares the non-exported license-manager Activity/actions/JNI names; adjacent same-family executable Java maps the settings entry and aircraft tab to official query/set-enable calls | Exact protected current Java bodies and type-6 rendering remain unknown; UI state is not RF proof |
+| C-181 | `STATIC` | A-033 is the exact zero-permission diagnostic-export build; 132 tests, lint, reproducible build, signing/alignment and final-artifact checks passed | No install/run/Binder/inventory/RF result; direct button remains `11/11` only |
+| C-182 | `OBSERVED` | A-033 removable-SD staging and fresh full readback matched its registered size and SHA-256 | Staging only; device and MTP identifiers are excluded |
+
+Details: [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md),
+[11_ARTIFACT_REGISTER.md](11_ARTIFACT_REGISTER.md), and
+[RC 2 RID Admin source](../apps/rc2-rid-admin/README.md).
+
 ## Promotion rules
 
 A claim changes status only when new evidence directly satisfies the missing boundary. Examples:

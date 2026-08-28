@@ -47,7 +47,7 @@ as a package and accepting system-package flags. The APK's Linux UID is unchange
 must be confirmed on RC 2 firmware `07.00.0100`; the local service ABI was recovered from adjacent
 RC331 `10.00.0700/0205` artifacts.
 
-Version `0.7.1-flysafe-direct-diagnostic` obtains the service Binder through the controller's own
+Version `0.8.0-flysafe-diagnostic-export` obtains the service Binder through the controller's own
 `com.dji.protocol.ProtocolManager`, avoiding an ordinary app's direct hidden-API lookup. It retains
 `ServiceManager.checkService()` only as a compatibility fallback. The result pane is selectable and
 copyable and reports the exact service lookup, Binder transaction, callback and DUML ACK stage.
@@ -150,15 +150,34 @@ That live result closes only the tested group transport callback. It does not es
 inventory, missing `RID_UNLOCK`, aircraft support, RID-off state, or any RF behavior, and it issued
 no `11/12` request.
 
-The current unreleased source successor also persists each completed active direct `11/11` result as
-UTF-8 at `getExternalFilesDir("diagnostics")/latest.txt`. It writes a synced temporary file and
-atomically replaces `latest.txt`; the screen shows the actual absolute path, or the write exception
-class on failure. Schema `finduas-rc2-rid-direct-diagnostic/v1` contains the app version, UTC time,
-fixed operation name, and complete privacy-reduced result. Direct callback failures now include
-failure text, `ccode`/ECode and the already-redacted Binder/ACK diagnostic, but never `Reply.data`
-or raw payload bytes. No permission, network, service, startup receiver, background retry, or
-protocol write was added. This source state has not been assigned a new release version, installed,
-  or run. The public-import verification compiled it only as a source check: 131 JVM tests passed,
-  Android lint reported zero errors and 15 warnings, and `assembleDebug` succeeded. That generated
-  APK is excluded and must not be confused with the earlier sealed A-028 artifact sharing the old
-  version metadata.
+## A-033 diagnostic export candidate
+
+A-033 persists each completed active direct `11/11` result as UTF-8 in two places:
+
+- private app external storage at `getExternalFilesDir("diagnostics")/latest.txt`, replaced through
+  a synced temporary file and atomic rename;
+- public MediaStore Downloads at `Download/FindUAS/FindUAS_RID_A033_latest.txt`, so the stock RC 2
+  file manager can return the report without ADB or a storage permission.
+
+Schema `finduas-rc2-rid-direct-diagnostic/v1` contains the app version, UTC time, fixed operation
+name, and complete privacy-reduced result. Direct callback failures include failure text,
+`ccode`/ECode and the already-redacted Binder/ACK diagnostic, but never `Reply.data`, raw payload,
+license ID, account data, aircraft serial, or coordinates. No permission, network, service, startup
+receiver, background retry, or protocol write was added. Protocol command, route, selectors and the
+zero-`11/12` direct-button boundary remain identical to A-028.
+
+Exact A-033 artifact:
+
+- version: `0.8.0-flysafe-diagnostic-export` / code `12`;
+- size: `204449` bytes;
+- SHA-256: `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`;
+- 132 JVM tests passed; lint reported zero errors and 15 non-blocking warnings;
+- two independent clean builds were byte-identical;
+- APK Signature Scheme v2 and zip alignment verified; the manifest declares zero permissions and
+  the APK contains no native library, network, socket, shell, or external-process execution path;
+- staged through MTP as removable-SD `Download/FindUAS_A033_DIAG_EXPORT.apk`; a fresh readback
+  matched the expected size and SHA-256.
+
+The APK binary remains excluded; this directory is its independently written source. Staging is
+not installation or execution. A-033 has not produced a live Binder result and does not establish
+inventory, entitlement, RID state, aircraft control, or RF behavior.

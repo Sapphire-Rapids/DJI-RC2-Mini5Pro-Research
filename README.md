@@ -140,6 +140,18 @@
   `ProtocolException`，细分 `group transport callback failed`，`11/12 count=0`。因此固定
   `11/11` group selector 没有得到成功 transport callback，尚未进入 group protobuf、page 或
   terminator；这仍不是 unsupported、empty inventory、无 `RID_UNLOCK`、RID off 或 RF 结论。
+- A-033 `0.8.0-flysafe-diagnostic-export` / code 12 保持 A-028 的固定 `11/11` 协议与零
+  `11/12` 按钮边界，只把 privacy-reduced 诊断自动写到
+  `Download/FindUAS/FindUAS_RID_A033_latest.txt`。其 `204,449`-byte APK SHA-256 为
+  `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`；132 tests、lint
+  0 errors/15 warnings、两次 byte-identical clean build、v2/zipalign、零权限及无
+  native/network/socket/shell/external-process path 已通过。MTP fresh readback 匹配；尚未安装或
+  运行，不能据此宣称 inventory、RID 状态或 RF 控制。
+- Exact DJI Fly 1.21.10 声明非 exported 的 `UnlockLicenseManagerActivity`，并保留 license-manager
+  actions、`queryFCLicensesJni`/`setLicenseEnableJni` 与账号/飞机证书列表资源。相邻同族可执行源码
+  显示官方设置页进入该 Activity，飞机 tab 通过同进程 owner 查询并可能呈现 generic switch。
+  当前版本 protected Java body 与 type-6 rendering 尚未恢复，所以返回电脑后的第一优先实机步骤
+  是只读查看 DJI Fly 的“证书列表/飞机内证书”，而不是再猜 external Binder route。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
@@ -209,6 +221,8 @@
   `Detection` 多字段 mask、NDSS RF 结果，以及不能迁移到现代 Broadcast RID 的边界。
 - [docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md](docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md)：RID
   状态、身份、地区、策略、managed/opaque/legacy 面的可读/可写/恢复/RF 与 UI 准入矩阵。
+- [docs/20_OFFICIAL_FLYSAFE_UI_PATH.md](docs/20_OFFICIAL_FLYSAFE_UI_PATH.md)：DJI Fly 官方同进程
+  FlySafe 清单入口、证据边界与一次性只读实机步骤。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
 - [projects/README.md](projects/README.md)：完整源码目录、状态与发布边界。

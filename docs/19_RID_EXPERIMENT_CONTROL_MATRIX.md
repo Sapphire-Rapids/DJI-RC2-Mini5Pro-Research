@@ -24,6 +24,7 @@ A-026's gated implementation/audit/delivery add C-160--C-162; user-reported inst
 and its first live gate-unobserved/zero-query result adds C-165. A-027's fixed active read-only lane,
 artifact audit, delivery, and first ambiguous live result add C-166--C-169. A-028's diagnostic-only
 successor, delivery, and group-transport live result add C-170--C-173.
+The exact official UI surface and A-033 diagnostic-export audit/delivery add C-180--C-182.
 
 ## 2. Implementation levels
 
@@ -100,7 +101,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 
 | Surface | Facts | Current disposition |
 | --- | --- | --- |
-| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; A-026 passive gate ended unobserved/zero-query; A-027 ended `ProtocolException`/ambiguous; A-028 localized it to group transport callback failure before protobuf/pages/terminator, with zero `11/12`; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; no canonical inventory, support, entitlement, RID, or RF evidence exists; next classifier is Reply failure/ecode/callback, not an identical run; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
+| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; exact current package declares a non-exported official license-manager Activity; A-026 passive gate ended unobserved/zero-query; A-027 ended `ProtocolException`/ambiguous; A-028 localized it to group transport callback failure before protobuf/pages/terminator, with zero `11/12`; A-033 adds privacy-reduced export but is unrun; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; next query is the official same-process aircraft tab followed by one A-033 diagnostic, not another route guess; no canonical inventory, support, entitlement, RID, or RF evidence exists; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
@@ -140,6 +141,13 @@ A-028 preserves all of A-027's protocol behavior and only adds safe UI classific
 length. Its artifact audit and MTP identity checks passed (C-170--C-172). The installed run returned
 `group transport callback failed`, `11/12 count=0`; protobuf/pages/terminator were not reached
 (C-173). The next discriminator is Reply failure/ecode/callback detail.
+
+A-033 packages that privacy-reduced diagnostic into a file-manager-readable MediaStore report while
+preserving the same command/route/selectors and zero-`11/12` direct-button boundary (C-181/C-182).
+It remains uninstalled and unrun. C-180 establishes a higher-information official same-process
+surface: DJI Fly's non-exported license-manager Activity and aircraft tab. The first live pass must
+inspect that tab without toggling, then run A-033 once; see
+[20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md).
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing
 found no edge from type 6/field 7/`11/12` to WA150 `0802`, motor state, or BLE/Wi-Fi enable. This is a
@@ -190,10 +198,9 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
 2. Treat A-026's `GATE_UNOBSERVED`, A-027's ambiguous `ProtocolException`, and A-028's group
-   transport callback failure as separate narrow negatives. Expose only the existing Reply
-   failure/ecode/callback detail; do not repeat the same black-box request. Otherwise recover a
-   materially different official owner. In parallel, check only the official RID-card and Mini 5
-   Pro RID-selector visibility booleans.
+   transport callback failure as separate narrow negatives. First inspect the official DJI Fly
+   aircraft-license tab without changing state, then run staged A-033 once and return its exported
+   failure/ecode/callback report. Do not repeat another external route guess.
 3. Advance only after one canonical privacy-reduced inventory; report type-6 count/level/enabled/
    valid and preserve unavailable versus empty.
 4. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,

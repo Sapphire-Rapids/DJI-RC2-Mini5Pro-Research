@@ -41,7 +41,8 @@ here does not imply that all of its claims were accepted.
 - [SKYROVER_src](https://github.com/MAVProxyUser/SKYROVER_src/tree/8186e19241c913318b140bf37c5eafba005f1e7c)
   at `8186e19241c913318b140bf37c5eafba005f1e7c`.
   Used for area-code strategy, Airlink/FC synchronization, legacy key models, cloud-control writers,
-  and generated mappings. It is prior/static source, not a live RC 2 binary identity.
+  generated mappings, and the adjacent executable license-manager Activity/query/set-enable control
+  flow. It is prior/static source, not exact DJI Fly 1.21.10 Java identity or live RC 2 behavior.
 - [SKYROVER current official APK](https://s.uavflightserver.com/TnWJndtfwf0VvUVJxke/skyrover.apk),
   version `1.2.0` / code `102001130`, APK SHA-256
   `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8`.

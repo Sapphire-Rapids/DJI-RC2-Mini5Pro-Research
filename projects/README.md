@@ -18,7 +18,7 @@ change Remote ID behavior on a device.
 
 | Destination | Project role | Recorded status at publication |
 | --- | --- | --- |
-| `apps/rc2-rid-admin/` | Current FindUAS RC 2 RID query/management APK source and unit tests | Mixed: A-028 was built/run, while the current diagnostic-file successor source is unbuilt; it also contains gated or unresolved controls |
+| `apps/rc2-rid-admin/` | Current FindUAS RC 2 RID query/management APK source and unit tests | Mixed: A-028 was built/run; current A-033 was audited and staged but is uninstalled/unrun; the source also contains gated or unresolved controls |
 | `apps/rc2-settings-launcher/` | Minimal launcher for hidden Android settings on RC 2 | Utility source; installation/use does not establish RID behavior |
 | `apps/rid-admission-probe/` | Zero-permission v0.10 Android admission probe and retained historical observer source | v0.10 `NOT ADMITTED`; historical localhost observer is `RETRACTED` and must remain excluded from the active source set |
 | `libraries/rid-switch-controller/` | Bounded-lease/control state model | Host-tested model; not a proven device transport |

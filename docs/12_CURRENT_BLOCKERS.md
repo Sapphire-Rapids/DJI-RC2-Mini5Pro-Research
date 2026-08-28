@@ -117,14 +117,17 @@ uninitialized from unsupported. Missing:
 - usable current-connection observations of both passive pushes;
 - current support=true and negotiated V2/V3/V4 version derived from those observations;
 - exact current-session receiver/product/device tuple;
+- one manual same-process result from DJI Fly's non-exported aircraft-license Activity, including
+  login/link/version/support errors rather than collapsing them to an empty list;
 - fresh canonical query correlation; A-028 localized the current failure to the group transport
-  callback, but Reply failure/ecode/callback detail remains hidden;
+  callback; A-033 can export Reply failure/ecode/callback detail but has not been installed or run;
 - privacy-minimized type-6 inventory result.
 
 Effect: fixed legacy inventory requests, version guessing, cache defaults, missed pushes, A-027's
 ambiguous result, and A-028's group transport callback failure are not evidence of unsupported or
 empty inventory. External Binder cannot see DJI's device token; a same-sender/window pair is only a
-proxy, and missing pushes remain unknown.
+proxy, and missing pushes remain unknown. C-180 identifies the official same-process UI as the next
+ground-truth read; its presence does not make a displayed switch RF proof.
 
 ## B-11 — genuine type-6 entitlement
 

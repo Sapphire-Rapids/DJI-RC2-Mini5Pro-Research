@@ -248,6 +248,14 @@ Later retractions override earlier progress summaries.
     successful transport callback and protobuf/pages/terminator were not reached. The next
     discriminator is the already available Reply failure/ecode/callback diagnostic; do not repeat
     the same black-box request or call the result unsupported/empty/no-`RID_UNLOCK`.
+36. A-033 `0.8.0-flysafe-diagnostic-export` / code 12 preserves A-028's fixed read-only `11/11`
+    protocol behavior and adds a zero-permission MediaStore report at
+    `Download/FindUAS/FindUAS_RID_A033_latest.txt`. Its exact SHA-256 is
+    `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177`; MTP staging/readback is
+    closed, but installation, execution and a live result are not. Exact DJI Fly 1.21.10 declares
+    a non-exported official license-manager Activity; inspect its aircraft list manually before
+    another external Binder route experiment. A UI row or switch is inventory/management evidence,
+    not type-6 identity, aircraft application, or RF proof.
 
 ## Privacy and redaction
 
