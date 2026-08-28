@@ -332,6 +332,23 @@ work when a report did not contain a more precise timestamp.
 - Implementation direction changed to a bounded, privacy-reduced, read-only modern inventory query.
   The next APK version must not implement or send `0x11/0x12` until inventory proves a genuine item.
 
+### 2026-08-29 — official type-6 application/account/sync chain closure
+
+- `STATIC`: the current official FlySafe website, not a recovered type-6-specific DJI Fly page,
+  exposes Mainland and Abroad RID applications. Background qualification, a product row whose
+  `support_unlock_type` contains exact `Rid`, and an account device record matching product plus FC
+  serial all precede `POST /api/qep/unlock`.
+- `STATIC`: current DJI Fly 1.21.10 native code requires a nonempty official login token, obtains
+  user context, downloads signed license groups, and selects server-supplied V2/V3/V4 onboard data
+  by current FC support/version/target before import. FC inventory and generic existing-ID enable/
+  disable remain separate states.
+- `UNKNOWN`: the logged-in Mini 5 Pro product capability row, account background eligibility,
+  approval, genuine type-6 record, FC import, and enabled baseline are not available. No login,
+  authenticated request, license acquisition, import, or setter was performed.
+- `STATIC`: changing Sky/Ground country, locale, app region, or SDK area strategy does not create
+  this server entitlement. Public MSDK support omits Mini 5 Pro, so public API availability cannot be
+  inferred from DJI Fly's internal components.
+
 ### 2026-08-29 — A-025 modern FlySafe inventory checkpoint
 
 - `STATIC`: A-025 `0.5.0-flysafe-readonly` / code 8 added one system-Binder transaction-4
@@ -350,9 +367,12 @@ work when a report did not contain a more precise timestamp.
   passed. The exact `111,889`-byte APK has SHA-256
   `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`, declares zero Android
   permissions, packages no native library, and has no inspected network/socket/shell path.
-- `STATIC`: A local delivery copy was made, but A-025 was not copied to RC 2 removable storage,
-  installed, or run. No live Binder ACK, inventory, genuine type-6 record, state transition, or RF
-  behavior is recorded; the APK and source remain outside this documentation repository.
+- `OBSERVED`: A-025 was written through RC 2 MTP to removable SD `Download` as
+  `FindUAS_A025_RID.apk`; a same-session readback SHA-256 matched the registered artifact. An
+  unintended long-name duplicate was deleted. This proves staging byte identity only; installation
+  was not yet confirmed at that point. The operator later explicitly reported that A-025 installation
+  completed (`OBSERVED`, C-163); launch, execution, Binder ACK, inventory, license, state, and RF
+  result remain unknown. Storage/USB/device serials and the APK/source remain excluded.
 
 ### 2026-08-29 — exact current-Fly field-7 and aircraft-consumer boundary
 
@@ -364,3 +384,46 @@ work when a report did not contain a more precise timestamp.
 - `NEGATIVE`: bounded app-side tracing found no edge from type 6/field 7/set-enable to WA150 `0802`,
   motor transition, or BLE/Wi-Fi enable. Encrypted aircraft plaintext was unavailable, so no
   firmware-absence conclusion or patch offset was recorded.
+
+### 2026-08-29 — passive FlySafe gates and A-026 direction
+
+- `STATIC`: current DJI Fly passively populates unlock version from current-token `03/09` Area Info
+  and support from `03/42` WhiteList Info. Cache defaults are `255/false`; without usable pushes they
+  are unknown, not evidence of unsupported state. The official query manager stops before sending
+  when support is false or version is outside 0/1/2.
+- `STATIC`: observer registration sends no business GET and replays no earlier frame; no safe active
+  push trigger was recovered. A-025 does not first observe these gates and directly assumes V3/V4.
+- `INFERENCE`: A-025 transport failure, zero callbacks, parser rejection, or any noncanonical
+  completion can therefore be a session/gate false negative and cannot mean no type-6 entitlement or
+  empty inventory. A canonical count-consistent result would still describe only returned inventory.
+- `INFERENCE`: the A-026 direction was a bounded passive `03/09 + 03/42` phase admitting the existing
+  one-shot V3/V4 query only after usable support=true and version 1/2. C-160/C-161 now record the
+  offline implementation and artifact audit; that does not turn the design inference into live proof.
+  Because third-party Binder lacks DJI's device token, a matching route/window remains only a proxy
+  and missing pushes remain unknown.
+
+### 2026-08-29 — A-026 gated FlySafe artifact and delivery checkpoint
+
+- `STATIC`: A-026 `0.6.0-flysafe-gated` / code 9 registers one tx2 listener for `03/09` version and
+  `03/42` support. It requires both callbacks' complete actual route to agree and signs no permit on
+  malformed/failure/conflict/deadline/cancel. Only support=true plus version V3/V4 yields a
+  same-process permit for the fixed `11/11` lane.
+- `STATIC`: after admission, group is followed by strict page 0..127 traversal; selector/count/page/
+  terminator bounds fail closed. The internal sender has no `11/12` path, and tx4 callback waiting
+  covers the initial request plus two 6-second retries. Privacy-reduced results are followed by
+  listener cleanup and process termination.
+- `STATIC`: external DJI Developer Assistant is outside the internal sender allow-list. The APK also
+  retains separately gated F9, France-EID, and OPID write controls, so it is an Admin artifact and not
+  globally read-only.
+- `STATIC`: two clean `testDebugUnitTest lintDebug assembleDebug` pipelines produced byte-identical
+  APKs; 63/63 tests passed, lint reported 0 errors/13 warnings, v2 signature and zipalign passed,
+  manifest has zero `uses-permission`, and no native/network/socket/shell path was found. Exact
+  `135,525`-byte SHA-256 is
+  `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`.
+- `OBSERVED`: A-026 was written through MTP to removable SD `Download` as
+  `FindUAS_A026_GATE.apk`; same-session readback SHA matched, and a new MTP session confirmed one
+  unique short-name entry with the registered size. No object/storage/USB/device serial is retained.
+- `OBSERVED`: the operator subsequently reported that A-026 installation completed (C-164).
+- Boundary: this user report establishes installation only. Launch, execution, passive gate, permit,
+  Binder query/result, inventory, license, state, and RF remain `UNKNOWN`; no package-manager
+  telemetry or private device identifier is retained.

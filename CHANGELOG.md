@@ -1,5 +1,70 @@
 # Changelog
 
+## 0.3.5 - 2026-08-29
+
+### Added
+
+- Registered A-026 `0.6.0-flysafe-gated` and C-160/C-161: tx2 passive `03/09 + 03/42` gate,
+  complete-route consistency, fail-closed same-process permit, fixed tx4 V3/V4 `11/11`, strict
+  group/page 0..127 traversal, and an initial-plus-two-retry callback window.
+- Recorded exact A-026 identity: code 9, 135,525 bytes, SHA-256
+  `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`; two clean
+  test/lint/assemble runs were byte-identical, 63/63 tests passed, lint was 0 errors/13 warnings,
+  v2 signature/zipalign passed, and the APK has zero permissions and no native/network/socket/shell
+  path.
+- Added C-162 for MTP delivery as `FindUAS_A026_GATE.apk`: same-session readback SHA matched and a
+  new session confirmed one unique short name with the registered size.
+- Added C-163: the operator explicitly reported A-025 installation complete. This does not establish
+  launch, execution, Binder requests, inventory, state change, or RF result.
+- Added C-164: the operator explicitly reported A-026 installation complete. This establishes only
+  installation; launch, execution, passive callbacks, permit, Binder requests/results, inventory,
+  state change, and RF remain unknown.
+- Updated C-159 from an unimplemented direction to the inference rationale now realized offline by
+  A-026; runtime passive-push visibility remains unknown.
+- Preserved the Admin boundary: external DJI Developer Assistant is outside A-026's internal
+  allow-list, and gated F9/EID/OPID write controls remain, so the APK is not globally read-only.
+
+### Provenance
+
+- No object/storage/USB/device serial, local absolute path, account material, raw payload, or license
+  material is recorded. A-026 implementation/audit is `STATIC`; delivery and user-reported
+  installation are `OBSERVED`; execution and all live behavior remain `UNKNOWN`.
+
+## 0.3.4 - 2026-08-29
+
+### Added
+
+- Added C-154 and updated A-025 disposition: the exact APK was written through RC 2 MTP to
+  removable-SD `Download` as `FindUAS_A025_RID.apk`; same-session readback SHA-256 matched, and an
+  unintended long-name duplicate was removed. Installation and execution remain unconfirmed.
+- Added C-155/C-156 for the current official type-6 chain: FlySafe website background qualification,
+  exact `Rid` product capability, product/FC-SN account record, reviewed application, nonempty-login
+  signed group download, version/target-specific onboard blob selection, FC import, inventory, and
+  existing-ID enable/disable.
+- Recorded the visible-surface boundary: DJI Fly has ordinary Remote-ID registration/status and
+  generic Unlock-a-Zone license lists, but no type-6-specific application page was recovered. Mini 5
+  Pro capability/approval remains unknown, country/locale changes do not grant entitlement, and
+  public MSDK support omits the product.
+- Added C-157 for exact passive FlySafe admission: `03/09` Area Info populates unlock version and
+  `03/42` WhiteList Info populates support; default `255/false`, missed pushes, and absent replay are
+  unknown rather than unsupported.
+- Added C-158 for A-025's false-negative boundary. Its fixed V3/V4 query lacks a current-connection
+  passive gate, so failure or noncanonical completion cannot establish unsupported/no-license/empty
+  inventory; only a canonical count-consistent completion describes returned inventory.
+- Added C-159/H-28 for the A-026 direction: bounded passive observation first, one existing V3/V4
+  query only after usable support=true and version 1/2, and fail-closed result classes otherwise.
+  No final A-026 APK, version/hash, audit, installation, or live result exists.
+- Updated the evidence/artifact registers, timeline, control surfaces, hypotheses, blockers,
+  handoff, source index, README, and AGENTS correction while keeping binaries and account/license
+  material outside this documentation-only repository.
+
+### Provenance
+
+- No local absolute path, storage/USB/device serial, account token/Cookie/HAR/SN, signed license,
+  authenticated request, FC import, setter, or RF result is recorded.
+- Public web and current-app evidence is static; A-025 staging is observed; A-025 execution,
+  Mini 5 Pro entitlement, passive-gate visibility, and all A-026 behavior remain unobserved.
+
 ## 0.3.3 - 2026-08-29
 
 ### Added

@@ -19,7 +19,8 @@ synthetic-source hypothesis). The exact China UOM reply/status closure adds C-13
 Dynamic bundle separation adds C-133 through C-135. The independent same-family `RIDCtrlEnable`
 chain, Mini 5 Pro admission experiment, full current inventory, and public-prior-art boundary add
 C-136 through C-140. A-025's bounded modern FlySafe inventory lane and final-artifact audit add
-C-150/C-151; the exact current-Fly field-7 and aircraft-consumer boundaries add C-152/C-153.
+C-150/C-151; the exact current-Fly field-7 and aircraft-consumer boundaries add C-152/C-153;
+A-026's gated implementation/audit/delivery add C-160--C-162; user-reported installation adds C-164.
 
 ## 2. Implementation levels
 
@@ -96,7 +97,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 
 | Surface | Facts | Current disposition |
 | --- | --- | --- |
-| FlySafe type-6 `RID_UNLOCK` | exact generic `0x11/0x11` inventory and `0x11/0x12` set-enable wire; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID; retained MSDK design only changes app status; A-025 implements an independent MSDK-compatible privacy-reduced `11/11` lane offline | `MANAGED`; A-025 still needs its first live query, never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
+| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; passive `03/09` version + `03/42` support gates; A-026 implements/audits the fail-closed gate; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; A-025 is user-reported installed but unexecuted; A-026 is audited/staged/user-reported installed but not confirmed run; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
@@ -108,10 +109,19 @@ A-025 fixes the candidate inventory request to system-Binder transaction 4,
 count/page calls/total duration at 127/128/90 seconds, accepts only ccode 0 records and a data-less
 ccode 1 terminator, and strictly parses an independently implemented MSDK-compatible candidate
 schema while displaying only counts, RID level, and status bits. Field-7 recognition is compatibility
-exploration, not proof that current DJI Fly understands it. A local delivery copy exists, but the
-artifact has not been copied to RC 2 removable storage, installed, or run. Its FlySafe allow-list has
-no `11/12` tuple; this does not remove the separately gated older F7/F9, France EID, and OPID controls
-from the same APK.
+exploration, not proof that current DJI Fly understands it. The exact APK was staged through MTP as
+`FindUAS_A025_RID.apk` with same-session readback hash equality; user-reported installation now
+exists but execution/result do not. Its FlySafe allow-list has no `11/12` tuple; this does not remove the separately gated
+older F7/F9, France EID, and OPID controls from the same APK.
+
+The official manager first derives version from passive `03/09` and support from passive `03/42`.
+A-025 skips this gate and assumes V3/V4, so failure/noncanonical completion is not unsupported or
+empty inventory. Exact A-026 classifies both on a complete-route proxy and sends no inventory request
+unless support=true plus version 1/2 are usable. Its final artifact/audit and staged readback are
+closed (C-160--C-162), and user-reported installation is C-164, but execution/live result are not;
+external Binder cannot see DJI's device
+token, so missing pushes remain unknown. Developer Assistant and retained gated F9/EID/OPID writes
+remain outside the claim that the new FlySafe lane is read-only.
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing
 found no edge from type 6/field 7/`11/12` to WA150 `0802`, motor state, or BLE/Wi-Fi enable. This is a
@@ -161,19 +171,23 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
-2. Add a bounded read-only modern FlySafe inventory query through the existing system Binder;
-   report only type-6 count/level/enabled/valid and preserve unavailable versus empty.
-3. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,
+2. Run exact audited and user-reported-installed A-026's bounded passive `03/09 + 03/42` admission
+   phase; in parallel, the owner checks only the official RID-card and Mini 5 Pro RID-selector
+   visibility booleans.
+3. Only when support=true and version is V3/V4, run one bounded read-only modern FlySafe inventory
+   query through the existing system Binder; report only type-6 count/level/enabled/valid and
+   preserve unavailable versus empty.
+4. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,
    inventory readback, restoration, and final readback; keep the license ID process-private.
-4. Correlate the controlled state with operator-started motor-on independent RF. The tested
+5. Correlate the controlled state with operator-started motor-on independent RF. The tested
    `0x11/0x1C` Binder listener is false-negative and must not be reused as truth.
-5. Locate the dependency that owns the external China UOM status mappings and Sync helper, then
+6. Locate the dependency that owns the external China UOM status mappings and Sync helper, then
    close runtime function-ID `0x6C` admission; keep identifier editing locked until live
    baseline/restore/RF gates are met.
-6. Close OPID/Japan runtime Characteristics and read-only admission; never retain credential data.
-7. Pursue verified WA150 `0802` plaintext or legitimate on-device production-owner evidence to find
+7. Close OPID/Japan runtime Characteristics and read-only admission; never retain credential data.
+8. Pursue verified WA150 `0802` plaintext or legitimate on-device production-owner evidence to find
    the actual broadcaster, motor/GNSS gates, region format selector, and any firmware-level control.
-8. In parallel, implement a separately reviewed synthetic OpenDroneID source adapter for fields
+9. In parallel, implement a separately reviewed synthetic OpenDroneID source adapter for fields
    that a DJI aircraft cannot safely or legitimately expose as free-form controls.
 
 No current surface in this matrix is admitted as a stable Mini 5 Pro RID transmitter switch or

@@ -100,28 +100,42 @@ Effect: Java false is ambiguous and no write baseline exists.
 
 ## B-10 — current FlySafe support/version/session
 
-Missing:
+Static source is now closed: current DJI Fly gets version only from passive `03/09` Area Info and
+support from passive `03/42` WhiteList Info; cache defaults `255/false` do not distinguish
+uninitialized from unsupported. Missing:
 
-- current support=true from an official populated gate;
-- negotiated V2/V3/V4 version;
+- usable current-connection observations of both passive pushes;
+- current support=true and negotiated V2/V3/V4 version derived from those observations;
 - exact current-session receiver/product/device tuple;
 - fresh query correlation;
 - privacy-minimized type-6 inventory result.
 
-Effect: fixed legacy inventory requests and version guessing are not admissible evidence.
+Effect: fixed legacy inventory requests, version guessing, cache defaults, missed pushes, and A-025
+noncanonical failure are not admissible evidence of unsupported or empty inventory. External Binder
+cannot see DJI's device token; a same-sender/window pair is only a proxy, and missing pushes remain
+unknown.
 
 ## B-11 — genuine type-6 entitlement
 
-Missing:
+The legal acquisition/sync architecture is now static: official FlySafe website background gate ->
+exact `Rid` product capability -> account product/FC-SN record -> reviewed application -> signed
+server group -> FC import -> FC inventory -> existing-ID enable. DJI Fly 1.21.10 has no recovered
+type-6-specific application page; ordinary Remote-ID registration and generic Unlock-a-Zone are
+separate. Missing:
 
-- official server eligibility for the exact product;
+- the owner-visible official RID application card and Mini 5 Pro RID product selector yes/no;
+- approved official server eligibility for the exact product/account/background;
 - genuine account-issued, FC-bound type-6 item;
+- successful FC import/visibility rather than server presence alone;
 - provenance, validity, enabled baseline, and matching region level;
 - same-item readback after any transition;
 - exact restore and final inventory;
 - onboard status and independent motor-on RF A-B-A.
 
-Effect: static SetEnable schema cannot establish a stable Mini 5 Pro switch.
+Effect: static SetEnable schema, region/country changes, a copied license, or a server-list item cannot
+establish a stable Mini 5 Pro switch. If either official visibility Boolean is false, the lawful path
+is a DJI FlySafe research/experimental support request or a separately supported aircraft for parser
+validation; never fabricate, transfer, or replay a license.
 
 ## B-12 — effective 30/50 m restriction observation
 
@@ -248,9 +262,22 @@ controls ended in `ECode 1` after about 3.1 seconds, so target F7/F8/F9 were not
 
 A-025 now closes only the offline implementation prerequisite for the next branch. Its FlySafe lane
 is fixed to system-Binder transaction 4, `02:04 -> 12:04`, `11/11`, bounded V3/V4 traversal and
-privacy-reduced output; the exact final artifact passed its recorded audit and has a local delivery
-copy but has not been copied to RC 2 removable storage, installed, or run (C-150/C-151). Therefore
-no live inventory fact exists yet.
+privacy-reduced output. The exact final artifact passed its recorded audit and was written through
+MTP to removable SD `Download` as `FindUAS_A025_RID.apk`; same-session readback SHA matched, and the
+unintended long-name duplicate was removed (C-150/C-151/C-154). The user subsequently reported
+installation complete (C-163), but launch, execution, query, and result remain unknown, so no live
+inventory fact exists.
+
+Static session analysis adds a new precondition. Official current Fly populates support/version only
+from passive `03/42` and `03/09`; A-025 neither observes those gates nor supports V2 before its fixed
+V3/V4 request. Thus a failure or noncanonical completion is a possible false negative rather than a
+no-license result (C-157/C-158). A-026 now implements the bounded passive gate and admits one fixed
+V3/V4 request only after usable support=true and version 1/2; its exact final artifact passed the
+recorded audit and was staged as unique `FindUAS_A026_GATE.apk` with matching readback SHA and size
+(C-159--C-162). The operator subsequently reported installation complete (C-164), but execution,
+passive visibility, permit, query, and result remain unknown.
+The external Developer Assistant remains outside its internal allow-list, and retained gated
+F9/EID/OPID controls make A-026 an Admin artifact rather than globally read-only.
 
 The current app-side schema also no longer supplies the missing aircraft consumer. Exact DJI Fly
 1.21.10 typed `LicenseData` parsing stops at fields 1--5 and treats field 7 as unknown; the separate
@@ -261,8 +288,9 @@ BLE/Wi-Fi broadcaster (C-153). This does not close encrypted aircraft firmware.
 Missing:
 
 - a materially different official in-process owner/authenticated route or verified WA150 handler;
-- one live A-025 result that distinguishes Binder/query unavailable from a canonical, privacy-reduced
-  genuine type-6 inventory baseline without retaining license material;
+- one first A-026 launch/passive gate window that distinguishes unobserved/unusable/unsupported/
+  version state before any inventory request;
+- one canonical, privacy-reduced genuine type-6 inventory baseline without retaining license material;
 - aircraft-side evidence that changing the genuine type-6 enabled state is consumed by the RID
   broadcaster rather than only reflected in an SDK status object;
 - only after a new owner path passes a same-route positive control: target metadata/value baseline,
@@ -277,8 +305,11 @@ status bits, and result class.
 Effect: known generic F7/F8 attach routes are closed for the current session. The third-party
 `0x11/0x1C` Binder listener is also closed as a false-negative oracle by independent RF evidence
 (C-146). Do not repeat either route family without a new owner fact. The shortest active dependency
-is now installing/running the already audited A-025 modern read-only type-6 inventory query, followed
-by same-item controlled enable-state readback/restore and WA150 `0802` aircraft-side ownership.
+is now running the exact audited and user-reported-installed A-026 and first reading its passive gate
+result, while the owner independently checks only the two official website eligibility booleans. Only if A-026 issues
+a permit may the same process run its one bounded `11/11` query. Same-item enable-state
+readback/restore and WA150 `0802` aircraft-side ownership follow only after a genuine canonical
+record.
 Static discovery of another setter is
 insufficient without baseline, readback, restore, persistence, and RF observation.
 
@@ -287,7 +318,10 @@ insufficient without baseline, readback, restore, persistence, and RF observatio
 The evidence dependencies are:
 
 ```text
-A-025 live bounded 11/11 inventory query via existing system Binder
+exact A-026 first run
+  -> bounded passive 03/09 + 03/42 gate (or equivalent official-owner state)
+  -> support=true + version V3/V4 in one connection proxy
+  -> one bounded 11/11 inventory query via existing system Binder
   -> privacy-reduced genuine type-6 level/enabled/valid baseline
   -> prove exact same-item 11/12 response and 11/11 readback/restore design
   -> verified 0802/aircraft-side consumer or independent RF effect
@@ -317,8 +351,10 @@ exact live identity
 The FlySafe path is separate:
 
 ```text
-official account eligibility
-  -> support/version populated
+official RID application card + Mini 5 Pro Rid product selector yes/no
+  -> approved official account/product/FC-SN entitlement
+  -> signed group download + FC import
+  -> passive support/version populated for the current connection
   -> fresh privacy-minimized inventory
   -> genuine type-6 item and baseline
   -> bounded same-item transition/readback/restore

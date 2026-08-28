@@ -49,6 +49,12 @@
   wire 已闭合为 `0x11/0x11` / `0x11/0x12`，product-139 receiver 为 `0x92`。这证明了设计语义，
   但 Mini 5 Pro 是否有资格、是否存在真实许可、当前 runtime 是否执行该分支及 RF 是否变化仍为
   `UNKNOWN`。
+- 当前官方申请入口在 FlySafe 网站，不是 DJI Fly 中已恢复的 type-6 专用设置页。Mainland/Abroad
+  RID 分别要求对应账号背景审核，产品 row 的 `support_unlock_type` 精确含 `Rid`，并选择与产品和
+  FC serial 匹配的账号设备记录。DJI Fly 1.21.10 随后以 nonempty login token 获取 user/signed
+  license group，按 FC support/version/target 选择 server-supplied V2/V3/V4 blob 后导入、pull，再对
+  existing license ID enable。Mini 5 Pro 的登录后 capability/审批、FC import 与 genuine record 均
+  未知；改地区不会生成 entitlement，public MSDK 也未支持 Mini 5 Pro。
 - Exact current DJI Fly 1.21.10 `LicenseData` typed parser 只处理 fields 1--5；field 7/tag `0x3a`
   进入 `UnknownFieldSet`。把 field 7 解成 `LicenseDataRID` 的是独立 MSDK 5.18 工件，A-025 因此是
   MSDK-compatible exploration，不是“current Fly 已理解 type 6”的证据。current Fly
@@ -81,22 +87,36 @@
   `0x11/0x1C` 状态时间线。25 项测试、lint 0 errors、两次逐字节相同构建及 APK 审计通过，
   已安装运行。legacy `0A:05 -> 03:00` 与 modern `02:04 -> 12:04` 正对照均以 `ECode 1`
   timeout，故 target F7/F8/F9 未发送；passive timeline 后续已由独立 RF 对照判为假阴性。
-- 当前离线候选 A-025 `0.5.0-flysafe-readonly` / code 8（SHA-256
+- 当前已审计并 staged 的 A-025 `0.5.0-flysafe-readonly` / code 8（SHA-256
   `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`，`111,889` bytes）
   已实现固定 system-Binder `02:04 -> 12:04`、`11/11` 的现代 FlySafe V3/V4 有界清单查询。
   count/page/overall 上限为 127/128/90 秒，只输出 count、RID level 与 status bits；identity/raw
   data 不输出，`11/12` 无获准路径，旧 `11/1C` 按钮已移除。42 tests、lint 0 errors、clean
-  assemble 与 byte-identical rebuild 通过，APK 零权限、无 native/network/socket/shell path；尚未
-  复制到 RC 2 removable storage、安装或运行。`flysafe-readonly` 只指新增 lane，同一 APK 仍保留
-  旧的门禁式 F7/F9、France EID 与 OPID 实验功能。
+  assemble 与 byte-identical rebuild 通过，APK 零权限、无 native/network/socket/shell path。它已
+  通过 MTP 写入 RC 2 removable SD `Download` 为 `FindUAS_A025_RID.apk`，同会话读回 hash 一致，
+  意外长名副本已删除；用户随后报告安装完成，但启动/执行/结果仍未知。A-025 已由 A-026 取代。
+  `flysafe-readonly` 只指新增 lane，同一 APK 仍保留旧的门禁式 F7/F9、France EID 与 OPID 实验功能。
+- Exact current Fly 还表明 FlySafe query 的 version/support 分别由 passive `03/09` Area Info 与
+  `03/42` WhiteList Info 填充；默认 `255/false` 或没看到 push 都是 unknown。A-025 在未观察这些
+  current-connection gates 时直接假设 V3/V4，所以 failure/noncanonical completion 可能是假阴性，
+  不能叫 unsupported 或 empty。A-026 `0.6.0-flysafe-gated` / code 9 已实现 bounded passive gate：
+  malformed/failure/conflict/deadline/cancel 不签 permit，仅 support=true + V3/V4 时同进程进入 fixed
+  `11/11`。exact `135,525`-byte SHA-256 为
+  `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`；63 tests、两次
+  byte-identical clean build、lint 0 errors/13 warnings、v2/zipalign、零权限及无
+  native/network/socket/shell path 通过。它已 staged 为 `FindUAS_A026_GATE.apk` 并跨 MTP 会话确认
+  readback hash/唯一短名/size；用户随后明确报告安装完成，但启动、执行、passive gate、query 与结果
+  仍未知。external Binder route/window 仍只是 token 代理；
+  external Developer Assistant 也不受内部 allow-list，且 APK 保留 gated F9/EID/OPID writes，因此是
+  Admin 而非全局 read-only。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
   A-024 又证明两条 Binder route 连 height 正对照都失败，因此 current generic-parameter
-  attach 路线已关闭；target 从未发送，未发送 F9。下一主线是将已审计 A-025 运行一次 system
-  Binder 现代 FlySafe type-6 inventory，只区分 query unavailable 与 canonical privacy-reduced
-  result；若存在 genuine type 6，再追其 enable state 到 `NO_BROADCAST`/真实 RF 的因果链；并行
-  继续 WA150 `0802` broadcaster/policy owner。
+  attach 路线已关闭；target 从未发送，未发送 F9。下一主线是首次运行 exact A-026，先读 passive
+  gate，只有 permit 才做一次 system-Binder modern FlySafe type-6 inventory；同时由所有者在 official FlySafe 只确认 RID
+  card 与 Mini 5 Pro RID product selector 两个 yes/no。只有 canonical genuine type 6 才继续追
+  enable state 到 `NO_BROADCAST`/真实 RF；并行继续 WA150 `0802` broadcaster/policy owner。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
 - NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 authenticated Base64 envelope、
@@ -134,7 +154,7 @@
 - [docs/00_SCOPE_AND_REDACTION.md](docs/00_SCOPE_AND_REDACTION.md)：范围、证据类型和脱敏边界。
 - [docs/01_RESEARCH_PROCESS.md](docs/01_RESEARCH_PROCESS.md)：实际研究过程与方法。
 - [docs/02_EVIDENCE_REGISTER.md](docs/02_EVIDENCE_REGISTER.md)：核心 claim 登记册。
-- [docs/03_TIMELINE.md](docs/03_TIMELINE.md)：2026-08-27 至 2026-08-28 时间线。
+- [docs/03_TIMELINE.md](docs/03_TIMELINE.md)：2026-08-27 至 2026-08-29 时间线。
 - [docs/04_STATE_ACCOUNT_LIMITS.md](docs/04_STATE_ACCOUNT_LIMITS.md)：RID 状态、账号登录和限飞层。
 - [docs/05_RID_CONTROL_SURFACES.md](docs/05_RID_CONTROL_SURFACES.md)：各 RID/EID/OPID/许可控制面。
 - [docs/06_REGION_RF_POLICY.md](docs/06_REGION_RF_POLICY.md)：地区码、FCC/CE、SDR 与 RF 证据。

@@ -165,9 +165,13 @@ Later retractions override earlier progress summaries.
     current Mini 5 Pro executes it. Current native inventory/set-enable endpoints are `0x11/0x11`
     and `0x11/0x12`, with product-139 receiver `0x92`; query only through a bounded read-only probe,
     never invent or expose license IDs or send set-enable before a genuine baseline exists.
-29. A-025 `0.5.0-flysafe-readonly` is the current offline inventory candidate. Its exact SHA-256 is
-    `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`; it has not been copied to
-    RC 2 removable storage, installed, or run. Its new lane is fixed to system-Binder transaction 4,
+29. A-025 `0.5.0-flysafe-readonly` is the current staged inventory baseline. Its exact SHA-256 is
+    `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`; it was copied through MTP
+    to RC 2 removable SD `Download` as `FindUAS_A025_RID.apk`, and same-session readback hash matched.
+    An unintended long-name duplicate was removed. The user later explicitly reported installation
+    complete; launch, execution, Binder activity, and result remain unknown. A-025 is superseded by
+    gate-aware A-026.
+    Its new lane is fixed to system-Binder transaction 4,
     route `02:04 -> 12:04`, `11/11`, bounded selectors/parser, and privacy-reduced output. It has no
     admitted `11/12` tuple and the old `11/1C` button is removed. The suffix applies only to the
     FlySafe lane: separately gated legacy F7/F9, France EID, and OPID controls remain in the APK, so
@@ -178,6 +182,28 @@ Later retractions override earlier progress summaries.
     recognizes type 6. Current Fly `11/12` carries only license ID and action, and no app-side edge to
     WA150 `0802`, motor state, or BLE/Wi-Fi enable was found. Do not turn that bounded negative into
     firmware absence, equate receiver `0x92` with module `0802`, or claim a patch offset.
+31. Current official FlySafe derives unlock version from passive current-token `03/09` Area Info and
+    support from `03/42` WhiteList Info. Defaults `255/false`, missed/late/unusable pushes, and no
+    replay are unknown, not unsupported. A-025 skips this gate and assumes V3/V4, so failure or a
+    noncanonical completion is not an empty-inventory or no-entitlement result. Exact A-026 now
+    observes both in one bounded complete-route proxy window before admitting one `11/11`; its final
+    artifact is audited, staged, and user-reported installed, but launch/run/result remain unknown;
+    external Binder cannot see DJI's device token.
+32. Type-6 acquisition is the official FlySafe website background/product/device approval path,
+    followed by DJI Fly's logged-in signed-group download, FC-SN/version/target-matched import,
+    aircraft inventory, and existing-ID action. Normal Remote-ID registration and generic
+    Unlock-a-Zone are separate. Never infer Mini 5 Pro eligibility from the public map catalog,
+    region/country, or MSDK schema; never export credentials or create, transfer, or replay a license.
+33. A-026 `0.6.0-flysafe-gated` / code 9 is `135,525` bytes with SHA-256
+    `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`. Its tx2 gate withholds
+    the same-process permit on malformed/failure/conflict/deadline/cancel and admits fixed tx4
+    `11/11` only for support=true plus V3/V4. Two clean builds, 63 tests, lint 0 errors/13 warnings,
+    v2 signature, zipalign, zero permissions, and no native/network/socket/shell path passed. It is
+    staged as `FindUAS_A026_GATE.apk` with matching readback and new-session unique short-name/size
+    confirmation; the operator subsequently reported installation complete (C-164), but launch,
+    execution, passive callbacks, query, and result remain unknown. External Developer Assistant is
+    outside its sender allow-list, and retained gated F9/EID/OPID writes make it Admin rather than
+    globally read-only.
 
 ## Privacy and redaction
 

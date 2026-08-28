@@ -472,3 +472,24 @@ stronger conclusion that cannot be drawn.
 - Does not establish: absence inside encrypted WA150 firmware, type-6 non-support, or no FC field-7
   response. Receiver `0x92` is a protocol endpoint rather than module `0802` identity. No reversible
   firmware patch offset has been recovered.
+
+## N-47 — A-025 without passive FlySafe admission as a negative oracle
+
+- Status: `INFERENCE` boundary for A-025 `0.5.0-flysafe-readonly`; machine claim C-158. The user later
+  reported A-025 installed, but launch/execution/result remain unknown (C-163).
+- Static cause: official current DJI Fly derives query support/version from passive current-token
+  `03/42` and `03/09`, while A-025 directly uses a fixed V3/V4 `11/11` session without observing
+  either gate. Cache defaults, missed pushes, and unknown version are deliberately absent from its
+  admission decision.
+- Consequence: timeout, zero callback, callback failure, parser rejection, count/terminator mismatch,
+  or any other noncanonical completion must be reported as query unavailable/ambiguous. It cannot be
+  reported as unsupported, no entitlement, or empty inventory.
+- Narrow positive boundary: a fully canonical, count-consistent completion may describe only the
+  returned inventory. It still does not prove account product eligibility, aircraft-side RID
+  consumption, or RF effect.
+- Next discriminator: audited A-026 adds a bounded passive gate and sends no inventory request unless
+  usable support=true plus version 1/2 are observed (C-160/C-161). Because external Binder lacks
+  DJI's device token and `11/1C` previously delivered a false negative, absent gate pushes remain
+  observer-unavailable, not device-unsupported. A-026 is staged with verified readback/unique short
+  name (C-162), and the operator reported installation complete (C-164); execution, passive
+  callbacks, permit, and query result remain unconfirmed.

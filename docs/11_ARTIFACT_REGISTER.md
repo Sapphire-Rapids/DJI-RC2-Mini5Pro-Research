@@ -36,7 +36,8 @@
 | A-022 | SKYROVER official Android application；input-sample；`1.2.0` / code `102001130` | `405,543,495` | `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8` | `STATIC`；只离线分析；从未安装或执行；排除且不分发 |
 | A-023 | FindUAS RC 2 RID Admin；self-developed；`0.3.0-research` | `64,745` | `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` | `OBSERVED`；已安装并执行一次只读 Binder F7 probe；无 F9；已由 A-024 取代且从 removable storage 清理；不进入本 documentation repo |
 | A-024 | FindUAS RC 2 RID Admin；self-developed；`0.4.1-research` | `92,569` | `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95` | `OBSERVED`；已安装并执行只读双路 positive-control 与 30 秒 listener；target 未发送、无 F9；listener 经独立 RF 对照判为假阴性；由下一 inventory 版本取代；不进入本 documentation repo |
-| A-025 | FindUAS RC 2 RID Admin；self-developed；`0.5.0-flysafe-readonly` / code 8 | `111,889` | `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80` | `STATIC`；exact final-artifact audit；仅有本地交付副本，尚未复制到 RC 2 removable storage、安装或运行；current modern FlySafe inventory candidate；不进入本 documentation repo |
+| A-025 | FindUAS RC 2 RID Admin；self-developed；`0.5.0-flysafe-readonly` / code 8 | `111,889` | `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80` | `OBSERVED`；exact final-artifact audit；MTP/readback 已闭合，用户随后明确报告安装完成；启动、执行与结果仍未知；由 A-026 取代；不进入本 documentation repo |
+| A-026 | FindUAS RC 2 RID Admin；self-developed；`0.6.0-flysafe-gated` / code 9 | `135,525` | `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4` | `OBSERVED`；exact final-artifact audit；MTP/readback/新会话唯一短名与 size 已闭合，用户随后明确报告安装完成；启动、执行与结果仍未知；current gate-aware FlySafe candidate；不进入本 documentation repo |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -159,7 +160,7 @@ listener 在 9 ms 内被接受并运行完整 30 秒，但 callback/valid/malfor
 操作者在窗口内起桨，独立检测器确认飞机实际播报 RID。故该 listener 被归类为假阴性，不再作为
 readback oracle。应用按设计在保存后关闭；未观察到由此造成的 DJI Fly/link 异常。
 
-A-025 是当前离线 modern FlySafe inventory candidate，package 保持
+A-025 是已审计并由用户报告安装完成、但没有启动/执行/结果记录的旧 modern FlySafe inventory baseline，package 保持
 `com.finduas.rc2ridadmin`，versionCode 8、versionName `0.5.0-flysafe-readonly`。新增主流程只通过
 system `protocol` Binder transaction 4 固定发送 `02:04 -> 12:04`、`11/11`、6,000 ms 的 V3/V4
 group/page 请求；selector、ccode、空 terminator、count/page/overall deadline 与 protobuf parser
@@ -177,14 +178,50 @@ geometry、signed data 和 raw protobuf 不进入显示或持久化。`flysafe-r
 warnings，第二次 clean build byte-identical，v2 signature 与 zip alignment 验证通过；manifest
 声明零 Android permission，APK 无 packaged native library，检查未发现 network/socket/shell path。
 最终工件为 `111,889` 字节，SHA-256
-`b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`。已生成本地交付副本，
-但它尚未复制到 RC 2 removable storage、安装或运行，所以状态保持 `STATIC`，不产生 Binder、
-inventory、license、设备状态或 RF 结论；二进制和源码均不进入本 documentation-only repository。
+`b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`。2026-08-29，工件已
+通过 RC 2 MTP 写入 removable SD 的 `Download`，短文件名为 `FindUAS_A025_RID.apk`；同一传输会话
+读回所得 SHA-256 与登记值一致。一个意外产生的长文件名副本已删除，仅保留短名副本。该观察只证明
+staging byte identity 与 duplicate cleanup，不包含 storage、USB 或 device serial。MTP 交付时尚无
+用户确认安装或运行结果；用户随后明确报告“A-025 APK 安装完成”，因此 artifact device-use state 与 C-163 记录为
+`OBSERVED`；该事实不证明应用被打开、发送 Binder 请求、返回 inventory、改变设备状态或产生 RF
+结果。A-025 已由 A-026 取代；二进制和源码均不进入本 documentation-only repository（C-154/C-163）。
 
 APK signer certificate SHA-256：
 `37896e5a80772e39edad4bdf3ce7f19d2b6e1352a701c48c70edc10c97b2b224`。
 
-## 11. 更新与一致性检查
+## 11. A-026：gate-aware FlySafe Admin candidate
+
+A-026 package 仍为 `com.finduas.rc2ridadmin`，versionCode 9、versionName
+`0.6.0-flysafe-gated`。它把 C-159 的 gate-aware 方向实现为一个不可跨进程转移的 permit：同一 tx2
+listener 被动接收 `03/09` version 与 `03/42` support，只有两者的完整实际 route 一致、payload
+usable、support=true 且 version 为 V3/V4 时才在同一进程内允许后续 fixed `11/11` query。malformed、
+failure callback、route/value conflict、deadline 与 cancellation 均不签发 permit；没有 permit 时不发
+inventory 请求。
+
+permit 后仍只使用固定 system-Binder transaction 4 FlySafe sender：group selector 后严格按 page
+0..127 遍历，selector、page 次数、count 与 terminator 都 fail closed。tx4 callback 等待预算覆盖初发与
+两次各 6 秒重试，避免在 vendor retry 仍可能到达时提前把本次 query 判死。内部 sender allow-list 不含
+`11/12`。结果仍只保留 privacy-reduced count/level/status；完成、失败或取消后清理 listener，并以进程
+termination 触发 Binder-death cleanup。
+
+这不是整个 APK 的 global read-only 声明。外部 DJI Developer Assistant launcher 不由内部 sender
+allow-list 约束；APK 也继续保留各自受原有门禁约束的 F9、France EID 与 OPID write controls。因此名称
+和用途为 RID Admin，`flysafe-gated` 只描述新的 FlySafe gate/query lane。
+
+最终工件经两次独立 clean `testDebugUnitTest lintDebug assembleDebug`；63/63 tests 通过，lint 为
+0 errors/13 warnings，两次 APK byte-identical。V2 signature 与 zipalign 验证通过；manifest 为零
+`uses-permission`，APK 无 packaged native library，检查未发现 network/socket/shell path。最终大小
+`135,525` bytes，SHA-256
+`3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`（C-160/C-161）。
+
+2026-08-29，A-026 已通过 RC 2 MTP 写入 removable SD `Download`，短名
+`FindUAS_A026_GATE.apk`。同一会话读回 SHA-256 与登记值一致；重新建立 MTP 会话后的目录清单又确认
+仅有一个该短名且 size 为 `135,525` bytes。此处不记录 object/storage/USB/device serial。该交付只证明
+staged-file identity/uniqueness（C-162）。用户随后明确报告“A-026 APK 安装完成”，因此安装记为
+`OBSERVED`（C-164）；这不证明启动、执行、passive callback、permit、Binder query/result、inventory、
+state 或 RF，以上仍为 `UNKNOWN`，且不记录 package-manager telemetry 或 private device identifier。
+
+## 12. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

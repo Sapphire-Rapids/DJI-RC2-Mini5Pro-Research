@@ -38,13 +38,17 @@ Every hypothesis below is testable and remains separate from factual findings.
   action. No app-to-WA150 broadcaster consumer has been recovered (C-152/C-153).
 - Hypothesis: a genuine, eligible Mini 5 Pro license can be inventoried, enabled/disabled, restored,
   consumed by the aircraft-side RID broadcaster, and observed over RF.
-- Missing: server eligibility, genuine record, live support/version, exact route, current baseline,
+- Missing: logged-in FlySafe `Rid` product capability, genuine record, live support/version, exact route, current baseline,
   FC acceptance, aircraft-side consumer, rollback, and independent RF A-B-A. License enable,
   status/HMS, cloud policy, and motor-gated RF remain four separate chains.
-- Next discriminator: the audited A-025 bounded read-only modern inventory query through the existing
-  system Binder. Its MSDK-compatible field-7 decoder is an independent compatibility exploration;
-  only a canonical response containing a genuine type-6 record can admit a later same-item
-  baseline/readback/restore experiment.
+- Next discriminator: two independent read-only facts. The owner checks in the official website only
+  whether the RID application card and Mini 5 Pro RID product selector are visible; the device lane
+  first observes current `03/09` version plus `03/42` support, then performs one canonical bounded
+  inventory query. A-025 is installed by user report but execution/result are unknown, and its fixed
+  V3/V4 request lacks that passive gate. A-026 now implements and audits the gate offline, is staged,
+  and is user-reported installed, but run/live callbacks remain unknown. Its MSDK-compatible field-7 decoder is an independent
+  compatibility exploration; only a canonical response containing a genuine type-6 record can admit
+  a later same-item baseline/readback/restore experiment.
 - Current state: `UNKNOWN`.
 
 ## H-05 — reason for legacy inventory timeout
@@ -295,3 +299,24 @@ Every hypothesis below is testable and remains separate from factual findings.
   target F7/F8/F9. This hypothesis is no longer actionable through the known generic attach routes.
   It remains open only for a materially different official in-process owner/authenticated route or
   a verified WA150 handler; RF effect has never been tested.
+
+## H-28 — third-party Binder can observe both FlySafe admission pushes（C-157--C-162, C-164）
+
+- Known facts: the exact official lifecycle passively derives unlock version from current-token
+  `03/09` and support from `03/42`; cache defaults are ambiguous and no active trigger or replay was
+  recovered. A-025 does not observe either gate before its fixed V3/V4 query. Exact A-026 now
+  implements the fail-closed gate and has passed its offline artifact audit.
+- Hypothesis: one bounded third-party Binder listener window can receive usable copies of both
+  pushes on one complete actual route proxy while the official owner remains connected, allowing
+  A-026 to distinguish V3/V4-ready from unobserved/unusable/unsupported/unknown/V2.
+- Distinguishing evidence: after user-confirmed installation, one passive window reporting only
+  seen/usable/version/support/result-class and no raw payload or identity. If both gates are usable,
+  the same process may consume the permit for one bounded canonical `11/11` completion.
+- False-negative rule: no callback, one missing push, malformed payload, conflicting values, or
+  sender change means observer unavailable/invalidated, not FC unsupported. External Binder cannot
+  see DJI's device token, and the earlier `11/1C` listener already proved that listener acceptance
+  does not guarantee delivery.
+- Current state: `STATIC` implementation/artifact plus `OBSERVED` staged delivery and user-reported
+  installation exist for exact A-026 `0.6.0-flysafe-gated` (C-160--C-162, C-164). Execution,
+  passive callbacks, permit, inventory query, and result remain `UNKNOWN`; therefore the hypothesis
+  itself is not confirmed.

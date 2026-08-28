@@ -51,31 +51,37 @@ or a verified WA150 handler. A-024's passive timeline is also complete: it produ
 while an independent detector confirmed real motor-on RID, so that third-party listener is a
 false-negative truth source and must not be repeated.
 
-### Current candidate: A-025 modern FlySafe inventory
+### Current candidate: A-026 gated FlySafe inventory
 
-A-025 `0.5.0-flysafe-readonly` / code 8 is the current offline candidate (C-150/C-151). Its exact
-`111,889`-byte APK SHA-256 is
-`b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`. A local delivery copy
-exists, but it has not been copied to RC 2 removable storage, installed, or run.
+A-025 remains the fixed V3/V4 baseline but the user has now reported its installation complete;
+launch, execution, and result remain unknown (C-150/C-151/C-154/C-163). Do not run it merely to
+produce another ambiguous negative because it lacks the current-connection support/version gate.
 
-The new FlySafe lane is fixed to system `protocol` Binder transaction 4, route
-`02:04 -> 12:04`, `11/11`, 6,000 ms, group selector `00 01`, and page selector
-`00 (index<<1)`. Count is capped at 127, page calls at 128, and total duration at 90 seconds. It
-accepts only ccode 0 records and a data-less ccode 1 terminator, then strictly parses an independently
-implemented MSDK-compatible candidate schema. Recognition of
-field 7 is a compatibility exploration, not proof that current DJI Fly understands it. The UI reports
-only count, RID level, and status bits. License IDs are session-salted only for duplicate
-detection; identifiers, signed data, and raw replies are not displayed or retained.
+A-026 `0.6.0-flysafe-gated` / code 9 is the current exact candidate (C-160--C-162, C-164). Its `135,525`-byte
+APK SHA-256 is `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`.
+It is staged as removable-SD `Download/FindUAS_A026_GATE.apk`; same-session readback SHA matched and
+a new MTP session confirmed one unique short name with the registered size. The operator subsequently
+reported installation complete; launch, execution, passive callbacks, permit, query, and result are
+not user-confirmed.
 
-The FlySafe allow-list contains no `11/12` tuple and its test rejects that command. The old
-`11/1C` button is removed. The suffix `flysafe-readonly` applies only to the new lane: separately
-gated F7/F9, France EID, and OPID experimental controls remain in the APK, so reviewers must not
-describe the entire artifact as globally write-free.
+A-026 uses one tx2 listener for `03/09 + 03/42`, requires complete actual-route equality, and signs no
+same-process permit on malformed/failure/conflict/deadline/cancel. Only support=true plus V3/V4
+admits the fixed tx4 `11/11` group/page traversal; page 0..127 and initial + two 6-second retries are
+strictly bounded. Its internal sender has no `11/12`, output is privacy-reduced, and process death
+cleans the listener.
 
-The next bounded action is one motors-off A-025 inventory run with the aircraft linked. Treat Binder
-failure as query unavailable, not empty inventory. Only a canonical result containing a genuine
-type-6 record may advance to a separately reviewed same-ID baseline/readback/restore design; RF truth
-still requires operator-initiated motors and the independent detector.
+Two clean build pipelines were byte-identical; 63/63 tests, lint 0 errors/13 warnings, v2 signature,
+zipalign, zero `uses-permission`, and no native/network/socket/shell path passed. This is still an
+Admin APK: external Developer Assistant is outside the internal allow-list, and gated F9/EID/OPID
+writes remain. Never call the whole APK read-only.
+
+The next bounded action is the first user-run passive gate step. Treat an
+absent/malformed gate as observer unavailable, not unsupported. External Binder cannot see DJI's
+device token; full-route/window equality is only a proxy. Only if A-026 displays the admitted
+V3/V4 result should the same process run its one bounded query.
+Only a canonical count-consistent result containing a genuine type-6 record may advance to a
+separately reviewed same-ID baseline/readback/restore design; RF truth still requires
+operator-initiated motors and the independent detector.
 
 ### RID working status
 
@@ -185,20 +191,36 @@ Static mappings:
   `broadcastRemoteIdEnabled=false` / `NO_BROADCAST`, but that branch only changes the SDK status
   object, starts behind an immediate return, and does not itself send an aircraft command.
 
+Official acquisition/sync chain:
+
+- the type-6 application is on the official FlySafe website, not a recovered type-6-specific DJI Fly
+  page; normal Remote-ID registration and generic Unlock-a-Zone are separate;
+- website access requires the qualifying account background, exact product
+  `support_unlock_type: Rid`, and an account device record matching product and FC serial before an
+  official reviewed application;
+- current DJI Fly requires a nonempty login token to fetch user context and signed license groups,
+  selects server-supplied V2/V3/V4 onboard data by the FC's current support/version/target, imports
+  that blob, pulls aircraft inventory, and toggles only an existing license ID;
+- server approved/downloaded, FC imported, inventory visible, enabled, aircraft consumed, and
+  motor-on RF effect are distinct states. Mini 5 Pro product eligibility remains unknown, and public
+  MSDK support does not include it.
+
 Current Fly correction: its exact typed `LicenseData` parser handles fields 1--5 and sends field 7
 to `UnknownFieldSet`; only the separate MSDK artifact typed-decodes field 7 as `LicenseDataRID`
 (C-152). Its `11/12` setter is generic ID-plus-action, and no current app xref connects type 6,
 field 7, or enabled state to WA150 `0802`, motor/armed state, or BLE/Wi-Fi enable (C-153). Receiver
 `0x92` is not firmware-module identity.
 
-A-025 now implements the bounded, read-only modern V3/V4 query offline as described in the current
-candidate section above. It has not been copied to RC 2 removable storage, installed, or run. A
-transport failure is “query unavailable,” not “empty inventory.”
+A-025 is user-reported installed but has no execution/result. Exact A-026 implements and audits the
+passive `03/09 + 03/42` gate, is staged, and is user-reported installed, but has no confirmed run or
+result. Defaults
+`255/false` and missed pushes remain unknown. A-026 sends the fixed query only after its same-process
+V3/V4 permit; it still cannot turn observer absence into unsupported state.
 
-Missing: live support/version, canonical Binder response, genuine account item, aircraft-side
-consumer, same-item baseline/restore, and RF. If separate approved instrumentation obtains raw
-unknown field-7 bytes, keep them only in excluded private evidence; never create or publish license
-material.
+Missing: the two owner-visible official eligibility booleans, live passive support/version, canonical
+Binder response, genuine account item, FC import, aircraft-side consumer, same-item baseline/restore,
+and RF. If separate approved instrumentation obtains raw unknown field-7 bytes, keep them only in
+excluded private evidence; never create, transfer, or publish license material.
 
 ### Region and RF policy
 

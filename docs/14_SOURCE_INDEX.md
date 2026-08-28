@@ -10,6 +10,24 @@ here does not imply that all of its claims were accepted.
   Used for public key/value models, Remote ID working-state models, UAS area delegates, FlySafe
   license types/levels, and product-support context. Presence in MSDK does not establish Mini 5 Pro
   support.
+- [DJI FlySafe](https://fly-safe.dji.com/), including the 2026-08-11 public
+  [unlock-request bundle](https://flysafe-public.djicdn.com/js/unlock-request.5439c983.js) and
+  [app bundle](https://flysafe-public.djicdn.com/js/app.e0d44da4.js), rechecked 2026-08-29.
+  Used for the Mainland/Abroad RID application cards, background gates, exact `Rid` product
+  capability filter, account-device selection, and application collection. Public code does not
+  reveal the logged-in Mini 5 Pro capability row or an approval result.
+- [DJI MSDK V5 FlyZone manager](https://developer.dji.com/api-reference-v5/android-api/Components/IFlyZoneManager/IFlyZoneManager.html)
+  and [FlyZone license model](https://developer.dji.com/api-reference-v5/android-api/Components/IFlyZoneManager/IFlyZoneManager_FlyZoneLicenseInfo.html).
+  Used to cross-check official login-required server download, FC-SN-matched push, aircraft pull,
+  and existing-license enable/disable semantics. Public MSDK APIs do not establish Mini 5 Pro
+  support or a genuine type-6 record.
+- [DJI Cloud API FlySafe](https://github.com/dji-sdk/Cloud-API-Doc/blob/4ec6b0c7f9472aeb09a0a47949855d19c473ea07/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/00.dock1/170.flysafe.md)
+  at `4ec6b0c7f9472aeb09a0a47949855d19c473ea07`.
+  Used to distinguish server-approved from aircraft-imported license inventory and corroborate
+  type 6 plus Europe/China levels. Dock/cloud semantics are not a consumer Mini 5 Pro API.
+- [DJI SDK compatibility help](https://repair.dji.com/help/content?customId=01700000763&lang=en&paperDocType=ARTICLE&re=US&spaceId=17).
+  Used only for the current public `Mini 5 Pro: No SDK` boundary; DJI Fly's internal components are
+  a separate subject.
 - [DJI RC 2 specifications](https://www.dji.com/rc-2/specs?startPoint=0).
   Used for published FCC/CE O4 EIRP ceilings.
 - [AOSP ADB](https://android.googlesource.com/platform/packages/modules/adb/).

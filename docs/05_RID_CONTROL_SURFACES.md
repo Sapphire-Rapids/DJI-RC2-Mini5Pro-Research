@@ -366,6 +366,73 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **隐私/分发：** 不发布账号、token、Cookie、FC serial、license ID、signed blob、描述、时间、区域或
   server response 正文。
 
+### RID-007A：申请入口在 FlySafe 网站，DJI Fly 没有已恢复的 type-6 专用申请页
+
+- **证据状态：STATIC（C-155）**
+- **对象/版本：** 2026-08-29 重新取得的 DJI FlySafe public web bundle；DJI Fly 1.21.10 visible
+  resource/model inventory。
+- **网页入口：** 当前官方页面同时保留 Mainland RID 与 Abroad RID。前者要求账号背景
+  `Government(0)`、审核 `Passed(4)`、资格 `Participated(1)` 且国家为 China；后者要求
+  `EuropeanFcc(3)`、`Passed(4)`、`Participated(1)`。两者分别形成 `type:"Rid"`、level 2 China
+  与 level 1 Europe。
+- **正式接口与 gate：** public bundle 直接闭合以下流程：
+
+  ```text
+  GET  /api/qep/background
+  GET  /api/qep/unlock/device_type
+  GET  /api/qep/device/list?page_size=1000&dtid=<product>
+  POST /api/qep/unlock
+  ```
+
+  产品 row 的 `support_unlock_type` 必须精确包含 `Rid`；随后账号设备记录必须同时匹配该产品与
+  FC serial。后台仍可重复检查这些条件。2026-08-29 bundle 与 2026-08-11 发布版本相同：
+  `unlock-request.5439c983.js` SHA-256
+  `a2b04cf9def3a06f741a55c4d8c0c8149a534e45946726171f51f8c612e6ca4b`，
+  `app.e0d44da4.js` SHA-256
+  `268d33eaee4afef6e52103efc05314bd223ac1758c710ffe37f938cd283a4371`。
+- **DJI Fly 可见面：** current app 有普通 Safety/Remote ID 注册、状态与地区字段，也有通用
+  Unlock-a-Zone 账号/飞机 license list；有界资源和模型盘点没有恢复 type-6 专用申请入口。它们不能
+  与网页受审核的 RID application 合并成一个“隐藏开关”。
+- **边界/不证明：** 公开 `/dji/drones` 目录包含 Mini 5 Pro 只证明地图目录识别；它不公开
+  `support_unlock_type`。当前未登录取数、未发送申请、未取得 Mini 5 Pro capability row 或审批结果。
+  改 Sky/Ground country、locale、app region 或 area strategy 都不会生成后台 entitlement。
+- **合法最小判别：** 设备所有者可在官方 FlySafe 登录后仅人工记录两个布尔值：“RID 申请卡是否
+  可见”“Mini 5 Pro 是否出现在 RID 产品选择器”。不得导出 token、Cookie、HAR、完整 URL、SN 或
+  response body。若资格不存在，可向 `flysafe@dji.com` 申请研究/实验支持；也可用一台官方支持且
+  genuinely issued type-6 的其他 aircraft 验证 parser/transaction，但该许可不得移到 Mini 5 Pro。
+  独立 synthetic OpenDroneID source 可验证检测器字段/地区兼容性，却不能证明 Mini 5 Pro switch。
+  任一路线都不能以本地构造、跨账号/跨 FC 搬运或重放许可代替官方签发。
+- **公开依据：** [DJI FlySafe](https://fly-safe.dji.com/)、
+  [current unlock-request bundle](https://flysafe-public.djicdn.com/js/unlock-request.5439c983.js)、
+  [current app bundle](https://flysafe-public.djicdn.com/js/app.e0d44da4.js)。
+
+### RID-007B：当前 official account -> server -> FC 同步链已静态闭合
+
+- **证据状态：STATIC（C-156）**
+- **对象/版本：** DJI Fly 1.21.10 exact `libflightrestrictcore.so`；官方 MSDK 5.18 FlySafe API
+  作为独立交叉验证。
+- **服务器 gate：** 当前 native 先要求 nonempty official login token，再 GET
+  `/api/v4/mobile/user` 取得 user context，随后 GET
+  `/api/v4/mobile/unlock_license_groups`。服务器刷新使用 `X-FS-*` signed headers；本档案不复制
+  app secret、签名材料或真实 header 值。
+- **许可组：** server group 带 `sn`、`user_id`、`group_id` 以及预签名的
+  `onboard_license_v2/v3/v4`。客户端按当前 FC 的 support、unlock version 与 target index 选择已有
+  blob，再原样导入；它不会由 JSON item 在本地生成或签名许可。
+- **导入、pull 与 enable gate：** 账号页/server refresh 需要登录；导入前按当前 FC SN 匹配 group，
+  native 还按 version/target 选择 blob。飞机页 pull inventory 的可见 app gate 是 connected/known
+  product，而非登录本身。enable/disable 只能引用 FC 中已存在的 license ID；FC 仍可校验 signature、
+  SN、user ID、validity、version 与飞行状态。
+- **不能合并的状态：** `server approved/downloaded`、`FC imported`、`inventory visible`、
+  `enabled`、`aircraft broadcaster consumed`、`motor-on RF effect` 是六个不同状态。服务器下载成功不
+  等于 FC 接受，FC enabled 也不等于实际 RF 已停播。
+- **产品边界：** DJI 官方 SDK compatibility 当前把 Mini 5 Pro 标为 No SDK，MSDK 5.18 public
+  support list 也未列出它；这只否定“可直接用 public MSDK app 管理”的假设，不否定 DJI Fly 内部组件。
+- **公开依据：** [MSDK FlyZone manager](https://developer.dji.com/api-reference-v5/android-api/Components/IFlyZoneManager/IFlyZoneManager.html)、
+  [FlyZone license model](https://developer.dji.com/api-reference-v5/android-api/Components/IFlyZoneManager/IFlyZoneManager_FlyZoneLicenseInfo.html)、
+  [DJI Cloud API FlySafe](https://github.com/dji-sdk/Cloud-API-Doc/blob/4ec6b0c7f9472aeb09a0a47949855d19c473ea07/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/00.dock1/170.flysafe.md)。
+- **隐私/分发：** 未登录、未发送 authenticated request、未获取 genuine license、未执行 import/push/
+  pull/setter。任何合法许可只由所有者通过官方流程取得；本档案不生成、搬运或重放。
+
 ### RID-008：Mini 5 Pro 的官方 type-6 entitlement 仍未知
 
 - **证据状态：UNKNOWN**
@@ -429,14 +496,74 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   `testDebugUnitTest lint assembleDebug` 成功，42 tests 全通过、lint 0 errors/9 warnings，第二次
   clean build byte-identical，v2 signature 与 zip alignment 通过。APK 声明零 Android permission、
   无 packaged native library，检查未发现 network/socket/shell path。二进制不进入本仓库。
-- **设备状态：** 已生成本地交付副本，但 A-025 尚未复制到 RC 2 removable storage、安装或运行。
-  以上只证明离线实现与 exact final-artifact identity，不证明 live Binder 接受、inventory 可用、
-  当前 FC 存在 genuine type 6 或任何 RF 行为。
+- **设备状态：** 2026-08-29 已通过 RC 2 MTP 写入 removable SD `Download`，短名
+  `FindUAS_A025_RID.apk`；同会话读回 SHA-256 与登记值一致，意外长名副本已删除（C-154）。这只证明
+  staging byte identity。用户随后明确报告安装完成（C-163），但没有确认启动、执行或任何结果；因此
+  仍不证明 live Binder 接受、inventory 可用、当前 FC 存在 genuine type 6 或任何 RF 行为。A-025 已
+  由 gate-aware A-026 取代。
 - **判别：** canonical inventory 中没有 genuine type 6，则这条 managed switch 路线在当前 FC
   停止；存在 type 6 才允许后续单独实现同一 ID 的 baseline -> transition -> readback -> restore。
   Binder failure 只能报告“modern query unavailable”，不能报告 inventory empty。
 - **最终真值：** 即便 readback 显示 type-6 enabled，仍要由操作者起桨并让独立检测器做
   enabled/disabled/restored 的 RF A-B-A，才能证明 Mini 5 Pro 实际广播受它控制。
+
+### RID-008E：`03/09` 与 `03/42` 是被动 session gate，不是可猜的 GET
+
+- **证据状态：STATIC（C-157）；A-025 false-negative 结论为 INFERENCE（C-158）**
+- **对象/版本：** exact DJI Fly 1.21.10 `libflightrestrictcore.so`；A-025
+  `0.5.0-flysafe-readonly`。
+- **官方生命周期：** 当前 `Device::Setup` / `PackManager::RegisterDevicePush` 只注册三类本地
+  observer，其中 `03/09` Area Info 为 unlock version 来源，`03/42` WhiteList Info 为 support 来源。
+  observer 注册链不发送 business GET，也不重放此前 push；没有恢复出安全的主动触发命令。
+- **version：** current-token、payload 至少 8 bytes 的 Area Info 从 bytes 3--4 LE16 最高两位得到
+  `0 -> V2`、`1 -> V3`、`2 -> V4`、`3 -> 255/unknown`。
+- **support：** usable WhiteList Info 按 current parser 的新旧格式产生 Boolean support。Device 初始
+  缓存是 `version=255`、`support=false`；若 push 没看到、太晚、长度不够或 token 不匹配，这两个默认值
+  必须标为 unknown，不能标成真实 unsupported。
+- **manager gate：** official `QueryFCLicenseInfo` 在 support=false 时以 417 停止；version 不在
+  0/1/2 时以 203 停止。version 还决定 V2/V3/V4 codec，即使 product 139 的最终 receiver 三代都被
+  override 为 `0x92`，也不能跳过 version。
+- **A-025 边界：** A-025 直接用固定 V3/V4 selector 发 `11/11`，没有先证明当前连接的
+  `03/09 + 03/42`。因此 timeout、zero callback、parser rejection 或任何未 canonical 完成的输出都只能
+  叫 `query unavailable/ambiguous`，不能叫 unsupported、no entitlement 或 empty inventory。只有通过
+  count/terminator 一致性校验的 canonical completion 才能描述返回清单，并仍不证明 RF effect。
+- **第三方 observer 边界：** external Binder 看不到 DJI internal device token；既有 `11/1C` listener
+  又已出现独立 RF 对照下的假阴性。故未来即使观察到两个 push，同 sender + 同 bounded window 也只是一
+  个 session proxy；若没观察到，结论仍是 observer unavailable，而不是设备不支持。
+
+### RID-008F：A-026 已离线实现 gate-aware query，但尚无实机运行结果
+
+- **证据状态：** 设计理由为 `INFERENCE`（C-159）；实现和 final artifact audit 为 `STATIC`
+  （C-160/C-161）；MTP 交付和用户报告安装为 `OBSERVED`（C-162/C-164）。
+- **对象/版本：** self-developed A-026，versionCode 9、versionName
+  `0.6.0-flysafe-gated`。
+- **passive gate：** 同一 transaction-2 listener 同时接收 `03/09` version 与 `03/42` support。只有
+  两条 callback 的完整实际 route 一致、payload usable、support=true 且 version 为 1/V3 或 2/V4，
+  才签发一个仅在同进程消费、不可序列化/复用的 permit。malformed、failure callback、route/value
+  conflict、deadline 或 cancellation 均不签 permit；因此 `unobserved`、`unusable`、`unsupported`、
+  `unknown` 与 `V2` 都不会发 `11/11`。
+- **query gate：** permit 只能进入固定 system-Binder transaction-4 `11/11` sender。group 成功后
+  严格按 page 0..127 selector 前进，count/page/terminator 约束保持 fail closed。callback 等待窗口覆盖
+  初发与 vendor 两次各 6 秒 retry，避免 request retry 尚活跃时提前 terminal；内部 sender allow-list
+  仍没有 `11/12`。
+- **privacy/lifecycle：** 结果只保留 count、RID level/status 与 gate result class；不保留 raw payload、
+  sender identity、license material 或 device token。完成、失败或取消都进入 listener cleanup，并终止
+  进程以触发 Binder-death 清理。
+- **非全局 read-only：** 外部 DJI Developer Assistant launcher 不经过上述内部 sender allow-list；
+  APK 还保留原有、分别受门禁约束的 F9、France EID 与 OPID write controls。因此该工件是
+  `RID Admin`，`flysafe-gated` 只描述新 FlySafe lane，不能把整个 APK 称为 read-only。
+- **工件审计：** exact `135,525`-byte APK SHA-256 为
+  `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`。两次 clean
+  `testDebugUnitTest lintDebug assembleDebug` 均成功且 APK byte-identical；63/63 tests、lint
+  0 errors/13 warnings、v2 signature、zip alignment、零 `uses-permission`、无 packaged native
+  library 及无 inspected network/socket/shell path 全部通过。
+- **设备状态：** 已通过 MTP 写入 removable SD `Download` 为 `FindUAS_A026_GATE.apk`；同会话
+  readback SHA 一致，重新建立 MTP 会话后确认只有一个该短名且 size 为 `135,525` bytes。没有记录
+  object/storage/USB/device serial。用户随后明确报告 A-026 安装完成（C-164），但没有确认启动、执行、
+  passive gate、permit、query 或任何结果。
+- **边界：** 若 A-026 未看到 push，仍只能报告 third-party observer unavailable；full-route proxy 不等于
+  DJI internal device token。即便 canonical inventory 成功，也只闭合返回清单，不闭合 official product
+  eligibility、aircraft-side consumer 或 RF effect。
 
 ### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
 
