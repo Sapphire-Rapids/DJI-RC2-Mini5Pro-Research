@@ -243,3 +243,37 @@ stronger conclusion that cannot be drawn.
   builds, fixed-zero gate, and zero-send inventory.
 - Missing: new independent post-fix audit and every live admission gate.
 - Does not establish: safe attach, valid live identity, request support, or RID state.
+
+## N-29 — NLD 2.0.0.6 explicit Remote ID control
+
+- Status: `NEGATIVE` within a fixed static scope.
+- Scope: both DEX files, decompiled sources, manifest, all localized resources, seven packaged
+  profiles, and printable strings from both native ABIs.
+- Result: no identifiable NLD Remote ID UI, switch, setting, command, profile, service, or handler.
+- Does not establish: absence of an indirect effect from an opaque native/server payload, a generic
+  raw frame, server-selected region policy, or the separately hosted DJI Fly APK.
+- Consequence: the generic vendor catalogue claim cannot be treated as a stable Mini 5 Pro RID
+  control implementation.
+
+## N-30 — NLD packaged-profile runtime attribution
+
+- Status: `NEGATIVE` for runtime-source attribution.
+- Positive fact: all seven files are byte-identical to pinned FreeFCC profiles.
+- Scope: filename, path, JSON-key, DEX/source, native string/import, asset-manager, and archive
+  loader searches in exact NLD `2.0.0.6`.
+- Result: no application runtime loader or reference was found; the only asset-manager call belongs
+  to AndroidX compiler-profile installation.
+- Does not establish: that a hidden custom parser is impossible, or that an opaque online/offline
+  payload cannot decode to similar bytes.
+- Consequence: the visible 21-frame batch, keepalive, CE restore, and labels cannot be attributed to
+  the current NLD execution path merely because the files are packaged.
+
+## N-31 — NLD main-app root or file-patch path
+
+- Status: `NEGATIVE` within a bounded static scope.
+- Scope: manifest/components, all DEX/decompiled sources, both native import/string sets, and
+  identifiable process/property calls in NLD `2.0.0.6`.
+- Result: no ADB client, `su`/Magisk, mount/remount, DJI configuration/database patch, or Binder FCC
+  path was found. The only found native shell property operation belongs to launcher selection.
+- Does not establish: absence of behavior encoded in opaque data, performed by NLD services, a
+  separately installed helper, or the separately hosted DJI Fly APK.

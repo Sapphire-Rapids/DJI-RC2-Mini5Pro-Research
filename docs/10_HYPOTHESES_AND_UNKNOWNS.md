@@ -185,3 +185,24 @@ Every hypothesis below is testable and remains separate from factual findings.
   exact onboard status, and independent receiver decode evidence. Country readback alone is not
   sufficient.
 - Current state: `UNKNOWN`.
+
+## H-21 — NLD C0 causal mechanism
+
+- Known facts: NLD `2.0.0.6` obtains server-controlled WireGuard configuration online, relaunches
+  DJI Fly under that route, and schedules automatic stop 25 seconds after tunnel UP; its Java C0
+  path does not write a visible 500 m or speed value. Actual route breadth and lifetime vary with
+  the server response and lifecycle.
+- Competing hypotheses: the claimed effect is caused by the routed DJI backend response, the
+  NLD-hosted DJI Fly 1.21.4 APK, or a combination.
+- Distinguishing evidence: signer/hash comparison of the hosted APK plus a privacy-redacted route/
+  host and DJI Fly startup-response comparison under an authorized license.
+- Current state: `UNKNOWN`; routing alone is not evidence of interception or response modification.
+
+## H-22 — NLD opaque payload and packaged-profile equivalence
+
+- Known facts: the visible profiles are byte-identical to FreeFCC but have no found loader; the
+  reachable FCC path decodes an online or native-offline blob and sends through native DUSS.
+- Hypothesis: the opaque blob may decode to all or part of the visible FreeFCC sequence.
+- Distinguishing evidence: an authorized, redacted observation at NLD's post-decode/pre-DUSS-send
+  boundary compared with the pinned profiles, without opening a second RCLink client.
+- Current state: `UNKNOWN`; file identity is not runtime reachability.

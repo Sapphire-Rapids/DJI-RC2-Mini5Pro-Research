@@ -172,6 +172,20 @@ Missing:
 
 Effect: ciphertext patching cannot produce a flashable Remote ID modification.
 
+## B-17 — NLD runtime causality
+
+Missing:
+
+- exact post-decode DUSS frames for no-op, normal FCC, restore, and C0 actions;
+- strict command/ACK/readback correlation rather than socket-write completion;
+- a signer/hash comparison for the separately hosted DJI Fly 1.21.4 APK;
+- a privacy-redacted actual VPN route/host record and controlled DJI Fly startup comparison;
+- independent onboard and motor-on RF A-B-A evidence for any claimed RID effect.
+
+Effect: the opaque NLD payload cannot be copied into an auditable implementation, the packaged
+FreeFCC profiles cannot be called its runtime source, and its generic RID marketing claim cannot be
+promoted to a Mini 5 Pro control surface.
+
 ## Dependency order
 
 The evidence dependencies are:

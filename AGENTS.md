@@ -88,6 +88,10 @@ Later retractions override earlier progress summaries.
     state-changing hypothesis.
 12. FC/Sky `CN -> US -> CN` state loops do not establish RID, channel, regulatory mode, or EIRP.
     Ground US did not receive a matching ACK and readback remained CN.
+13. NLD FCC Smart RC `2.0.0.6` packages seven JSON profiles byte-identical to pinned FreeFCC, but
+    no runtime reference was found. Its reachable FCC path uses an opaque native-decoded online or
+    native-handled offline payload. Do not attribute the visible 21-frame batch, keepalive, restore,
+    or any Remote ID effect to the current runtime without independent dynamic evidence.
 
 ## Privacy and redaction
 

@@ -59,8 +59,15 @@ here does not imply that all of its claims were accepted.
 
 - [FreeFCC](https://github.com/doesthings/FreeFCC/tree/597157bd52120dfeb9677f79a8ad46b6027ce8dc)
   at `597157bd52120dfeb9677f79a8ad46b6027ce8dc`.
-  Used to inspect community RC 2 loopback frames and issue history. Its success UI was not treated
-  as target readback or RF measurement.
+  Used to inspect community RC 2 loopback frames and issue history. Seven exact profile files also
+  match the NLD `2.0.0.6` APK, but no NLD runtime reference to those assets was found. FreeFCC is
+  AGPL-3.0; its success UI was not treated as target readback or RF measurement.
+- [FreeFCC releases](https://github.com/doesthings/FreeFCC/releases).
+  Used for public timing, keepalive, compatibility, update-validation, and write-completion claims;
+  release text is project history rather than independent RF or minimal-command evidence.
+- [FreeFCC protocol-provenance issue](https://github.com/doesthings/FreeFCC/issues/30).
+  Used to preserve the unresolved minimal-causality boundary around the multi-frame profile and
+  keepalive.
 - [SkylabFCCfree](https://github.com/danusha2345/SkylabFCCfree/tree/aa024985bf1556ab9c3b12f3d0f2305f63b021f5)
   tag/revision `v1.5.50` / `aa024985bf1556ab9c3b12f3d0f2305f63b021f5`.
   Used for its DUML command audit and profile comparison.
@@ -69,6 +76,19 @@ here does not imply that all of its claims were accepted.
   Historical mechanism only; not evidence of the RC 2 + O4 implementation.
 - [fpv_live legacy source](https://github.com/ctomichael/fpv_live/tree/4c7bb40e5cc5daec67b39cc093235afb959a4bfe).
   Used for the legacy `DataOsdSetSdrAssitantWrite.setForceFcc()` literal and command semantics.
+
+## NLD public product and release material
+
+- [NLD FCC Smart RC product page](https://nolimitdronez.com/nld-fcc-android-smart-rc-license).
+  Used only for current vendor claims, compatibility lists, and license scope.
+- [NLD FCC 2.0.0.6 release article](https://nolimitdronez.com/nld-fcc-2006-the-remake).
+  Used for the vendor's dated rewrite, C0, offline, FCC/4G, editor, macro, and trial claims.
+- [NLD downloads page](https://nolimitdronez.com/download).
+  Used to record the public Smart RC download and its displayed `2.0.0.1` version mismatch with the
+  downloaded `2.0.0.6` manifest.
+- [NLD generic Android catalogue page](https://nolimitdronez.com/nldfcc-for-android?orderby=11).
+  Used only to record the vendor's generic Remote ID transmission-disable claim. The exact Smart RC
+  `2.0.0.6` static sample did not expose a corresponding control.
 
 ## Public research baseline
 

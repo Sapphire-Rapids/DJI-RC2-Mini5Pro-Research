@@ -27,6 +27,9 @@
 | A-013 | Rejected multi-capability Android input sample；input-sample；未版本化第三方样本 | 未登记 | 未登记 | `NEGATIVE`；从未安装；拒绝并排除；只公开 metadata |
 | A-014 | Non-flashable integrity mutation sample；self-developed；offline-only | `679,295,296` | `dafe2c69e0ccf5ebeeaed2e9fd894f3ee3ac997453bc2b247c499aefe64a3fff` | `NOT ADMITTED`；从未传输或刷写；已销毁、不保留；只公开 hash |
 | A-015 | WA150 encrypted cross-version input set；input-sample；`01.00.0600` 与 `01.00.0700` | 未登记 | 未登记 | `STATIC`；仅作输入分析；排除且不分发；只公开 metadata |
+| A-016 | NLD FCC Smart RC distribution；input-sample；`2.0.0.6` bundle | `6,932,568` | `e75011e8190098aff12219d687c17b93495993890bf4a96212856174087a5100` | `STATIC`；本轮仅离线分析、无设备动作；排除且不分发；只公开 metadata |
+| A-017 | NLD FCC Smart RC main APK；input-sample；`2.0.0.6` / code 46 | `7,278,464` | `1035f0aa22e158fd1703e14dd3bd2198845da4c2113454f9ac3a4569c41ee474` | `STATIC`；本轮仅离线分析、无设备动作；排除且不分发；只公开 metadata |
+| A-018 | NLD bundled Package Installer helper；input-sample；Android 11 / code 30 | `3,274,224` | `523361acbe62587fa61e00a92369e87daa0d812232b8942deba67771ccf2633a` | `STATIC`；本轮仅离线分析、无设备动作；排除且不分发；只公开 metadata |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -83,9 +86,22 @@ V2.2 的 passing built-in audit 没有覆盖这些问题。A-002 永久 `REJECTE
 
 三者均为 `NOT ADMITTED` 且未上机。V0、V1、V2.1 之间存在依赖顺序，但 hash 或 static success 不替代 live v0.10、caller、SELinux、ABI、mapping、exception、epoch 和 quiescence 门禁。
 
-## 7. 输入样本与分发
+## 7. NLD FCC Smart RC 输入样本
 
-A-004 至 A-008、A-013 和 A-015 是 input-sample 或 rejected third-party input。它们不属于本仓库实现，不能提交二进制或复制正文。允许保留的内容只有：
+A-016 至 A-018 记录本次 NLD 静态分析的外层分发包、主 APK 和安装器 helper。外层包在
+2026-08-28 与官网 Smart RC 下载 bytes 相同；主 APK manifest 为 `2.0.0.6`/code 46。三个工件
+均只在排除的工作区中离线读取；本轮没有安装、执行、动态加载或传输到设备，也未调用 NLD API。
+这不追溯判断用户在其他时间是否曾使用相同 hash 的 helper。
+
+这些 hash 只支持 exact-input 复核。仓库不分发 APK、native library、DEX、反编译源码或安装
+说明正文。Package Installer helper 的签名 subject 提及 DJI 且签名校验有效，但不能仅凭 subject
+文字推断其来源或其在任一精确 RC 2 平台上的特权。
+
+详细结论见 [NLD FCC Smart RC 静态分析](16_NLDFCC_STATIC_ANALYSIS.md)。
+
+## 8. 输入样本与分发
+
+A-004 至 A-008、A-013、A-015 至 A-018 是 input-sample 或 rejected third-party input。它们不属于本仓库实现，不能提交二进制或复制正文。允许保留的内容只有：
 
 - 公开版本和产品族；
 - 在规范 CSV 明确登记的 public hash；
@@ -95,7 +111,7 @@ A-004 至 A-008、A-013 和 A-015 是 input-sample 或 rejected third-party inpu
 
 厂商输入的补充身份只在 [固件与信任边界](07_FIRMWARE_TRUST_BOUNDARY.md) 中作为样本 provenance 描述，不增加本规范 artifact CSV 的行，也不代表本仓库提供样本。
 
-## 8. 更新与一致性检查
+## 9. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

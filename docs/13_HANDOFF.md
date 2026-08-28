@@ -108,6 +108,13 @@ Read:
 Do not redistribute the local binary corpus. Reproduce static claims only from legally obtained
 inputs whose hashes match the artifact/source register.
 
+### NLD FCC comparison
+
+Read [16_NLDFCC_STATIC_ANALYSIS.md](16_NLDFCC_STATIC_ANALYSIS.md) before using the NLD or FreeFCC
+profiles as protocol evidence. The files are exact public-prior-art matches but have no found NLD
+runtime reference. Keep the normal-FCC native payload, C0/VPN orchestration, parameter editor, and
+Remote ID claim as four separate evidence paths.
+
 ## Documentation-only tasks available without device access
 
 - independently audit V2.3 exact bytes and its audit script against hostile mutations;

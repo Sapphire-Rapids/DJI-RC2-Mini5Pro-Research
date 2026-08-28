@@ -118,3 +118,17 @@ work when a report did not contain a more precise timestamp.
 
 - Redacted ADB, v0.10, retry-layout, route, exception, mapping, and quiescence conclusions were
   synchronized to the FindUAS repository at commit `15f331c`.
+
+### 17:10–17:41 — NLD FCC Smart RC 2.0.0.6 static comparison
+
+- `STATIC`: the supplied Smart RC ZIP matched the current official download bytes; the embedded
+  app identified itself as `2.0.0.6` even though the downloads page displayed `2.0.0.1`.
+- `STATIC`: seven packaged profiles were byte-identical to pinned FreeFCC, but no application or
+  native runtime reference to them was found.
+- `STATIC`: normal FCC was traced through native online/native-offline payload decode and DUSS;
+  the exact command sequence remained opaque.
+- `STATIC`: C0 was traced through online VPN configuration, server-routed WireGuard, DJI Fly
+  lifecycle, and a 25-second automatic-stop schedule after tunnel UP.
+- `NEGATIVE`: a bounded full-package search found no identifiable Remote ID control surface.
+- No APK was installed or executed, no NLD API was contacted, and no controller or aircraft state
+  changed.

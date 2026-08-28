@@ -226,3 +226,27 @@ close execution safety or current-device identity.
 - Host quiescence model 0.1.1: synthetic state-machine verifier only.
 
 None of these artifacts produced a live RID read or write in the recorded work.
+
+## 15. NLD FCC Smart RC comparison
+
+The supplied Smart RC ZIP was treated as untrusted input. Archive structure, manifest, APK
+signatures, hashes, permissions, components, DEX/resources, both native ABIs, and public NLD pages
+were inspected without installing or executing the apps or contacting their API.
+
+The main paths were traced separately:
+
+- normal FCC from subscription selection through opaque online/native-offline payload decode and
+  native DUSS send;
+- C0 from version gate through locally generated client key, server-controlled WireGuard routes,
+  DJI Fly lifecycle, and the conditional 25-second automatic-stop schedule;
+- subscription identity and offline cache binding;
+- parameter schema discovery, typed write, and post-write verification;
+- bounded Remote ID term/control search.
+
+All seven packaged JSON profiles were hashed and compared with pinned FreeFCC. Exact equality was
+recorded, followed by a separate DEX/native reachability audit. Because no loader/reference was
+found, the files were not described as the active NLD command source. The opaque runtime payload was
+not requested, decoded, replayed, or copied into this repository.
+
+The detailed results and reusable-design review are in
+[16_NLDFCC_STATIC_ANALYSIS.md](16_NLDFCC_STATIC_ANALYSIS.md).

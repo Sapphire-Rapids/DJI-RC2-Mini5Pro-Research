@@ -51,6 +51,12 @@
 - 当前 Android admission probe v0.10 通过离线工件审计，但尚未复制、安装或运行于 RC 2。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
+- NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 native 解码的在线响应或 native 离线缓存，
+  再经 DUSS 发送；APK 内七个与 FreeFCC 完全相同的 JSON 未发现运行时引用。C0 是独立的
+  在线 VPN 配置、WireGuard、重启 DJI Fly，并在隧道 UP 后安排 25 秒自动停止的流程；实际
+  路由范围由服务端配置，只有 allowed IPs 为空时才使用目标主机 IPv4 `/32` fallback。
+- 对 NLD `2.0.0.6` 的全 DEX、资源、profile 和两架构 native 可打印字符串搜索没有找到
+  可识别的 Remote ID 开关。opaque payload 或外部 DJI Fly 的间接副作用仍为 `UNKNOWN`。
 - 尚未证明一个稳定、可恢复、经状态读回和起桨后独立 RF 接收共同确认的 Mini 5 Pro RID 开关。
 
 ## 文档地图
@@ -72,6 +78,8 @@
 - [docs/13_HANDOFF.md](docs/13_HANDOFF.md)：接手顺序、文件/符号入口和状态更新规则。
 - [docs/14_SOURCE_INDEX.md](docs/14_SOURCE_INDEX.md)：公开来源与固定 revision。
 - [docs/15_LOG_INDEX.md](docs/15_LOG_INDEX.md)：未公开工作日志族及其支持的结论。
+- [docs/16_NLDFCC_STATIC_ANALYSIS.md](docs/16_NLDFCC_STATIC_ANALYSIS.md)：NLD FCC Smart RC
+  `2.0.0.6` 的静态实现、FreeFCC 对照、RID 阴性边界和可借鉴设计。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
 
