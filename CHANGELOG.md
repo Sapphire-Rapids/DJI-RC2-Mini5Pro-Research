@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.3.7 - 2026-08-29
+
+### Added
+
+- Registered A-027 and C-166--C-169 for the active read-only FlySafe inventory candidate:
+  `0.7.0-flysafe-direct-readonly` / code 10, fixed `02:04 -> 12:04`, `11/11`, V3/V4 selectors,
+  no route scan, and no application-level retry.
+- Recorded exact final identity and audit: 196,569 bytes, SHA-256
+  `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`; 127 tests with
+  zero failures/errors/skips, lint 0 errors/15 warnings, two byte-identical clean builds, v2
+  signature, zipalign, zero permissions, and no native/network/socket/shell/external-process path.
+- Recorded MTP staging as `Download/FindUAS_A027_RO.apk`; a fresh listing matched the registered size
+  and readback SHA-256 matched.
+- Recorded the first installed A-027 run: the active button returned
+  `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS` at `ProtocolException`, and displayed
+  `11/12 request count=0`. The UI did not expose the exception message or lower-level failure stage.
+- Added the public-evidence boundary: pinned `fpv_live`, `dji-firmware-tools`, DJI Cloud API, and MSDK
+  support generic transport/FlySafe context but do not independently confirm the product-139/RC331
+  fixed route; A-027/A-028's noncanonical live results did not confirm it.
+- Registered A-028 and C-170--C-173: `0.7.1-flysafe-direct-diagnostic` / code 11 changes only safe UI
+  diagnosis while preserving command, route, selectors, and write boundary. Exact identity is
+  197,061 bytes, SHA-256
+  `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`; 127 tests,
+  lint 0 errors/15 warnings, two byte-identical clean builds, v2 signature, zipalign, zero
+  permissions, and no packaged native library passed.
+- Recorded A-028 MTP staging as `Download/FindUAS_A028_DIAG.apk`; fresh listing size and readback SHA
+  matched.
+- Recorded the installed A-028 run: `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`,
+  `ProtocolException`, detail `group transport callback failed`, `11/12 count=0`. The fixed group
+  selector therefore did not reach a successful transport callback; protobuf/pages/terminator were
+  not reached. The next discriminator is Reply failure/ecode/callback detail, not another identical
+  black-box run.
+
+### Provenance
+
+- No APK, source, result image, device identifier, raw reply, license ID, or account material is committed.
+  Failure remains ambiguous rather than unsupported/no-license, and canonical inventory would not
+  establish RF RID.
+
 ## 0.3.6 - 2026-08-29
 
 ### Added

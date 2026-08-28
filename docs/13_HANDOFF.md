@@ -51,13 +51,13 @@ or a verified WA150 handler. A-024's passive timeline is also complete: it produ
 while an independent detector confirmed real motor-on RID, so that third-party listener is a
 false-negative truth source and must not be repeated.
 
-### Current candidate: A-026 gated FlySafe inventory
+### Closed passive branch: A-026 gated FlySafe inventory
 
 A-025 remains the fixed V3/V4 baseline but the user has now reported its installation complete;
 launch, execution, and result remain unknown (C-150/C-151/C-154/C-163). Do not run it merely to
 produce another ambiguous negative because it lacks the current-connection support/version gate.
 
-A-026 `0.6.0-flysafe-gated` / code 9 is the current exact candidate (C-160--C-165). Its `135,525`-byte
+A-026 `0.6.0-flysafe-gated` / code 9 was the exact gated candidate (C-160--C-165). Its `135,525`-byte
 APK SHA-256 is `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4`.
 It is staged as removable-SD `Download/FindUAS_A026_GATE.apk`; same-session readback SHA matched and
 a new MTP session confirmed one unique short name with the registered size. The operator subsequently
@@ -85,6 +85,50 @@ query.
 Only a canonical count-consistent result containing a genuine type-6 record may advance to a
 separately reviewed same-ID baseline/readback/restore design; RF truth still requires
 operator-initiated motors and the independent detector.
+
+### Current result: A-027 active read-only inventory
+
+A-027 `0.7.0-flysafe-direct-readonly` / code 10 is C-166--C-169. Its 196,569-byte APK SHA-256 is
+`aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`. It admits one fixed
+system-Binder transaction-4 `02:04 -> 12:04`, `11/11` V3/V4 group/page traversal, with no route scan
+or application-level retry. The product-139/RC331 route is a local exact-static candidate; pinned
+`fpv_live`, `dji-firmware-tools`, DJI Cloud API, and MSDK sources do not independently confirm it.
+
+Final audit: 127 tests with zero failures/errors/skips, lint 0 errors/15 warnings, two byte-identical
+clean builds, v2 signature, zipalign, zero permissions, and no native/network/socket/shell/
+external-process path. MTP staging as `Download/FindUAS_A027_RO.apk` passed fresh size and readback
+SHA checks.
+
+The operator installed and ran the active button. It returned
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, stage `ProtocolException`, with
+`11/12 request count=0`. No canonical inventory formed and no set-enable request was sent. The UI
+did not expose the exception message, so callback, ccode, group, page, and terminator are not yet
+separated. Do not call this unsupported, empty inventory, no `RID_UNLOCK`, RID off, or RF evidence.
+The result image, identifiers, raw replies, and license material are excluded.
+
+A-028 was the next read-only diagnostic and preserved command, route, selectors, retries, and write
+boundary. A materially different official owner remained the parallel alternative.
+
+### Current result: A-028 safe diagnostic
+
+A-028 `0.7.1-flysafe-direct-diagnostic` / code 11 is C-170--C-173. It changes only UI diagnosis over
+A-027: static-safe `ProtocolException` text, numeric unexpected group/page ccode with page index,
+and terminator data length. Command, fixed route, V3/V4 selectors, and write boundary are unchanged.
+
+The 197,061-byte APK SHA-256 is
+`d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`. 127 tests,
+lint 0 errors/15 warnings, two byte-identical clean builds, v2 signature, zipalign, zero permissions,
+and no packaged native library passed. It is staged as removable-SD
+`Download/FindUAS_A028_DIAG.apk`; fresh listing size and readback SHA matched.
+
+The operator installed and ran it. The display showed
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, `ProtocolException`, detail
+`group transport callback failed`, and `11/12 count=0` (C-173). The fixed group selector had no
+successful transport callback; group protobuf, page, and terminator were not reached.
+
+The next read-only change is to display the already existing Reply failure/ecode/callback diagnostic.
+Do not repeat the same black-box request or retain result images, identifiers, raw replies, or
+license material.
 
 ### RID working status
 
@@ -220,8 +264,18 @@ passive `03/09 + 03/42` gate, was staged/installed, and completed one 60,003 ms 
 unknown. A-026 sends the fixed query only after its same-process V3/V4 permit; this run therefore
 cannot turn observer absence into unsupported state.
 
+A-027 then ran the fixed active V3/V4 route and ended
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS` at `ProtocolException`; it displayed zero `11/12`
+requests (C-169). Because the current UI did not expose the exception message or lower-level stage,
+this is not a canonical inventory, support, entitlement, or RF result.
+
+A-028 preserved the same protocol behavior and localized the result to
+`group transport callback failed`; `11/12 count=0` (C-173). Protobuf/pages/terminator were not
+reached. Its next discriminator is Reply failure/ecode/callback detail, not another identical run.
+
 Missing: the two owner-visible official eligibility booleans, a materially different official-owner
-support/version surface or safe replay/trigger, canonical Binder response, genuine account item, FC
+support/version surface or A-028 Reply failure/ecode/callback detail, canonical Binder response,
+genuine account item, FC
 import, aircraft-side consumer, same-item baseline/restore, and RF. If separate approved
 instrumentation obtains raw unknown field-7 bytes, keep them only in
 excluded private evidence; never create, transfer, or publish license material.

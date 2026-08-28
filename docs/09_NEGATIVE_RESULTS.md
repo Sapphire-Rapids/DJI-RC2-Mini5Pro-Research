@@ -511,3 +511,36 @@ stronger conclusion that cannot be drawn.
 - What it does not close: aircraft RID support, genuine type-6 entitlement, inventory contents,
   enabled state, motor-gated Broadcast RID RF, or the official in-process observer. No write, motor
   action, independent RF receiver observation, raw frame, identifier, or license material occurred.
+- Successor: A-027 is a separately audited active read-only `11/11` path and has now run. Its result
+  is recorded separately as N-49/C-169; it does not revise this passive-listener negative.
+
+## N-49 — A-027 active read-only inventory did not complete canonically
+
+- Status: `NEGATIVE` for exact A-027 `0.7.0-flysafe-direct-readonly`; machine claim C-169.
+- Preconditions/route: installed audited artifact; operator pressed the active read-only button;
+  fixed system-Binder `02:04 -> 12:04`, `11/11`, V3/V4 candidate; no route scan or app retry.
+- Result: the strict inventory parser was entered, then reported
+  `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, stage `ProtocolException`;
+  `11/12 request count=0`. No canonical inventory formed and no set-enable request was issued.
+- Remaining discriminator: the UI did not display the exception message, so callback, ccode,
+  group, page, and terminator failure classes remain merged.
+- Does not establish: unsupported state, empty inventory, no `RID_UNLOCK`, RID off, or RF state.
+  The result image is not committed, and no identifier, raw reply, license material, motor action,
+  or independent RF observation is recorded.
+- Successor: A-028 preserved the same protocol behavior and exposed the failure as group transport
+  callback failure. That distinct result is N-50/C-173.
+
+## N-50 — A-028 group selector transport callback failed
+
+- Status: `NEGATIVE` for exact A-028 `0.7.1-flysafe-direct-diagnostic`; machine claim C-173.
+- Preconditions/route: installed audited artifact; active read-only button; fixed system-Binder
+  `02:04 -> 12:04`, `11/11` V3/V4 group selector; no route scan or app retry.
+- Result: `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, `ProtocolException`, detail
+  `group transport callback failed`; `11/12 count=0`.
+- Scope: the group selector obtained no successful transport callback. Group protobuf, page, and
+  terminator were not reached, and no set-enable request was issued.
+- Remaining discriminator: display the existing Reply failure/ecode/callback diagnostic. Repeating
+  the same black-box request without that detail is not new evidence.
+- Does not establish: unsupported state, empty inventory, no `RID_UNLOCK`, RID off, or RF state.
+  The result image is not committed, and no identifier, raw reply, license material, motor action,
+  or independent RF observation is recorded.

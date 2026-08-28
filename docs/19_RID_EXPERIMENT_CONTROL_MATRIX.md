@@ -21,7 +21,9 @@ chain, Mini 5 Pro admission experiment, full current inventory, and public-prior
 C-136 through C-140. A-025's bounded modern FlySafe inventory lane and final-artifact audit add
 C-150/C-151; the exact current-Fly field-7 and aircraft-consumer boundaries add C-152/C-153;
 A-026's gated implementation/audit/delivery add C-160--C-162; user-reported installation adds C-164,
-and its first live gate-unobserved/zero-query result adds C-165.
+and its first live gate-unobserved/zero-query result adds C-165. A-027's fixed active read-only lane,
+artifact audit, delivery, and first ambiguous live result add C-166--C-169. A-028's diagnostic-only
+successor, delivery, and group-transport live result add C-170--C-173.
 
 ## 2. Implementation levels
 
@@ -98,7 +100,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 
 | Surface | Facts | Current disposition |
 | --- | --- | --- |
-| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; passive `03/09` version + `03/42` support gates; A-026 implements/audits the fail-closed gate and its first live window ended gate-unobserved/zero-query; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; A-025 is user-reported installed but unexecuted; A-026's first live result closes only its third-party passive observation window, not support/entitlement/inventory/RID/RF; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
+| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; A-026 passive gate ended unobserved/zero-query; A-027 ended `ProtocolException`/ambiguous; A-028 localized it to group transport callback failure before protobuf/pages/terminator, with zero `11/12`; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; no canonical inventory, support, entitlement, RID, or RF evidence exists; next classifier is Reply failure/ecode/callback, not an identical run; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
@@ -124,6 +126,20 @@ neither gate nor any callback class; it correctly issued zero `11/11` requests (
 Binder cannot see DJI's device token, so missing pushes remain unknown rather than unsupported,
 no-entitlement, empty inventory, or RID-off. Developer Assistant and retained gated F9/EID/OPID writes
 remain outside the claim that the new FlySafe lane is read-only.
+
+A-027 next fixed the active read-only lane to `02:04 -> 12:04`, `11/11`, V3/V4 selectors with no
+route scan or app retry. Its artifact audit and MTP identity checks passed (C-166--C-168). The
+installed run returned `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS` at `ProtocolException`, with
+`11/12 request count=0` (C-169). Because the UI omitted the exception message, callback, ccode,
+group, page, and terminator remain merged. The result is not unsupported, empty inventory, no
+`RID_UNLOCK`, RID-off, or RF evidence. Public prior art corroborates only generic families, not the
+exact product-139/RC331 fixed route.
+
+A-028 preserves all of A-027's protocol behavior and only adds safe UI classification: static
+`ProtocolException` text, numeric unexpected group/page ccode and page index, and terminator data
+length. Its artifact audit and MTP identity checks passed (C-170--C-172). The installed run returned
+`group transport callback failed`, `11/12 count=0`; protobuf/pages/terminator were not reached
+(C-173). The next discriminator is Reply failure/ecode/callback detail.
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing
 found no edge from type 6/field 7/`11/12` to WA150 `0802`, motor state, or BLE/Wi-Fi enable. This is a
@@ -173,13 +189,13 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
-2. Treat exact A-026's completed first `GATE_UNOBSERVED`/zero-query run as a third-party observer
-   negative; do not repeat it unchanged. Recover a materially different official in-process/current-
-   state owner or safe replay/trigger; in parallel, the owner checks only the official RID-card and
-   Mini 5 Pro RID-selector visibility booleans.
-3. Only when support=true and version is V3/V4 through an admitted current-state path, run one bounded read-only modern FlySafe inventory
-   query through the existing system Binder; report only type-6 count/level/enabled/valid and
-   preserve unavailable versus empty.
+2. Treat A-026's `GATE_UNOBSERVED`, A-027's ambiguous `ProtocolException`, and A-028's group
+   transport callback failure as separate narrow negatives. Expose only the existing Reply
+   failure/ecode/callback detail; do not repeat the same black-box request. Otherwise recover a
+   materially different official owner. In parallel, check only the official RID-card and Mini 5
+   Pro RID-selector visibility booleans.
+3. Advance only after one canonical privacy-reduced inventory; report type-6 count/level/enabled/
+   valid and preserve unavailable versus empty.
 4. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,
    inventory readback, restoration, and final readback; keep the license ID process-private.
 5. Correlate the controlled state with operator-started motor-on independent RF. The tested

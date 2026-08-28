@@ -37,7 +37,9 @@
 | A-023 | FindUAS RC 2 RID Admin；self-developed；`0.3.0-research` | `64,745` | `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59` | `OBSERVED`；已安装并执行一次只读 Binder F7 probe；无 F9；已由 A-024 取代且从 removable storage 清理；不进入本 documentation repo |
 | A-024 | FindUAS RC 2 RID Admin；self-developed；`0.4.1-research` | `92,569` | `68f9b0d42d42e1bcb674ddba88a3996229d06978e35e30a355f253678a8e2b95` | `OBSERVED`；已安装并执行只读双路 positive-control 与 30 秒 listener；target 未发送、无 F9；listener 经独立 RF 对照判为假阴性；由下一 inventory 版本取代；不进入本 documentation repo |
 | A-025 | FindUAS RC 2 RID Admin；self-developed；`0.5.0-flysafe-readonly` / code 8 | `111,889` | `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80` | `OBSERVED`；exact final-artifact audit；MTP/readback 已闭合，用户随后明确报告安装完成；启动、执行与结果仍未知；由 A-026 取代；不进入本 documentation repo |
-| A-026 | FindUAS RC 2 RID Admin；self-developed；`0.6.0-flysafe-gated` / code 9 | `135,525` | `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4` | `OBSERVED`；exact final-artifact audit；`installed-and-run-gate-unobserved-zero-query`；首次 60,003 ms gate 窗口无任何 callback、无 permit、无 `11/11`；current gate-aware FlySafe candidate；不进入本 documentation repo |
+| A-026 | FindUAS RC 2 RID Admin；self-developed；`0.6.0-flysafe-gated` / code 9 | `135,525` | `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4` | `OBSERVED`；exact final-artifact audit；`installed-and-run-gate-unobserved-zero-query`；首次 60,003 ms gate 窗口无任何 callback、无 permit、无 `11/11`；已由 direct-readonly branch 取代；不进入本 documentation repo |
+| A-027 | FindUAS RC 2 RID Admin；self-developed；`0.7.0-flysafe-direct-readonly` / code 10 | `196,569` | `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81` | `OBSERVED`；exact audit/MTP/install/run；active result 为 `ProtocolException`-class ambiguous，`11/12 count=0`；无 canonical inventory/write；已由 A-028 取代；不进入本 documentation repo |
+| A-028 | FindUAS RC 2 RID Admin；self-developed；`0.7.1-flysafe-direct-diagnostic` / code 11 | `197,061` | `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540` | `OBSERVED`；exact audit/MTP/install/run；current direct-readonly transport diagnostic result；group transport callback failed，`11/12 count=0`；无 protobuf/page/terminator/write；不进入本 documentation repo |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -226,7 +228,50 @@ inventory、RID off/no RF 或 official in-process observer 缺失。没有记录
 private device identifier、raw frame 或 license material；也没有 write、motor action 或 independent RF
 observation。
 
-## 12. 更新与一致性检查
+## 12. A-027：active direct-readonly FlySafe result
+
+A-027 package 仍为 `com.finduas.rc2ridadmin`，versionCode 10、versionName
+`0.7.0-flysafe-direct-readonly`。其新按钮只允许一次 fixed system-Binder transaction-4
+`02:04 -> 12:04`、`11/11` V3/V4 group/page query；不扫描 route，不做应用层 retry。只有严格
+count/page/terminator/schema completion 才形成 inventory，其他结果保持 unavailable/ambiguous。
+
+最终工件经两次独立 clean build，APK byte-identical；127 tests 为 0 failures/errors/skips，lint 为
+0 errors/15 warnings。V2 signature 与 zipalign 验证通过；manifest 声明零 permission，final-artifact
+检查未发现 packaged native library、network、socket、shell 或 external-process execution path。
+最终大小 `196,569` bytes，SHA-256
+`aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`（C-166/C-167）。
+
+2026-08-29，A-027 已通过 MTP staged 到 removable SD `Download/FindUAS_A027_RO.apk`；fresh
+listing size 与登记值一致，readback SHA-256 也匹配（C-168）。操作者随后安装并运行主动只读按钮。
+进入 strict inventory parser 后，屏幕结果为 `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`，
+阶段 `ProtocolException`，并显示 `11/12 request count=0`（C-169）。因此 device-use state 为
+`installed-and-run-direct-v3-v4-query-unavailable-ambiguous-no-write`。
+
+该 UI 没有显示 exception message，故不能进一步区分 callback、ccode、group、page 或 terminator
+阶段；它不证明 unsupported、empty inventory、no `RID_UNLOCK`、RID off 或 RF state。截图不入库，
+且未记录 storage/USB/device identifier、raw reply、license ID 或 account material。APK 和源码也不
+进入本 documentation-only repository。
+
+## 13. A-028：direct-readonly diagnostic result
+
+A-028 package 仍为 `com.finduas.rc2ridadmin`，versionCode 11、versionName
+`0.7.1-flysafe-direct-diagnostic`。它仅扩展 A-027 的安全 UI 诊断：静态
+`ProtocolException` message、unexpected group/page ccode 数值及 page index、terminator data
+length。command、固定 `02:04 -> 12:04` route、V3/V4 selectors 和 write boundary 不变。
+
+最终工件 127 tests 通过，lint 0 errors/15 warnings，两次 clean build byte-identical；v2 signature、
+zipalign、zero permissions、no packaged native library 通过。最终大小 `197,061` bytes，SHA-256
+`d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`（C-170/C-171）。
+
+2026-08-29，A-028 已通过 MTP staged 到 removable SD `Download/FindUAS_A028_DIAG.apk`；fresh
+listing size 与登记值一致，readback SHA-256 匹配（C-172）。操作者随后安装并运行；结果为
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`、`ProtocolException`，细分
+`group transport callback failed`，`11/12 count=0`（C-173）。当前 device-use state 为
+`installed-and-run-group-transport-callback-failed-no-write`。固定 group selector 未得到成功 transport
+callback，未进入 protobuf/pages/terminator。当前 UI 不显示 Reply failure/ecode/callback diagnostic；
+不提交 APK、源码、结果图片、device identifier、raw reply 或 license material。
+
+## 14. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

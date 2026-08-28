@@ -112,14 +112,37 @@
   empty inventory、RID off 或无 RF。external Binder route/window 仍只是 token 代理；
   external Developer Assistant 也不受内部 allow-list，且 APK 保留 gated F9/EID/OPID writes，因此是
   Admin 而非全局 read-only。
+- A-027 `0.7.0-flysafe-direct-readonly` / code 10 现在把下一步收敛为一次主动只读 `11/11`：固定
+  system-Binder `02:04 -> 12:04`，只使用 V3/V4 group/page selectors，不扫描 route，也不做应用层
+  retry。`196,569`-byte APK 的 SHA-256 为
+  `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`；127 tests 全通过、
+  lint 0 errors/15 warnings、两次 clean build byte-identical、v2/zipalign、零权限以及无
+  native/network/socket/shell/external-process path 均通过。它已通过 MTP staged 为
+  `Download/FindUAS_A027_RO.apk`，fresh listing size 与 readback SHA 均匹配。操作者随后安装并运行
+  主动按钮；进入 strict inventory parser 后结果为 `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`，阶段
+  `ProtocolException`，`11/12 request count=0`。UI 没显示 exception message，所以目前不能区分
+  callback、ccode、group、page 或 terminator；这不是 unsupported、empty inventory、无
+  `RID_UNLOCK`、RID off 或 RF 结论。
+- A-028 `0.7.1-flysafe-direct-diagnostic` / code 11 是紧随其后的只读诊断版。它只让 UI 安全显示
+  `ProtocolException` 静态说明、unexpected group/page ccode 数值与 page index、terminator data
+  length；协议命令、固定 route、selectors 和写入边界不变。`197,061`-byte APK SHA-256 为
+  `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`；127 tests、
+  lint 0 errors/15 warnings、两次 clean build byte-identical、v2/zipalign、零权限、无 packaged
+  native library 通过。已 staged 为 `Download/FindUAS_A028_DIAG.apk`，fresh size/readback SHA
+  匹配。操作者随后安装并运行；结果为 `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`、
+  `ProtocolException`，细分 `group transport callback failed`，`11/12 count=0`。因此固定
+  `11/11` group selector 没有得到成功 transport callback，尚未进入 group protobuf、page 或
+  terminator；这仍不是 unsupported、empty inventory、无 `RID_UNLOCK`、RID off 或 RF 结论。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
   A-024 又证明两条 Binder route 连 height 正对照都失败，因此 current generic-parameter
   attach 路线已关闭；target 从未发送，未发送 F9。Exact A-026 的首次 passive gate 运行也已闭合为
-  `GATE_UNOBSERVED`/zero-query，不能重复解释为设备能力阴性。下一主线是寻找 materially different
-  official in-process/current-state owner 或安全 replay/trigger；同时由所有者在 official FlySafe 只确认 RID
-  card 与 Mini 5 Pro RID product selector 两个 yes/no。只有 canonical genuine type 6 才继续追
+  `GATE_UNOBSERVED`/zero-query，不能重复解释为设备能力阴性。A-027 主动只读候选随后也已运行，
+  但只收敛到 `ProtocolException` 级 ambiguous failure，尚未形成 canonical inventory。A-028 又把它
+  定位为 group transport callback failure。下一步显示现有 Reply 的 failure/ecode/callback diagnostic，
+  不重复相同黑盒请求；或继续 official
+  in-process/current-state owner；同时确认网站 RID card/Mini 5 Pro selector 两个 yes/no。只有 canonical genuine type 6 才继续追
   enable state 到 `NO_BROADCAST`/真实 RF；并行继续 WA150 `0802` broadcaster/policy owner。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。

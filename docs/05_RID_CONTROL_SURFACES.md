@@ -571,6 +571,57 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   对照、raw frame、identifier 或 license material。即便未来 canonical inventory 成功，也只闭合返回清单，
   不闭合 official product eligibility、aircraft-side consumer 或 RF effect。
 
+### RID-008G：A-027 把下一步收敛为一次主动只读 inventory
+
+- **证据状态：** 实现与 final artifact audit 为 `STATIC`（C-166/C-167）；MTP 交付为
+  `OBSERVED`（C-168）。
+- **对象/版本：** self-developed A-027，versionCode 10、versionName
+  `0.7.0-flysafe-direct-readonly`。
+- **固定 query：** 一个不可复用的 active-read-only permit 只进入 system-Binder transaction 4，
+  固定 `02:04 -> 12:04`、`11/11`、V3/V4 group/page selectors。该 lane 不扫描 sender/receiver route，
+  不做应用层 retry，也不借 passive `03/09`/`03/42` gate 解释结果。
+- **结果分类：** 只有 count、page、terminator 和 bounded schema 全部 canonical 才显示 inventory。
+  timeout、callback failure、schema mismatch 或 noncanonical completion 一律是
+  `query unavailable/ambiguous`，不是 unsupported/no entitlement/no license。canonical inventory
+  也只是返回清单，不证明 type-6 已被 aircraft broadcaster 消费，更不证明 RF RID 状态。
+- **公开证据边界：** pinned `fpv_live` 与 `dji-firmware-tools` 支持历史 DUML device/packet family；
+  DJI Cloud API 与 MSDK 支持 FlySafe inventory/license 的通用模型。没有一个公开来源独立确认
+  product 139 / RC331 的固定 `02:04 -> 12:04` query route；该 route 是本地 exact static analysis
+  候选，A-027/A-028 的 noncanonical live result 没有确认它。
+- **工件审计：** exact `196,569`-byte APK SHA-256 为
+  `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`。127 tests 为
+  0 failures/errors/skips，lint 0 errors/15 warnings；两次 clean build byte-identical；v2 signature、
+  zipalign、zero permissions、no native/network/socket/shell/external-process path 均通过。
+- **设备状态：** 已通过 MTP staged 为 removable-SD `Download/FindUAS_A027_RO.apk`；fresh listing
+  size 为 `196,569` bytes，readback SHA 与登记值一致。操作者随后安装并运行主动按钮；结果为
+  `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`，stage `ProtocolException`，显示
+  `11/12 request count=0`（C-169）。没有 canonical inventory 或 set-enable request。
+- **live 边界：** UI 没显示 exception message，因此不能区分 callback、ccode、group、page 或
+  terminator。该运行不证明 unsupported、empty inventory、no `RID_UNLOCK`、RID off 或 RF。结果图片
+  不入库；无 raw reply、identifier、license ID、write、motor action 或 independent RF observation。
+
+### RID-008H：A-028 只增加安全诊断，不改变协议行为
+
+- **证据状态：** 实现与 final artifact audit 为 `STATIC`（C-170/C-171）；MTP 交付为
+  `OBSERVED`（C-172）。
+- **对象/版本：** self-developed A-028，versionCode 11、versionName
+  `0.7.1-flysafe-direct-diagnostic`。
+- **唯一变化：** `FlysafeRidInventory.ProtocolException` 显示静态安全 message；group/page 非预期
+  ccode 显示数值和 page index；terminator mismatch 显示 data length。A-027 的 command、固定
+  `02:04 -> 12:04` route、V3/V4 selectors 与 write boundary 完全不变。
+- **工件审计：** exact `197,061`-byte APK SHA-256 为
+  `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`。127 tests、
+  lint 0 errors/15 warnings、两次 clean build byte-identical、v2 signature、zipalign、zero
+  permissions 与 no packaged native library 通过。
+- **设备状态：** 已通过 MTP staged 为 removable-SD `Download/FindUAS_A028_DIAG.apk`；fresh
+  listing size 为 `197,061` bytes，readback SHA 与登记值一致。操作者随后安装并运行；结果为
+  `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`、`ProtocolException`，细分
+  `group transport callback failed`，`11/12 count=0`（C-173）。
+- **live 边界：** 固定 `11/11` group selector 未获得成功 transport callback，因此尚未进入 group
+  protobuf、page 或 terminator，也没有 set-enable request。当前 UI 未显示 Reply failure/ecode/
+  callback diagnostic；不能解释为 unsupported、empty inventory、no `RID_UNLOCK`、RID off 或 RF。
+  下一判别是显示该既有 Reply 诊断，不重复同一黑盒请求。
+
 ### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
 
 - **证据状态：** C-152 为 `STATIC`；C-153 为 `NEGATIVE`。

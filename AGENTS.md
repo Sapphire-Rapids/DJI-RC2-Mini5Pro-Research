@@ -165,7 +165,7 @@ Later retractions override earlier progress summaries.
     current Mini 5 Pro executes it. Current native inventory/set-enable endpoints are `0x11/0x11`
     and `0x11/0x12`, with product-139 receiver `0x92`; query only through a bounded read-only probe,
     never invent or expose license IDs or send set-enable before a genuine baseline exists.
-29. A-025 `0.5.0-flysafe-readonly` is the current staged inventory baseline. Its exact SHA-256 is
+29. A-025 `0.5.0-flysafe-readonly` is the historical fixed inventory baseline. Its exact SHA-256 is
     `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`; it was copied through MTP
     to RC 2 removable SD `Download` as `FindUAS_A025_RID.apk`, and same-session readback hash matched.
     An unintended long-name duplicate was removed. The user later explicitly reported installation
@@ -207,6 +207,33 @@ Later retractions override earlier progress summaries.
     every reported class, and zero `11/11` requests. External Developer Assistant is outside its
     sender allow-list, and retained gated F9/EID/OPID writes make it Admin rather than globally
     read-only.
+34. A-027 `0.7.0-flysafe-direct-readonly` / code 10 is the current direct-query result. The
+    `196,569`-byte APK has SHA-256
+    `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`; 127 tests, lint
+    0 errors/15 warnings, two byte-identical clean builds, v2 signature, zipalign, zero permissions,
+    and no native/network/socket/shell/external-process path passed. Its one-shot lane uses only the
+    fixed `02:04 -> 12:04`, `11/11`, V3/V4 selectors, with no route scan or app retry. MTP staging as
+    `Download/FindUAS_A027_RO.apk` passed fresh size and readback-hash checks. The operator then
+    installed and ran its active button; it returned `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`
+    at `ProtocolException`, with `11/12 request count=0`. Because the UI omitted the exception
+    message, callback/ccode/group/page/terminator cannot be separated. This is not unsupported,
+    empty inventory, no `RID_UNLOCK`, RID-off, or RF evidence.
+    Public MSDK/Cloud API and community DUML prior art support only the generic families; they do not
+    independently confirm this product-139/RC331 fixed route; C-169's ambiguous live result did not
+    canonically confirm it.
+35. A-028 `0.7.1-flysafe-direct-diagnostic` / code 11 is the current diagnostic result. It changes
+    only safe UI classification: static `ProtocolException` text, numeric unexpected group/page
+    ccode with page index, and terminator data length; command, route, selectors, and write boundary
+    are unchanged. The `197,061`-byte APK has SHA-256
+    `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`; 127 tests,
+    lint 0 errors/15 warnings, two byte-identical clean builds, v2 signature, zipalign, zero
+    permissions, and no packaged native library passed. MTP staging as
+    `Download/FindUAS_A028_DIAG.apk` passed fresh size and readback-hash checks. The operator then
+    installed and ran it: `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, `ProtocolException`, detail
+    `group transport callback failed`, `11/12 count=0`. Thus the fixed `11/11` group selector got no
+    successful transport callback and protobuf/pages/terminator were not reached. The next
+    discriminator is the already available Reply failure/ecode/callback diagnostic; do not repeat
+    the same black-box request or call the result unsupported/empty/no-`RID_UNLOCK`.
 
 ## Privacy and redaction
 

@@ -442,3 +442,45 @@ system Binder. Its FlySafe lane allows `0x11/0x11` only, starts with the V3/V4 g
 page selection below wrap, and reports only aggregate type-6 level/enabled/valid state.
 `0x11/0x12` is not admitted in this stage. Only a canonical genuine type-6 result can admit the later
 baseline-transition-readback-restore experiment and motor-on independent RF A-B-A.
+
+## 25. Passive-gate result and direct read-only successor
+
+A-026 added one bounded passive `03/09 + 03/42` gate before the A-025 inventory lane. Its first live
+60,003 ms run delivered no callback of any class, left both inputs unobserved, and correctly sent no
+`11/11`. That result closed the third-party passive listener as the next discriminator without
+reinterpreting it as aircraft non-support or empty inventory.
+
+A-027 therefore isolates the active read-only question. It uses one non-reusable permit for one
+fixed system-Binder transaction-4 `02:04 -> 12:04`, `11/11` V3/V4 group/page traversal. It does not
+scan routes and adds no application-level retry. A result is promoted to inventory only after the
+existing count/page/terminator/schema checks complete canonically; timeout, callback failure, or
+noncanonical data remains ambiguous. Public MSDK/Cloud API and pinned `fpv_live`/
+`dji-firmware-tools` evidence corroborate generic families only, not this product-139/RC331 fixed
+route, which comes from local exact static analysis and remains a live candidate.
+
+The exact versionCode-10 `0.7.0-flysafe-direct-readonly` APK passed 127 tests, lint with zero errors
+and 15 warnings, two byte-identical clean builds, v2-signature/zipalign checks, zero-permission
+inspection, and no-native/network/socket/shell/external-process inspection. Its registered size is
+196,569 bytes and SHA-256 is
+`aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`. It was staged through MTP
+as removable-SD `Download/FindUAS_A027_RO.apk`; a fresh listing matched the size and readback SHA
+matched. The operator then installed it and ran the active button. The result was
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, stage `ProtocolException`, with displayed
+`11/12 request count=0`. Because the UI omitted the exception message, this run did not separate
+callback, ccode, group, page, or terminator failure. The result image was not retained in this
+repository and no identifier or license material was recorded.
+
+A-028 was then built as a diagnostic-only successor. It preserves A-027's protocol command, fixed
+route, selectors, and no-write boundary; only UI classification changed. `ProtocolException` now
+uses a static safe message, unexpected group/page ccode reports its numeric value and page index,
+and terminator mismatch reports data length. The versionCode-11
+`0.7.1-flysafe-direct-diagnostic` APK is 197,061 bytes with SHA-256
+`d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`. Its 127 tests,
+lint 0 errors/15 warnings, two byte-identical clean builds, v2 signature, zipalign, zero permissions,
+and no-packaged-native check passed. MTP staging as `Download/FindUAS_A028_DIAG.apk` passed fresh
+size and readback-SHA checks. The operator then installed and ran it. The result remained
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS` / `ProtocolException`, but the new classifier showed
+`group transport callback failed`; `11/12 count=0`. The fixed `11/11` group selector therefore had
+no successful transport callback, and the run did not reach group protobuf, page, or terminator.
+The next useful read-only change is to display the existing Reply failure/ecode/callback diagnostic,
+not to repeat the identical black-box request.

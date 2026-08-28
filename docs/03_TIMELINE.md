@@ -440,3 +440,52 @@ work when a report did not contain a more precise timestamp.
 - Boundary: this run establishes only that the third-party system-Binder passive listener did not
   form an observation surface in that window. It does not establish aircraft non-support, absent
   type-6 entitlement, empty inventory, RID off/no RF, or absence of the official in-process observer.
+
+### 2026-08-29 — A-027 active read-only inventory checkpoint
+
+- `STATIC`: A-027 `0.7.0-flysafe-direct-readonly` / code 10 removes the failed passive gate from the
+  next experiment and admits one one-shot active read-only system-Binder transaction-4 query. The
+  route is fixed to `02:04 -> 12:04`, command `11/11`, V3/V4 group/page selectors; it performs no
+  route scan and no application-level retry.
+- `STATIC`: only a canonical count/page/terminator/schema completion may be reported as inventory.
+  Timeout, callback failure, and noncanonical completion remain ambiguous and cannot mean
+  unsupported or no license. A canonical inventory would still not prove aircraft-side consumption
+  or RF RID.
+- `STATIC`: the fixed product-139/RC331 route comes from local exact static analysis. Pinned
+  `fpv_live`, `dji-firmware-tools`, DJI Cloud API, and MSDK sources corroborate generic DUML/FlySafe
+  families but do not independently confirm that exact route.
+- `STATIC`: both clean builds produced byte-identical APKs; 127 tests passed with zero failures,
+  errors, or skips; lint reported 0 errors/15 warnings; v2 signature, zipalign, zero permissions, and
+  no native/network/socket/shell/external-process path passed. Exact size is `196,569` bytes and
+  SHA-256 is `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`.
+- `OBSERVED`: MTP staging to removable-SD `Download/FindUAS_A027_RO.apk` completed. A fresh listing
+  matched the registered size and readback SHA-256 matched the registered artifact (C-168).
+- `NEGATIVE`: after installation the operator ran the active button. It entered the strict inventory
+  parser and reported
+  `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, stage `ProtocolException`, and
+  `11/12 request count=0` (C-169). No canonical inventory formed and no set-enable request was sent.
+- Boundary: the UI did not expose the exception message or a lower-level callback, ccode, group,
+  page, or terminator class. The result is not evidence of unsupported state, empty inventory, no
+  `RID_UNLOCK`, RID off, or RF. The image is not committed; no identifier, raw reply, license
+  material, motor action, or independent RF observation is recorded.
+
+### 2026-08-29 — A-028 read-only diagnostic checkpoint
+
+- `STATIC`: A-028 `0.7.1-flysafe-direct-diagnostic` / code 11 changes only A-027's safe UI output:
+  static `ProtocolException` text, numeric unexpected group/page ccode with page index, and
+  terminator data length. Protocol command, fixed route, selectors, and write boundary are unchanged.
+- `STATIC`: 127 tests passed; lint reported 0 errors/15 warnings; two clean builds were byte-identical;
+  v2 signature, zipalign, zero permissions, and no packaged native library passed. Exact size is
+  `197,061` bytes and SHA-256 is
+  `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540`.
+- `OBSERVED`: MTP staging as removable-SD `Download/FindUAS_A028_DIAG.apk` completed; a fresh listing
+  matched 197,061 bytes and readback SHA-256 matched (C-172).
+- `NEGATIVE`: after installation the active button reported
+  `DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS`, `ProtocolException`, detail
+  `group transport callback failed`, and `11/12 count=0` (C-173).
+- The fixed `02:04 -> 12:04`, `11/11` group selector obtained no successful transport callback;
+  group protobuf, page, and terminator were not reached, and no set-enable request was sent.
+- Boundary: the current UI does not expose Reply failure/ecode/callback detail. This is not
+  unsupported, empty inventory, no `RID_UNLOCK`, RID off, or RF evidence. The result image is not
+  committed; no identifier, raw reply, license material, motor action, or independent RF observation
+  is recorded. Repeating the same black-box request is not the next discriminator.

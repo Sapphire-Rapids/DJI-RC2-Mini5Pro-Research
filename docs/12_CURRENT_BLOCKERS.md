@@ -107,13 +107,14 @@ uninitialized from unsupported. Missing:
 - usable current-connection observations of both passive pushes;
 - current support=true and negotiated V2/V3/V4 version derived from those observations;
 - exact current-session receiver/product/device tuple;
-- fresh query correlation;
+- fresh canonical query correlation; A-028 localized the current failure to the group transport
+  callback, but Reply failure/ecode/callback detail remains hidden;
 - privacy-minimized type-6 inventory result.
 
-Effect: fixed legacy inventory requests, version guessing, cache defaults, missed pushes, and A-025
-noncanonical failure are not admissible evidence of unsupported or empty inventory. External Binder
-cannot see DJI's device token; a same-sender/window pair is only a proxy, and missing pushes remain
-unknown.
+Effect: fixed legacy inventory requests, version guessing, cache defaults, missed pushes, A-027's
+ambiguous result, and A-028's group transport callback failure are not evidence of unsupported or
+empty inventory. External Binder cannot see DJI's device token; a same-sender/window pair is only a
+proxy, and missing pushes remain unknown.
 
 ## B-11 — genuine type-6 entitlement
 
@@ -282,6 +283,22 @@ or the official in-process observer.
 The external Developer Assistant remains outside its internal allow-list, and retained gated
 F9/EID/OPID controls make A-026 an Admin artifact rather than globally read-only.
 
+A-027 then isolated one active read-only fixed-route candidate. Its 127-test/15-warning final audit,
+byte-identical builds, signature/alignment, zero-permission and no-native/network/socket/shell/
+external-process checks passed; MTP fresh size/readback SHA matched (C-166--C-168). The operator
+installed it and ran the active button. It returned
+`DIRECT_V3_V4_QUERY_UNAVAILABLE_OR_AMBIGUOUS` at `ProtocolException` with
+`11/12 request count=0` (C-169). No canonical inventory formed and no set-enable request was issued.
+The UI did not expose the exception message, so callback, ccode, group, page, and terminator remain
+undifferentiated. This is not a support, entitlement, empty-inventory, RID, or RF result.
+
+A-028 changes only that diagnostic surface: it adds static-safe `ProtocolException` text, numeric
+unexpected group/page ccode with page index, and terminator data length while preserving command,
+route, selectors, and write boundary. Its 127-test/15-warning audit, byte-identical builds,
+v2/zipalign, zero-permission, no-native check, and MTP fresh size/readback SHA are closed
+(C-170--C-172). The installed run returned `group transport callback failed`, `11/12 count=0`
+(C-173). Thus group protobuf/page/terminator were not reached.
+
 The current app-side schema also no longer supplies the missing aircraft consumer. Exact DJI Fly
 1.21.10 typed `LicenseData` parsing stops at fields 1--5 and treats field 7 as unknown; the separate
 MSDK schema is what identifies it as `LicenseDataRID` (C-152). Current Fly's generic `11/12` carries
@@ -294,6 +311,8 @@ Missing:
 - a materially different official in-process/current-state owner or safe replay/trigger for the
   FlySafe support/version state; the first A-026 passive window is already closed as unobserved and
   should not be repeated unchanged;
+- privacy-reduced exposure of the existing Reply failure/ecode/callback diagnostic for the A-028
+  group transport failure, without exposing raw replies or license material;
 - one canonical, privacy-reduced genuine type-6 inventory baseline without retaining license material;
 - aircraft-side evidence that changing the genuine type-6 enabled state is consumed by the RID
   broadcaster rather than only reflected in an SDK status object;
@@ -309,11 +328,12 @@ status bits, and result class.
 Effect: known generic F7/F8 attach routes are closed for the current session. The third-party
 `0x11/0x1C` Binder listener is also closed as a false-negative oracle by independent RF evidence
 (C-146). Do not repeat either route family without a new owner fact. The shortest active dependency
-is now recovering a materially different official in-process/current-state support/version owner or
-safe replay/trigger, while the owner independently checks only the two official website eligibility
-booleans. The first A-026 gate run already returned unobserved with zero query (C-165); do not turn
-it into a support or entitlement result. Only a future admitted same-session path may run one bounded
-`11/11` query. Same-item enable-state
+is now either the existing Reply failure/ecode/callback diagnostic or a materially different official
+in-process/current-state support/version owner, while the owner independently checks only the two
+official website eligibility booleans. A-026 returned unobserved/zero-query (C-165), and A-027
+returned `ProtocolException`-class ambiguous failure with no `11/12` (C-169); neither is support or
+entitlement evidence. A-028 further localized that result to group transport callback failure before
+protobuf/page/terminator (C-173). Only a future canonical inventory may advance. Same-item enable-state
 readback/restore and WA150 `0802` aircraft-side ownership follow only after a genuine canonical
 record.
 Static discovery of another setter is
@@ -325,10 +345,10 @@ The evidence dependencies are:
 
 ```text
 exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
-  -> materially different official-owner state or safe replay/trigger
-  -> bounded usable 03/09 + 03/42 equivalent state
-  -> support=true + version V3/V4 in one connection proxy
-  -> one bounded 11/11 inventory query via existing system Binder
+  -> A-027 fixed active read-only 11/11 = ProtocolException / ambiguous (C-169)
+  -> A-028 = group transport callback failed before protobuf/page/terminator (C-173)
+  -> expose Reply failure/ecode/callback detail or recover official-owner state
+  -> one canonical privacy-reduced 11/11 inventory
   -> privacy-reduced genuine type-6 level/enabled/valid baseline
   -> prove exact same-item 11/12 response and 11/11 readback/restore design
   -> verified 0802/aircraft-side consumer or independent RF effect

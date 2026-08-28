@@ -14,6 +14,8 @@ The record covers:
 - public prior art relevant to those same surfaces;
 - work-only parsers, admission probes, state-machine models, and route-only artifacts, indexed by
   identity rather than distributed.
+- self-developed staged APK identity/audit/delivery records, including A-027/A-028, without
+  committing the APK, source, host path, device identifier, raw reply, or license material.
 
 FindUAS receiver and macOS client implementation details remain in the separate
 [FindUAS repository](https://github.com/Sapphire-Rapids/FindUAS). This repository records only the
@@ -75,3 +77,5 @@ part of this repository.
   nonzero protocol result into false.
 - `unavailable` is not off, unsupported, or empty.
 - a generated key name is not a live handler.
+- a fixed product-route candidate is not independently corroborated merely because public sources
+  document the generic DUML or FlySafe family.

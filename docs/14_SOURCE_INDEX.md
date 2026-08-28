@@ -56,7 +56,8 @@ here does not imply that all of its claims were accepted.
 - [dji-firmware-tools](https://github.com/o-gs/dji-firmware-tools/tree/195692263c2684cf1ddc4995f2736be6c0fb135e)
   at `195692263c2684cf1ddc4995f2736be6c0fb135e`.
   Used for DUML dissector behavior and IMaH container tooling/field interpretation. Tool support is
-  not target-key availability or signature bypass.
+  not target-key availability, signature bypass, or independent confirmation of A-027's
+  product-139/RC331 `02:04 -> 12:04` route.
 - [N3Live](https://github.com/brendan779/N3Live/tree/bb254b0d0b1f5ac79462e9fe3ea986fc91adeec0)
   at `bb254b0d0b1f5ac79462e9fe3ea986fc91adeec0`.
   Used for Goggles N3 USB/DUML framing corroboration and a generated command-name corpus. It does not
@@ -100,7 +101,24 @@ here does not imply that all of its claims were accepted.
   at `84f149f58a20cad7f2c0abdebb8bd2d100daa94e`.
   Historical mechanism only; not evidence of the RC 2 + O4 implementation.
 - [fpv_live legacy source](https://github.com/ctomichael/fpv_live/tree/4c7bb40e5cc5daec67b39cc093235afb959a4bfe).
-  Used for the legacy `DataOsdSetSdrAssitantWrite.setForceFcc()` literal and command semantics.
+  Used for the legacy `DataOsdSetSdrAssitantWrite.setForceFcc()` literal, command semantics, and
+  historical DJI device/packet-class context. It does not independently confirm A-027's
+  product-139/RC331 fixed route or FlySafe V3/V4 inventory behavior.
+
+## A-027 fixed-route provenance boundary
+
+The public sources above provide independent context at different layers:
+
+- DJI MSDK and Cloud API document FlySafe license inventory/enable concepts and type/level models;
+- `dji-firmware-tools` documents generic DUML framing/dissector conventions;
+- `fpv_live` preserves historical DJI device and packet-class prior art.
+
+None independently identifies the exact RC331 system-Binder sender `2/4`, product-139 receiver
+`18/4`, and `0x11/0x11` combination used by A-027. That fixed route is therefore recorded as a local
+exact-static-analysis candidate, not as public corroboration. Its first live result is C-169 and
+remains protocol-stage ambiguous; A-028 then localized the same fixed route to group transport
+callback failure before protobuf/pages/terminator (C-173) without making the route public-source
+corroborated.
 
 ## NLD public product and release material
 

@@ -321,3 +321,20 @@ Every hypothesis below is testable and remains separate from factual findings.
   observation surface, not a device-capability result. H-28 remains unconfirmed outside that window,
   but another identical passive run is not the next discriminator; a materially different official
   in-process/current-state owner or safe replay/trigger is required.
+
+## H-29 — fixed active read-only V3/V4 inventory route（C-166--C-173）
+
+- Known facts: A-027 implements and audits one fixed system-Binder transaction-4
+  `02:04 -> 12:04`, `11/11` V3/V4 group/page query with no route scan and no app retry. It is staged
+  with size and readback-hash confirmation and was subsequently installed and run.
+- Hypothesis: the exact product-139/RC331 route recovered by local static analysis can return a
+  canonical inventory even though A-026's passive gate observer was silent.
+- Public-evidence boundary: `fpv_live`, `dji-firmware-tools`, DJI Cloud API, and MSDK corroborate
+  generic DUML/FlySafe families, not this exact fixed route.
+- Distinguishing evidence obtained: A-027 entered the strict inventory path but ended
+  `ProtocolException`/ambiguous with `11/12 count=0` (C-169). A-028 preserved protocol behavior and
+  localized the failure to `group transport callback failed`; protobuf/page/terminator were not
+  reached (C-170--C-173).
+- Current state: the fixed-route success hypothesis remains unconfirmed. The next discriminator is
+  existing Reply failure/ecode/callback detail, not another identical black-box request. Neither
+  result establishes unsupported/no-license or RF state.
