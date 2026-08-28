@@ -118,13 +118,15 @@ stronger conclusion that cannot be drawn.
 
 ## N-13 — exact `07.00.0100` local package set
 
-- Status: `NEGATIVE`.
+- Status: `RETRACTED` as a current package-availability conclusion; retained as the historical
+  cache-search result.
 - Scope: Assistant 2 2.1.40.0 caches/logs/Local Storage, ordinary download locations, and retained
   RC331 material.
-- Result: no exact signed module manifest, `0205` body, `framework.jar`, `services.jar`, or
-  `dpad_fuli.apk` tied to displayed `07.00.0100`.
-- Does not establish: that the package is unavailable from DJI or cannot be read from another
-  authorized source.
+- Historical result: that bounded scope contained no exact signed module manifest, `0205` body,
+  `framework.jar`, `services.jar`, or `dpad_fuli.apk` tied to displayed `07.00.0100`.
+- Later result: C-174 obtained another public-archive aggregate and independently verified the exact
+  signed system/`0205` chain, APEX `adbd`, and packaged `dpad_fuli`. The complete all-module set,
+  live mounted/installed files, `framework.jar`, and `services.jar` remain open.
 
 ## N-14 — WA150 Assistant plaintext readback
 
@@ -182,11 +184,15 @@ stronger conclusion that cannot be drawn.
 ## N-21 — stock `dpad_fuli` command carrier
 
 - Status: `NEGATIVE`.
-- Scope: 30 activities, two receivers, one service; six externally reachable components.
+- Scope: exact-v07 APK (A-031), 30 activities, two receivers, one service; six externally reachable
+  components.
 - Result: no side-effect-free fixed-argv UID1000 path that returns stdout, stderr, and exit status.
-  The private Shell page automatically tries `adb shell su` and `adb version`, and drops stderr/
-  exit status. The Protocol page lacks selector control and loses retry information through Parcel.
-- Does not establish: that no other signed system package or future audited carrier exists.
+  The operator-visible Shell page accepts arbitrary text through `Runtime.exec` and drops reliable
+  stderr/exit status; it is a manual evidence surface, not an automation RPC. The Protocol page
+  lacks selector control and loses retry information through Parcel.
+- Does not establish: installed-live APK hash, actual command UID/SELinux context, or that a bounded
+  operator command cannot collect the ADB baseline. Exact package identity supersedes only the old
+  adjacent-version boundary.
 
 ## N-22 — ordinary app attach-agent privilege
 
@@ -201,14 +207,16 @@ stronger conclusion that cannot be drawn.
 - Status: `NEGATIVE`.
 - Result: stock legacy/libusb backends, pinned DJI-oriented pre-auth profile, and isolated
   version/MAXDATA/banner/checksum changes all stopped after host `CNXN` with no device packet.
-- Static explanation: adjacent `adbd` production CNXN drop before RSA.
-- Does not establish: exact binary identity with live v07 or the behavior of an unexecuted
-  first-packet AUTH public-key experiment.
+- Static explanation: exact signed-v07 APEX `adbd` contains the production/debug-count `CNXN`
+  return before RSA (C-174/C-175); the old adjacent-only inference is retracted.
+- Does not establish: live `mp_state`/`dbg_cnt`, mounted-file identity, a live gate log, or the
+  behavior of unexecuted A-032. Repeating host-only banner/version/checksum variants is not a new
+  discriminator.
 
 ## N-24 — `once_auth_open_adb` as a usable switch
 
 - Status: `NEGATIVE` static search.
-- Result: a read was found in the adjacent binary, but no writer/safe setter; the independent
+- Result: a read exists in the exact-v07 binary, but no writer/safe setter; the independent
   per-CNXN production gate does not consult it.
 - Does not establish: absence of an external privileged writer in another component. It is not a
   documented usable debug switch in the current evidence.

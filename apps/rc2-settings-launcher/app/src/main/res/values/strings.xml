@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FindUAS RC 2 设置入口</string>
+    <string name="instructions">请严格按顺序操作：\n\n1. 点击“1. 打开设备信息”。\n2. 在“关于手机”中连续点击“版本号”7 次，直到看到“您现在处于开发者模式！”。\n3. 返回本工具。\n4. 点击“2. 打开开发者选项”。\n5. 在系统页面中手动开启“USB 调试”，并阅读、确认系统警告。\n\n本工具只打开 Android 系统页面，不会自动修改任何设置。</string>
+    <string name="warning">禁止操作：不要开启“OEM 解锁”；不要进入或使用“重置选项”。</string>
+    <string name="open_device_info">1. 打开设备信息</string>
+    <string name="open_developer_options">2. 打开开发者选项</string>
+    <string name="initial_status">等待你的点击。若第 2 步提示“请先启用开发者选项”，请重新完成版本号 7 次点击后再试。</string>
+    <string name="device_info_opened">已请求打开设备信息。请找到“版本号”并连续点击 7 次。</string>
+    <string name="developer_options_opened">已请求打开开发者选项。请只开启“USB 调试”。</string>
+    <string name="developer_mode_still_disabled">开发者模式尚未启用。系统可能显示“请先启用开发者选项”；请先完成版本号 7 次点击。</string>
+    <string name="no_settings_handler">系统没有可处理此入口的页面；本工具未执行任何更改。</string>
+    <string name="settings_access_denied">系统拒绝打开此页面；本工具未执行任何更改。</string>
+    <string name="settings_open_failed">打开系统页面失败；本工具未执行任何更改。</string>
+</resources>

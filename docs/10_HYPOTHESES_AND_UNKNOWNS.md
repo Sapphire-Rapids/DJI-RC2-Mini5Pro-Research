@@ -129,19 +129,23 @@ Every hypothesis below is testable and remains separate from factual findings.
 
 ## H-13 — first-packet ADB public key
 
-- Known facts: live host CNXN receives no reply; adjacent `adbd` AUTH switch handles a public-key
-  packet independently and may call key confirmation.
+- Known facts: live host CNXN receives no reply; exact signed-v07 `adbd` AUTH switch handles a
+  public-key packet independently and may call key confirmation, while its CNXN branch has a
+  separate earlier production/debug-count return.
 - Hypothesis: an `AUTH/RSAPUBLICKEY` sent as the first ADB packet may produce an authorization
   prompt despite CNXN drop.
 - State effect: may display a prompt and persist a key.
-- Current state: unexecuted `HYPOTHESIS`, not a result or general workaround.
+- Current state: unexecuted `HYPOTHESIS`, not a result or general workaround. It is no longer the
+  preferred next discriminator because A-032 is designed to restore the ordinary CNXN/AUTH path.
 
 ## H-14 — adjacent `adbd` parity with live v07
 
-- Known facts: adjacent binary behavior exactly explains the live trace shape.
-- Hypothesis: live `07.00.0100` uses the same CNXN production gate implementation.
-- Distinguishing evidence: exact live binary/file hash or a device-side read-only build identity.
-- Current state: `INFERENCE`, not exact proof.
+- Historical hypothesis: the signed `07.00.0100` package uses the same CNXN production gate as the
+  previously inspected adjacent binary.
+- Resolution: `RETRACTED` as an open hypothesis. The exact signed-v07 APEX `adbd` is byte-identical
+  and C-174/C-175 establish the same gate statically for the target package.
+- Remaining unknown: mounted live-file hash, `mp_state`/`dbg_cnt`, and live gate log. Those are
+  runtime identity/branch questions, not package-parity questions.
 
 ## H-15 — v0.10 live compatibility
 
@@ -338,3 +342,20 @@ Every hypothesis below is testable and remains separate from factual findings.
 - Current state: the fixed-route success hypothesis remains unconfirmed. The next discriminator is
   existing Reply failure/ecode/callback detail, not another identical black-box request. Neither
   result establishes unsupported/no-license or RF state.
+
+## H-30 — A-032 restores the ordinary ADB authentication path（C-174--C-179）
+
+- Known facts: exact signed-v07 `adbd` contains the production/debug-count CNXN return; A-032 changes
+  only the instruction that materializes that gate flag and preserves the normal TLS/auth target.
+  Its removable-SD staging size and full readback SHA are closed.
+- Hypothesis: when launched as a userspace copy under a live identity/path/SELinux combination that
+  can own FunctionFS ADB, A-032 will answer host `CNXN` with `AUTH TOKEN` or `CNXN` instead of silence.
+- Distinguishing evidence: first collect live `id`, `getenforce`, gate properties, init/USB state,
+  stock daemon hash, staged-copy hash, installed Fuli hash, and path labels. Only then choose one
+  internal executable location, verify the copied SHA, stop the init daemon, and send one host
+  `CNXN`.
+- Failure classes remain distinct: copy denied, chmod/exec denied, daemon exits, FunctionFS claim
+  denied, CNXN silence, AUTH response, authorization prompt, final CNXN, and shell-open result must
+  not be collapsed into success/failure.
+- Current state: `NOT ADMITTED` and entirely unexecuted. MTP staging is not runtime evidence; no
+  internal path is preselected until the baseline is observed.

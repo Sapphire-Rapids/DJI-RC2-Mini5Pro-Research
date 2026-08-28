@@ -58,8 +58,10 @@ part of this repository.
 ## Version boundary
 
 - `07.00.0100` is the RC 2 version displayed to the operator.
-- The exact corresponding complete RC331 signed package set was not found in the audited Assistant
-  caches, ordinary download locations, or retained material.
+- A later third-party archive supplied the exact corresponding RC331 signed system aggregate; its
+  config/`0205` chain passed independent PRAK/signature/checksum verification. This closes only the
+  registered target-package `adbd`/`dpad_fuli` static bytes, not the complete package set or current
+  mounted/installed live-file identity.
 - RC331 `10.00.0700/0205` is a verified adjacent Android OTA/platform sample.
 - RC331 `10.00.0700/0200` passed an outer verification boundary; protected inner FLYA content was
   not recovered.

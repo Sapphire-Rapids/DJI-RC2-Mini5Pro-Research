@@ -1,0 +1,2 @@
+# Preserve the exact upstream AOSP header, including its original final blank line.
+experiments/jvmti/jvmti_attach_canary/app/src/main/cpp/third_party/aosp_android_11_jvmti/jvmti.h -whitespace

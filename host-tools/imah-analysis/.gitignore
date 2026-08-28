@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+firmware/
+output/
+outputs/
+reports/
+*.json
+*.fw.sig
+*.bin
+third-party/dji-firmware-tools/

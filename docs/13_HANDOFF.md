@@ -25,6 +25,44 @@ older “install v0.8” or “V2.3 in progress” instruction into a current pr
 
 ## Topic entry points
 
+### Current ADB task: exact v07 gate and pending userspace-copy session
+
+Read C-174--C-179/A-029--A-032 in the two registers, then read
+[08_ANDROID_ADB.md](08_ANDROID_ADB.md), H-30, and B-21 before touching the device.
+
+Exact target-package facts:
+
+- RC331 `07.00.0100` signed system aggregate: `1,446,604,800` bytes, SHA-256
+  `296cfa63e3c6b011fd1ee8dd911c11f64dac9d34a8424a6fbb95b0c237ab1ae3`; its signed config and
+  `0205` module passed the recorded PRAK/checksum chain.
+- APEX `adbd`: `1,497,232` bytes, SHA-256
+  `b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422`. Runtime path is
+  `/apex/com.android.adbd/bin/adbd`; extracted backing path is
+  `/system/apex/com.android.adbd/bin/adbd`; `/system/bin/adbd` does not exist in the target image.
+- Exact `handle_packet(CNXN)` checks `mp_state=production && dbg_cnt<1` and returns before ordinary
+  AUTH. This closes target-package code, not the live property values or taken branch.
+- Exact packaged `dpad_fuli.apk`: `8,849,471` bytes, SHA-256
+  `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f`; its operator Shell page is
+  exact-v07 static evidence but installed-live hash/UID/SELinux are still unknown.
+
+A-032 changes only `cset w21, lt -> mov w21, wzr` at the exact gate-value instruction and preserves
+the normal TLS/auth target. Its `1,497,232`-byte SHA-256 is
+`3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f`. It is already staged with
+matching fresh size/full readback as removable-SD `Download/RC2_ADBD_CNXN.bin`; no binary is in this
+repository.
+
+Current state is `NOT ADMITTED`: no internal copy, chmod, execution, daemon stop, new ADB response,
+or shell has occurred. When the operator returns, run only the three first-segment read-only commands
+in section 11.1 of the ADB document and preserve their complete output. Do not guess an internal
+path. Use the observed UID, SELinux, owner/mode/label and hashes to prepare the second segment in the
+same assisted session. The second segment may stop only init-managed `adbd`, launch only the verified
+A-032 copy, and send one host `CNXN`; if it reaches `device`, record `adb shell id` before describing
+privilege.
+
+Do not return to first-packet public key, WebADB, banner/MAXDATA/checksum variants, USB-debugging
+toggle, wireless ADB, or `tcpip 5555` before that discriminator. Never use bootloader/fastboot/OEM
+unlock, boot/vendor_boot/vbmeta/Magisk/TEE/QFPROM/eFuse or firmware flash.
+
 ### Closed generic-attach path: independent `RIDCtrlEnable`
 
 Read RID-002C in [05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md), H-27 in
@@ -350,7 +388,7 @@ Read [18_LEGACY_DRONEID_DETECTION.md](18_LEGACY_DRONEID_DETECTION.md) before reu
 
 Use the tuple only as a static search signature. Do not add it to a current product sender or UI.
 
-## Documentation-only tasks available without device access
+## Offline tasks available without device access
 
 - independently audit V2.3 exact bytes and its audit script against hostile mutations;
 - normalize claim/source links and add missing exact revision pins;

@@ -10,13 +10,29 @@
 
 | 对象 | 状态 | 已知事实 | 不成立的外推 | 公开处置 |
 | --- | --- | --- | --- | --- |
-| RC 2 操作界面版本 `07.00.0100` | `OBSERVED` | 版本由操作者界面报告；当前 USB 设备曾枚举为 RC331/RC 2 类设备 | 不等于 RC331 模块版本 `10.00.0700`；不证明本地相邻样本与实机逐字节一致 | 可公开版本；不公开设备标识 |
+| RC 2 操作界面版本 `07.00.0100` | `OBSERVED` | 版本由操作者界面报告；当前 USB 设备曾枚举为 RC331/RC 2 类设备 | C-174 的 signed-package 静态身份不等于 mounted live-file readback | 可公开版本；不公开设备标识 |
+| RC331 `07.00.0100/0205` signed system chain | `STATIC` | target aggregate/signed config/`0205` 通过记录的签名与 checksum chain；exact APEX `adbd` 和 packaged `dpad_fuli` 已提取并固定 hash | 不证明当前实机 mounted/installed bytes、live properties、UID 或 SELinux | 只公开身份、hash 与独立描述；aggregate/module/image/APK/binary 不分发 |
 | RC331 `10.00.0700/0205` | `STATIC` | 官方相邻 Android OTA 已按公开验证材料完成无强制外层验证，并用于平台静态审计 | 不证明当前 `07.00.0100` 实机具有相同 APK、属性、SELinux、Binder、ADBD 或 localhost 配置 | 只公开身份和独立描述；样本不分发 |
 | RC331 `10.00.0700/0200` | `STATIC` | 官方相邻 `flyapp` 模块外层完整性已验证；内层 FLYA 仍受保护 | 不证明已取得可执行的 DJI Fly 镜像；不能用强制输出的密文字节代替明文 | 只公开身份和验证边界；样本不分发 |
 | WA150 `01.00.0600` 与 `01.00.0700` | `STATIC` | 官方清单均有十个模块记录；主要变化集中在 `0802` 与 `2603` | 不证明变化必然由 Remote ID 引起；不证明 `2603` 是广播实现 | 只公开模块元数据和哈希；样本不分发 |
 | DJI Fly `1.21.10` | `STATIC` | 官方公开下载样本用于定向静态分析；ARM64 native 样本身份固定 | 不证明 RC 2 内置 DJI Fly 与该 APK 相同；不证明静态 handler 在当前会话被选择 | 只公开版本、大小、哈希和独立结论；APK/SO 不分发 |
 
 相关规范见 [范围与脱敏边界](00_SCOPE_AND_REDACTION.md)、[工件登记](11_ARTIFACT_REGISTER.md) 和后续的证据登记。
+
+### 2.1 Exact target system chain（C-174--C-176）
+
+`STATIC`：A-029 `07.00.0100` aggregate 是 `1,446,604,800` bytes，SHA-256
+`296cfa63e3c6b011fd1ee8dd911c11f64dac9d34a8424a6fbb95b0c237ab1ae3`。Third-party archive
+只提供获取与外层 metadata；内部 signed config 与 `0205` module 又用 `PRAK-2020-01` 完成 header
+signature、stored/encrypted checksum 和 decrypted/plaintext checksum verification，全程无
+force/skip/truncate。该内层 verification 才是 target bytes 的信任锚点。
+
+Target `0205` 中 A-030 APEX `adbd` 是 `1,497,232` bytes，SHA-256
+`b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422`；A-031
+`dpad_fuli.apk` 是 `8,849,471` bytes，SHA-256
+`58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f`。二者与既有审计样本
+逐字节相同，所以只有对应 binary/package 的静态结论可迁移到 exact target package。该 closure
+不自动迁移 framework、Binder、ART、DJI Fly 或 live installed/mounted state。
 
 ## 3. RC331 `0205`：可读 Android 平台样本
 
@@ -71,7 +87,10 @@
 - `STATIC`：无强制外层验证通过，产生一个 `454,223,200` bytes 的内层对象；其 SHA-256 为 `ea5e447b56823c6aa320eb90d4d883bc9f9223cd250a50b47689d23ffd04cb46`。
 - `STATIC`：内层类型为 `flyapp`/`RAW`，包含一个 FLYA chunk，并声明 PRAK 认证与 TBIE 加密。
 - `NEGATIVE`：固定公开 corpus 中的八个 PRAK 变体均未验证内层头；六个 TBIE 变体均未产生满足预期明文校验的结果。
-- `NEGATIVE`：在已审计的 Assistant 缓存、普通下载位置和保留材料中，没有找到与当前 `07.00.0100` 对应的完整、可独立验签的 signed config/module set。
+- `RETRACTED`：早期限定缓存审计曾未找到当前 `07.00.0100` 的可独立验签 signed config/module
+  set；A-029 后续从另一合法公开 archive 获得 target aggregate 并完成 signed system chain，故该
+  “当前材料中没有 target signed system package”结论已被后续事实取代。完整 package set 与 live
+  mounted identity 仍未闭合。
 
 `NEGATIVE` 结果仅限定于记录的公开 key corpus 和本地审计范围。它不证明所需材料不存在于其他合法来源，也不允许把 `--force-continue` 产生的密文或校验失败输出标记为已解密固件。
 

@@ -23,3 +23,20 @@ jobs:
         run: sh scripts/check_sensitive_patterns.sh --all
       - name: Check whitespace
         run: git show --check --oneline --no-renames HEAD
+
+  host-source-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile published Python source
+        run: python -m compileall -q host-tools libraries experiments
+      - name: Test protocol probes
+        run: python -m unittest discover -s libraries/protocol-probes -p 'test_*.py'
+      - name: Test request-quiescence model
+        working-directory: libraries/rid-quiescence-model
+        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Test firmware metadata and target locks
+        run: python -m unittest discover -s host-tools/firmware-acquisition -p 'test_*.py'

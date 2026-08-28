@@ -4,7 +4,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-29 的实机观察、
-固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题。
+固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题，并逐步
+纳入可复现的自研 APK 源码、host tools、tests 和合成 fixtures。
 
 档案中的产品名称只用于说明研究对象。项目与 DJI 无隶属、授权或背书关系。
 
@@ -12,7 +13,7 @@
 
 | 对象 | 记录值 | 证据边界 |
 | --- | --- | --- |
-| 遥控器 | DJI RC 2；界面固件 `07.00.0100` | 精确 live 系统包未取得；部分平台结论来自相邻 RC331 `10.00.0700/0205` |
+| 遥控器 | DJI RC 2；界面固件 `07.00.0100` | exact signed system/`0205` package 已验证；mounted live files/properties 仍未读回，其他平台结论仍可能来自相邻样本 |
 | 飞机 | DJI Mini 5 Pro；静态候选 WA150 / product 139 | product/route 需在 live session 重新确认 |
 | DJI Fly | 重点分析样本 1.21.10 | 静态样本，不自动等同于 RC 2 当前已加载 APK |
 | MSDK | 重点交叉验证 5.18.0 | schema/handler 证据不等于消费级产品支持 |
@@ -74,8 +75,14 @@
   30/50 m effective runtime restriction。
 - FC area 和 Sky country 已完成 `CN -> US -> CN` 的一次有界读回/恢复闭环；Ground country 的
   单次 US 请求无匹配 ACK，随后 GET 仍为 CN。没有由此获得 Remote ID、频道或 RF 功率证据。
-- RC 2 标准 ADB 在 RSA 认证前停止：主机 `CNXN` 已发出，设备不返回 ADB 包。相邻 unstripped
-  `adbd` 含 production `CNXN` drop gate，可解释现象但不等同于精确 live v07 二进制证明。
+- RC 2 标准 ADB 在 RSA 认证前停止：主机 `CNXN` 已发出，设备不返回 ADB 包。Exact signed-v07
+  APEX `adbd` 已固定 hash 并证明含 `mp_state=production && dbg_cnt<1` 的 pre-AUTH return；运行时
+  path 是 `/apex/com.android.adbd/bin/adbd`，不是 `/system/bin/adbd`。Live properties/mounted hash
+  尚未读回，因此这是 target-package 静态解释，不是 live branch log。
+- 只改该 gate-value instruction、保留 ordinary TLS/auth path 的 A-032 userspace copy 已生成；
+  removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
+  没有 shell。下一次 operator session 先采集 exact Fuli UID/SELinux/properties/hashes/path labels，
+  再据实生成第二段单次启动命令，不预猜 `/data` path。
 - 当前 Android admission probe v0.10 通过离线工件审计，但尚未复制、安装或运行于 RC 2。
 - 固定 clean-room 管理客户端 `0.3.0-research` 已安装并执行：live `protocol` Binder lookup、
   manager transaction 和 callback exception layer 均成功，但 target F7 在约 3.1 秒后以
@@ -204,13 +211,40 @@
   状态、身份、地区、策略、managed/opaque/legacy 面的可读/可写/恢复/RF 与 UI 准入矩阵。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
+- [projects/README.md](projects/README.md)：完整源码目录、状态与发布边界。
+
+## 源码地图
+
+- Android 应用：[RC 2 RID Admin](apps/rc2-rid-admin/README.md)、
+  [隐藏设置启动器](apps/rc2-settings-launcher/README.md)、
+  [v0.10 admission probe](apps/rid-admission-probe/README.md)。
+- 协议与模型：[protocol probes](libraries/protocol-probes/README.md)、
+  [RID switch wire codec](libraries/rid-switch-wire-codec/README.md)、
+  [type-6 inventory parser](libraries/rid-type6-inventory-parser/README.md)、
+  [bounded controller](libraries/rid-switch-controller/README.md)、
+  [quiescence model](libraries/rid-quiescence-model/README.md)。
+- 主机工具：[ADB handshake](host-tools/adb-handshake-probe/README.md)、
+  [exact-v07 adbd patch generator](host-tools/adbd-userspace-patch/README.md)、
+  [system-UID bridge probes](host-tools/system-uid-bridge-probe/README.md)、
+  [device read probes](host-tools/device-read-probes/README.md)、
+  [firmware acquisition](host-tools/firmware-acquisition/README.md)、
+  [IMaH analysis](host-tools/imah-analysis/README.md)、
+  [ELF analysis](host-tools/elf-analysis/README.md)、
+  [Ghidra scripts](host-tools/ghidra-scripts/README.md)。
+- 历史实验：[country/area round trips](experiments/device-write/README.md) 与
+  [JVMTI experiment sequence](experiments/jvmti/README.md)。撤回或尚未准入的路线保留原状态，
+  不因为源码公开而变成已验证功能。
 
 ## 仓库内容边界
 
-本仓库只发布独立撰写的 Markdown/CSV、公开链接、版本号、命令标识、聚合结果和文件哈希。
-不发布 DJI APK、固件、提取分区、共享库、反编译源码、原始私人抓包、账号材料、ADB key、
-设备序列号、UAS ID、电话或坐标。
+本仓库发布独立撰写的 Markdown/CSV、公开链接、版本号、命令标识、聚合结果、文件哈希，以及
+可审阅的自研 APK/host-tool 源码和测试。源码公开不代表相应路线已通过实机验证；每个项目必须
+保留 `OBSERVED`、`NOT ADMITTED`、`RETRACTED` 或 `UNKNOWN` 状态边界。
+
+不发布 DJI APK、固件、提取分区、厂商共享库、厂商反编译源码、原始私人抓包、账号材料、
+ADB/signing key、已打包 APK/JAR/SO、patched vendor binary、设备序列号、UAS ID、电话或坐标。
 
 ## License
 
-[MIT](LICENSE) © 2026 Sapphire-Rapids
+[MIT](LICENSE) © 2026 Sapphire-Rapids。少量纳入的第三方源码保留原许可，见
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

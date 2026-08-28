@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <queries>
+        <intent>
+            <action android:name="dji.intent.action.fuli" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:label="FindUAS RID Admin"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <!--
+          RC331 ProtocolManagerService 10 authorizes by looking up the caller's
+          processName as though it were a package name.  Running this laboratory
+          Activity under the stock system application's process label reuses the
+          service's own compatibility rule; the Linux UID remains this APK's UID.
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:process="com.dpad.fuli"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

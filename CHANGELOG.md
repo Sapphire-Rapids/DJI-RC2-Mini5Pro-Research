@@ -1,5 +1,62 @@
 # Changelog
 
+## 0.3.9 - 2026-08-29
+
+### Added
+
+- Published the independently written RC 2 / Mini 5 Pro research source archive under `apps/`,
+  `libraries/`, `host-tools/`, and `experiments/`, with project-local status, build, test, and
+  evidence-boundary documentation.
+- Added the current FindUAS RC 2 RID administration source, the hidden-settings launcher, and the
+  v0.10 admission probe safe source set. Exact historical APKs remain identity records rather than
+  redistributed binaries, and later source is not represented as a byte-for-byte reconstruction of
+  every historical APK.
+- Added host-testable RID codecs, inventory parsing, quiescence and bounded-control models; USB/ADB,
+  firmware-acquisition, IMaH and ELF analysis helpers; Ghidra scripts; source-only system-UID bridge
+  probes; and the preserved JVMTI experiment sequence.
+- Preserved experimental outcomes in source: V2.2 is `RETRACTED`, V2.3 remains `NOT ADMITTED`, the
+  ADB userspace-copy patch has not been executed, and build/test success is never promoted into a
+  live Remote ID control result.
+- Extended CI with 121 stable, device-free host tests for the protocol probes, quiescence model and
+  firmware metadata/target-lock helpers, plus compilation of all published Python source.
+
+### Publication boundary
+
+- No DJI APK, firmware, partition, shared library, decompiled vendor source, patched vendor binary,
+  raw private capture, device/account identifier, signing/ADB key, or generated APK/JAR/SO/DEX is
+  published. A small third-party MIT transport helper and AOSP JVMTI header retain their original
+  notices; GPL tooling is referenced externally rather than vendored.
+
+## 0.3.8 - 2026-08-29
+
+### Added
+
+- Registered C-174--C-179 and A-029--A-032 for the exact `07.00.0100` ADB chain: verified signed
+  system/`0205` provenance, exact APEX `adbd`, exact packaged `dpad_fuli`, the narrow userspace-copy
+  gate patch, MTP staging/readback, and the still-unexecuted live session.
+- Recorded the exact APEX path distinction: runtime `/apex/com.android.adbd/bin/adbd`, extracted
+  backing `/system/apex/com.android.adbd/bin/adbd`, and no target `/system/bin/adbd` entry.
+- Promoted the production/debug-count pre-AUTH return from adjacent-only inference to exact
+  target-package `STATIC`; retracted C-032/H-14 only as the obsolete adjacent-parity inference while
+  retaining live mounted-hash/property/branch-log unknowns.
+- Registered A-032 at `1,497,232` bytes and SHA-256
+  `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f`. The patch changes only
+  `cset w21, lt` to `mov w21, wzr` at the exact gate-value instruction and preserves the normal
+  TLS/auth target.
+- Recorded removable-SD `Download/RC2_ADBD_CNXN.bin` staging: a fresh MTP listing matched size and a
+  full readback SHA matched. No internal copy, chmod, execution, daemon stop, new ADB response, or
+  shell occurred.
+- Added the operator handoff: first collect live UID/SELinux/gate/USB/init and exact stock/staged/Fuli
+  hashes. Choose an internal executable path only from that output, then generate the second one-shot
+  command segment in the same assisted session.
+
+### Provenance
+
+- At the time of this release, the outer aggregate came from a third-party archive, not DJI; the
+  evidence anchor is the separately
+  verified signed config/`0205` PRAK/checksum chain. No firmware, image, APK, original/patched vendor
+  binary, raw disassembly, MTP identifier, device serial, ADB key, or host path is committed.
+
 ## 0.3.7 - 2026-08-29
 
 ### Added
@@ -35,9 +92,10 @@
 
 ### Provenance
 
-- No APK, source, result image, device identifier, raw reply, license ID, or account material is committed.
-  Failure remains ambiguous rather than unsupported/no-license, and canonical inventory would not
-  establish RF RID.
+- At the time of this release, no APK, implementation source, result image, device identifier, raw
+  reply, license ID, or account material was committed. Source was published later in 0.3.9; sealed
+  APK bytes and private/live material remain excluded. Failure remains ambiguous rather than
+  unsupported/no-license, and canonical inventory would not establish RF RID.
 
 ## 0.3.6 - 2026-08-29
 
@@ -112,8 +170,9 @@
   query only after usable support=true and version 1/2, and fail-closed result classes otherwise.
   No final A-026 APK, version/hash, audit, installation, or live result exists.
 - Updated the evidence/artifact registers, timeline, control surfaces, hypotheses, blockers,
-  handoff, source index, README, and AGENTS correction while keeping binaries and account/license
-  material outside this documentation-only repository.
+  handoff, source index, README, and AGENTS correction. At this release the repository was
+  documentation-only; source was added later in 0.3.9. Binaries and account/license material remain
+  excluded.
 
 ### Provenance
 
@@ -164,8 +223,9 @@
 
 - The two user-supplied result photographs were used only to transcribe redacted protocol outcomes;
   PID, UID, device identity, and image files are not committed.
-- A-023/A-024/A-025 APKs and all implementation source remain outside this documentation-only
-  repository.
+- At the time of this release, A-023/A-024/A-025 APKs and implementation source were outside the
+  documentation-only repository. Later successor source was published in 0.3.9; the sealed APK
+  bytes and exact historical snapshots remain excluded.
 - No target F7, F8, F9, reset, account action, license action, firmware write, or RF claim is made.
 
 ## 0.3.2 - 2026-08-28

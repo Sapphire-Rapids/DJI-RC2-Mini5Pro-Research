@@ -40,6 +40,10 @@
 | A-026 | FindUAS RC 2 RID Admin；self-developed；`0.6.0-flysafe-gated` / code 9 | `135,525` | `3c2ae42ac9f19a9e3dfe669ed6357bb8d2f1c38568af6a0f8d8b8f677fcbfec4` | `OBSERVED`；exact final-artifact audit；`installed-and-run-gate-unobserved-zero-query`；首次 60,003 ms gate 窗口无任何 callback、无 permit、无 `11/11`；已由 direct-readonly branch 取代；不进入本 documentation repo |
 | A-027 | FindUAS RC 2 RID Admin；self-developed；`0.7.0-flysafe-direct-readonly` / code 10 | `196,569` | `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81` | `OBSERVED`；exact audit/MTP/install/run；active result 为 `ProtocolException`-class ambiguous，`11/12 count=0`；无 canonical inventory/write；已由 A-028 取代；不进入本 documentation repo |
 | A-028 | FindUAS RC 2 RID Admin；self-developed；`0.7.1-flysafe-direct-diagnostic` / code 11 | `197,061` | `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540` | `OBSERVED`；exact audit/MTP/install/run；current direct-readonly transport diagnostic result；group transport callback failed，`11/12 count=0`；无 protobuf/page/terminator/write；不进入本 documentation repo |
+| A-029 | RC331 v07 system aggregate；input-sample；`07.00.0100` | `1,446,604,800` | `296cfa63e3c6b011fd1ee8dd911c11f64dac9d34a8424a6fbb95b0c237ab1ae3` | `STATIC`；signed-chain verification 与离线提取；排除且不分发；只公开 metadata/hash |
+| A-030 | RC331 v07 APEX `adbd`；input-sample；`07.00.0100` | `1,497,232` | `b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422` | `STATIC`；从 exact signed package 离线提取并审计；排除且不分发；只公开 hash |
+| A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `STATIC`；exact package 离线提取并审计；当前实机安装文件 hash 未读回；排除且不分发 |
+| A-032 | RC331 v07 APEX `adbd` CNXN-gate derivative；input-sample；userspace copy | `1,497,232` | `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` | `NOT ADMITTED`；MTP staging/readback 闭合；未复制到内部存储、未 chmod、未执行；vendor derivative 排除且不分发 |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -186,7 +190,8 @@ warnings，第二次 clean build byte-identical，v2 signature 与 zip alignment
 staging byte identity 与 duplicate cleanup，不包含 storage、USB 或 device serial。MTP 交付时尚无
 用户确认安装或运行结果；用户随后明确报告“A-025 APK 安装完成”，因此 artifact device-use state 与 C-163 记录为
 `OBSERVED`；该事实不证明应用被打开、发送 Binder 请求、返回 inventory、改变设备状态或产生 RF
-结果。A-025 已由 A-026 取代；二进制和源码均不进入本 documentation-only repository（C-154/C-163）。
+结果。A-025 已由 A-026 取代；sealed APK 和精确历史源码快照不入库。后续持续演化的 clean-room
+源码现发布于 `apps/rc2-rid-admin`，不能反向当作 A-025 的逐字节源码身份（C-154/C-163）。
 
 APK signer certificate SHA-256：
 `37896e5a80772e39edad4bdf3ce7f19d2b6e1352a701c48c70edc10c97b2b224`。
@@ -249,8 +254,8 @@ listing size 与登记值一致，readback SHA-256 也匹配（C-168）。操作
 
 该 UI 没有显示 exception message，故不能进一步区分 callback、ccode、group、page 或 terminator
 阶段；它不证明 unsupported、empty inventory、no `RID_UNLOCK`、RID off 或 RF state。截图不入库，
-且未记录 storage/USB/device identifier、raw reply、license ID 或 account material。APK 和源码也不
-进入本 documentation-only repository。
+且未记录 storage/USB/device identifier、raw reply、license ID 或 account material。sealed APK
+不入库；后续源码 successor 发布于 `apps/rc2-rid-admin`，不声称是 A-027 的 exact snapshot。
 
 ## 13. A-028：direct-readonly diagnostic result
 
@@ -269,9 +274,41 @@ listing size 与登记值一致，readback SHA-256 匹配（C-172）。操作者
 `group transport callback failed`，`11/12 count=0`（C-173）。当前 device-use state 为
 `installed-and-run-group-transport-callback-failed-no-write`。固定 group selector 未得到成功 transport
 callback，未进入 protobuf/pages/terminator。当前 UI 不显示 Reply failure/ecode/callback diagnostic；
-不提交 APK、源码、结果图片、device identifier、raw reply 或 license material。
+不提交 APK、结果图片、device identifier、raw reply 或 license material。仓库公开的是加入诊断文件
+持久化后的未发布源码 successor，并明确标记为未分配新版本、未安装、未运行。
 
-## 14. 更新与一致性检查
+## 14. A-029 至 A-032：exact v07 ADB 静态链与未执行 userspace copy
+
+A-029 来自第三方 firmware archive，但其内部 signed configuration 与 `0205` module 已用
+`PRAK-2020-01` 完成 header signature、stored/encrypted checksum 和 decrypted/plaintext
+checksum 验证，过程中没有 `--force-continue`、skip 或 truncate。该链把 A-030 与 A-031 锚定
+到 DJI-signed `07.00.0100` package；并不把第三方 archive 本身描述成 DJI 官方来源，也不证明
+当前实机 mounted file 与 archive 逐字节一致。
+
+A-030 是 exact APEX `adbd`。运行时 service path 是
+`/apex/com.android.adbd/bin/adbd`；`/system/apex/com.android.adbd/bin/adbd` 是离线 filesystem
+backing path，exact target image 没有 `/system/bin/adbd`。A-030 与此前审计的相邻样本
+`cmp` 相等，因此 target-version gate 结论不再只是 adjacent inference。
+
+A-031 是 exact package 中的 `dpad_fuli.apk`。它与已审计样本逐字节相等，所以 manifest、
+`ShellCommandActivity` 和 `Runtime.exec` 行为是 target-package `STATIC` 事实。其 installed-live
+hash、实际进程 UID/SELinux context 和任何 command output 均尚未由实机读回。
+
+A-032 是 vendor-derived、不可分发的 userspace-copy 实验工件。语义 patcher 只将 exact A-030
+的 `handle_packet(CNXN)` gate-value instruction 从 `cset w21, lt` 改为 `mov w21, wzr`，保持
+普通 TLS/auth target。三处实际 byte difference 均位于同一四字节 instruction；embedded
+Build ID 没有重写，所以 A-032 必须用 whole-file SHA-256 识别。
+
+`OBSERVED`：A-032 已通过 MTP 写入 removable-SD `Download/RC2_ADBD_CNXN.bin`。fresh session
+listing 得到一个同名 `1,497,232`-byte object，完整读回 SHA-256 与表中登记值一致。没有记录
+MTP object、storage、USB 或 device identifier。
+
+`NOT ADMITTED`：A-032 尚未复制到 controller internal executable location、未 chmod、未执行；
+没有停止 init-managed daemon、没有得到 ADB packet、没有 shell。Git 仓库只保留 identity、
+独立描述与准入边界，不包含 A-029/A-030/A-031/A-032 bytes、厂商反编译正文或 patched manifest
+中的本机路径。
+
+## 15. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

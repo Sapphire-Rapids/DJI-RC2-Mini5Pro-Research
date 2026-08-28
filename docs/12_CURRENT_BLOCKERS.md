@@ -5,17 +5,25 @@ control.
 
 ## B-01 — exact live RC 2 package identity
 
-Missing:
+Closed for the signed target package:
 
-- exact `07.00.0100` package/module manifest;
+- RC331 `07.00.0100` system aggregate and verified signed `0205` chain;
+- exact APEX `adbd` whole-file identity, init path, and CNXN gate;
+- exact packaged `dpad_fuli.apk` identity and byte equality to the audited sample.
+
+Still missing:
+
+- full signed module/package set beyond the verified system/`0205` lane;
+- current mounted `/apex/com.android.adbd/bin/adbd` readback hash and live boot properties;
+- current installed `com.dpad.fuli` path/hash, process UID, and SELinux context;
 - exact live DJI Fly APK/version/signer/splits;
-- exact `framework.jar`, `services.jar`, `dpad_fuli.apk`, broker configuration/library, and ART
-  identities;
+- exact live `framework.jar`, `services.jar`, broker configuration/library, and ART identities;
 - live process ABI, UID relation, `ro.debuggable`, SELinux, native-library extraction/path, and
   linker namespace.
 
-Effect: adjacent RC331 `0205` Binder, Parcelable, package, policy, ADB, and ART conclusions cannot
-be promoted to exact live facts.
+Effect: ADB and Fuli statements explicitly tied to C-174--C-176 may be promoted to exact
+target-package `STATIC`; they are not live execution facts. Other adjacent Binder, Parcelable,
+policy, ART, and installed-file conclusions remain unpromoted.
 
 ## B-02 — v0.10 runtime result
 
@@ -34,7 +42,9 @@ Missing: an independently audited live caller that:
 - does not probe root, start ADB, enter update/recovery, change settings, or invoke arbitrary input.
 
 Effect: neither a no-op attach canary nor even the fixed Binder liveness checker has an admitted
-launcher. Adjacent stock `dpad_fuli` does not supply one.
+launcher. Exact-v07 stock `dpad_fuli` supplies an operator-visible arbitrary command page for the
+bounded ADB baseline, but it still does not supply fixed argv, stderr, exit status, or an automatic
+side-effect-free RPC for the general attach path.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -339,6 +349,30 @@ record.
 Static discovery of another setter is
 insufficient without baseline, readback, restore, persistence, and RF observation.
 
+## B-21 — A-032 live userspace execution and shell identity
+
+Closed offline:
+
+- exact signed-v07 APEX `adbd` identity and pre-AUTH gate;
+- semantic one-instruction A-032 design and output hash;
+- removable-SD MTP staging, fresh size, and full readback hash.
+
+Missing live:
+
+- `id`, `getenforce`, `mp_state`, `dbg_cnt`, init/USB/FunctionFS state;
+- mounted stock `adbd`, staged copy, and installed Fuli hashes;
+- a proven internal location that is both writable by the observed caller and executable under the
+  observed mount/SELinux policy;
+- internal copy size/hash, mode, label, and successful process start;
+- exclusive FunctionFS ownership after stopping only the init-managed daemon;
+- first returned ADB packet after one host `CNXN`;
+- if transport becomes `device`, actual shell UID/GID/SELinux context and fixed property readback.
+
+Effect: A-032 remains `NOT ADMITTED`. Do not guess `/data` paths, run from removable storage, change
+APEX/partition/boot state, or describe the staged file as an ADB workaround. The first operator batch
+collects the baseline; only that evidence may generate the second command batch in the same assisted
+session.
+
 ## Dependency order
 
 The evidence dependencies are:
@@ -389,3 +423,16 @@ official RID application card + Mini 5 Pro Rid product selector yes/no
 ```
 
 Failure or `UNKNOWN` at a gate does not authorize trial-and-error at the next gate.
+
+The ADB path is independent and currently shortest:
+
+```text
+exact signed-v07 adbd + gate (C-174/C-175)
+  -> live baseline and mounted-file identities
+  -> choose one proven internal executable path
+  -> verify copied A-032 hash/mode/label
+  -> stop only init-managed adbd
+  -> launch one userspace copy
+  -> one host CNXN and exact first-packet classification
+  -> if device: adb shell id + fixed properties
+```

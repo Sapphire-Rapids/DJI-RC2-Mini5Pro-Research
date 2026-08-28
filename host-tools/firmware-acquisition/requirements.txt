@@ -1,0 +1,2 @@
+# Standard-library-only Python tools. macOS /usr/bin/otool and a lawful local DJI Assistant 2
+# installation are runtime prerequisites for live metadata/download operations.

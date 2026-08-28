@@ -1,0 +1,1666 @@
+{
+  "schema": "finduas.dji-fly-runtime-route-elf-manifest",
+  "schema_version": 1,
+  "target": "DJI Fly 1.21.10 arm64-v8a on DJI RC 2 firmware 07.00.0100",
+  "purpose": "fail-closed zero-send EID/RID runtime-route resolver admission",
+  "source_root": "host-tools/elf-analysis",
+  "parser_contract": {
+    "standard_library_only": true,
+    "dynamic_table_source": "PT_DYNAMIC.p_vaddr mapped through exactly one file-backed PT_LOAD",
+    "section_headers_used": false,
+    "dynsym_count_source": "DT_GNU_HASH buckets/chains",
+    "text_policy": "exact first min(16, symbol size) AArch64 bytes (one to four instructions)",
+    "data_policy": "record segment and address points; never hash relocation-sensitive or BSS bytes"
+  },
+  "runtime_consumer_contract": {
+    "handle": "RTLD_NOLOAD on the already-loaded exact SO only; no plain dlopen and no RTLD_DEFAULT",
+    "mapping": "require one coherent exact-file mapping and derive load bias from its PT_LOAD layout",
+    "symbol": "dlsym(exact handle), then dladdr must name that same mapping and equal load_bias + exact RVA",
+    "weak_interposition": "reject every WEAK target whose resolved address is outside the exact defining SO",
+    "work_thread": "RunOnWorkThread/GetWorker are audit coverage, not synchronization barriers or v2.1 direct-call requirements"
+  },
+  "modules": [
+    {
+      "id": "libsdk_jni.so",
+      "relative_path": "official_dji_fly_20260827/working/extracted/libsdk_jni.so",
+      "file_size": 87313856,
+      "sha256": "5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188075ada61f5a7b46286",
+      "gnu_build_id": "c892b3c06664df91d643f84ae9e59a906387068b",
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "type": "ET_DYN",
+        "machine": "AArch64",
+        "machine_number": 183,
+        "program_header_count": 7,
+        "section_headers_used": false
+      },
+      "load_segments": [
+        {
+          "index": 0,
+          "flags": "R-X",
+          "vaddr": "0x0",
+          "file_offset": "0x0",
+          "file_size": 84562816,
+          "memory_size": 84562816,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 1,
+          "flags": "RW-",
+          "vaddr": "0x50a6380",
+          "file_offset": "0x50a5380",
+          "file_size": 1810800,
+          "memory_size": 1810800,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 2,
+          "flags": "RW-",
+          "vaddr": "0x52614f0",
+          "file_offset": "0x525f4f0",
+          "file_size": 921960,
+          "memory_size": 8693329,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 6,
+          "flags": "R-X",
+          "vaddr": "0x5aac078",
+          "file_offset": "0x5344078",
+          "file_size": 2640,
+          "memory_size": 2640,
+          "alignment": "0x4000"
+        }
+      ],
+      "dynamic_table": {
+        "program_header_index": 3,
+        "vaddr": "0x5222d10",
+        "size": 608,
+        "claimed_file_offset": "0x5344ae0",
+        "mapped_file_offset": "0x5221d10",
+        "claimed_offset_matches_mapping": false,
+        "mapped_through_load_segment": 1,
+        "entry_count_through_dt_null": 38,
+        "dt_symtab": "0x2f8",
+        "dt_strtab": "0x26e674",
+        "dt_strsz": 10762514,
+        "dt_syment": 24,
+        "dt_gnu_hash": "0x1f27a8",
+        "dt_versym": "0x1cc1f8",
+        "needed": [
+          "liblog.so",
+          "libandroid.so",
+          "libmediandk.so",
+          "libz.so",
+          "libfile_uploader.so",
+          "libsdk_file_system.so",
+          "libflightrestrictcore.so",
+          "libfr_engine.so",
+          "libsdk_common.so",
+          "libsdk_key_value.so",
+          "libsdk_base.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      "gnu_hash": {
+        "vaddr": "0x1f27a8",
+        "file_offset": "0x1f27a8",
+        "nbuckets": 18825,
+        "symoffset": 3194,
+        "bloom_size": 16384,
+        "bloom_shift": 26,
+        "nonzero_buckets": 18474,
+        "max_bucket": 78492,
+        "chain_words_read": 75302,
+        "dynsym_count": 78496
+      },
+      "symbols": [
+        {
+          "role": "module_mediator_singleton_slot",
+          "name": "_ZN3uav3sdk17g_pModuleMediatorE",
+          "index": 65107,
+          "bind": "GLOBAL",
+          "type": "OBJECT",
+          "visibility": "DEFAULT",
+          "shndx": 23,
+          "rva": "0x5344600",
+          "size": 8,
+          "segment": {
+            "index": 2,
+            "flags": "RW-",
+            "vaddr": "0x52614f0",
+            "file_offset": "0x525f4f0",
+            "file_size": 921960,
+            "memory_size": 8693329,
+            "alignment": "0x1000",
+            "storage": "zero_fill_bss"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "address_only": {
+            "reason": "runtime relocations or zero-fill make file-byte hashing invalid",
+            "address_points": []
+          }
+        },
+        {
+          "role": "get_instance_do_not_call",
+          "name": "_ZN3uav3sdk11GetInstanceEv",
+          "index": 4858,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d3ae40",
+          "size": 140,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d3ae40",
+            "bytes_hex": "fd7bbea9f44f01a9fd03009154a701b0",
+            "sha256": "6e30e587f6ec079c1e64ea9b5c50a9db89eabf096b02c69cff8a5df5256d5a75"
+          }
+        },
+        {
+          "role": "get_framework_core_weak_owner",
+          "name": "_ZN3uav3sdk14ModuleMediator16GetFrameworkCoreEv",
+          "index": 64131,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d54ff8",
+          "size": 56,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d54ff8",
+            "bytes_hex": "091842f9690100b4090100f9091c42f9",
+            "sha256": "31ddec9db7a88f4f57bad4084f99ea907b371270488780f038f2654b06b29916"
+          }
+        },
+        {
+          "role": "get_product_manager_shared_owner",
+          "name": "_ZN3uav3sdk14ModuleMediator13GetProductMgrEv",
+          "index": 46775,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d54da0",
+          "size": 56,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d54da0",
+            "bytes_hex": "091042f9690100b4090100f9091442f9",
+            "sha256": "7231b7f6c9b389fbd55db973d7780070a26d3e32c1c177b5d6770d46b21fd208"
+          }
+        },
+        {
+          "role": "module_mediator_get_worker",
+          "name": "_ZN3uav3sdk14ModuleMediator9GetWorkerEv",
+          "index": 77526,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d55030",
+          "size": 56,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d55030",
+            "bytes_hex": "09f841f9690100b4090100f909fc41f9",
+            "sha256": "c7b67b2b66b8a172b8912d26f3762457e73e892128de84b5e170cd7faf08bc2a"
+          }
+        },
+        {
+          "role": "module_mediator_run_on_work_thread",
+          "name": "_ZN3uav3sdk14ModuleMediator15RunOnWorkThreadENSt6__ndk18functionIFvvEEEb",
+          "index": 29569,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d55764",
+          "size": 720,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d55764",
+            "bytes_hex": "ff4307d1fd7b19a9fc5f1aa9f6571ba9",
+            "sha256": "0121786350d7d64cc531d13ba18cd686aacb8f54e1f191cf5ab053e96a33b9b2"
+          }
+        },
+        {
+          "role": "framework_core_get_worker",
+          "name": "_ZNK3uav3sdk16SDKFrameworkCore9GetWorkerEv",
+          "index": 6855,
+          "bind": "WEAK",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x2501904",
+          "size": 40,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x2501904",
+            "bytes_hex": "0a0440f9090840f90a2500a9c90000b4",
+            "sha256": "74b56f4440d04cc94dfede3e280a61ae38ac7c3b9de7abc428631067a1454939"
+          }
+        },
+        {
+          "role": "framework_core_get_semantic_key",
+          "name": "_ZN3uav3sdk16SDKFrameworkCore6GetKeyEjjjjjRKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE",
+          "index": 54849,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25006bc",
+          "size": 52,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x25006bc",
+            "bytes_hex": "29690190290940f9e00308aa29014079",
+            "sha256": "dd29b17bc9eead618469dbf528cde5c354d7f3ad718422aa2effd87497e54f3c"
+          }
+        },
+        {
+          "role": "hardware_layer_get_abstraction",
+          "name": "_ZN3uav3sdk13HardwareLayer14GetAbstractionERKNSt6__ndk16vectorIjNS2_9allocatorIjEEEE",
+          "index": 4078,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x250d6c0",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x250d6c0",
+            "bytes_hex": "00800091af8aad14",
+            "sha256": "d740a52812645cbeb70e43498aded2823640f967ef6572a7e51b1d251c86db32"
+          }
+        },
+        {
+          "role": "base_abstraction_get_characteristics_by_cache_key",
+          "name": "_ZN3uav3sdk15BaseAbstraction18GetCharacteristicsERKNS0_8CacheKeyE",
+          "index": 12314,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x2515d94",
+          "size": 52,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x2515d94",
+            "bytes_hex": "fd7bbea9f30b00f9fd030091f30300aa",
+            "sha256": "d71b94d7b7653e11c1fd6116431f898f536ba6dc31cfc793097a635aa2da9986"
+          }
+        },
+        {
+          "role": "base_abstraction_get_characteristics_by_string",
+          "name": "_ZN3uav3sdk15BaseAbstraction18GetCharacteristicsERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE",
+          "index": 19431,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25195e4",
+          "size": 440,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x25195e4",
+            "bytes_hex": "ff0301d1fd7b02a9f44f03a9fd830091",
+            "sha256": "d44c0cc818e6bbac2db216c3f7beaae643e11e57accf313cb69c10d61869538d"
+          }
+        },
+        {
+          "role": "base_abstraction_get_abstraction_key",
+          "name": "_ZN3uav3sdk15BaseAbstraction17GetAbstractionKeyEv",
+          "index": 65581,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25194f0",
+          "size": 228,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x25194f0",
+            "bytes_hex": "ff4301d1fd7b02a9f51b00f9f44f04a9",
+            "sha256": "363442ae56c961e39e7982af0ac0953c8ffca7786a8aecf8f615a0340e026985"
+          }
+        },
+        {
+          "role": "base_abstraction_get_datalink_id",
+          "name": "_ZNK3uav3sdk15BaseAbstraction13GetDataLinkIDEv",
+          "index": 52584,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25194bc",
+          "size": 12,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 12,
+            "requested_max_length": 16,
+            "file_offset": "0x25194bc",
+            "bytes_hex": "01c00291e00308aa1f09ad14",
+            "sha256": "a8441c96bd8baef6fa7e77935f052ae7ad877cd692a6eb17e8441c1939109386"
+          }
+        },
+        {
+          "role": "base_abstraction_get_device_id",
+          "name": "_ZNK3uav3sdk15BaseAbstraction11GetDeviceIDEv",
+          "index": 55804,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25194c8",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x25194c8",
+            "bytes_hex": "00e040b9c0035fd6",
+            "sha256": "f0012dc4823812318679c1d1a773070ef58cc7bb934713906fe09197a50748da"
+          }
+        },
+        {
+          "role": "base_abstraction_get_product_id",
+          "name": "_ZNK3uav3sdk15BaseAbstraction12GetProductIDEv",
+          "index": 74448,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25194d0",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x25194d0",
+            "bytes_hex": "009840b9c0035fd6",
+            "sha256": "9249f32b31e8d77574e88f31ddf3813a4540bc0947a0e7d86edc408c31449897"
+          }
+        },
+        {
+          "role": "base_abstraction_get_abstraction_id",
+          "name": "_ZNK3uav3sdk15BaseAbstraction16GetAbstractionIDEv",
+          "index": 18742,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25194d8",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x25194d8",
+            "bytes_hex": "00a040b9c0035fd6",
+            "sha256": "d69f3cffc8e693353edccb74dca4d3e625ce5f853d9d96431dcb9ae13745242c"
+          }
+        },
+        {
+          "role": "base_abstraction_get_sender_seq_diagnostic_only",
+          "name": "_ZNK3uav3sdk15BaseAbstraction12GetSenderSeqEv",
+          "index": 18461,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x25195dc",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x25195dc",
+            "bytes_hex": "00a04339c0035fd6",
+            "sha256": "7e2e9bd2255e2c06aaa47f8054aab05a5f590f0fbcbe7e8b3a836dd5713da62d"
+          }
+        },
+        {
+          "role": "base_abstraction_get_component_index",
+          "name": "_ZNK3uav3sdk15BaseAbstraction17GetComponentIndexEv",
+          "index": 27058,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x2519b10",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x2519b10",
+            "bytes_hex": "00e440b9c0035fd6",
+            "sha256": "e7ab58da73fa79dddf59b1daba42a3cf1966ff651a540f2ad3ebe61061323fe6"
+          }
+        },
+        {
+          "role": "product_manager_get_datalink_by_product_id",
+          "name": "_ZN3uav3sdk10ProductMgr22GetDatalinkByProductIdEjRNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEERt",
+          "index": 9604,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x24fcd2c",
+          "size": 308,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x24fcd2c",
+            "bytes_hex": "fd7bbba9f90b00f9f85f02a9f65703a9",
+            "sha256": "ef332b4018376cb33879249a202dd4e34c67a842c823d15821bbc185c3bfdb85"
+          }
+        },
+        {
+          "role": "module_mediator_add_product_connection_observer",
+          "name": "_ZN3uav3sdk14ModuleMediator28AddProductConnectionObserverENSt6__ndk18functionIFvjRKNS0_11ProductInfoEEEENS3_IFvjEEE",
+          "index": 30675,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d5b508",
+          "size": 1720,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d5b508",
+            "bytes_hex": "fd7bbca9fc5f01a9f65702a9f44f03a9",
+            "sha256": "1d957920d1169b57d891cf1c3de2da0eb626886233e92704007ec3e839f08f30"
+          }
+        },
+        {
+          "role": "module_mediator_remove_product_connection_observer",
+          "name": "_ZN3uav3sdk14ModuleMediator31RemoveProductConnectionObserverEm",
+          "index": 59285,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d5bbc0",
+          "size": 704,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d5bbc0",
+            "bytes_hex": "fd7bbca9fc0b00f9f65702a9f44f03a9",
+            "sha256": "9c9d9972a2589907e4a20aef762062cf2a63bc0e883185fe00391fa65043e285"
+          }
+        },
+        {
+          "role": "module_mediator_add_datalink_observer",
+          "name": "_ZN3uav3sdk14ModuleMediator19AddDatalinkObserverENSt6__ndk18functionIFvRKNS2_12basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEEEEESD_",
+          "index": 60876,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d550a0",
+          "size": 1732,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d550a0",
+            "bytes_hex": "fd7bbca9fc5f01a9f65702a9f44f03a9",
+            "sha256": "1d957920d1169b57d891cf1c3de2da0eb626886233e92704007ec3e839f08f30"
+          }
+        },
+        {
+          "role": "module_mediator_remove_datalink_observer",
+          "name": "_ZN3uav3sdk14ModuleMediator22RemoveDatalinkObserverEm",
+          "index": 13888,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d55a34",
+          "size": 724,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d55a34",
+            "bytes_hex": "fd7bbca9fc0b00f9f65702a9f44f03a9",
+            "sha256": "9c9d9972a2589907e4a20aef762062cf2a63bc0e883185fe00391fa65043e285"
+          }
+        },
+        {
+          "role": "product_manager_add_product_connection_observer",
+          "name": "_ZN3uav3sdk10ProductMgr28AddProductConnectionObserverEmNSt6__ndk18functionIFvjRKNS0_11ProductInfoEEEENS3_IFvjEEE",
+          "index": 76776,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x24fca3c",
+          "size": 676,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x24fca3c",
+            "bytes_hex": "ff8302d1fd7b06a9f73b00f9f65708a9",
+            "sha256": "58007257656c9b2a262e51f78c2099cc496a894de0433546dada7bc50f7893c8"
+          }
+        },
+        {
+          "role": "product_manager_remove_product_connection_observer",
+          "name": "_ZN3uav3sdk10ProductMgr31RemoveProductConnectionObserverEm",
+          "index": 72878,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x24fcce0",
+          "size": 76,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x24fcce0",
+            "bytes_hex": "e90300aa2a8d4af8ca0100b4e80301aa",
+            "sha256": "74bf50b7aa2b6079ce02f7973cfc8370cbb6c9931e99e1fcbabe0d7f54c562b7"
+          }
+        },
+        {
+          "role": "target_shared_weak_lock",
+          "name": "_ZNSt6__ndk119__shared_weak_count4lockEv",
+          "index": 24541,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d2f300",
+          "size": 84,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d2f300",
+            "bytes_hex": "5f2403d5082000910afddfc85f0500b1",
+            "sha256": "48b6a32ea486183c46f939ec0e68fc4b10a272a30b407df0502d530de56f24ef"
+          }
+        },
+        {
+          "role": "target_release_shared",
+          "name": "_ZNSt6__ndk119__shared_weak_count16__release_sharedEv",
+          "index": 77553,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d2f244",
+          "size": 136,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d2f244",
+            "bytes_hex": "3f2303d5fd7bbea9f44f01a9fd030091",
+            "sha256": "92b1e5026aadbb47c73a2f84bf9dd380ab98fab6f8261c5472517e70255ee5bc"
+          }
+        },
+        {
+          "role": "target_release_weak",
+          "name": "_ZNSt6__ndk119__shared_weak_count14__release_weakEv",
+          "index": 63352,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d2f2cc",
+          "size": 52,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d2f2cc",
+            "bytes_hex": "5f2403d50840009109fddfc8e90000b4",
+            "sha256": "d07fef3e5d29e2394da142f409f7ea6d002b8bf6a110709d5a2f3d0262329a6c"
+          }
+        },
+        {
+          "role": "target_string_init",
+          "name": "_ZNSt6__ndk112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm",
+          "index": 6239,
+          "bind": "WEAK",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d30ee8",
+          "size": 144,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d30ee8",
+            "bytes_hex": "3f2303d5fd7bbda9f65701a9f44f02a9",
+            "sha256": "a52fd8f0cfdfe284a0198f90b88697e22abe5924bc457796b305ed0e9ff9181d"
+          }
+        },
+        {
+          "role": "target_string_dtor",
+          "name": "_ZNSt6__ndk112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev",
+          "index": 67996,
+          "bind": "WEAK",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x1d30bcc",
+          "size": 24,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x1d30bcc",
+            "bytes_hex": "5f2403d50800403948000037c0035fd6",
+            "sha256": "62c2afe8006f7821f0ed671d2d0b80a8093b891adf99f0300e53d0feb3170b0a"
+          }
+        },
+        {
+          "role": "target_cache_key_dtor",
+          "name": "_ZN3uav3sdk8CacheKeyD2Ev",
+          "index": 5244,
+          "bind": "WEAK",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x4a32a48",
+          "size": 68,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 84562816,
+            "memory_size": 84562816,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x4a32a48",
+            "bytes_hex": "fd7bbea9f30b00f9fd030091f30300aa",
+            "sha256": "d71b94d7b7653e11c1fd6116431f898f536ba6dc31cfc793097a635aa2da9986"
+          }
+        },
+        {
+          "role": "vtable_hardware_layer",
+          "name": "_ZTVN3uav3sdk13HardwareLayerE",
+          "index": 44996,
+          "bind": "GLOBAL",
+          "type": "OBJECT",
+          "visibility": "DEFAULT",
+          "shndx": 16,
+          "rva": "0x50f1250",
+          "size": 120,
+          "segment": {
+            "index": 1,
+            "flags": "RW-",
+            "vaddr": "0x50a6380",
+            "file_offset": "0x50a5380",
+            "file_size": 1810800,
+            "memory_size": 1810800,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "address_only": {
+            "reason": "runtime relocations or zero-fill make file-byte hashing invalid",
+            "address_points": [
+              {
+                "offset": "0x10",
+                "rva": "0x50f1260",
+                "segment_index": 1
+              },
+              {
+                "offset": "0x68",
+                "rva": "0x50f12b8",
+                "segment_index": 1
+              }
+            ]
+          }
+        },
+        {
+          "role": "vtable_abstraction_manager_impl",
+          "name": "_ZTVN3uav3sdk22AbstractionManagerImplE",
+          "index": 46945,
+          "bind": "GLOBAL",
+          "type": "OBJECT",
+          "visibility": "DEFAULT",
+          "shndx": 16,
+          "rva": "0x50f2040",
+          "size": 408,
+          "segment": {
+            "index": 1,
+            "flags": "RW-",
+            "vaddr": "0x50a6380",
+            "file_offset": "0x50a5380",
+            "file_size": 1810800,
+            "memory_size": 1810800,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "address_only": {
+            "reason": "runtime relocations or zero-fill make file-byte hashing invalid",
+            "address_points": [
+              {
+                "offset": "0x10",
+                "rva": "0x50f2050",
+                "segment_index": 1
+              }
+            ]
+          }
+        },
+        {
+          "role": "vtable_product139_fc_mixabs",
+          "name": "_ZTVN3uav3sdk3key6MixAbsINS0_32UAV77FlightControllerAbstractionENS1_11UAV139FCAbsEEE",
+          "index": 14021,
+          "bind": "WEAK",
+          "type": "OBJECT",
+          "visibility": "DEFAULT",
+          "shndx": 16,
+          "rva": "0x5100f88",
+          "size": 1584,
+          "segment": {
+            "index": 1,
+            "flags": "RW-",
+            "vaddr": "0x50a6380",
+            "file_offset": "0x50a5380",
+            "file_size": 1810800,
+            "memory_size": 1810800,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "address_only": {
+            "reason": "runtime relocations or zero-fill make file-byte hashing invalid",
+            "address_points": [
+              {
+                "offset": "0x10",
+                "rva": "0x5100f98",
+                "segment_index": 1
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "libsdk_key_value.so",
+      "relative_path": "official_dji_fly_20260827/working/sdk_native/libsdk_key_value.so",
+      "file_size": 12684576,
+      "sha256": "09f4aa8aef65f720da09a1dad79c8851e05d619affaf73708bf6747341208336",
+      "gnu_build_id": "877a01a5b4b17e0a0f1b9153ccfe24891fb3c230",
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "type": "ET_DYN",
+        "machine": "AArch64",
+        "machine_number": 183,
+        "program_header_count": 7,
+        "section_headers_used": false
+      },
+      "load_segments": [
+        {
+          "index": 0,
+          "flags": "R-X",
+          "vaddr": "0x0",
+          "file_offset": "0x0",
+          "file_size": 12267104,
+          "memory_size": 12267104,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 1,
+          "flags": "RW-",
+          "vaddr": "0xbb3e60",
+          "file_offset": "0xbb2e60",
+          "file_size": 412704,
+          "memory_size": 412704,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 2,
+          "flags": "RW-",
+          "vaddr": "0xc19a80",
+          "file_offset": "0xc17a80",
+          "file_size": 128,
+          "memory_size": 2936,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 6,
+          "flags": "R-X",
+          "vaddr": "0xc1c078",
+          "file_offset": "0xc18078",
+          "file_size": 2640,
+          "memory_size": 2640,
+          "alignment": "0x4000"
+        }
+      ],
+      "dynamic_table": {
+        "program_header_index": 3,
+        "vaddr": "0xc05cc0",
+        "size": 448,
+        "claimed_file_offset": "0xc18ae0",
+        "mapped_file_offset": "0xc04cc0",
+        "claimed_offset_matches_mapping": false,
+        "mapped_through_load_segment": 1,
+        "entry_count_through_dt_null": 28,
+        "dt_symtab": "0x2f8",
+        "dt_strtab": "0x1a81d0",
+        "dt_strsz": 3486879,
+        "dt_syment": 24,
+        "dt_gnu_hash": "0x149048",
+        "dt_versym": "0x12fb50",
+        "needed": [
+          "libsdk_base.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      "gnu_hash": {
+        "vaddr": "0x149048",
+        "file_offset": "0x149048",
+        "nbuckets": 12921,
+        "symoffset": 116,
+        "bloom_size": 16384,
+        "bloom_shift": 26,
+        "nonzero_buckets": 12687,
+        "max_bucket": 51797,
+        "chain_words_read": 51685,
+        "dynsym_count": 51801
+      },
+      "symbols": [
+        {
+          "role": "cache_key_get_prefixes",
+          "name": "_ZNK3uav3sdk8CacheKey11GetPrefixesEv",
+          "index": 22886,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x7eab64",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 12267104,
+            "memory_size": 12267104,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x7eab64",
+            "bytes_hex": "00c00091c0035fd6",
+            "sha256": "49fc344646fca180c3bae378c59541df984e47e0c82064db3aa65f30632b9cfc"
+          }
+        },
+        {
+          "role": "characteristics_get_extra_param",
+          "name": "_ZNK3uav3sdk15Characteristics13GetExtraParamEv",
+          "index": 25465,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x8f9a54",
+          "size": 276,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 12267104,
+            "memory_size": 12267104,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x8f9a54",
+            "bytes_hex": "ff0307d1fd7b1aa9fc4f1ba9fd830691",
+            "sha256": "45ed2c34d4638c042fa181be74d65f37f555e2c66af91709c66dd2b0b762f4c5"
+          }
+        },
+        {
+          "role": "extra_param_get_single_send_pack_host_id",
+          "name": "_ZNK3uav3sdk25CharacteristicsExtraParam17GetSendPackHostIDEv",
+          "index": 35309,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x8f9bb0",
+          "size": 4,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 12267104,
+            "memory_size": 12267104,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 4,
+            "requested_max_length": 16,
+            "file_offset": "0x8f9bb0",
+            "bytes_hex": "c0035fd6",
+            "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+          }
+        },
+        {
+          "role": "extra_param_get_send_pack_host_ids",
+          "name": "_ZNK3uav3sdk25CharacteristicsExtraParam18GetSendPackHostIDsEv",
+          "index": 49658,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x8f9bec",
+          "size": 8,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 12267104,
+            "memory_size": 12267104,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 8,
+            "requested_max_length": 16,
+            "file_offset": "0x8f9bec",
+            "bytes_hex": "00200091c0035fd6",
+            "sha256": "16e21e8466298640b30a77c6d532a726afc0cf074bb54d17bfaed901b400f570"
+          }
+        },
+        {
+          "role": "characteristics_invalid_singleton",
+          "name": "_ZN3uav3sdk15Characteristics7InvalidE",
+          "index": 44958,
+          "bind": "GLOBAL",
+          "type": "OBJECT",
+          "visibility": "DEFAULT",
+          "shndx": 23,
+          "rva": "0xc19d78",
+          "size": 56,
+          "segment": {
+            "index": 2,
+            "flags": "RW-",
+            "vaddr": "0xc19a80",
+            "file_offset": "0xc17a80",
+            "file_size": 128,
+            "memory_size": 2936,
+            "alignment": "0x1000",
+            "storage": "zero_fill_bss"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "address_only": {
+            "reason": "runtime relocations or zero-fill make file-byte hashing invalid",
+            "address_points": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "libsdk_base.so",
+      "relative_path": "official_dji_fly_20260827/working/sdk_native/libsdk_base.so",
+      "file_size": 7720240,
+      "sha256": "e5b290ebc6aa6e409e116cc0d3b84fb4e49c70f6c552feffacd5b15c7c83e873",
+      "gnu_build_id": "de104ddaca91438807b21688baf08455d5ade20c",
+      "elf": {
+        "class": "ELF64",
+        "endianness": "little",
+        "type": "ET_DYN",
+        "machine": "AArch64",
+        "machine_number": 183,
+        "program_header_count": 7,
+        "section_headers_used": false
+      },
+      "load_segments": [
+        {
+          "index": 0,
+          "flags": "R-X",
+          "vaddr": "0x0",
+          "file_offset": "0x0",
+          "file_size": 7174320,
+          "memory_size": 7174320,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 1,
+          "flags": "RW-",
+          "vaddr": "0x6d88b0",
+          "file_offset": "0x6d78b0",
+          "file_size": 316216,
+          "memory_size": 316216,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 2,
+          "flags": "RW-",
+          "vaddr": "0x726bf0",
+          "file_offset": "0x724bf0",
+          "file_size": 219712,
+          "memory_size": 257168,
+          "alignment": "0x1000"
+        },
+        {
+          "index": 6,
+          "flags": "R-X",
+          "vaddr": "0x768078",
+          "file_offset": "0x75c078",
+          "file_size": 2640,
+          "memory_size": 2640,
+          "alignment": "0x4000"
+        }
+      ],
+      "dynamic_table": {
+        "program_header_index": 3,
+        "vaddr": "0x718500",
+        "size": 464,
+        "claimed_file_offset": "0x75cae0",
+        "mapped_file_offset": "0x717500",
+        "claimed_offset_matches_mapping": false,
+        "mapped_through_load_segment": 1,
+        "entry_count_through_dt_null": 29,
+        "dt_symtab": "0x2f8",
+        "dt_strtab": "0x78e8c",
+        "dt_strsz": 725042,
+        "dt_syment": 24,
+        "dt_gnu_hash": "0x5f128",
+        "dt_versym": "0x57bf8",
+        "needed": [
+          "libz.so",
+          "liblog.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      "gnu_hash": {
+        "vaddr": "0x5f128",
+        "file_offset": "0x5f128",
+        "nbuckets": 3652,
+        "symoffset": 335,
+        "bloom_size": 4096,
+        "bloom_shift": 26,
+        "nonzero_buckets": 3595,
+        "max_bucket": 14941,
+        "chain_words_read": 14609,
+        "dynsym_count": 14944
+      },
+      "symbols": [
+        {
+          "role": "global_packet_status_instance",
+          "name": "_ZN3uav4core18GlobalPacketStatus8instanceEv",
+          "index": 2175,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x2ec280",
+          "size": 168,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 7174320,
+            "memory_size": 7174320,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x2ec280",
+            "bytes_hex": "fd7bbea9f44f01a9fd03009188230090",
+            "sha256": "e5edb42eba7fe6ef7df60206c1009432b0f92003b0f7d3deae4dc28b38fde2dd"
+          }
+        },
+        {
+          "role": "global_packet_status_get_sender_index",
+          "name": "_ZN3uav4core18GlobalPacketStatus20GetGlobalSenderIndexEv",
+          "index": 13137,
+          "bind": "GLOBAL",
+          "type": "FUNC",
+          "visibility": "DEFAULT",
+          "shndx": 14,
+          "rva": "0x2ec328",
+          "size": 24,
+          "segment": {
+            "index": 0,
+            "flags": "R-X",
+            "vaddr": "0x0",
+            "file_offset": "0x0",
+            "file_size": 7174320,
+            "memory_size": 7174320,
+            "alignment": "0x1000",
+            "storage": "file_backed"
+          },
+          "version": {
+            "raw": "0x1",
+            "index": 1,
+            "hidden": false
+          },
+          "code_signature": {
+            "length": 16,
+            "requested_max_length": 16,
+            "file_offset": "0x2ec328",
+            "bytes_hex": "080040f9680000b400fddf08c0035fd6",
+            "sha256": "9b936c4f033e2311e0e6dfb15fa5915ac147f573c83920c51595295079ff92ff"
+          }
+        }
+      ]
+    }
+  ]
+}

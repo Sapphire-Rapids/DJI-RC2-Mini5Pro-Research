@@ -1,0 +1,7 @@
+adb_shell==0.4.4
+cffi==2.1.1
+cryptography==50.0.1
+libusb1==3.4.0
+pyasn1==0.6.4
+pycparser==3.0
+rsa==4.9.1

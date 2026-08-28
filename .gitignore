@@ -4,6 +4,16 @@
 .env
 .env.*
 
+# Nested Android/Gradle/CMake/Python build state
+**/.gradle/
+**/.cxx/
+**/.externalNativeBuild/
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/local.properties
+*.py[cod]
+
 # Private/local research material
 work/
 private/
@@ -51,3 +61,11 @@ adbkey*
 *.har
 *.cap
 *.pfx
+
+# Android signing and generated package metadata
+*.jks
+*.keystore
+*.idsig
+
+# A Gradle wrapper may be reviewed and admitted explicitly in a source project.
+!**/gradle/wrapper/gradle-wrapper.jar

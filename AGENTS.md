@@ -5,13 +5,21 @@ agents maintaining the RC 2 / Mini 5 Pro research record.
 
 ## Repository boundary
 
-This repository contains independently written research documentation and machine-readable indexes.
-It is not DJI software and does not contain a device-control product, firmware patch, unlock tool,
-root package, Remote ID transmitter, license generator, account client, or radio-power profile.
+This repository contains independently written research documentation, machine-readable indexes,
+reproducible host tools, tests, and research Android source code. It is not DJI software and must
+not be presented as an official, production-ready, or compliance-approved device-control product.
 
-Do not commit vendor APKs, firmware, partitions, shared libraries, decompiled vendor code, raw
-private captures, accounts, sessions, signed licenses, device authorization keys, or temporary
-patched images. Hashes and high-level independently written findings are allowed.
+Source under `apps/`, `experiments/`, `libraries/`, and `host-tools/` may be committed when it is
+independently written, reviewable, and its observed/admitted state is documented. Keep source,
+tests, build instructions, and synthetic fixtures; do not commit generated APK/JAR/native binaries,
+Gradle/CMake output, local SDK paths, or signing material. A source tree being public does not
+change an experiment from `NOT ADMITTED`, `RETRACTED`, or `UNKNOWN` to a validated capability.
+
+Do not commit vendor APKs, firmware, partitions, shared libraries, decompiled vendor code, copied
+vendor disassembly, raw private captures, accounts, sessions, signed licenses, device authorization
+keys, patched vendor binaries, flashable images, or temporary runtime dumps. Hashes, offsets,
+minimal independently written patch/probe code, and high-level findings are allowed when the
+corresponding evidence and redistribution boundary are explicit.
 
 ## Evidence discipline
 
@@ -56,8 +64,10 @@ Later retractions override earlier progress summaries.
 
 ## Current non-negotiable corrections
 
-1. RC 2 UI firmware is `07.00.0100`; adjacent RC331 `10.00.0700/0205` evidence does not become
-   an exact live-build fact without a matching package/hash.
+1. RC 2 UI firmware is `07.00.0100`. The verified signed-v07 system/`0205` chain now supplies exact
+   target-package hashes for APEX `adbd` and `dpad_fuli`; those static facts still do not become
+   mounted/installed live-file facts without live hash/property/context readback. Unmatched adjacent
+   RC331 evidence remains adjacent only.
 2. Product-139 France EID static receiver is type/index 18/4 (`0x92`), not the older `0x03`
    assumption. `0x03/0x77` is France EID only.
 3. `uav_cmd_req+0x08` is retry; receiver index is `+0x19`. Constructor retry is 3. Static
@@ -83,9 +93,13 @@ Later retractions override earlier progress summaries.
    shared `route_gate` are proven.
 10. A callback return, cancel return, or fixed 100 ms delay is not request quiescence. Exact pending
     and Stopper membership, in-flight zero, lifecycle stability, and a worker-tail fence remain open.
-11. Standard ADB is silent before RSA. The adjacent `adbd` production gate explains but does not
-    prove byte identity with live v07. A first-packet public-key branch is an unexecuted,
-    state-changing hypothesis.
+11. Standard ADB is silent before RSA. Exact signed-v07 APEX `adbd` contains the
+    `mp_state=production && dbg_cnt<1` pre-AUTH return and runs at
+    `/apex/com.android.adbd/bin/adbd`; `/system/bin/adbd` is not the target path. Live boot values,
+    mounted hash and branch log remain unobserved. A-032 changes only gate materialization, has
+    matching removable-SD MTP readback, but has not been copied internally, chmodded or executed.
+    Do not preselect an internal path before the live UID/SELinux/path-label baseline. First-packet
+    public key remains an unexecuted, state-changing, non-default hypothesis.
 12. FC/Sky `CN -> US -> CN` state loops do not establish RID, channel, regulatory mode, or EIRP.
     Ground US did not receive a matching ACK and readback remained CN.
 13. NLD FCC Smart RC `2.0.0.6` packages seven JSON profiles byte-identical to pinned FreeFCC, but
@@ -294,5 +308,8 @@ ruby scripts/check_evidence_csv.rb
 sh scripts/check_sensitive_patterns.sh
 ```
 
-The repository is documentation-only. Do not add a build system or executable device code without
-an explicit repository-scope decision.
+The repository includes independently written research source code. Keep every imported project in
+the directory class defined by `projects/README.md`, preserve its local README/AGENTS contract, and
+exclude packaged binaries and generated output. Before publishing source, inspect it for private
+identifiers, absolute local paths, credentials, vendor-derived code, and stale claims about live or
+admitted status.

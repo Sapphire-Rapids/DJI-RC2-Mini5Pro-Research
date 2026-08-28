@@ -55,17 +55,31 @@ here does not imply that all of its claims were accepted.
   parser differences were treated as unresolved until current native evidence closed a layout.
 - [dji-firmware-tools](https://github.com/o-gs/dji-firmware-tools/tree/195692263c2684cf1ddc4995f2736be6c0fb135e)
   at `195692263c2684cf1ddc4995f2736be6c0fb135e`.
-  Used for DUML dissector behavior and IMaH container tooling/field interpretation. Tool support is
-  not target-key availability, signature bypass, or independent confirmation of A-027's
-  product-139/RC331 `02:04 -> 12:04` route.
+  Used for DUML dissector behavior and IMaH container tooling/field interpretation. For A-029 the
+  public `dji_imah_fwsig.py` path verified the target signed config/`0205` header signature plus
+  stored/plaintext checksums without force or skipped chunks. Tool support is not target-key
+  availability, signature bypass, or independent confirmation of A-027's product-139/RC331
+  `02:04 -> 12:04` route.
 - [N3Live](https://github.com/brendan779/N3Live/tree/bb254b0d0b1f5ac79462e9fe3ea986fc91adeec0)
   at `bb254b0d0b1f5ac79462e9fe3ea986fc91adeec0`.
   Used for Goggles N3 USB/DUML framing corroboration and a generated command-name corpus. It does not
   implement the RC 2 localhost or Mini 5 Pro RID route.
 - [DJI-RC-Emulator](https://github.com/o-gs/DJI-RC-Emulator).
   Used only for historical DJI transport context where explicitly cited.
+- [deviverr/DJI-RC-Emulator](https://github.com/deviverr/DJI-RC-Emulator/tree/93eb7594770dc891c9c8495da1c57274e0d1d26c)
+  at `93eb7594770dc891c9c8495da1c57274e0d1d26c`.
+  The byte-identical MIT `duml.py` helper used by the device-read and historical device-write tools
+  is vendored with its complete upstream license and notice. No upstream device-control application,
+  capture, generated packet, or other source file is copied.
 
 ## RC 2 community work
+
+- [Dank Drone Downloader](https://github.com/cs2000/DankDroneDownloader/tree/536da66bff4075c0a2b63a1e3e9e68586900bcfe)
+  at `536da66bff4075c0a2b63a1e3e9e68586900bcfe`, together with its public web selector.
+  Used only as the third-party archive/metadata source for the `07.00.0100` aggregate. It is not DJI
+  and its published hash alone is not the trust anchor; the extracted signed config and `0205`
+  module were independently checked through the recorded PRAK/signature/checksum chain. Firmware,
+  APK, image and binary bytes are not redistributed.
 
 - [whitelewi1-ctrl/dji-rc2-research](https://github.com/whitelewi1-ctrl/dji-rc2-research/tree/fc5949acfe8196e2faccf96615821b62fbe60804)
   at `fc5949acfe8196e2faccf96615821b62fbe60804`.

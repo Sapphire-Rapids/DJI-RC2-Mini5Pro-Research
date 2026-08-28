@@ -372,7 +372,9 @@ work when a report did not contain a more precise timestamp.
   unintended long-name duplicate was deleted. This proves staging byte identity only; installation
   was not yet confirmed at that point. The operator later explicitly reported that A-025 installation
   completed (`OBSERVED`, C-163); launch, execution, Binder ACK, inventory, license, state, and RF
-  result remain unknown. Storage/USB/device serials and the APK/source remain excluded.
+  result remain unknown. Storage/USB/device serials and the sealed APK remain excluded; the later
+  evolving clean-room source is now published under `apps/rc2-rid-admin` without claiming it is
+  the exact A-025 snapshot.
 
 ### 2026-08-29 — exact current-Fly field-7 and aircraft-consumer boundary
 
@@ -489,3 +491,28 @@ work when a report did not contain a more precise timestamp.
   unsupported, empty inventory, no `RID_UNLOCK`, RID off, or RF evidence. The result image is not
   committed; no identifier, raw reply, license material, motor action, or independent RF observation
   is recorded. Repeating the same black-box request is not the next discriminator.
+
+### 2026-08-29 — exact v07 ADB package, gate patch, and staging checkpoint
+
+- `STATIC`：the RC331 `07.00.0100` system aggregate matched its archived SHA-256; signed config and
+  `0205` module passed `PRAK-2020-01` header-signature plus stored/plaintext checksum verification
+  without force, skip, or truncate (C-174/A-029).
+- `STATIC`：the extracted APEX `adbd` is `1,497,232` bytes, SHA-256
+  `b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422`, and byte-identical to the
+  prior sample. Target-v07 code therefore exactly contains the `mp_state=production && dbg_cnt<1`
+  `CNXN` early return before ordinary AUTH (C-175/A-030). Runtime path is
+  `/apex/com.android.adbd/bin/adbd`; `/system/bin/adbd` is absent.
+- `STATIC`：the exact package `dpad_fuli.apk` is `8,849,471` bytes, SHA-256
+  `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f`, and byte-identical to the
+  audited developer assistant. Its ShellCommandActivity behavior is now exact-v07 package evidence,
+  while installed-live hash/UID/SELinux remain unobserved (C-176/A-031).
+- `STATIC`：a semantic userspace-copy patch changed only gate materialization
+  `cset w21, lt -> mov w21, wzr`, retaining the normal TLS/auth target. A-032 is `1,497,232` bytes,
+  SHA-256 `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` (C-177).
+- `OBSERVED`：A-032 was written by MTP as removable-SD `Download/RC2_ADBD_CNXN.bin`; a fresh
+  session confirmed one same-name object with the registered size, and full readback SHA matched
+  (C-178). MTP object/storage/USB/device identifiers are excluded.
+- `NOT ADMITTED`：the copy was not moved to internal storage, chmodded, or executed; init `adbd` was
+  not stopped for this experiment and no new ADB response/shell exists. The prepared next session
+  first collects live UID/SELinux/properties/hashes; only that output may determine a second-stage
+  internal path and one-shot launch (C-179).

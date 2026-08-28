@@ -191,9 +191,19 @@ pinned Dr-Muh pre-authentication profile, and one-variable changes to protocol v
 banner, and legacy checksum. Split header/payload writes transmitted `CNXN`; no ADB packet returned
 before timeout. Combined transfer framing failed at the I/O path and was discarded as a lead.
 
-Static analysis of the exact adjacent unstripped `adbd` found a DJI production check in the CNXN
-branch before normal authentication. No `AUTH` key packet, `OPEN`, shell, install, reboot, fastboot,
-root, or bootloader operation was sent during the handshake work.
+Later provenance work obtained the target `07.00.0100` signed system chain and independently
+verified its signed config/`0205` module. The exact target APEX `adbd` is byte-identical to the
+earlier sample, promoting the production/debug-count CNXN return from adjacent explanation to exact
+target-package `STATIC`. Its live boot properties and mounted-file hash remain unobserved.
+
+A semantic offline patcher then changed only the exact gate-value instruction while preserving the
+normal TLS/auth branch. The derivative output was staged to removable SD through MTP and a fresh
+full-file readback hash matched. It was not copied to internal storage, chmodded, or executed; no
+daemon was stopped and no new ADB packet/shell resulted. The next operator session begins with
+read-only UID/SELinux/property/hash/path-label evidence before any internal path is selected.
+
+No `AUTH` key packet, `OPEN`, shell, install, reboot, fastboot, root, bootloader, boot-image, APEX or
+partition modification was sent during the recorded handshake/staging work.
 
 ## 13. Same-owner runtime-route research
 

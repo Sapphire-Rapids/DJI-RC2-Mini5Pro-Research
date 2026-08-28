@@ -1,0 +1,1116 @@
+#!/usr/bin/env python3
+"""Fail-closed artifact/source audit for the offline EID route resolver V2.3."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import os
+import re
+import struct
+import subprocess
+import tempfile
+import zipfile
+from dataclasses import dataclass
+from pathlib import Path
+
+
+EXPECTED_SIGNER_CERT_SHA256 = (
+    "37896e5a80772e39edad4bdf3ce7f19d2b6e1352a701c48c70edc10c97b2b224"
+)
+DJI_PLATFORM_CERT_SHA256 = (
+    "a4aa1cdd2ea580cbbe67486b5f6f3cfea83f488889995afa70793daa516687da"
+)
+EXPECTED_PACKAGE = "com.finduas.jvmti.eidroute.v23"
+EXPECTED_NATIVE_ENTRY = "lib/arm64-v8a/libfinduas_eid_route_resolver_v2_3.so"
+EXPECTED_ZIP_ENTRIES = {
+    "META-INF/com/android/build/gradle/app-metadata.properties",
+    "AndroidManifest.xml",
+    "resources.arsc",
+    EXPECTED_NATIVE_ENTRY,
+}
+EXPECTED_NEEDED = {"liblog.so", "libdl.so", "libc.so"}
+EXPECTED_UNDEFINED = {
+    "__android_log_print",
+    "__errno",
+    "__memcpy_chk",
+    "__memset_chk",
+    "__openat_2",
+    "__pread64_chk",
+    "__read_chk",
+    "__stack_chk_fail",
+    "close",
+    "dl_iterate_phdr",
+    "dladdr",
+    "dlclose",
+    "dlerror",
+    "dlopen",
+    "dlsym",
+    "fstat",
+    "getpagesize",
+    "memcmp",
+}
+
+PT_LOAD = 1
+PT_DYNAMIC = 2
+PT_NOTE = 4
+PF_X = 1
+PF_W = 2
+PF_R = 4
+DT_NULL = 0
+DT_HASH = 4
+DT_STRTAB = 5
+DT_SYMTAB = 6
+DT_RELA = 7
+DT_RELASZ = 8
+DT_RELAENT = 9
+DT_STRSZ = 10
+DT_SYMENT = 11
+DT_GNU_HASH = 0x6FFFFEF5
+R_AARCH64_RELATIVE = 1027
+SHN_UNDEF = 0
+STB_GLOBAL = 1
+STB_WEAK = 2
+STT_OBJECT = 1
+STT_FUNC = 2
+STV_DEFAULT = 0
+
+
+class AuditFailure(RuntimeError):
+    pass
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise AuditFailure(message)
+
+
+def research_fixture_root() -> Path:
+    setting = os.environ.get("FINDUAS_RESEARCH_FIXTURE_ROOT")
+    require(bool(setting), "set FINDUAS_RESEARCH_FIXTURE_ROOT to the external fixture tree")
+    return Path(str(setting)).expanduser().resolve()
+
+
+def run_checked(command: list[str]) -> str:
+    completed = subprocess.run(command, check=False, text=True, capture_output=True)
+    if completed.returncode != 0:
+        raise AuditFailure(
+            f"command failed ({completed.returncode}): {' '.join(command)}\n"
+            f"{completed.stdout}{completed.stderr}"
+        )
+    return completed.stdout + completed.stderr
+
+
+def configure_java_runtime() -> None:
+    for candidate in (
+        os.environ.get("FINDUAS_ROUTE_V23_JAVA_HOME"),
+        os.environ.get("JAVA_HOME"),
+    ):
+        if not candidate:
+            continue
+        java_home = Path(candidate).expanduser().resolve()
+        if (java_home / "bin/java").is_file():
+            os.environ["JAVA_HOME"] = str(java_home)
+            os.environ["PATH"] = f"{java_home / 'bin'}:{os.environ.get('PATH', '')}"
+            return
+    raise AuditFailure("no usable Java runtime")
+
+
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def dynamic_symbol_names(output: str) -> set[str]:
+    names: set[str] = set()
+    for line in output.splitlines():
+        fields = line.split()
+        if fields:
+            names.add(fields[-1].split("@", 1)[0])
+    return names
+
+
+@dataclass(frozen=True)
+class ProgramHeader:
+    kind: int
+    flags: int
+    offset: int
+    vaddr: int
+    file_size: int
+    memory_size: int
+
+
+class ExactElf:
+    def __init__(self, path: Path):
+        self.path = path
+        self.data = path.read_bytes()
+        require(self.data[:6] == b"\x7fELF\x02\x01", f"not ELF64 LE: {path}")
+        require(len(self.data) >= 64, f"truncated ELF header: {path}")
+        phoff = struct.unpack_from("<Q", self.data, 32)[0]
+        phentsize = struct.unpack_from("<H", self.data, 54)[0]
+        phnum = struct.unpack_from("<H", self.data, 56)[0]
+        require(phentsize >= 56 and phnum > 0, f"invalid program headers: {path}")
+        self.program_headers: list[ProgramHeader] = []
+        for index in range(phnum):
+            offset = phoff + index * phentsize
+            require(offset + 56 <= len(self.data), f"truncated program header: {path}")
+            values = struct.unpack_from("<IIQQQQQQ", self.data, offset)
+            self.program_headers.append(
+                ProgramHeader(values[0], values[1], values[2], values[3], values[5], values[6])
+            )
+
+    def vaddr_to_offset(self, vaddr: int, size: int) -> int:
+        require(vaddr >= 0 and size >= 0, "negative ELF range")
+        for header in self.program_headers:
+            if header.kind != PT_LOAD:
+                continue
+            if vaddr >= header.vaddr and vaddr + size <= header.vaddr + header.file_size:
+                result = header.offset + (vaddr - header.vaddr)
+                require(result + size <= len(self.data), "mapped ELF range exceeds file")
+                return result
+        raise AuditFailure(f"RVA 0x{vaddr:x}+0x{size:x} is not file-backed in {self.path}")
+
+    def offset_to_vaddr(self, offset: int, size: int) -> int:
+        require(offset >= 0 and size >= 0, "negative ELF file range")
+        for header in self.program_headers:
+            if header.kind != PT_LOAD:
+                continue
+            if offset >= header.offset and offset + size <= header.offset + header.file_size:
+                return header.vaddr + (offset - header.offset)
+        raise AuditFailure(f"file range 0x{offset:x}+0x{size:x} is not in PT_LOAD: {self.path}")
+
+    def bytes_at(self, vaddr: int, size: int) -> bytes:
+        offset = self.vaddr_to_offset(vaddr, size)
+        return self.data[offset : offset + size]
+
+    def load_for_range(self, vaddr: int, size: int) -> ProgramHeader:
+        matches = [
+            header
+            for header in self.program_headers
+            if header.kind == PT_LOAD
+            and vaddr >= header.vaddr
+            and vaddr + size <= header.vaddr + header.file_size
+        ]
+        require(len(matches) == 1, f"PT_LOAD range cardinality for 0x{vaddr:x}+0x{size:x}")
+        return matches[0]
+
+    def cstring_at(self, vaddr: int, maximum: int = 4096) -> str:
+        offset = self.vaddr_to_offset(vaddr, 1)
+        limit = min(len(self.data), offset + maximum)
+        end = self.data.find(b"\0", offset, limit)
+        require(end >= 0, f"unterminated ELF string at RVA 0x{vaddr:x}")
+        return self.data[offset:end].decode("utf-8", errors="strict")
+
+    def unique_cstring_rva(self, value: str) -> int:
+        needle = value.encode("utf-8") + b"\0"
+        require(self.data.count(needle) == 1, f"ELF string cardinality for {value!r}")
+        return self.offset_to_vaddr(self.data.index(needle), len(needle))
+
+    def build_id(self) -> bytes:
+        matches: list[bytes] = []
+        for header in self.program_headers:
+            if header.kind != PT_NOTE or header.file_size == 0:
+                continue
+            note_data = self.bytes_at(header.vaddr, header.file_size)
+            cursor = 0
+            while cursor < len(note_data):
+                require(cursor + 12 <= len(note_data), "truncated ELF note header")
+                name_size, desc_size, note_type = struct.unpack_from("<III", note_data, cursor)
+                cursor += 12
+                name_end = cursor + name_size
+                desc_start = (name_end + 3) & ~3
+                desc_end = desc_start + desc_size
+                next_note = (desc_end + 3) & ~3
+                require(next_note <= len(note_data) and next_note > cursor, "invalid ELF note")
+                name = note_data[cursor:name_end]
+                description = note_data[desc_start:desc_end]
+                if name == b"GNU\0" and note_type == 3:
+                    matches.append(description)
+                cursor = next_note
+        require(len(matches) == 1 and len(matches[0]) == 20, "GNU build-id cardinality/size")
+        return matches[0]
+
+    def dynamic_tags(self) -> dict[int, int]:
+        dynamic_headers = [h for h in self.program_headers if h.kind == PT_DYNAMIC]
+        require(len(dynamic_headers) == 1, "PT_DYNAMIC cardinality")
+        header = dynamic_headers[0]
+        dynamic = self.bytes_at(header.vaddr, header.file_size)
+        tags: dict[int, int] = {}
+        for offset in range(0, len(dynamic), 16):
+            require(offset + 16 <= len(dynamic), "truncated dynamic table")
+            tag, value = struct.unpack_from("<QQ", dynamic, offset)
+            if tag == DT_NULL:
+                break
+            tags[tag] = value
+        require(DT_SYMTAB in tags and DT_STRTAB in tags and DT_STRSZ in tags, "dynsym tags absent")
+        return tags
+
+    def rela_entries(self) -> list[tuple[int, int, int, int]]:
+        tags = self.dynamic_tags()
+        require(DT_RELA in tags and DT_RELASZ in tags, "DT_RELA metadata absent")
+        entry_size = tags.get(DT_RELAENT, 24)
+        require(entry_size == 24 and tags[DT_RELASZ] % entry_size == 0, "invalid ELF64 RELA table")
+        raw = self.bytes_at(tags[DT_RELA], tags[DT_RELASZ])
+        result: list[tuple[int, int, int, int]] = []
+        for offset in range(0, len(raw), entry_size):
+            relocation_offset, info, addend = struct.unpack_from("<QQq", raw, offset)
+            result.append((relocation_offset, info & 0xFFFFFFFF, info >> 32, addend))
+        return result
+
+    def dynsym_count(self, tags: dict[int, int]) -> int:
+        if DT_HASH in tags:
+            raw = self.bytes_at(tags[DT_HASH], 8)
+            _bucket_count, chain_count = struct.unpack("<II", raw)
+            return chain_count
+        require(DT_GNU_HASH in tags, "neither SYSV nor GNU hash is present")
+        header = self.bytes_at(tags[DT_GNU_HASH], 16)
+        bucket_count, symbol_offset, bloom_size, _bloom_shift = struct.unpack("<IIII", header)
+        buckets_rva = tags[DT_GNU_HASH] + 16 + bloom_size * 8
+        buckets_raw = self.bytes_at(buckets_rva, bucket_count * 4)
+        buckets = struct.unpack(f"<{bucket_count}I", buckets_raw) if bucket_count else ()
+        nonzero = [value for value in buckets if value != 0]
+        if not nonzero:
+            return symbol_offset
+        symbol_index = max(nonzero)
+        require(symbol_index >= symbol_offset, "invalid GNU hash bucket")
+        chains_rva = buckets_rva + bucket_count * 4
+        while True:
+            chain_rva = chains_rva + (symbol_index - symbol_offset) * 4
+            value = struct.unpack("<I", self.bytes_at(chain_rva, 4))[0]
+            symbol_index += 1
+            if value & 1:
+                return symbol_index
+            require(symbol_index < 1_000_000, "unbounded GNU hash chain")
+
+    def true_dynsym(self) -> dict[str, list[tuple[int, int, int, int, int]]]:
+        tags = self.dynamic_tags()
+        symbol_count = self.dynsym_count(tags)
+        symbol_size = tags.get(DT_SYMENT, 24)
+        require(symbol_size == 24, "unexpected ELF64 symbol size")
+        string_table = self.bytes_at(tags[DT_STRTAB], tags[DT_STRSZ])
+        symbols: dict[str, list[tuple[int, int, int, int, int]]] = {}
+        for index in range(symbol_count):
+            raw = self.bytes_at(tags[DT_SYMTAB] + index * symbol_size, symbol_size)
+            name_offset, info, other, section, value, size = struct.unpack("<IBBHQQ", raw)
+            require(name_offset < len(string_table), "dynsym name offset outside string table")
+            end = string_table.find(b"\0", name_offset)
+            require(end >= 0, "unterminated dynsym name")
+            name = string_table[name_offset:end].decode("utf-8", errors="strict")
+            symbols.setdefault(name, []).append((info, other, section, value, size))
+        return symbols
+
+
+MODULE_PROFILES = {
+    "libsdk_jni.so": {
+        "relative": "official_dji_fly_20260827/working/extracted/libsdk_jni.so",
+        "sha256": "5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188075ada61f5a7b46286",
+        "build_id": "c892b3c06664df91d643f84ae9e59a906387068b",
+        "size": 87313856,
+    },
+    "libsdk_key_value.so": {
+        "relative": "official_dji_fly_20260827/working/sdk_native/libsdk_key_value.so",
+        "sha256": "09f4aa8aef65f720da09a1dad79c8851e05d619affaf73708bf6747341208336",
+        "build_id": "877a01a5b4b17e0a0f1b9153ccfe24891fb3c230",
+        "size": 12684576,
+    },
+    "libsdk_base.so": {
+        "relative": "official_dji_fly_20260827/working/sdk_native/libsdk_base.so",
+        "sha256": "e5b290ebc6aa6e409e116cc0d3b84fb4e49c70f6c552feffacd5b15c7c83e873",
+        "build_id": "de104ddaca91438807b21688baf08455d5ade20c",
+        "size": 7720240,
+    },
+}
+
+
+@dataclass(frozen=True)
+class TargetSymbol:
+    module: str
+    name: str
+    rva: int
+    symbol_type: int
+    binding: int
+    profile_size: int
+    signature: str = ""
+
+
+TARGET_SYMBOLS = [
+    TargetSymbol("libsdk_jni.so", "_ZN3uav3sdk17g_pModuleMediatorE", 0x05344600, STT_OBJECT, STB_GLOBAL, 8),
+    TargetSymbol("libsdk_jni.so", "_ZN3uav3sdk14ModuleMediator16GetFrameworkCoreEv", 0x01D54FF8, STT_FUNC, STB_GLOBAL, 56, "091842f9690100b4090100f9091c42f9"),
+    TargetSymbol("libsdk_jni.so", "_ZN3uav3sdk16SDKFrameworkCore6GetKeyEjjjjjRKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE", 0x025006BC, STT_FUNC, STB_GLOBAL, 52, "29690190290940f9e00308aa29014079"),
+    TargetSymbol("libsdk_jni.so", "_ZN3uav3sdk13HardwareLayer14GetAbstractionERKNSt6__ndk16vectorIjNS2_9allocatorIjEEEE", 0x0250D6C0, STT_FUNC, STB_GLOBAL, 8, "00800091af8aad14"),
+    TargetSymbol("libsdk_jni.so", "_ZN3uav3sdk15BaseAbstraction18GetCharacteristicsERKNS0_8CacheKeyE", 0x02515D94, STT_FUNC, STB_GLOBAL, 52, "fd7bbea9f30b00f9fd030091f30300aa"),
+    TargetSymbol("libsdk_jni.so", "_ZNK3uav3sdk15BaseAbstraction11GetDeviceIDEv", 0x025194C8, STT_FUNC, STB_GLOBAL, 8, "00e040b9c0035fd6"),
+    TargetSymbol("libsdk_jni.so", "_ZNK3uav3sdk15BaseAbstraction12GetProductIDEv", 0x025194D0, STT_FUNC, STB_GLOBAL, 8, "009840b9c0035fd6"),
+    TargetSymbol("libsdk_jni.so", "_ZNK3uav3sdk15BaseAbstraction16GetAbstractionIDEv", 0x025194D8, STT_FUNC, STB_GLOBAL, 8, "00a040b9c0035fd6"),
+    TargetSymbol("libsdk_jni.so", "_ZNK3uav3sdk15BaseAbstraction17GetComponentIndexEv", 0x02519B10, STT_FUNC, STB_GLOBAL, 8, "00e440b9c0035fd6"),
+    TargetSymbol("libsdk_jni.so", "_ZNSt6__ndk119__shared_weak_count4lockEv", 0x01D2F300, STT_FUNC, STB_GLOBAL, 84, "5f2403d5082000910afddfc85f0500b1"),
+    TargetSymbol("libsdk_jni.so", "_ZNSt6__ndk119__shared_weak_count16__release_sharedEv", 0x01D2F244, STT_FUNC, STB_GLOBAL, 136, "3f2303d5fd7bbea9f44f01a9fd030091"),
+    TargetSymbol("libsdk_jni.so", "_ZNSt6__ndk119__shared_weak_count14__release_weakEv", 0x01D2F2CC, STT_FUNC, STB_GLOBAL, 52, "5f2403d50840009109fddfc8e90000b4"),
+    TargetSymbol("libsdk_jni.so", "_ZNSt6__ndk112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEPKcm", 0x01D30EE8, STT_FUNC, STB_WEAK, 144, "3f2303d5fd7bbda9f65701a9f44f02a9"),
+    TargetSymbol("libsdk_jni.so", "_ZNSt6__ndk112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED2Ev", 0x01D30BCC, STT_FUNC, STB_WEAK, 24, "5f2403d50800403948000037c0035fd6"),
+    TargetSymbol("libsdk_jni.so", "_ZN3uav3sdk8CacheKeyD2Ev", 0x04A32A48, STT_FUNC, STB_WEAK, 68, "fd7bbea9f30b00f9fd030091f30300aa"),
+    TargetSymbol("libsdk_jni.so", "_ZTVN3uav3sdk13HardwareLayerE", 0x050F1250, STT_OBJECT, STB_GLOBAL, 0x70),
+    TargetSymbol("libsdk_jni.so", "_ZTVN3uav3sdk3key6MixAbsINS0_32UAV77FlightControllerAbstractionENS1_11UAV139FCAbsEEE", 0x05100F88, STT_OBJECT, STB_WEAK, 0x20),
+    TargetSymbol("libsdk_key_value.so", "_ZNK3uav3sdk8CacheKey11GetPrefixesEv", 0x007EAB64, STT_FUNC, STB_GLOBAL, 8, "00c00091c0035fd6"),
+    TargetSymbol("libsdk_key_value.so", "_ZN3uav3sdk15Characteristics7InvalidE", 0x00C19D78, STT_OBJECT, STB_GLOBAL, 56),
+    TargetSymbol("libsdk_base.so", "_ZN3uav4core18GlobalPacketStatus8instanceEv", 0x002EC280, STT_FUNC, STB_GLOBAL, 168, "fd7bbea9f44f01a9fd03009188230090"),
+    TargetSymbol("libsdk_base.so", "_ZN3uav4core18GlobalPacketStatus20GetGlobalSenderIndexEv", 0x002EC328, STT_FUNC, STB_GLOBAL, 24, "080040f9680000b400fddf08c0035fd6"),
+]
+
+
+def audit_target_samples(project_dir: Path) -> None:
+    del project_dir
+    research_dir = research_fixture_root()
+    parsed: dict[str, ExactElf] = {}
+    dynsyms: dict[str, dict[str, list[tuple[int, int, int, int, int]]]] = {}
+    for module_name, profile in MODULE_PROFILES.items():
+        path = research_dir / str(profile["relative"])
+        require(path.is_file(), f"missing exact target sample: {path}")
+        require(sha256_file(path) == profile["sha256"], f"target SHA mismatch: {module_name}")
+        elf = ExactElf(path)
+        require(elf.build_id().hex() == profile["build_id"], f"build-id mismatch: {module_name}")
+        parsed[module_name] = elf
+        dynsyms[module_name] = elf.true_dynsym()
+
+    require(len(TARGET_SYMBOLS) == 21, "target symbol manifest cardinality")
+    for target in TARGET_SYMBOLS:
+        matches = dynsyms[target.module].get(target.name, [])
+        require(len(matches) == 1, f"true dynsym cardinality: {target.name}")
+        info, other, section, value, symbol_size = matches[0]
+        require(info >> 4 == target.binding, f"dynsym binding mismatch: {target.name}")
+        require(info & 0xF == target.symbol_type, f"dynsym type mismatch: {target.name}")
+        require(other & 0x3 == STV_DEFAULT, f"dynsym visibility mismatch: {target.name}")
+        require(section != SHN_UNDEF, f"undefined target dynsym: {target.name}")
+        require(value == target.rva, f"dynsym RVA mismatch: {target.name}")
+        if target.symbol_type == STT_FUNC:
+            require(symbol_size == target.profile_size, f"function st_size mismatch: {target.name}")
+        else:
+            require(
+                0 < target.profile_size <= symbol_size,
+                f"object profile range exceeds dynsym size: {target.name}",
+            )
+        if target.signature:
+            signature_size = len(bytes.fromhex(target.signature))
+            require(
+                0 < signature_size <= target.profile_size <= symbol_size,
+                f"instruction signature exceeds dynsym size: {target.name}",
+            )
+            require(
+                parsed[target.module].bytes_at(target.rva, signature_size).hex() == target.signature,
+                f"instruction signature mismatch: {target.name}",
+            )
+
+
+def unique_relative_relocation(
+    elf: ExactElf,
+    relocations: list[tuple[int, int, int, int]],
+    string_value: str,
+) -> tuple[int, int, int, int]:
+    string_rva = elf.unique_cstring_rva(string_value)
+    matches = [
+        relocation
+        for relocation in relocations
+        if relocation[1] == R_AARCH64_RELATIVE
+        and relocation[2] == 0
+        and relocation[3] == string_rva
+    ]
+    require(len(matches) == 1, f"compiled string relocation cardinality: {string_value}")
+    return matches[0]
+
+
+def audit_compiled_target_profile(elf: ExactElf) -> None:
+    """Prove that the packaged runtime tables equal the independently checked manifest."""
+    relocations = elf.rela_entries()
+    module_names = list(MODULE_PROFILES)
+
+    module_entry_rvas: list[int] = []
+    module_entry_size = 536
+    for module_index, module_name in enumerate(module_names):
+        relocation = unique_relative_relocation(elf, relocations, module_name)
+        entry_rva = relocation[0]
+        module_entry_rvas.append(entry_rva)
+        raw = elf.bytes_at(entry_rva, module_entry_size)
+        require(raw[:8] == b"\0" * 8, f"compiled module pointer storage: {module_name}")
+        require(
+            raw[8:28] == bytes.fromhex(str(MODULE_PROFILES[module_name]["build_id"])),
+            f"compiled module build-id mismatch: {module_name}",
+        )
+        source_kind, file_size = struct.unpack_from("<IQ", raw, 28)
+        require(source_kind == 1, f"compiled source kind mismatch: {module_name}")
+        require(file_size == MODULE_PROFILES[module_name]["size"], f"compiled file size mismatch: {module_name}")
+        require(raw[40:72] == bytes.fromhex(str(MODULE_PROFILES[module_name]["sha256"])), f"compiled whole-file SHA mismatch: {module_name}")
+
+        target_path = research_fixture_root() / str(MODULE_PROFILES[module_name]["relative"])
+        target_bytes = target_path.read_bytes()
+        require(raw[72:136] == target_bytes[:64], f"compiled ELF header mismatch: {module_name}")
+        phnum = struct.unpack_from("<H", raw, 136)[0]
+        require(phnum == 7 and raw[138:144] == b"\0" * 6, f"compiled phnum/reserved mismatch: {module_name}")
+        require(raw[144:536] == target_bytes[64:456], f"compiled program headers mismatch: {module_name}")
+        if module_index:
+            require(
+                entry_rva == module_entry_rvas[0] + module_index * module_entry_size,
+                "compiled module profile is not one exact contiguous table",
+            )
+
+    symbol_entry_rvas: list[int] = []
+    for symbol_index, target in enumerate(TARGET_SYMBOLS):
+        relocation = unique_relative_relocation(elf, relocations, target.name)
+        entry_rva = relocation[0] - 8
+        symbol_entry_rvas.append(entry_rva)
+        raw = elf.bytes_at(entry_rva, 56)
+        module_id, kind, pointer_storage, rva, profile_size, signature_size = struct.unpack_from(
+            "<IIQQQQ", raw, 0
+        )
+        expected_module_id = module_names.index(target.module)
+        expected_kind = 0 if target.symbol_type == STT_FUNC else 1
+        expected_signature = bytes.fromhex(target.signature)
+        require(module_id == expected_module_id, f"compiled module id mismatch: {target.name}")
+        require(kind == expected_kind, f"compiled symbol kind mismatch: {target.name}")
+        require(pointer_storage == 0, f"compiled symbol pointer storage: {target.name}")
+        require(rva == target.rva, f"compiled profile RVA mismatch: {target.name}")
+        require(profile_size == target.profile_size, f"compiled profile size mismatch: {target.name}")
+        require(
+            signature_size == len(expected_signature),
+            f"compiled signature size mismatch: {target.name}",
+        )
+        require(
+            raw[40:56] == expected_signature.ljust(16, b"\0"),
+            f"compiled signature bytes mismatch: {target.name}",
+        )
+        if symbol_index:
+            require(
+                entry_rva == symbol_entry_rvas[0] + symbol_index * 56,
+                "compiled symbol profile is not one exact contiguous table",
+            )
+
+    require(
+        module_entry_rvas[-1] + module_entry_size == symbol_entry_rvas[0],
+        "compiled module/symbol profile table boundary mismatch",
+    )
+
+
+def decode_aarch64_bl_target(address: int, instruction: int) -> int:
+    require(instruction & 0xFC000000 == 0x94000000, f"not AArch64 BL at 0x{address:x}")
+    immediate = instruction & 0x03FFFFFF
+    if immediate & 0x02000000:
+        immediate -= 0x04000000
+    return address + immediate * 4
+
+
+def audit_compiled_exception_gate(elf: ExactElf) -> None:
+    """Bind the source-level gate claim to the exact packaged machine-code control flow."""
+    gate_rva = 0x1240
+    gate_check_rva = 0x8900
+    dormant_helper_rva = 0x8914
+    gate_call_rva = 0x8758
+    gate_true_branch_rva = 0x8774
+    false_exit_branch_rva = 0x879C
+    dormant_call_rva = 0x87A8
+
+    require(elf.bytes_at(gate_rva, 4) == b"\0" * 4, "compiled exception gate is not zero")
+    gate_load = elf.load_for_range(gate_rva, 4)
+    require(gate_load.flags & PF_R != 0, "compiled exception gate is not readable")
+    require(gate_load.flags & (PF_W | PF_X) == 0, "compiled exception gate is writable/executable")
+    for relocation_offset, _kind, _symbol, _addend in elf.rela_entries():
+        require(
+            not (gate_rva <= relocation_offset < gate_rva + 4),
+            "compiled exception gate has a relocation",
+        )
+
+    gate_check = bytes.fromhex(
+        "c8ffffb0"  # adrp x8, gate page
+        "084142b9"  # ldr w8, [x8, #0x240]
+        "08050071"  # subs w8, w8, #1
+        "e0179f1a"  # cset w0, eq
+        "c0035fd6"  # ret
+    )
+    require(elf.bytes_at(gate_check_rva, len(gate_check)) == gate_check, "gate check code mismatch")
+    require(elf.data.count(gate_check) == 1, "gate check code cardinality")
+
+    # Lock the full data-flow block, not only its branch endpoints.  This proves that the value
+    # returned by the fixed-zero check is normalized, stored, reloaded and used by the CBNZ;
+    # replacing the reload with (for example) ``mov w8, #1`` must be rejected.
+    gate_control_block = bytes.fromhex(
+        "6a000094"  # bl gate_check
+        "08000071"  # subs w8, w0, #0
+        "e8079f1a"  # cset w8, ne
+        "e91b40f9"  # ldr x9, [sp, #0x30]
+        "281900b9"  # str w8, [x9, #0x18]
+        "e81b40f9"  # ldr x8, [sp, #0x30]
+        "081940b9"  # ldr w8, [x8, #0x18]
+        "68010035"  # cbnz w8, admitted block
+        "01000014"  # b false block
+        "e91b40f9"  # false: ldr x9, [sp, #0x30]
+        "a8008052"  # mov w8, #5 (EXCEPTION_BOUNDARY_UNPROVEN)
+        "280100b9"  # str w8, [x9]
+        "e0a30891"  # add x0, sp, #0x228
+        "eafaff97"  # bl close module handles
+        "e81b40f9"  # ldr x8, [sp, #0x30]
+        "080140b9"  # ldr w8, [x8]
+        "e83f00b9"  # str w8, [sp, #0x3c]
+        "0e000014"  # b after dormant helper block
+    )
+    require(
+        elf.bytes_at(gate_call_rva, len(gate_control_block)) == gate_control_block,
+        "gate result data-flow/control block mismatch",
+    )
+    require(elf.data.count(gate_control_block) == 1, "gate control block cardinality")
+
+    gate_call = struct.unpack("<I", elf.bytes_at(gate_call_rva, 4))[0]
+    dormant_call = struct.unpack("<I", elf.bytes_at(dormant_call_rva, 4))[0]
+    require(
+        decode_aarch64_bl_target(gate_call_rva, gate_call) == gate_check_rva,
+        "gate call target mismatch",
+    )
+    require(
+        decode_aarch64_bl_target(dormant_call_rva, dormant_call) == dormant_helper_rva,
+        "dormant helper call target mismatch",
+    )
+    require(
+        struct.unpack("<I", elf.bytes_at(gate_true_branch_rva, 4))[0] == 0x35000168,
+        "gate true CBNZ edge mismatch",
+    )
+    require(
+        struct.unpack("<I", elf.bytes_at(false_exit_branch_rva, 4))[0] == 0x1400000E,
+        "gate false exit edge mismatch",
+    )
+
+    executable_calls_to_gate: list[int] = []
+    executable_calls_to_helper: list[int] = []
+    for header in elf.program_headers:
+        if header.kind != PT_LOAD or header.flags & PF_X == 0:
+            continue
+        for address in range(header.vaddr, header.vaddr + header.file_size - 3, 4):
+            instruction = struct.unpack("<I", elf.bytes_at(address, 4))[0]
+            if instruction & 0xFC000000 != 0x94000000:
+                continue
+            target = decode_aarch64_bl_target(address, instruction)
+            if target == gate_check_rva:
+                executable_calls_to_gate.append(address)
+            if target == dormant_helper_rva:
+                executable_calls_to_helper.append(address)
+    require(executable_calls_to_gate == [gate_call_rva], "gate check call-site cardinality")
+    require(executable_calls_to_helper == [dormant_call_rva], "dormant helper call-site cardinality")
+
+    # The only helper call is in the CBNZ-taken block.  The not-taken block exits over it.
+    require(gate_true_branch_rva < false_exit_branch_rva < dormant_call_rva, "gate block order")
+
+
+def audit_compiled_identity_dominance(elf: ExactElf) -> None:
+    """Prove identity -> epoch -> runtime-header finalizer -> symbol -> fixed gate."""
+    identity_call_rva, identity_target_rva = 0x854C, 0x95E0
+    admission_call_rva, admission_target_rva = 0x85F4, 0x6B6C
+    finalizer_call_rva, finalizer_target_rva = 0x8654, 0x6BE8
+    resolver_call_rva, resolver_target_rva = 0x86A4, 0x8810
+    exception_gate_call_rva, dormant_call_rva = 0x8758, 0x87A8
+    close_target_rva = 0x7334
+
+    for call_rva, target_rva, label in (
+        (identity_call_rva, identity_target_rva, "identity"),
+        (admission_call_rva, admission_target_rva, "epoch admission"),
+        (finalizer_call_rva, finalizer_target_rva, "runtime-header finalizer"),
+        (resolver_call_rva, resolver_target_rva, "symbol resolver"),
+    ):
+        instruction = struct.unpack("<I", elf.bytes_at(call_rva, 4))[0]
+        require(
+            decode_aarch64_bl_target(call_rva, instruction) == target_rva,
+            f"{label} call target mismatch",
+        )
+
+    require(struct.unpack("<I", elf.bytes_at(0x85C4, 4))[0] == 0x34000168, "identity CBZ edge")
+    require(struct.unpack("<I", elf.bytes_at(0x860C, 4))[0] == 0x34000228, "epoch CBZ edge")
+    require(struct.unpack("<I", elf.bytes_at(0x866C, 4))[0] == 0x34000168, "finalizer CBZ edge")
+    for status_rva, expected, label in (
+        (0x85D0, 0x52800208, "identity failure route status 16"),
+        (0x8618, 0x52800248, "epoch failure identity error 18"),
+        (0x8624, 0x528001A8, "epoch failure stage 13"),
+        (0x8630, 0x52800208, "epoch failure route status 16"),
+        (0x8678, 0x52800028, "finalizer failure route status 1"),
+    ):
+        require(struct.unpack("<I", elf.bytes_at(status_rva, 4))[0] == expected, label)
+    for close_rva in (0x85DC, 0x863C, 0x8684):
+        instruction = struct.unpack("<I", elf.bytes_at(close_rva, 4))[0]
+        require(
+            decode_aarch64_bl_target(close_rva, instruction) == close_target_rva,
+            "identity/epoch/finalizer failure does not close handles",
+        )
+
+    identity_calls: list[int] = []
+    admission_calls: list[int] = []
+    finalizer_calls: list[int] = []
+    resolver_calls: list[int] = []
+    for header in elf.program_headers:
+        if header.kind != PT_LOAD or header.flags & PF_X == 0:
+            continue
+        for address in range(header.vaddr, header.vaddr + header.file_size - 3, 4):
+            instruction = struct.unpack("<I", elf.bytes_at(address, 4))[0]
+            if instruction & 0xFC000000 != 0x94000000:
+                continue
+            target = decode_aarch64_bl_target(address, instruction)
+            if target == identity_target_rva:
+                identity_calls.append(address)
+            if target == admission_target_rva:
+                admission_calls.append(address)
+            if target == finalizer_target_rva:
+                finalizer_calls.append(address)
+            if target == resolver_target_rva:
+                resolver_calls.append(address)
+    require(identity_calls == [identity_call_rva], "identity verifier call-site cardinality")
+    require(admission_calls == [admission_call_rva], "epoch admission call-site cardinality")
+    require(finalizer_calls == [finalizer_call_rva], "module finalizer call-site cardinality")
+    require(resolver_calls == [resolver_call_rva], "symbol resolver call-site cardinality")
+    require(
+        identity_call_rva < admission_call_rva < finalizer_call_rva < resolver_call_rva <
+        exception_gate_call_rva < dormant_call_rva,
+        "identity/epoch/runtime-header/symbol/exception/dormant order mismatch",
+    )
+
+
+def audit_compiled_preidentity_poison_boundary(elf: ExactElf) -> None:
+    """Exact packaged proof that runtime Ehdr/phdr reads are post-identity and post-epoch."""
+    # Lock every relevant final function, not only selected branches. These ranges were manually
+    # audited from the symbol-bearing build; the stripped packaged SO has byte-identical .text.
+    for start, end, expected, label in (
+        (0x82B8, 0x8810, "32bfa3aff22044c1602d7e78293055782af86107a49fbae8788b89613617bb69", "route"),
+        (0x95E0, 0x9F10, "7b61215bdb9b2378cc9527f04ba1b25bee186e6f12df4ff0830dfe2971f381bf", "narrow identity verifier"),
+        (0xA054, 0xA2D8, "ef2745773b19da2132729e15cf30d7b3c97b06b76a726d267bc00e0b831ddde2", "maps snapshot reader"),
+        (0xA2D8, 0xA488, "8e589bf2287731854f92f8e0662e62689b22ddd0107e85fb7d085b18bad0ff37", "file-only header check"),
+        (0xA488, 0xA744, "93cc23b8c859c86619259948de1f34b3a49437b1a491875afbde7587680d99d8", "whole-file/non-W compare"),
+        (0x6B6C, 0x6BE8, "6d4b2cb6b376b76a2ee754b35f77ed523132028c824862467c94c1cbdebdd0b1", "epoch admission"),
+        (0x6BE8, 0x71D8, "57da1235c9e4276e2dbd90d2d9da941117f80d40683b52a18a90c2562eda91b6", "runtime-header finalizer"),
+    ):
+        require(
+            sha256_bytes(elf.bytes_at(start, end - start)) == expected,
+            f"exact packaged {label} function hash mismatch",
+        )
+
+    # The route constructs a 24-byte-per-module narrow canary containing only base/path/length,
+    # then passes that distinct stack object to the identity verifier.
+    narrow_block = bytes.fromhex(
+        "e82b40b908090071a804005401000014e82b40b9e003082a08248252e103082a"
+        "e803012aeb03002aeca308916931a89b290540f90a038052e0030a2aea03002a"
+        "6d7daa9bebc3049169692df8e92b40b9e003092aed03002aa931a89b29410091"
+        "ad2daa9ba90500f9e92b40b9e003092ae903002a2831a89b080948f91f2003d5"
+        "292daa9b280900f901000014e82b40b908050011e82b00b9daffff17e0c30491"
+        "e1230491"
+    )
+    require(elf.bytes_at(0x84A8, len(narrow_block)) == narrow_block, "narrow poison input block")
+    require(elf.data.count(narrow_block) == 1, "narrow poison input block cardinality")
+
+    # Inside the verifier: maps-A -> file-only Ehdr/phdr -> whole hash + all original PF_W==0
+    # byte compare -> maps-B -> exact snapshot equality -> success return.
+    expected_calls = {
+        0x9A9C: 0xA054,  # maps A
+        0x9AEC: 0xA2D8,  # file-only Ehdr/phdr
+        0x9B54: 0xA488,  # whole SHA + runtime/file original-non-W bytes
+        0x9D38: 0xA054,  # maps B
+        0x9D80: 0x5AC8,  # snapshots equal
+    }
+    for call_rva, target_rva in expected_calls.items():
+        instruction = struct.unpack("<I", elf.bytes_at(call_rva, 4))[0]
+        require(
+            decode_aarch64_bl_target(call_rva, instruction) == target_rva,
+            f"pre-identity internal call mismatch at 0x{call_rva:x}",
+        )
+    require(list(expected_calls) == sorted(expected_calls), "pre-identity internal call order")
+
+    # Admission is written only after the unique linker-epoch recheck returns zero.
+    admission_block = bytes.fromhex(
+        "e80b40f91f7933b9e00b40f95fffff97e00f00b9e80f40b9a800003401000014"
+        "e80f40b9a8c31fb807000014e90b40f9c8a988528828a972287933b9"
+    )
+    require(elf.bytes_at(0x6B94, len(admission_block)) == admission_block, "epoch admission block")
+    require(elf.data.count(admission_block) == 1, "epoch admission block cardinality")
+
+    # Finalizer first validates the immutable admission magic. Only after that does it compare
+    # runtime Ehdr (0x6dc8) and runtime phdr (0x6dec), both through memcmp.
+    admission_check = bytes.fromhex(
+        "e83340f9087973b9c9a988528928a9720801096ba000005401000014"
+    )
+    require(elf.bytes_at(0x6C3C, len(admission_check)) == admission_check, "finalizer admission check")
+    for call_rva in (0x6DC8, 0x6DEC):
+        instruction = struct.unpack("<I", elf.bytes_at(call_rva, 4))[0]
+        require(
+            decode_aarch64_bl_target(call_rva, instruction) == 0xB6D0,
+            "runtime Ehdr/phdr comparison call mismatch",
+        )
+    require(0x9D80 < 0x9E4C and 0x85F4 < 0x8654 and 0x6C3C < 0x6DC8 < 0x6DEC, "runtime-header boundary order")
+
+
+def audit_source(project_dir: Path) -> None:
+    cpp_dir = project_dir / "app/src/main/cpp"
+    source_names = sorted(
+        path.name
+        for path in cpp_dir.iterdir()
+        if path.is_file() and path.suffix.lower() in {".c", ".h", ".s", ".asm"}
+    )
+    require(
+        source_names == [
+            "abi_shims.S", "abi_shims.h", "agent.c", "elf_profile.h", "file_state.c",
+            "file_state.h", "identity_core.c",
+            "identity_core.h", "module_inspect.c", "module_inspect.h", "note_parser.c",
+            "note_parser.h", "route_policy.c", "route_policy.h", "route_resolver.c",
+            "route_resolver.h", "runtime_identity.c", "runtime_identity.h", "sha256.c",
+            "sha256.h", "target_profile.c", "target_profile.h",
+        ],
+        f"unexpected native source inventory: {source_names}",
+    )
+
+    cmake = (cpp_dir / "CMakeLists.txt").read_text(encoding="utf-8")
+    require("LANGUAGES C ASM" in cmake, "CMake does not enable explicit ASM shims")
+    require(cmake.count("-nostartfiles") == 1, "no-constructor link boundary mismatch")
+    require(cmake.count("-mno-outline-atomics") == 1, "outline atomics boundary mismatch")
+    require("ANDROID_STL=none" in (project_dir / "app/build.gradle.kts").read_text(encoding="utf-8"), "carrier links an STL")
+
+    assembly = (cpp_dir / "abi_shims.S").read_text(encoding="utf-8")
+    require(assembly.count("mov x8, x1") == 3, "x8 hidden-sret move count mismatch")
+    require(assembly.count("br x9") == 3 and "blr" not in assembly, "sret shims are not tail bridges")
+    require("ldr x10, [sp]" in assembly and "mov x6, x10" in assembly, "GetKey stack argument bridge absent")
+
+    agent = (cpp_dir / "agent.c").read_text(encoding="utf-8")
+    route = (cpp_dir / "route_resolver.c").read_text(encoding="utf-8")
+    module = (cpp_dir / "module_inspect.c").read_text(encoding="utf-8")
+    identity = (cpp_dir / "runtime_identity.c").read_text(encoding="utf-8")
+    identity_header = (cpp_dir / "runtime_identity.h").read_text(encoding="utf-8")
+    identity_core = (cpp_dir / "identity_core.c").read_text(encoding="utf-8")
+    file_state = (cpp_dir / "file_state.c").read_text(encoding="utf-8")
+    profile_source = (cpp_dir / "target_profile.c").read_text(encoding="utf-8")
+    combined = "\n".join(path.read_text(encoding="utf-8") for path in cpp_dir.iterdir() if path.suffix.lower() in {".c", ".h", ".s"})
+
+    require(agent.count("RemoteIDModelImpl$electronicIDBroadcastOn$2$1;") == 1, "on anchor mismatch")
+    require(agent.count("RemoteIDModelImpl$electronicIDBroadcastExisted$2$1;") == 1, "gate anchor mismatch")
+    require(agent.count("GetLoadedClasses") == 1 and agent.count("GetClassSignature") == 1, "anchor enumeration surface mismatch")
+    require(agent.count("GetClassLoader") == 1 and agent.count("IsSameObject") == 1, "same-loader gate mismatch")
+    require(len(re.findall(r'"Lcom/', agent)) == 2, "agent enumerates non-EID class anchors")
+
+    require(route.count("static const volatile uint32_t g_exception_boundary_admitted = 0u;") == 1, "exception gate is not fixed zero")
+    require(route.count("g_exception_boundary_admitted") == 2, "exception gate has a hidden mutation/reference")
+    run_marker = route.index("enum FinduasRouteStatus finduas_route_resolver_run")
+    identity_index = route.index(
+        "finduas_runtime_identity_verify(&identity_modules, &identity)", run_marker
+    )
+    recheck_index = route.index(
+        "finduas_modules_admit_after_identity_recheck(&modules)", run_marker
+    )
+    finalize_index = route.index("finduas_modules_finalize_verified(&modules)", run_marker)
+    symbol_index = route.index("resolve_target_api(&modules, &api, diagnostic)", run_marker)
+    gate_index = route.index("if (diagnostic->exception_boundary_admitted == 0u)", run_marker)
+    admitted_call_index = route.index("status = run_admitted_route_calls(&api, diagnostic);", run_marker)
+    require(
+        identity_index < recheck_index < finalize_index < symbol_index < gate_index < admitted_call_index,
+        "identity/recheck/finalize/exception gate ordering mismatch",
+    )
+    require("FINDUAS_ROUTE_STATUS_EXCEPTION_BOUNDARY_UNPROVEN" in route, "exception failure status absent")
+
+    require(module.count("dlopen(module->path, RTLD_NOW | RTLD_NOLOAD)") == 1, "not exact RTLD_NOLOAD-only open")
+    require(module.count("dlopen(") == 1 and "RTLD_DEFAULT" not in combined, "plain/default dynamic lookup exists")
+    require(module.count("dlsym(") == 1 and module.count("dladdr(") == 1, "true dynsym/dladdr validation surface mismatch")
+    require("(uintptr_t)symbol != expected_address" in module, "base+RVA equality gate absent")
+    require("memcmp(\n            symbol,\n            profile->instruction_signature,\n            profile->signature_size)" in module, "instruction signature gate absent")
+    require("profile->signature_size > profile->symbol_size" in module, "signature-size bound absent")
+    require("profile->signature_size > FINDUAS_INSTRUCTION_SIGNATURE_SIZE" in module, "signature-cap bound absent")
+    require("finduas_parse_unique_gnu_build_id" in module, "in-memory GNU build-id gate absent")
+    discovery_start = module.index("static int inspect_matching_module")
+    discovery_end = module.index("static int scan_callback", discovery_start)
+    discovery_body = module[discovery_start:discovery_end]
+    require("info->dlpi_phdr[" not in discovery_body and "finduas_parse_unique" not in discovery_body, "pre-identity discovery dereferences runtime phdr")
+    finalize_start = module.index("enum FinduasModuleError finduas_modules_finalize_verified")
+    require(finalize_start > discovery_end, "post-identity module finalizer absent")
+    require(
+        all(token not in identity for token in ("runtime_phdr", "runtime_phnum", "dlpi_phdr", "FinduasModuleSet")),
+        "pre-epoch identity verifier can name runtime program-header metadata",
+    )
+    require(
+        "typedef struct FinduasIdentityModule" in identity_header and
+        "uintptr_t base;" in identity_header and
+        "const char *path;" in identity_header and
+        "size_t path_length;" in identity_header,
+        "narrow pre-identity input type absent",
+    )
+    require(
+        route.count("identity_modules.modules[index].base =") == 1 and
+        route.count("identity_modules.modules[index].path =") == 1 and
+        route.count("identity_modules.modules[index].path_length =") == 1,
+        "pre-identity narrow-input construction mismatch",
+    )
+    require(
+        module.count("finduas_modules_recheck(set)") == 1 and
+        "FINDUAS_IDENTITY_ADMISSION" in module,
+        "post-identity linker-epoch admission absent",
+    )
+    require(
+        "set->identity_admission != FINDUAS_IDENTITY_ADMISSION" in module,
+        "runtime-header finalizer is not admission-gated",
+    )
+    require(
+        "profile->elf_header" in module and "profile->phdrs" in module and
+        module.count("memcmp(") >= 4,
+        "post-admission runtime Ehdr/phdr comparison absent",
+    )
+    require(identity.count("openat(") == 2, "identity read-only openat surface mismatch")
+    require(identity.count("O_RDONLY | O_CLOEXEC | O_NOFOLLOW") == 2, "open flags mismatch")
+    require(identity.count("fstat(") == 2, "pre/post fstat surface mismatch")
+    require(identity.count("pread64(") == 2, "bounded pread64 surface mismatch")
+    require(identity.count("read(") == 1, "maps streaming read surface mismatch")
+    require(identity.count("close(") == 2, "identity close surface mismatch")
+    require("finduas_constant_time_equal" in identity, "constant-time SHA compare absent")
+    require("NONWRITABLE_LOAD_MISMATCH" in identity, "non-writable PT_LOAD gate absent")
+    require("finduas_maps_snapshots_equal" in identity, "two maps snapshot gate absent")
+    require("FINDUAS_SOURCE_EXTRACTED_ELF_V1" in identity, "extracted-ELF source gate absent")
+    for rejected_source in ("!/", " (deleted)", "/memfd:", "[anon:"):
+        require(rejected_source in identity_core, f"source rejection absent: {rejected_source}")
+    require(
+        "FINDUAS_IDENTITY_WRITABLE_ORIGINAL_NONWRITABLE_LOAD" in identity_core and
+        "record.writable != 0u" in identity_core,
+        "current-writable original PF_W==0 rejection absent",
+    )
+    require(
+        "finduas_snapshot_contains_readable_nonwritable_range" in identity_core,
+        "non-writable byte-compare range gate absent",
+    )
+    require("status->st_dev == 0" in file_state, "zero st_dev rejection absent")
+
+    require(profile_source.count("FUNCTION_PROFILE(") == 18, "function profile macro/use count mismatch")
+    require(profile_source.count("OBJECT_PROFILE(") == 5, "object profile macro/use count mismatch")
+    for target in TARGET_SYMBOLS:
+        require(profile_source.count(f'"{target.name}"') == 1, f"target source symbol cardinality: {target.name}")
+
+    require("characteristics_before == invalid_characteristics" in route, "Invalid singleton first gate absent")
+    require("characteristics_after == invalid_characteristics" in route, "Invalid singleton second gate absent")
+    require("characteristics_after != characteristics_before" in route, "Characteristics identity epoch gate absent")
+    require("abstraction_after.control != abstraction_before.control" in route, "control-block epoch gate absent")
+    require("release_weak(framework_weak.control)" in route, "weak release absent")
+    for owner in (
+        "abstraction_after.control",
+        "abstraction_before.control",
+        "framework_strong.control",
+    ):
+        require(route.count(f"release_shared({owner})") == 1, f"shared owner cleanup mismatch: {owner}")
+    require("release_shared(framework_weak.control)" not in route, "weak owner released as shared")
+    require("cache_key_dtor(cache_key)" in route and "string_dtor(target_string)" in route, "target destructor pair absent")
+
+    for forbidden in (
+        "GetInstance",
+        "JNIRawData",
+        "native_SendData",
+        "native_SendDataWithTcpPort",
+        "JNIKeyValue",
+        "native_get",
+        "native_set",
+        "RegisterObserver",
+        "AddProductConnectionObserver",
+        "AddDatalinkObserver",
+        "127.0.0.1",
+        "40007",
+        "40009",
+        "android/os/Binder",
+    ):
+        require(forbidden not in combined, f"forbidden control/observer route: {forbidden}")
+    for pattern, label in (
+        (r"\b(?:socket|connect|bind|listen|accept|send|sendto|recv|recvfrom)\s*\(", "network API"),
+        (r"\b(?:open|creat|fopen|write|pwrite|rename|unlink|chmod|mmap)\s*\(", "forbidden filesystem API"),
+        (r"\b(?:fork|vfork|execve|system|popen|ptrace|process_vm_readv)\s*\(", "process API"),
+    ):
+        require(re.search(pattern, combined) is None, f"source contains forbidden {label}")
+    for forbidden in ("malloc(", "calloc(", "realloc(", "free(", "realpath(", "/proc/self/mem"):
+        require(forbidden not in combined, f"forbidden allocation/fallback surface: {forbidden}")
+
+    audit_target_samples(project_dir)
+
+
+def audit_manifest(aapt: Path, apk: Path) -> None:
+    manifest = run_checked([str(aapt), "dump", "xmltree", str(apk), "AndroidManifest.xml"])
+    elements = re.findall(r"^\s*E:\s+([^\s(]+)", manifest, flags=re.MULTILINE)
+    require(elements == ["manifest", "uses-sdk", "application"], f"unexpected elements: {elements}")
+    require(f'package="{EXPECTED_PACKAGE}"' in manifest, "unexpected package")
+    for label, pattern in {
+        "versionCode 1": r"android:versionCode[^\n]*\(type 0x10\)0x1(?:\s|$)",
+        "versionName": r'android:versionName[^\n]*="0\.1\.0-offline-unadmitted"',
+        "minSdk 30": r"android:minSdkVersion[^\n]*\(type 0x10\)0x1e(?:\s|$)",
+        "targetSdk 30": r"android:targetSdkVersion[^\n]*\(type 0x10\)0x1e(?:\s|$)",
+        "fixed label": r'android:label[^\n]*="FindUAS EID route resolver V2\.3 offline carrier"',
+        "hasCode false": r"android:hasCode[^\n]*\(type 0x12\)0x0(?:\s|$)",
+        "debuggable true": r"android:debuggable[^\n]*\(type 0x12\)0xffffffff(?:\s|$)",
+        "allowBackup false": r"android:allowBackup[^\n]*\(type 0x12\)0x0(?:\s|$)",
+        "extractNativeLibs true": r"android:extractNativeLibs[^\n]*\(type 0x12\)0xffffffff(?:\s|$)",
+        "cleartext false": r"android:usesCleartextTraffic[^\n]*\(type 0x12\)0x0(?:\s|$)",
+    }.items():
+        require(re.search(pattern, manifest) is not None, f"manifest missing {label}")
+    require("E: uses-permission" not in manifest, "manifest declares a permission")
+    require("android:sharedUserId" not in manifest, "manifest requests a shared UID")
+    for component in ("activity", "service", "receiver", "provider", "instrumentation"):
+        require(f"E: {component}" not in manifest, f"manifest declares {component}")
+
+
+def audit_elf(ndk_bin: Path, library_path: Path) -> None:
+    readelf = ndk_bin / "llvm-readelf"
+    nm = ndk_bin / "llvm-nm"
+    strings = ndk_bin / "llvm-strings"
+
+    header = run_checked([str(readelf), "-h", str(library_path)])
+    require("Class:                             ELF64" in header, "carrier is not ELF64")
+    require("Machine:                           AArch64" in header, "carrier is not AArch64")
+
+    carrier_elf = ExactElf(library_path)
+    audit_compiled_target_profile(carrier_elf)
+    audit_compiled_identity_dominance(carrier_elf)
+    audit_compiled_preidentity_poison_boundary(carrier_elf)
+    audit_compiled_exception_gate(carrier_elf)
+
+    dynamic = run_checked([str(readelf), "-d", str(library_path)])
+    needed = set(re.findall(r"Shared library: \[([^]]+)\]", dynamic))
+    require(needed == EXPECTED_NEEDED, f"unexpected dependencies: {sorted(needed)}")
+    require("Library soname: [libfinduas_eid_route_resolver_v2_3.so]" in dynamic, "unexpected SONAME")
+    require(all(tag not in dynamic for tag in ("(INIT)", "(INIT_ARRAY)", "(PREINIT_ARRAY)", "(FINI)", "(FINI_ARRAY)")), "constructor/destructor table present")
+    require(all(tag not in dynamic for tag in ("(TEXTREL)", "(RPATH)", "(RUNPATH)")), "unsafe ELF dynamic path/text relocation")
+
+    defined = dynamic_symbol_names(run_checked([str(nm), "-D", "--defined-only", "--extern-only", str(library_path)]))
+    require(defined == {"Agent_OnAttach"}, f"unexpected exports: {sorted(defined)}")
+    undefined = dynamic_symbol_names(run_checked([str(nm), "-D", "--undefined-only", str(library_path)]))
+    require(undefined == EXPECTED_UNDEFINED, f"unexpected imports: {sorted(undefined)}")
+    for forbidden in ("socket", "connect", "write", "pwrite", "ptrace", "fork", "execve", "getenv", "__system_property_get"):
+        require(forbidden not in undefined, f"forbidden import: {forbidden}")
+
+    printable = run_checked([str(strings), "-a", str(library_path)])
+    for required in (
+        "FindUAS-EID-Route-V23",
+        "FINDUAS_EID_ROUTE_V23 error=",
+        "libsdk_jni.so",
+        "libsdk_key_value.so",
+        "libsdk_base.so",
+        "EIDSwitch",
+        "Characteristics7InvalidE",
+    ):
+        require(required in printable, f"required binary evidence absent: {required}")
+    for forbidden in ("GetInstance", "JNIRawData", "native_SendData", "127.0.0.1", "40007", "40009", "/data/", "/sdcard/"):
+        require(forbidden not in printable, f"forbidden binary string: {forbidden}")
+
+    library_bytes = library_path.read_bytes()
+    # Hidden names are stripped from the packaged SO, so validate each exact bridge byte sequence
+    # directly.  llvm-objdump renders AArch64 raw words in host textual order, which is not the
+    # byte order used by an in-file signature.
+    for signature in (
+        "e9 03 00 aa e8 03 01 aa e0 03 02 aa 20 01 1f d6",
+        "ea 03 40 f9 e9 03 00 aa e8 03 01 aa e0 03 02 aa",
+        "e9 03 00 aa e8 03 01 aa e0 03 02 aa e1 03 03 aa",
+    ):
+        require(
+            library_bytes.count(bytes.fromhex(signature)) == 1,
+            "AArch64 x8 sret shim signature cardinality",
+        )
+
+    require(
+        library_bytes.count(b"\x7fELF") == 1 + len(MODULE_PROFILES),
+        "unexpected ELF magic cardinality (carrier plus three fixed profile headers)",
+    )
+    require(b"dex\n" not in library_bytes, "embedded DEX payload present")
+    require(b"PK\x03\x04" not in library_bytes, "embedded ZIP payload present")
+
+
+def audit_readme(project_dir: Path, apk_digest: str, apk_size: int, so_digest: str, so_size: int) -> None:
+    readme = (project_dir / "README.md").read_text(encoding="utf-8")
+    require(f"APK SHA-256: `{apk_digest}`" in readme, "README APK digest mismatch")
+    require(f"APK bytes: `{apk_size}`" in readme, "README APK size mismatch")
+    require(f"packaged SO SHA-256: `{so_digest}`" in readme, "README SO digest mismatch")
+    require(f"packaged SO bytes: `{so_size}`" in readme, "README SO size mismatch")
+    require("DO NOT INSTALL OR ATTACH" in readme, "README warning absent")
+    require("EXCEPTION_BOUNDARY_UNPROVEN" in readme, "README does not disclose hard gate")
+    for document in ("LIVE_ADMISSION.md", "ZERO_SEND_CONTRACT.md", "ARTIFACT_AUDIT.md"):
+        require((project_dir / document).is_file(), f"missing project document: {document}")
+    artifact_audit = (project_dir / "ARTIFACT_AUDIT.md").read_text(encoding="utf-8")
+    require(apk_digest in artifact_audit and so_digest in artifact_audit, "artifact-audit digest mismatch")
+
+
+def audit_apk(apk: Path, project_dir: Path, sdk_root: Path, ndk_root: Path) -> None:
+    require(apk.is_file(), f"missing APK: {apk}")
+    build_tools = sdk_root / "build-tools/35.0.0"
+    aapt = build_tools / "aapt"
+    apksigner = build_tools / "apksigner"
+    zipalign = build_tools / "zipalign"
+    ndk_bin = ndk_root / "toolchains/llvm/prebuilt/darwin-x86_64/bin"
+
+    with zipfile.ZipFile(apk) as archive:
+        entries = archive.namelist()
+        require(len(entries) == len(set(entries)), "duplicate ZIP entry")
+        require(set(entries) == EXPECTED_ZIP_ENTRIES, f"unexpected ZIP inventory: {entries}")
+        require(not any(re.fullmatch(r"classes\d*\.dex", entry) for entry in entries), "packaged DEX present")
+        native_info = archive.getinfo(EXPECTED_NATIVE_ENTRY)
+        require(native_info.compress_type == zipfile.ZIP_DEFLATED, "native library is not compressed")
+        library_bytes = archive.read(EXPECTED_NATIVE_ENTRY)
+
+    inspection_mirror = project_dir / "build/inspect.so"
+    require(inspection_mirror.is_file() and not inspection_mirror.is_symlink(), "missing regular inspection mirror")
+    require(inspection_mirror.read_bytes() == library_bytes, "inspection mirror differs from packaged SO")
+
+    audit_manifest(aapt, apk)
+    run_checked([str(zipalign), "-c", "4", str(apk)])
+    signer_output = run_checked([str(apksigner), "verify", "--verbose", "--print-certs", str(apk)])
+    for line in (
+        "Verifies",
+        "Verified using v1 scheme (JAR signing): false",
+        "Verified using v2 scheme (APK Signature Scheme v2): true",
+        "Verified using v3 scheme (APK Signature Scheme v3): false",
+        "Verified using v3.1 scheme (APK Signature Scheme v3.1): false",
+        "Verified using v4 scheme (APK Signature Scheme v4): false",
+        "Verified for SourceStamp: false",
+        "Number of signers: 1",
+    ):
+        require(line in signer_output, f"unexpected signing profile: {line}")
+    match = re.search(r"certificate SHA-256 digest:\s*([0-9a-fA-F]+)", signer_output)
+    require(match is not None, "signer digest absent")
+    signer_digest = match.group(1).lower()
+    require(signer_digest == EXPECTED_SIGNER_CERT_SHA256, "unexpected signer")
+    require(signer_digest != DJI_PLATFORM_CERT_SHA256, "DJI platform signer unexpectedly used")
+
+    with tempfile.TemporaryDirectory(prefix="finduas-route-v23-audit-") as temporary:
+        library_path = Path(temporary) / "libfinduas_eid_route_resolver_v2_3.so"
+        library_path.write_bytes(library_bytes)
+        audit_elf(ndk_bin, library_path)
+
+    apk_digest = sha256_file(apk)
+    so_digest = sha256_bytes(library_bytes)
+    audit_readme(project_dir, apk_digest, apk.stat().st_size, so_digest, len(library_bytes))
+
+    print(f"APK SHA-256: {apk_digest}")
+    print(f"Packaged SO SHA-256: {so_digest}")
+    print(f"Signer certificate SHA-256: {signer_digest}")
+    print(f"Native entry: {EXPECTED_NATIVE_ENTRY} ({len(library_bytes)} bytes, compressed)")
+    print("Manifest: no permissions, no components, no shared UID, hasCode=false")
+    print("Packaged/embedded DEX: absent")
+    print("Target profile: packaged tables equal 3 whole-file SHA/size/header/phdr/build-id profiles and 21 symbols")
+    print("Runtime: RTLD_NOLOAD only; extracted regular ELF whole-file/maps/non-W PT_LOAD gate")
+    print("Control surface: no GET/listen/SET/send/observer/socket/Binder/file-write/process route")
+    print("AUDIT PASS")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("apk", type=Path)
+    arguments = parser.parse_args()
+    configure_java_runtime()
+
+    script_dir = Path(__file__).resolve().parent
+    project_dir = script_dir.parent
+    sdk_setting = os.environ.get("ANDROID_SDK_ROOT") or os.environ.get("ANDROID_HOME")
+    require(bool(sdk_setting), "set ANDROID_SDK_ROOT or ANDROID_HOME")
+    sdk_root = Path(str(sdk_setting)).expanduser().resolve()
+    ndk_root = Path(os.environ.get("FINDUAS_ROUTE_V23_NDK_ROOT", str(sdk_root / "ndk/27.2.12479018"))).resolve()
+
+    audit_source(project_dir)
+    audit_apk(arguments.apk.resolve(), project_dir, sdk_root, ndk_root)
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except AuditFailure as error:
+        print(f"AUDIT FAILED: {error}")
+        raise SystemExit(1)
