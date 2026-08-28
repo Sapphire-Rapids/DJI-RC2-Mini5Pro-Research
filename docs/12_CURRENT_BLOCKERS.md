@@ -176,15 +176,31 @@ Effect: ciphertext patching cannot produce a flashable Remote ID modification.
 
 Missing:
 
+- a legitimately obtained online response or offline FCC blob and matching authorized-device
+  context for offline authentication/decryption;
 - exact post-decode DUSS frames for no-op, normal FCC, restore, and C0 actions;
 - strict command/ACK/readback correlation rather than socket-write completion;
 - a signer/hash comparison for the separately hosted DJI Fly 1.21.4 APK;
 - a privacy-redacted actual VPN route/host record and controlled DJI Fly startup comparison;
 - independent onboard and motor-on RF A-B-A evidence for any claimed RID effect.
 
-Effect: the opaque NLD payload cannot be copied into an auditable implementation, the packaged
+Effect: the now-understood envelope/framing still cannot supply actual commands; the opaque NLD
+payload cannot be copied into an auditable implementation, the packaged
 FreeFCC profiles cannot be called its runtime source, and its generic RID marketing claim cannot be
 promoted to a Mini 5 Pro control surface.
+
+## B-18 — Drone-Hacks target recipe and WA150 CFC applicability
+
+Missing:
+
+- a public or legitimately obtained Mini 5 Pro software product/license and exact target job;
+- a WA150 CFC image or verified plaintext, exact firmware hook, loader/signature acceptance, and
+  recovery route;
+- an explicit RID command/parameter with baseline, forward readback, restore, and final readback;
+- synchronized onboard status and independent motor-on RF A-B-A.
+
+Effect: the generic local executor, server-owned job model, FCC quick action, FCC ModBox support,
+parameter editor, and older-product CFC cannot be promoted to a Mini 5 Pro RID implementation.
 
 ## Dependency order
 

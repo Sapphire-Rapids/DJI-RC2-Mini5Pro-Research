@@ -40,6 +40,12 @@ Static anchors:
 
 Missing evidence: synchronized motor-off/motor-on onboard state plus independent receiver data.
 
+Do not treat `UAVOIDManager.native_SetOIDReportEnable(false)` as the missing RF switch. In the exact
+`1.21.10` native path it selects app-side China OID network submission versus `DirectSuccess`; no
+aircraft broadcast write or gate getter exists. `CN_OPERATE_ID_EFFECT` and
+`dji_fly_rid_cloud_control_v2` are distinct namespaces. Read RID-011A/011B in
+[05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md) before reusing any “report enable” name.
+
 ### Account and effective limits
 
 Read [04_STATE_ACCOUNT_LIMITS.md](04_STATE_ACCOUNT_LIMITS.md).
@@ -114,6 +120,29 @@ Read [16_NLDFCC_STATIC_ANALYSIS.md](16_NLDFCC_STATIC_ANALYSIS.md) before using t
 profiles as protocol evidence. The files are exact public-prior-art matches but have no found NLD
 runtime reference. Keep the normal-FCC native payload, C0/VPN orchestration, parameter editor, and
 Remote ID claim as four separate evidence paths.
+
+The normal-FCC outer envelope, signed entitlement, offline cache, command JSON schema, and DUML
+framing are statically closed. Do not repeat superseded notes claiming hex envelope fields,
+lowercase serial normalization, or a zero-length online HMAC key. The actual command plaintext is
+still missing because the package contains no real response/blob. Never publish the embedded
+symmetric master, entitlement, cache, serial, or device public key.
+
+### Drone-Hacks comparison
+
+Read [17_DRONE_HACKS_STATIC_ANALYSIS.md](17_DRONE_HACKS_STATIC_ANALYSIS.md) before using
+Drone-Hacks as protocol or firmware precedent. Keep these layers separate:
+
+- exact signed local client identity;
+- generic local DUML/USB/ADB/firmware/parameter executor;
+- authenticated server-defined target jobs;
+- one-time FCC and separate FCC ModBox compatibility;
+- firmware-resident CFC on explicitly listed products;
+- explicit RID feature/command/readback, which was not found.
+
+Do not map `wm1695` to Mini 5 Pro; the public definitions map Mini 5 Pro to `wa150` and `wm1695` to
+O3 Air Unit. Do not infer software or RID support from the public FCC flag or hardware ModBox list.
+The useful next handoff question is whether WA150's authoritative RID owner can be closed in verified
+plaintext or an exact live read-only path—not how to invoke the generic custom-packet engine.
 
 ## Documentation-only tasks available without device access
 

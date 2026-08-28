@@ -158,7 +158,19 @@
 
 当前没有满足上述门禁的记录。Bootloader unlock、Magisk、Root、boot patch 和 firmware flash 均保持 `NOT ADMITTED`。
 
-## 9. 可复核来源与分发声明
+## 9. Drone-Hacks CFC 架构与 WA150 边界
+
+`STATIC`：Drone-Hacks `2.0.29` 客户端包含通用固件/IMaH/upgrade/job 能力，公开文档说明其 V2
+核心在已支持飞机固件中加入 CFC，再通过飞机 Name 字段提供窄运行时命令。该架构说明“host
+安装器”和“飞行时控制入口”可以分层，但不公开每个 target 的完整 server job 或 patch。
+
+`NEGATIVE/UNKNOWN`：公开 CFC 支持清单与命令均不含 Mini 5 Pro 或 RID。公开数据只建立
+`wa150` 型号登记与独立 FCC ModBox 硬件兼容；没有 WA150 软件产品、CFC image、verified
+plaintext、hook、签名接受或恢复链。故 CFC 只能作为架构假设，不能降低第 8 节刷写门禁。
+
+完整证据见 [Drone-Hacks 2.0.29 静态分析](17_DRONE_HACKS_STATIC_ANALYSIS.md)。
+
+## 10. 可复核来源与分发声明
 
 - 公开工具基线：[o-gs/dji-firmware-tools](https://github.com/o-gs/dji-firmware-tools/tree/195692263c2684cf1ddc4995f2736be6c0fb135e)
 - 当前公共研究入口：[DJI Fly 官方下载页](https://www.dji.com/downloads/djiapp/dji-fly)

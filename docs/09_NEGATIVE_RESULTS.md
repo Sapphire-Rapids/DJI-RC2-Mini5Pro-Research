@@ -277,3 +277,40 @@ stronger conclusion that cannot be drawn.
   path was found. The only found native shell property operation belongs to launcher selection.
 - Does not establish: absence of behavior encoded in opaque data, performed by NLD services, a
   separately installed helper, or the separately hosted DJI Fly APK.
+
+## N-32 — Drone-Hacks 2.0.29 explicit Remote ID control
+
+- Status: `NEGATIVE` within a fixed static/public scope.
+- Scope: MSI payload identities, direct Tauri command schema, mobile feature enum, Rust type and
+  source-path metadata, endpoints, model tokens, UI/resource strings, generic DUSS names, public
+  compatibility/license/product data, and public CFC documentation.
+- Result: no identifiable RID feature, switch, local command, parameter, CFC Name command, server
+  job name, or Mini 5 Pro RID implementation was found.
+- Positive clues kept separate: a generic DUSS vocabulary contains ADSB RID/EID labels; a broad
+  server job engine can send custom packets; a firmware-resident CFC exists for listed older models.
+- Does not establish: absence of an opaque authenticated server job, unpublished firmware code, a
+  different private product, or a future version.
+- Consequence: Drone-Hacks cannot currently be cited as a working Mini 5 Pro RID control or protocol
+  implementation.
+
+## N-33 — China OID report-enable as an RF Remote ID switch
+
+- Status: `NEGATIVE` for RF-switch attribution; the app-side gate itself is `STATIC`.
+- Positive fact: current DJI Fly `1.21.10` native exposes report/simulator/mock Booleans through
+  `UAVOIDManager`.
+- Result: the normal Boolean selects network `Submit` versus `DirectSuccess` after OID push parsing.
+  It has no recovered gate getter and no aircraft broadcast writer.
+- Corroboration: the adjacent Java path binds it to `CN_OPERATE_ID_EFFECT`, not to the distinct
+  opaque `dji_fly_rid_cloud_control_v2` policy.
+- Does not establish: absence of an aircraft-side RID switch in encrypted firmware, managed license,
+  opaque cloud payload, or a later app.
+- Consequence: `setOIDReportEnable(false)` must not be presented as stopping BLE/Wi-Fi RID.
+
+## N-34 — current exact app/native global RID setter
+
+- Status: `NEGATIVE` within DJI Fly `1.21.10` readable app/native surfaces.
+- Result: the targeted registration/function search found France EID switch wrappers and helper
+  validation, but no product-139 EID broadcast-enable, EID open/close, ODID/OpenDroneID, or global RF
+  setter handler. MSDK's America broadcast-enable method mutates a status object, not the device.
+- Does not establish: absence inside WA150 encrypted firmware, server-selected opaque policy, signed
+  type-6 state, or future versions.

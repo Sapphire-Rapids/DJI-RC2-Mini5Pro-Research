@@ -132,3 +132,43 @@ work when a report did not contain a more precise timestamp.
 - `NEGATIVE`: a bounded full-package search found no identifiable Remote ID control surface.
 - No APK was installed or executed, no NLD API was contacted, and no controller or aircraft state
   changed.
+
+### 18:05–19:10 — Drone-Hacks 2.0.29 static comparison
+
+- `STATIC`: the supplied MSI was byte-identical to the MSI in the official release ZIP; the MSI
+  and both embedded PEs carried valid Skymod Technologies Authenticode signatures.
+- `STATIC`: the Rust/Tauri client exposed a broad DUML/USB/ADB/firmware/parameter executor and
+  server-driven job model; the direct `dhfc_config` schema contained only FCC, NFZ, and height.
+- `CORROBORATED`: public data recognized `wa150` as Mini 5 Pro but exposed no software platform,
+  compatible license, or software product; separate FCC ModBox compatibility did include `wa150`.
+- `NEGATIVE`: no explicit Drone-Hacks RID feature, switch, local command, parameter, job, or Mini 5
+  Pro RID implementation was found in the bounded client/public search.
+- `STATIC`: public CFC documentation supplied a firmware-resident runtime-control precedent for
+  listed older products, but neither Mini 5 Pro nor RID was documented.
+- No installer or PE was executed, no account/authenticated API/private job was used, and no device
+  read/write action occurred.
+
+### 2026-08-28 follow-up — NLD native envelope and cache closure
+
+- `STATIC`: the outer Base64/HMAC/AES-CBC envelope, online default-master selection, offline
+  uppercase-serial derivation, and strict padding/MAC checks were closed.
+- `STATIC`: RSA-3072/SHA-256 entitlement verification and version/serial/type/device-key binding
+  were closed; cached subscription responses are reverified after the exact connection-failure
+  sentinel.
+- `STATIC`: offline cache framing and durable-write behavior plus decrypted JSON and DUML framing/
+  write-loop semantics were closed.
+- `UNKNOWN`: no real encrypted payload or command object exists in the package, so actual commands,
+  restore behavior, readback, and RF effects remain unresolved.
+- The embedded symmetric key value and all license/cache material were excluded. No vendor code or
+  API was executed.
+
+### 2026-08-28 follow-up — exact RID setter and China OID gate re-audit
+
+- `STATIC`: current `UAVOIDManager` report/simulator/mock Booleans and their consumer branches were
+  closed in DJI Fly `1.21.10` native code.
+- `CORROBORATED`: report-enable controls China OID app-side network submission and can direct-success
+  without upload; it is distinct from aircraft BLE/Wi-Fi transmission and from the opaque RID cloud
+  V2 namespace.
+- `NEGATIVE`: a current exact setter search found France EID wrappers but no product-139
+  ODID/OpenDroneID/global RF setter handler. The encrypted WA150 firmware boundary remains.
+- No vendor code, network call, or device action was executed.

@@ -90,6 +90,34 @@ here does not imply that all of its claims were accepted.
   Used only to record the vendor's generic Remote ID transmission-disable claim. The exact Smart RC
   `2.0.0.6` static sample did not expose a corresponding control.
 
+## Drone-Hacks public release, support, and compatibility material
+
+- [Drone-Hacks current release metadata](https://releases.drone-hacks.com/latest.json).
+  Used to identify the official `2.0.29` Windows archive and publication date. The notes/version
+  mismatch is retained as metadata, not interpreted as binary identity.
+- [Drone-Hacks Windows release notes](https://wiki.drone-hacks.com/en/windows_release_notes).
+  Used to corroborate the `2.0.29` release and its public RM700 change.
+- [Custom Flight Controller commands](https://wiki.drone-hacks.com/en/dh2-cfc-commands).
+  Used for the firmware-resident CFC architecture, Name-field command transport, command list, and
+  explicitly listed supported models. No RID command or Mini 5 Pro entry was present.
+- [Known issues](https://wiki.drone-hacks.com/en/dh2-known-issues).
+  Used for the documented multi-step FCC-to-CE restoration boundary.
+- [Custom-firmware release notes](https://wiki.drone-hacks.com/en/drone-hacks-v2/extras/fcfw-release-notes).
+  Used only for public custom-firmware version context.
+- [Ownership transfer notice](https://wiki.drone-hacks.com/new-era-for-DH).
+  Used to corroborate the Skymod Technologies Ltd operator identity shown by Authenticode.
+- [Public model definitions](https://drone-hacks.com/api/v1/definitions/models),
+  [public model-catalogue application chunk](https://drone-hacks.com/_app/immutable/chunks/CXG_u84T.js),
+  [compatible-license definitions](https://drone-hacks.com/api/v1/definitions/compatible-licenses),
+  [Mini 5 Pro product search](https://drone-hacks.com/api/v1/products/search?model=wa150),
+  [Mini 3 Pro product-search positive control](https://drone-hacks.com/api/v1/products/search?model=wm162), and
+  [FCC ModBox compatibility](https://drone-hacks.com/api/v1/configs/fccModBoxCompatibility).
+  Anonymous snapshot on 2026-08-28. Used to separate model recognition, software product/license,
+  software platform, and FCC-hardware compatibility. No account or device identifier was supplied.
+- [Remote-controller compatibility boundary](https://wiki.drone-hacks.com/en/compatible-rc-dji-fly).
+  Used to distinguish an official controller remaining compatible with a modified aircraft from
+  direct modification support for that controller.
+
 ## Public research baseline
 
 - [FindUAS repository at `15f331c`](https://github.com/Sapphire-Rapids/FindUAS/tree/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc).

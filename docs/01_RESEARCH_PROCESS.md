@@ -250,3 +250,42 @@ not requested, decoded, replayed, or copied into this repository.
 
 The detailed results and reusable-design review are in
 [16_NLDFCC_STATIC_ANALYSIS.md](16_NLDFCC_STATIC_ANALYSIS.md).
+
+A follow-up control-flow pass closed the native envelope, online/offline key-selection distinction,
+RSA-bound entitlement checks, durable cache framing, decrypted JSON schema, and DUML frame/write
+loop. Earlier provisional readings of a hex envelope, lowercase serial normalization, or an empty
+online HMAC key were rejected. No embedded symmetric key value, licensed cache, response payload,
+or command plaintext was admitted to the repository.
+
+## 16. Drone-Hacks Windows comparison
+
+The supplied `2.0.29` MSI was first matched byte-for-byte against the MSI in the official release
+ZIP. MSI and PE Authenticode signatures, package metadata, embedded-file hashes, and release
+metadata were then recorded before inspecting functionality. The installer and both payloads were
+kept offline and never executed.
+
+Static strings, Rust/Tauri type metadata, command schemas, endpoint names, model tables, and public
+anonymous compatibility APIs were analyzed as separate evidence classes. The client-side executor
+was distinguished from server-owned modification/job payloads. The FCC quick action, generic
+parameter editor, firmware/CFC path, and Remote ID search were also kept separate so a generic DUML
+name or an FCC feature could not be promoted into a RID implementation.
+
+The current public model, license, product, platform, and FCC ModBox views were queried with no
+account or device identifier. Positive controls were used where possible: a known Mini 3 Pro model
+returned a software product while `wa150` did not. No authenticated API, license, private job, or
+device action was used.
+
+Detailed methods, exact identities, results, and design implications are in
+[17_DRONE_HACKS_STATIC_ANALYSIS.md](17_DRONE_HACKS_STATIC_ANALYSIS.md).
+
+## 17. Current RID-setter and China OID gate re-audit
+
+The exact registered JNI surface in DJI Fly `1.21.10` was re-enumerated for RID/EID/OID broadcast,
+open/close, simulator, report, cloud-reset, and OpenDroneID/ODID terms. Every Boolean was followed to
+its consumer rather than classified by name. This identified a real OID report-enable gate but
+showed that its false branch bypasses network submission through a direct-success result.
+
+The gate was then separated from the opaque RID cloud-control V2 namespace, France EID wrappers,
+MSDK status-object setters, and firmware-only unknowns. Adjacent Java code was used only to
+corroborate the China cloud namespace and default policy; it was not described as exact 1.21.10
+Java. No code was executed and no network/device state changed.

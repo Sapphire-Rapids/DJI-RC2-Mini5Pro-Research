@@ -84,9 +84,34 @@ The native core also recognizes an offline sentinel and exposes names for an off
 signature and offline FCC blob. The normal FCC path can therefore operate from a
 previously provisioned cache without exposing the command sequence in Java.
 
-`UNKNOWN`: the online response and offline blob were not requested or decrypted. Their exact
-frames, order, retry policy, restore behavior, and success semantics are not established by this
-analysis.
+Follow-up native control-flow analysis closed the outer envelope (C-102):
+
+```text
+V1##Base64(16-byte IV)##Base64(nonempty block-aligned ciphertext)##Base64(32-byte tag)
+```
+
+For a selected outer key, the decoder derives an encryption key with
+`HMAC-SHA256(Kouter, "OUTER|ENC")` and a MAC key with
+`HMAC-SHA256(Kouter, "OUTER|MAC")`. It authenticates ASCII `V1`, IV, and ciphertext with
+HMAC-SHA256, compares the tag in constant time, decrypts with AES-256-CBC, and strictly checks
+PKCS#7 padding. The envelope fields are Base64; only the later command `PAYLOAD` field is hex.
+
+An empty key argument on the online path selects a fixed embedded 32-byte master as `Kouter`; it
+does not use a zero-length HMAC key. For an offline blob, the outer key is the Base64 text of
+`HMAC-SHA256(master, "OFFLINE_FCC_V1|" + UPPERCASE_SERIAL)`. The serial is normalized to uppercase.
+The master location and use were confirmed statically, but its value is intentionally excluded as
+key/license material.
+
+`STATIC` (C-105): after decryption, the accepted command object is either a top-level array or a
+`packets` array. Each entry uses `RECV`, `RECV_INDEX`, `CMD_SET`, `CMD`, and a hex-byte `PAYLOAD`.
+Native code constructs a DJI DUML frame with start byte, length/version, CRC8, endpoints,
+little-endian sequence, control, command set/ID, payload, and little-endian CRC16. It invokes Java
+`write(byte[])` once per frame, stops on false/exception, and spaces successful frames by 150 ms.
+
+`UNKNOWN`: the APK/ZIP contains no usable encrypted response, offline blob, or real command object.
+No vendor API was called and no licensed cache was obtained. Therefore the actual command values,
+frame count/order, restore behavior, success semantics, and RF effect remain unresolved even though
+the envelope and framing logic are now statically closed.
 
 ### 4.2 Transport
 
@@ -206,13 +231,36 @@ carry an app ID/name plus activation and optional expiry times. On connection fa
 the same public-key bytes to a native offline-state function. Native printable names include
 `offlineEntitlement`, `offlineEntitlementSignature`, and `offlineFccBlob`.
 
-Those facts are consistent with device-bound signed offline entitlement/blob handling, but this
-analysis did not close the native signature-verification control flow, persistence location,
-freshness enforcement, or exact binding inputs. The app exposes an offline normal-FCC path; trial
-entries have an expiry and are blocked from offline use. C0 is different: an offline VPN-setup
-sentinel produces an error, so each new C0 activation needs a successful online VPN-config response
-tied to a qualifying subscription. It does not necessarily perform a separate subscription refresh
-before every start.
+Follow-up analysis closed the entitlement verification boundary (C-103). The native code Base64
+decodes the entitlement and signature, hashes the raw entitlement with SHA-256, and verifies a
+384-byte RSA signature with an embedded 384-byte modulus and exponent 65537 using the PKCS#1 v1.5 /
+SHA-256 mode. The verified JSON must have `v == 1` and match `sn`, `deviceType`, and
+`devicePublicKey`; the last value is compared with the Java-supplied X.509 P-256 public key.
+
+The exact connection-failure sentinel is
+`NLD::SUBSCRIPTIONS::CONNECTION_FAILURE::V1`. It restores only the previously cached successful
+subscription response, which is parsed and signature-checked again. The embedded RSA public key can
+verify an entitlement but cannot create a valid signature.
+
+`STATIC` (C-104): the no-backup cache file is `offline_fcc_cache.bin` with a temporary sibling. Its
+format is:
+
+```text
+[8-byte magic][u32BE blob length][u32BE subscription length]
+[offlineFccBlob][original successful subscription response]
+```
+
+Both sections must be nonempty, the total length must match exactly and remain at or below 8 MiB,
+and the writer uses mode 0600, complete writes, file `fsync`, atomic rename, and parent-directory
+`fsync`. There is no extra whole-file encryption: the first section is already the encrypted FCC
+envelope, and the second is the signed subscription response.
+
+The asymmetric device public key binds the entitlement but is not the FCC blob's outer-key input.
+The offline blob uses the fixed-master/uppercase-serial derivation described above. Trial entries
+have an expiry and are blocked from offline use. C0 is different: an offline VPN-setup sentinel
+produces an error, so each new C0 activation needs a successful online VPN-config response tied to a
+qualifying subscription. It does not necessarily perform a separate subscription refresh before
+every start.
 
 The reusable design idea is device-bound asymmetric identity plus signed, expiring offline state.
 For an open research tool, the more appropriate default is no license telemetry at all; if signed
@@ -294,11 +342,14 @@ observable layers:
 3. an independent Remote ID receiver timeline synchronized with onboard status and operator-started
    motor transitions.
 
-For NLD-specific causality, a future authorized dynamic experiment would need to record the exact
-decoded DUSS output at NLD's post-decode boundary and the actual VPN route/host set while keeping
-license and identity material redacted. It must not attach a second localhost broker client. A
-no-op run, normal FCC action, C0 action, and restore would then be compared separately. Until such a
-record exists, the opaque server/offline payload and C0 server behavior remain `UNKNOWN`.
+For NLD-specific causality, the immediate missing input is now precise: a legitimately obtained
+online response or `offlineFccBlob` plus its matching authorized-device context. An independent
+offline parser could then authenticate, decrypt, and list DUML commands without executing the
+vendor native library. A future dynamic experiment would still need to record post-decode output
+and the actual VPN route/host set while keeping license and identity material redacted. It must not
+attach a second localhost broker client. A no-op run, normal FCC action, C0 action, and restore would
+then be compared separately. Until such a record exists, the actual commands and C0 server behavior
+remain `UNKNOWN`.
 
 ## 11. Public references
 

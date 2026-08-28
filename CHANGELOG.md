@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.3.0 - 2026-08-28
+
+### Added
+
+- Added a bounded static analysis of the official Drone-Hacks `2.0.29` Windows distribution,
+  including exact provenance, Authenticode identity, Rust/Tauri command surface, server-driven job
+  architecture, parameter editor, one-time FCC path, and firmware-resident CFC precedent.
+- Recorded the current public Mini 5 Pro boundary: `wa150` is recognized, but no software platform,
+  compatible license, product, CFC image, or explicit RID control was found; separate FCC ModBox
+  compatibility is not software/RID support.
+- Added Drone-Hacks artifacts A-019 through A-021, claims C-093 through C-101, a fixed-scope RID
+  negative result, one architecture hypothesis, one blocker, source links, and handoff guidance.
+- Closed NLD's native FCC envelope, entitlement verification, offline-cache framing, decrypted
+  command schema, and DUML write loop as claims C-102 through C-105 while retaining the absent-real-
+  payload and absent-RF-evidence boundary.
+- Closed DJI Fly's current China OID report-enable Boolean as an app-side network-submission gate,
+  not an aircraft RF switch; added the distinct cloud-namespace boundary and current exact global-
+  setter negative as C-106 through C-109.
+
+### Safety and provenance
+
+- The user-supplied MSI matched the MSI in the official release ZIP and its signature validated.
+- The MSI and embedded PEs were never installed or executed. No account, authenticated endpoint,
+  license, private job payload, device identifier, or device read/write operation was used.
+- Vendor binaries, extracted strings, decompiled material, credentials, and device data remain
+  excluded from this repository.
+- The fixed NLD symmetric master and all license/cache material remain excluded; only algorithm and
+  framing facts are recorded.
+
 ## 0.2.0 - 2026-08-28
 
 ### Added

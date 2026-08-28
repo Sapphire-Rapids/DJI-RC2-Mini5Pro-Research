@@ -92,6 +92,14 @@ Later retractions override earlier progress summaries.
     no runtime reference was found. Its reachable FCC path uses an opaque native-decoded online or
     native-handled offline payload. Do not attribute the visible 21-frame batch, keepalive, restore,
     or any Remote ID effect to the current runtime without independent dynamic evidence.
+14. NLD's envelope is Base64/HMAC/AES-256-CBC, not hex. Online empty-argument selection loads a
+    fixed embedded master; offline derivation uses an uppercase serial. Do not publish that master,
+    licenses, caches, or device binding. Closing crypto/framing does not reveal the absent payload.
+15. Drone-Hacks `wm1695` is O3 Air Unit, not Mini 5 Pro (`wa150`). A generic ADSB RID command name,
+    FCC flag, FCC ModBox entry, or server job engine is not Mini 5 Pro software/CFC/RID support.
+16. `UAVOIDManager.native_SetOIDReportEnable` controls app-side China OID network submission and can
+    return direct success without upload. It is not an aircraft BLE/Wi-Fi RID switch and has no
+    recovered state getter. `CN_OPERATE_ID_EFFECT` is distinct from RID cloud-control V2.
 
 ## Privacy and redaction
 

@@ -11,7 +11,7 @@ Japan DIPS `C-015`；type-6 architecture/eligibility/inventory `C-016`--`C-018`�
 `C-038` / `C-039` / `C-055`；route epoch 与 quiescence `C-040`--`C-043`；typed EID retry
 `C-044`--`C-046`；state model 与历史 corpus `C-056`--`C-059`；EU C0、cloud policy、legacy
 inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C-078`；stable control
-未闭合 `C-053`。
+未闭合 `C-053`；中国 OID network-report gate 与 current exact setter re-audit `C-106`--`C-109`。
 
 ## 总结矩阵
 
@@ -28,6 +28,7 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 | RID-009 | EU C0 policy | `NEGATIVE` | live F7 未返回 metadata，未执行 F8/F9 |
 | RID-010 | broadcast-effect policy | `NEGATIVE` | live F7 未返回 metadata，bitmap 语义未知 |
 | RID-011 | opaque cloud-control V2 | `STATIC` | set-only policy blob，不是稳定 Boolean |
+| RID-011A | 中国 OID 云上报 gate | `STATIC/CORROBORATED` | 只控制 App 网络提交并可 direct-success，不控制飞机 RF 广播 |
 | RID-012 | localhost observer | `NEGATIVE` | 历史路线已撤回，不得再连接第二 broker client |
 | RID-013 | same-owner raw EID GET | `HYPOTHESIS` | 静态候选，当前不具备 live 准入条件 |
 | RID-014 | route-only V2.2/V2.3 | `NEGATIVE` | V2.2 撤销；V2.3 修复但仍 zero-send、未准入 |
@@ -242,6 +243,42 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 - **公开依据：** 前述公开 state/firmware research。
 - **隐私/分发：** 不保存或发布 cloud response、installation identity 或 blob。
 
+### RID-011A：中国 OID report gate 是网络提交开关，不是 RF 开关
+
+- **证据状态：STATIC / CORROBORATED**（C-106--C-108）
+- **对象/版本：** 当前精确 DJI Fly `1.21.10` `libsdk_jni.so`；相邻旧 Java 方法体只作
+  cloud-policy corroboration。
+- **当前 native 入口：** `uav/sdk/oidmgr/UAVOIDManager` 注册
+  `native_SetOIDReportEnable(Z)V`、`native_SetSimulatorEnable(Z)V`、
+  `native_MockOIDReportStatus(ZZ)V` 及 init/uninit/observer 方法。
+- **对象状态：** constructor 将 report gate 默认置 true、simulator/mock gates 默认 false，
+  mock result 默认 true。`SetReportEnable`、`SetSimulatorEnable` 和 `MockReportStatus` 只更新
+  对象 Boolean；没有找到 gate-state getter。
+- **消费语义：** `ShouldReport` 优先处理 mock，其次 simulator，正常状态只读 report gate。
+  OID push 解析后，true 进入网络 `Submit`；false 进入 `DirectSuccess`，即跳过网络提交但向
+  上层给出直接成功结果。
+- **cloud namespace：** 相邻 Java flow 将该 gate 绑定到 `CN_OPERATE_ID_EFFECT`；值精确为
+  `"0"` 才关闭，缺失/异常默认开启。它与 `dji_fly_rid_cloud_control_v2` 是不同链路。
+- **关键边界：** 这条路径处理中国 OID/UOM 数据的 RC/App 云上报。它不写飞机广播参数，
+  不控制 BLE/Wi-Fi RID transmitter，也没有 RF/readback/persistence 证据。因此名字中出现
+  OID、report、enable 仍不能把它加入管理员面板的 RF 开关候选。
+- **静态入口：** `OIDMgr` constructor `0x25e33f8`、`SetReportEnable` `0x25e57b0`、
+  `SetSimulatorEnable` `0x25e5a20`、`MockReportStatus` `0x25e5c90`、`OnOIDPushReceived`
+  `0x25e73e8`、`ShouldReport` `0x25e7df0`。RVA 只适用于已登记的 `1.21.10` native 样本。
+
+### RID-011B：当前 exact setter 复查仍没有 global RF Boolean
+
+- **证据状态：NEGATIVE**（C-109）
+- **范围：** 当前 `1.21.10` native function/name/registration paths 中的
+  EID broadcast/open/close、Remote ID、ODID、OpenDroneID 和 switch/setter 组合，以及 MSDK
+  `setBroadcastRemoteIdEnabled`、generic cloud-reset 和既有 product-139 policy 路线。
+- **结果：** 当前 native 只有已知 France `EIDSwitchGet/Set` wrapper 与 RemoteIDHelper 输入校验；
+  没有可识别的 product-139 `EIDBroadcastEnable`、EID open/close、ODID/OpenDroneID 或 global RF
+  setter handler。MSDK America `setBroadcastRemoteIdEnabled` 只改状态 DTO，不发设备 SET；
+  `ResetCloudControlSetting` 的已知业务 caller 属于云端速度限制恢复，不是 RID reset。
+- **边界：** 该阴性只覆盖当前可读 app/native surfaces。WA150 现有输入仍是加密 `.fw.sig`，
+  因此不能据此断言固件内不存在隐藏 owner 或 setter。
+
 ## 观察路线、撤回与未准入设计
 
 ### RID-012：历史 localhost observer 路线已撤回
@@ -316,6 +353,19 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
   与 worker-tail fence 的完整证明，因此任何 raw GET 仍不能进入 live execution。
 - **公开依据：** 前述 compatibility/state research、本仓库 AGENTS correction。
 - **隐私/分发：** 只记录状态机关系，不发布 vendor disassembly。
+
+### RID-016：Drone-Hacks CFC 是架构先例，不是 Mini 5 Pro RID 实现
+
+- **证据状态：STATIC / NEGATIVE / UNKNOWN**
+- **对象/版本：** Drone-Hacks `2.0.29` 客户端、2026-08-28 公开兼容性快照与 CFC 文档。
+- **事实：** 客户端直接 `dhfc_config` 只有 FCC、NFZ、高度；公开 CFC 命令覆盖 FCC、LED、
+  ATTI、NFZ、高度，支持清单不含 Mini 5 Pro，且未文档化 RID。通用 DUSS 名称表虽出现
+  ADSB RID/EID 标签，但没有数值、schema、caller、product gate、readback 或 live job。
+- **边界/不证明：** server job engine 的能力、`wa150` 型号登记和独立 FCC ModBox 兼容均不
+  等于 Mini 5 Pro 软件/CFC/RID 支持。
+- **可借鉴：** 若未来闭合 WA150 authoritative owner，可采用“固件内窄 hook + 显式状态/readback
+  + stock restore + 独立 RF A-B-A”的架构；当前没有 flash 准入。
+- **公开依据：** [Drone-Hacks 静态分析](17_DRONE_HACKS_STATIC_ANALYSIS.md)。
 
 ## 当前判定规则
 

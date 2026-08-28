@@ -201,8 +201,23 @@ Every hypothesis below is testable and remains separate from factual findings.
 ## H-22 — NLD opaque payload and packaged-profile equivalence
 
 - Known facts: the visible profiles are byte-identical to FreeFCC but have no found loader; the
-  reachable FCC path decodes an online or native-offline blob and sends through native DUSS.
+  reachable FCC path decodes an online or native-offline blob and sends through native DUSS. The
+  authenticated envelope, entitlement verification, cache format, decrypted JSON schema, and DUML
+  framing are closed, but the package contains no real encrypted command object.
 - Hypothesis: the opaque blob may decode to all or part of the visible FreeFCC sequence.
-- Distinguishing evidence: an authorized, redacted observation at NLD's post-decode/pre-DUSS-send
-  boundary compared with the pinned profiles, without opening a second RCLink client.
+- Distinguishing evidence: a legitimately obtained online response or offline blob in its authorized
+  device context, decoded offline and compared with the pinned profiles; any live observation must
+  avoid opening a second RCLink client.
 - Current state: `UNKNOWN`; file identity is not runtime reachability.
+
+## H-23 — WA150 firmware-resident RID controller
+
+- Known facts: Drone-Hacks documents a firmware-resident CFC with narrow runtime commands on older
+  products; the current client has firmware/job/parameter machinery; no Mini 5 Pro CFC, RID command,
+  software product, or RID job was found.
+- Hypothesis: if WA150's authoritative RID policy/output owner is firmware-resident, a similarly
+  narrow controller could provide explicit state, one bounded transition, readback, and restoration.
+- Distinguishing evidence: verified WA150 plaintext and ownership path, exact policy/output hook,
+  loader/signature acceptance, a recovery route independent of the modified path, and synchronized
+  motor-on onboard/RF A-B-A.
+- Current state: `UNKNOWN`; architectural precedent is not target applicability or flash admission.

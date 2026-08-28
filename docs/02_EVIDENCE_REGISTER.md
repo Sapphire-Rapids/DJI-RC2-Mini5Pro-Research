@@ -51,6 +51,10 @@ Details: [07_FIRMWARE_TRUST_BOUNDARY.md](07_FIRMWARE_TRUST_BOUNDARY.md),
 | C-076 | `STATIC` | MSDK area strategy selects region-specific Remote-ID delegates | Does not set authoritative region or RF output by itself |
 | C-077 | `STATIC` | Product 139 maps a broadcast-quality key to a product bitmap/quality parameter | Bit semantics and relation to ordinary RID are unknown |
 | C-078 | `NEGATIVE` | Two F7 routes returned status `0x03` without broadcast-effect metadata; no value/write followed | Static-key absence and Boolean semantics are not established |
+| C-106 | `STATIC` | Current `UAVOIDManager` Boolean gate controls app-side China OID reporting and can return direct success without upload | It has no gate getter and does not control aircraft BLE/Wi-Fi broadcast |
+| C-107 | `CORROBORATED` | Current native and adjacent Java policy flows separate China OID network submission from RF RID | Adjacent Java is corroboration; no live network test was run |
+| C-108 | `STATIC` | `CN_OPERATE_ID_EFFECT` and `dji_fly_rid_cloud_control_v2` are distinct policy paths | Neither is a recovered global RF Boolean with readback |
+| C-109 | `NEGATIVE` | Current exact native search found France-EID wrappers but no product-139 ODID/OpenDroneID/global RF RID setter handler | Firmware, encrypted blobs, managed licenses, and future versions remain outside the negative |
 
 Details: [04_STATE_ACCOUNT_LIMITS.md](04_STATE_ACCOUNT_LIMITS.md),
 [05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md).
@@ -98,15 +102,35 @@ Details: [04_STATE_ACCOUNT_LIMITS.md](04_STATE_ACCOUNT_LIMITS.md),
 | C-083 | `STATIC` | The reachable path connects to RCLink and sends through DUSS; explicit handover/hijack code exists but has no found current call site | Main-path broker takeover is not established |
 | C-084 | `STATIC` | C0 obtains online VPN configuration, starts server-routed WireGuard, relaunches DJI Fly, and schedules automatic stop 25 seconds after tunnel UP | Actual route breadth, earlier/later stop, server behavior, and the claimed 500 m/speed causal step remain unknown |
 | C-085 | `NEGATIVE` | No identifiable RID UI, command, profile, setting, service, or handler was found in the bounded `2.0.0.6` static search | Opaque native/server or external-DJI-Fly side effects remain possible |
-| C-086 | `STATIC` | Licensing sends a device-keystore EC public key and passes the same key into native offline recovery; native data names an offline-entitlement signature and blob | Exact signature verification, persistence, freshness, binding, and server decisions remain opaque |
+| C-086 | `STATIC` | Native verifies an RSA-3072/SHA-256 entitlement bound to version, serial, device type, and the Android-keystore P-256 public key | Verification cannot mint a license; server decisions remain unavailable |
 | C-087 | `STATIC` | The parameter editor models live schema, typed validation, write result, and post-write verification | Target-pair live success/coverage is unverified; UI preview values are not Mini 5 Pro parameters |
 | C-088 | `STATIC` | The C0 repair path validates hosted DJI Fly by size, package, and numeric version-equivalence to 1.21.4 without a found fixed hash or signer allowlist | The comparator is weaker than exact version-string equality; the hosted APK was not independently obtained |
 | C-089 | `STATIC` | The bundled Android 11 Package Installer contains valid v1/v2/v3 DJI-subject signatures and privileged declarations | Android 11 selects v3; subject text does not prove provenance or live-build privilege |
 | C-090 | `NEGATIVE` | No identifiable ADB/root/remount/DJI-file-patch/Binder-FCC path was found in the bounded main-app search | Opaque data, server behavior, helpers, and hosted DJI Fly remain outside the negative |
 | C-091 | `STATIC` | Boot normally posts a notification and starts auto FCC only when its armed preference is set; stop clears it | Sticky service presence is not unconditional boot activation or proof of FCC effect |
 | C-092 | `STATIC` | Runtime inquiry normalizes and longest-prefix maps a returned model token | Model classification is not exact controller firmware or aircraft-product identity |
+| C-102 | `STATIC` | FCC payload uses authenticated Base64 envelope, HMAC key separation, AES-256-CBC, and strict PKCS#7; offline key derivation binds an uppercase serial | No real response/blob or embedded-master value is published |
+| C-103 | `STATIC` | Offline entitlement uses RSA-3072 PKCS#1 v1.5/SHA-256 and exact device binding | Public verification material cannot create a valid entitlement |
+| C-104 | `STATIC` | Offline cache framing, bounds, permissions, fsync, and atomic replacement are closed | No licensed cache or decrypted command was obtained |
+| C-105 | `STATIC` | Decrypted command schema and native DUML framing/write loop are closed | Actual commands, ACK/readback, restore, and RF effect remain unknown |
 
 Details: [16_NLDFCC_STATIC_ANALYSIS.md](16_NLDFCC_STATIC_ANALYSIS.md).
+
+## Drone-Hacks static comparison
+
+| ID | Status | Claim | Boundary |
+| --- | --- | --- | --- |
+| C-093 | `STATIC` | The analyzed MSI matches the official `2.0.29` release bytes and has a valid Skymod Authenticode signature | Signed provenance is not feature proof; nothing was executed |
+| C-094 | `STATIC` | The Rust/Tauri client is a broad DUML/USB/ADB/firmware/parameter executor for server-defined jobs | Exact production jobs and restore logic are not all in the MSI |
+| C-095 | `STATIC` | Public CFC uses a firmware-resident hook plus runtime Name-field commands on listed older models | Mini 5 Pro and RID are not listed |
+| C-096 | `NEGATIVE` | No explicit RID feature, switch, local command, parameter, job, or Mini 5 Pro implementation was found | Generic command names and private server jobs remain outside the negative |
+| C-097 | `CORROBORATED` | Public data recognizes `wa150` but exposes no software platform/license/product; separate FCC ModBox compatibility exists | Hardware FCC compatibility is not software/CFC/RID support |
+| C-098 | `STATIC` | Generic DUSS vocabulary includes ADSB RID/EID/parameter labels | Names are not command semantics, reachability, readback, restore, or RF proof |
+| C-099 | `STATIC` | One-time FCC is server-authorized and cached per device/model | FCC path is not RID evidence |
+| C-100 | `STATIC` | Parameter workflow retains original/current typed values and verification-aware outcomes | No RID-owned WA150 parameter is established |
+| C-101 | `UNKNOWN` | CFC is a plausible architecture for a stable target-owned RID control | WA150 plaintext, signing, hook, recovery, RID semantics, and RF closure are missing |
+
+Details: [17_DRONE_HACKS_STATIC_ANALYSIS.md](17_DRONE_HACKS_STATIC_ANALYSIS.md).
 
 ## ADB and Android access
 

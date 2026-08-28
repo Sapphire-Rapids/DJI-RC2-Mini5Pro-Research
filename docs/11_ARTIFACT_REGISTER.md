@@ -30,6 +30,9 @@
 | A-016 | NLD FCC Smart RC distribution；input-sample；`2.0.0.6` bundle | `6,932,568` | `e75011e8190098aff12219d687c17b93495993890bf4a96212856174087a5100` | `STATIC`；本轮仅离线分析、无设备动作；排除且不分发；只公开 metadata |
 | A-017 | NLD FCC Smart RC main APK；input-sample；`2.0.0.6` / code 46 | `7,278,464` | `1035f0aa22e158fd1703e14dd3bd2198845da4c2113454f9ac3a4569c41ee474` | `STATIC`；本轮仅离线分析、无设备动作；排除且不分发；只公开 metadata |
 | A-018 | NLD bundled Package Installer helper；input-sample；Android 11 / code 30 | `3,274,224` | `523361acbe62587fa61e00a92369e87daa0d812232b8942deba67771ccf2633a` | `STATIC`；本轮仅离线分析、无设备动作；排除且不分发；只公开 metadata |
+| A-019 | Drone-Hacks Windows MSI；input-sample；`2.0.29` | `16,289,792` | `a4c3867e34235a74b5df37ae81bc19f80a988e26e47b408947224e6c8247fd8d` | `STATIC`；与官网下载 MSI 相同且签名有效；从未安装或执行；排除且不分发 |
+| A-020 | Drone-Hacks desktop application；input-sample；`2.0.29.0` | `24,011,848` | `9813d6a9d7ba137066712ecfebd2c397bfbe5516d546c6d5f95d23014e06f996` | `STATIC`；只从 MSI 静态提取；从未执行；排除且不分发 |
+| A-021 | Drone-Hacks TypeScript binding generator；input-sample；`2.0.29.0` | `11,522,632` | `84eecdf2329635bf9856a9ea002c9696d4222cd56cafdc101c9f19bea809e652` | `STATIC`；只从 MSI 静态提取；从未执行；排除且不分发 |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -99,9 +102,19 @@ A-016 至 A-018 记录本次 NLD 静态分析的外层分发包、主 APK 和安
 
 详细结论见 [NLD FCC Smart RC 静态分析](16_NLDFCC_STATIC_ANALYSIS.md)。
 
-## 8. 输入样本与分发
+## 8. Drone-Hacks 输入样本
 
-A-004 至 A-008、A-013、A-015 至 A-018 是 input-sample 或 rejected third-party input。它们不属于本仓库实现，不能提交二进制或复制正文。允许保留的内容只有：
+A-019 至 A-021 记录官方 Windows 分发包及其两个 PE payload。用户输入 MSI 与官方 release ZIP
+内 MSI 的大小和 SHA-256 完全一致；三个 Windows 工件的 Authenticode 签名均验证为
+Skymod Technologies LTD。签名只建立来源/完整性边界，不证明功能或安全性。
+
+本轮没有安装 MSI、运行 PE、登录账号、请求受保护 job/license、提交设备标识或连接设备。
+客户端静态结论和公开支持快照见
+[Drone-Hacks 2.0.29 静态分析](17_DRONE_HACKS_STATIC_ANALYSIS.md)。
+
+## 9. 输入样本与分发
+
+A-004 至 A-008、A-013、A-015 至 A-021 是 input-sample 或 rejected third-party input。它们不属于本仓库实现，不能提交二进制或复制正文。允许保留的内容只有：
 
 - 公开版本和产品族；
 - 在规范 CSV 明确登记的 public hash；
@@ -111,7 +124,7 @@ A-004 至 A-008、A-013、A-015 至 A-018 是 input-sample 或 rejected third-pa
 
 厂商输入的补充身份只在 [固件与信任边界](07_FIRMWARE_TRUST_BOUNDARY.md) 中作为样本 provenance 描述，不增加本规范 artifact CSV 的行，也不代表本仓库提供样本。
 
-## 9. 更新与一致性检查
+## 10. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

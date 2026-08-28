@@ -40,6 +40,9 @@
   global RID。两个固定人工 USB GET 路由均未获得 canonical ACK；DJI Fly 私有 owner 路径未实测。
 - FlySafe type-6 `RID_UNLOCK` 是账号/FC 绑定的签名许可类别，具备 enable-state 语义；当前
   Mini 5 Pro 是否有资格、是否存在真实许可、FC 是否接受及 RF 是否变化均为 `UNKNOWN`。
+- DJI Fly `1.21.10` 的中国 OID `setReportEnable` 已闭合为 App/RC 网络上报 gate：关闭时跳过
+  云提交并 direct-success，但不写飞机 BLE/Wi-Fi 广播。当前 exact setter 复查仍只找到 France
+  EID wrapper，没有 product-139 ODID/OpenDroneID/global RF setter。
 - 起桨前的受限观察窗没有收到严格 `0x11/0x1C` RID working-status；已知现场观察表明该机型
   起桨后才开始实际 RID 播报。缺少同步 onboard status + 独立接收器 RF 记录。
 - 配置读取显示高度 500 m、距离 5000 m、距离限制关闭；这不能解释或否定未登录状态可能存在的
@@ -51,12 +54,18 @@
 - 当前 Android admission probe v0.10 通过离线工件审计，但尚未复制、安装或运行于 RC 2。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
-- NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 native 解码的在线响应或 native 离线缓存，
-  再经 DUSS 发送；APK 内七个与 FreeFCC 完全相同的 JSON 未发现运行时引用。C0 是独立的
+- NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 authenticated Base64 envelope、
+  AES-256-CBC、签名 entitlement 与原子离线缓存，再把解密 JSON 转为 DUML 发送；APK/ZIP
+  没有真实 payload，因此具体命令和 RF 效果仍未知。七个与 FreeFCC 完全相同的 JSON 未发现
+  运行时引用。C0 是独立的
   在线 VPN 配置、WireGuard、重启 DJI Fly，并在隧道 UP 后安排 25 秒自动停止的流程；实际
   路由范围由服务端配置，只有 allowed IPs 为空时才使用目标主机 IPv4 `/32` fallback。
 - 对 NLD `2.0.0.6` 的全 DEX、资源、profile 和两架构 native 可打印字符串搜索没有找到
   可识别的 Remote ID 开关。opaque payload 或外部 DJI Fly 的间接副作用仍为 `UNKNOWN`。
+- Drone-Hacks `2.0.29` 的官方 MSI 与本地输入逐字节一致且签名有效。客户端是 Rust/Tauri
+  通用 DUML/USB/ADB/固件/参数 job engine；直接 `dhfc_config` 只有 FCC、NFZ 和高度，未发现
+  RID 命令。其公开 CFC 是值得借鉴的“固件内 hook + 窄运行时控制”架构，但当前公开支持中
+  Mini 5 Pro 只有型号登记/独立 FCC 硬件兼容，没有软件产品、CFC 或 RID 控制证据。
 - 尚未证明一个稳定、可恢复、经状态读回和起桨后独立 RF 接收共同确认的 Mini 5 Pro RID 开关。
 
 ## 文档地图
@@ -80,6 +89,8 @@
 - [docs/15_LOG_INDEX.md](docs/15_LOG_INDEX.md)：未公开工作日志族及其支持的结论。
 - [docs/16_NLDFCC_STATIC_ANALYSIS.md](docs/16_NLDFCC_STATIC_ANALYSIS.md)：NLD FCC Smart RC
   `2.0.0.6` 的静态实现、FreeFCC 对照、RID 阴性边界和可借鉴设计。
+- [docs/17_DRONE_HACKS_STATIC_ANALYSIS.md](docs/17_DRONE_HACKS_STATIC_ANALYSIS.md)：Drone-Hacks
+  `2.0.29` 的官方来源、签名、客户端/job/CFC 架构、Mini 5 Pro 支持边界和 RID 阴性结果。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
 
