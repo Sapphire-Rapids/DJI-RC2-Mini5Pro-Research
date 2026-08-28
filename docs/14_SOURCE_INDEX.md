@@ -118,6 +118,51 @@ here does not imply that all of its claims were accepted.
   Used to distinguish an official controller remaining compatible with a modified aircraft from
   direct modification support for that controller.
 
+## WA150 public identity, security, and RF-test material
+
+- [Mini 5 Pro 0600-era original photo](https://commons.wikimedia.org/wiki/File:Dji_fly_20260805_075506_0062_1785909768062_photo.jpg).
+  Original-file SHA-256 `378089ae600522fb9fc0ab6d9db75d7807ab72ddf6cec8843dee22975f742c6e`;
+  used only for the `FC9313` / `10.00.12.83` product-software match. Coordinates and unrelated
+  metadata were neither copied nor retained in this repository.
+- [Mini 5 Pro 0700-era original photo](https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_de_Long_(Somme)_2.jpg).
+  Original-file SHA-256 `269d2fefcb8b104659e6244c058a83ef56569c00eac7f600c72173386be5f17f`;
+  used only for the `FC9313` / `10.00.15.17` product-software match, under the same privacy boundary.
+- [NVD CVE-2026-77812](https://nvd.nist.gov/vuln/detail/CVE-2026-77812) and
+  [GitHub Advisory CVE-2026-78306](https://github.com/advisories/ghsa-vq46-xr65-w8q7).
+  Used to identify the publicly described Mini 5 Pro `<=01.00.0600` BLE DUML and Wi-Fi/network
+  configuration surfaces and firmware-update remediation. They do not expose the 0700 file diff or
+  a RID control.
+- FCC ID `SS3-MT5MFND25` reports:
+  [BLE](https://fccid.io/SS3-MT5MFND25/Test-Report/Test-Report-BLE-8307076.pdf),
+  [RLAN](https://fccid.io/SS3-MT5MFND25/Test-Report/Test-Report-RLAN-8307219.pdf), and
+  [Wi-Fi](https://fccid.io/SS3-MT5MFND25/Test-Report/Test-Report-WiFi-1-8307077.pdf).
+  Used only for the laboratory USB-C/`DjiSdrConsole-v2.2.8` test setup and RF-chain description.
+  The reports do not publish the tool/protocol or mention Remote ID.
+
+## Legacy proprietary DroneID research
+
+- Schiller et al., [Drone Security and the Mysterious Case of DJI's DroneID](https://www.ndss-symposium.org/wp-content/uploads/2023/02/ndss2023_f217_paper.pdf),
+  NDSS 2023, DOI `10.14722/ndss.2023.24217`.
+  Used for the proprietary OcuSync DroneID packet model, tested legacy products/firmware, and the
+  observed `fake`-field behavior. The paper did not publish the control's tuple or payload.
+- [RUB-SysSec/DroneSecurity](https://github.com/RUB-SysSec/DroneSecurity/tree/9ff819843bee48fb140a0704ec78aff757896dea)
+  and [DroneSecurity-Fuzzer](https://github.com/RUB-SysSec/DroneSecurity-Fuzzer/tree/1410df748b9aecd0cb81ec15282bc570c595eb26).
+  Used as pinned author artifacts; the fuzzer source remains absent from its public repository.
+- Pinned DJI-derived
+  [DataFlycDetection](https://github.com/MAVProxyUser/SKYROVER_src/blob/8186e19241c913318b140bf37c5eafba005f1e7c/uav/midware/data/model/P3/DataFlycDetection.java)
+  and [CmdIdFlyc](https://github.com/MAVProxyUser/SKYROVER_src/blob/8186e19241c913318b140bf37c5eafba005f1e7c/uav/midware/data/config/P3/CmdIdFlyc.java).
+  Used to reconstruct the high-confidence `0x03/0xDA`, subcommand `0x05`/`0x06`, eight-field-mask
+  correspondence. This reconstruction is not an author-disclosed command or WA150 support proof.
+
+## Synthetic standards-based source references
+
+- [OpenDroneID Core C](https://github.com/opendroneid/opendroneid-core-c).
+  Used for the standards-oriented Basic ID, Location/Vector, Authentication, Self ID, System,
+  Operator ID, and Message Pack data-model boundary. The library is not a DJI control API.
+- [OpenDroneID Linux transmitter](https://github.com/opendroneid/transmitter-linux).
+  Used as public precedent for a separate controlled Bluetooth/Wi-Fi laboratory source. It does not
+  imply that macOS or the attached DJI aircraft can transmit those messages through the same API.
+
 ## Public research baseline
 
 - [FindUAS repository at `15f331c`](https://github.com/Sapphire-Rapids/FindUAS/tree/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc).

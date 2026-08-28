@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.3.1 - 2026-08-28
+
+### Added
+
+- Recovered Drone-Hacks' complete 28-entry ADSB numerical Debug dictionary, including
+  `RID_INFO=0x11/0x1A` and `EID_INFO=0x11/0x35`, as claims C-110 and C-111.
+- Cross-checked the dictionary against exact DJI Fly `1.21.10` and recorded the mixed agreement and
+  semantic collisions that prevent using it as a current Mini 5 Pro request schema.
+- Updated README, AGENTS, handoff, blocker, timeline, and negative-result guidance so future work
+  uses these IDs only for passive traffic classification or exact static xrefs until a current
+  handler and payload are recovered.
+- Closed the current product-139 RID state owner through `RidImportModule`, including the exact
+  seven-byte status mapping and the absence of a status GET/SET/action surface (C-115/C-116).
+- Closed `KeyCloudControlData` as value-routed SET-only `0x00/0xDD`; ACK/cache is the request rather
+  than applied RID state, and no active read-only RID query was recovered (C-117/C-118).
+- Added independent public identity evidence for both WA150 `0802` versions, the bounded
+  network-service ownership inference, and the still-negative public plaintext/key/recovery search
+  (C-112--C-114).
+- Added a focused legacy DroneID report: FlyC `0x03/0xDA` subcommands `0x05`/`0x06` are the
+  high-confidence match for the NDSS multi-field mask, whose reported RF effect retained packets
+  and changed selected values to `fake`; no WA150/modern Broadcast RID transfer is established
+  (C-119--C-122).
+- Expanded the target into a RID experiment-control matrix with explicit live-read, passive-owner,
+  static-locked, managed, opaque, legacy, and synthetic-source implementation levels.
+- Closed exact current identity/data surfaces for EASA OPID, Japan DIPS, China UOM identifier,
+  app-location upload, and compliance serial; excluded the LTE phone path from RID (C-123--C-128).
+- Recorded a separate synthetic OpenDroneID source as a controlled-lab hypothesis, not as a current
+  Mac or DJI-device capability (C-129).
+- Closed the current China UOM identifier receiver/timeout/retry and reply parser, corrected its
+  GET-tail bytes from assumed zeroes to undefined vendor initialization, and separated conditional
+  `UOMV1` real-name status/sync from broadcast control (C-130--C-132).
+
+### Safety and provenance
+
+- The Drone-Hacks executables were not run, no guessed DUML request was sent, and no device state
+  changed. Vendor binaries and disassembly output remain excluded.
+- No active RID query or cloud-control write was sent. Public image coordinates and unrelated
+  metadata were excluded; only product/software version and whole-file hashes were retained.
+- No legacy `Detection` command was sent and no executable sender was added to the repository.
+- No OPID, DIPS, UOM, location, telephone, compliance identity, cloud policy, or license data was
+  read or written. Secret credentials and real identity fixtures remain excluded.
+- No China UOM GET or Sync action was sent; the new result is exact static analysis only.
+
 ## 0.3.0 - 2026-08-28
 
 ### Added

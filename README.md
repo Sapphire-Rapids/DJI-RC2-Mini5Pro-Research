@@ -45,6 +45,9 @@
   EID wrapper，没有 product-139 ODID/OpenDroneID/global RF setter。
 - 起桨前的受限观察窗没有收到严格 `0x11/0x1C` RID working-status；已知现场观察表明该机型
   起桨后才开始实际 RID 播报。缺少同步 onboard status + 独立接收器 RF 记录。
+- DJI Fly `1.21.10` 的 product-139 主 abstraction 确实挂载 `RidImportModule`；它把
+  `0x11/0x1C` 注册成只监听的七字节 RID/EID 状态，没有 GET、SET 或 action。独立的
+  `0x00/0xDD` cloud-control key 只有 SET，ACK 只确认请求并缓存原值，不是 applied-state readback。
 - 配置读取显示高度 500 m、距离 5000 m、距离限制关闭；这不能解释或否定未登录状态可能存在的
   30/50 m effective runtime restriction。
 - FC area 和 Sky country 已完成 `CN -> US -> CN` 的一次有界读回/恢复闭环；Ground country 的
@@ -66,6 +69,21 @@
   通用 DUML/USB/ADB/固件/参数 job engine；直接 `dhfc_config` 只有 FCC、NFZ 和高度，未发现
   RID 命令。其公开 CFC 是值得借鉴的“固件内 hook + 窄运行时控制”架构，但当前公开支持中
   Mini 5 Pro 只有型号登记/独立 FCC 硬件兼容，没有软件产品、CFC 或 RID 控制证据。
+- Drone-Hacks 的 Debug 字典已数值恢复：其中 `RID_INFO=0x11/0x1A`、
+  `EID_INFO=0x11/0x35`。但它在 `0x11/0x0C`、`0x11/0x1C` 上与 DJI Fly `1.21.10` 当前含义
+  冲突，因此只能用于被动分类/固件检索，不能作为 Mini 5 Pro 发包或开关协议。
+- NDSS 2023 所述旧式 DroneID 多字段控制已高置信对应到 FlyC `0x03/0xDA` 的
+  `0x05`/`0x06` mask。论文的 RF 实测并未停发包，只把选中字段替换成 `fake`；它针对私有
+  OcuSync/AeroScope DroneID，不是 Mini 5 Pro 的 ASTM/FAA/EU Broadcast RID。
+- 可调目标已扩展为 RID 实验控制面。current exact 路径新增闭合 EASA OPID `0x03/0x78`、
+  Japan DIPS `0x11/0x4B`、China UOM tag `0x11/0xD6`、app location `0x11/0x43` 和只读
+  compliance serial；它们是不同身份/地区数据面，当前均未达到 Mini 5 Pro 可写 UI 的完整门禁。
+- China UOM tag 的 product-139 receiver、timeout/retry 与 reply value parser 已进一步闭合；其
+  独立 `0x11/0xD1` 实名状态 key 只有在 runtime function ID `0x6C` admission 后出现，Sync 属
+  账户/网络认证链且没有 setter。两者都不是 RID 广播开关，实机 admission/ACK/RF 仍未验证。
+- 两份独立公开 Mini 5 Pro 照片元数据的软件版本与 WA150 `0802` 的 0600/0700 版本精确匹配；
+  结合公开 BLE/网络公告，`0802` 是主应用及网络服务的强候选。公开检索仍没有 plaintext、
+  target key、recovery image、RID handler 或 0700 可复现 PoC，故固件修改门禁未改变。
 - 尚未证明一个稳定、可恢复、经状态读回和起桨后独立 RF 接收共同确认的 Mini 5 Pro RID 开关。
 
 ## 文档地图
@@ -91,6 +109,10 @@
   `2.0.0.6` 的静态实现、FreeFCC 对照、RID 阴性边界和可借鉴设计。
 - [docs/17_DRONE_HACKS_STATIC_ANALYSIS.md](docs/17_DRONE_HACKS_STATIC_ANALYSIS.md)：Drone-Hacks
   `2.0.29` 的官方来源、签名、客户端/job/CFC 架构、Mini 5 Pro 支持边界和 RID 阴性结果。
+- [docs/18_LEGACY_DRONEID_DETECTION.md](docs/18_LEGACY_DRONEID_DETECTION.md)：旧式 FlyC
+  `Detection` 多字段 mask、NDSS RF 结果，以及不能迁移到现代 Broadcast RID 的边界。
+- [docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md](docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md)：RID
+  状态、身份、地区、策略、managed/opaque/legacy 面的可读/可写/恢复/RF 与 UI 准入矩阵。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
 

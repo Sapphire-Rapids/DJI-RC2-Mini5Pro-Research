@@ -221,3 +221,30 @@ Every hypothesis below is testable and remains separate from factual findings.
   loader/signature acceptance, a recovery route independent of the modified path, and synchronized
   motor-on onboard/RF A-B-A.
 - Current state: `UNKNOWN`; architectural precedent is not target applicability or flash admission.
+
+## H-24 — separate synthetic OpenDroneID source（C-129）
+
+- Known facts: a DJI aircraft does not expose every standards message as a free-form setting;
+  OpenDroneID supplies public encoders and external Linux/embedded transmitter precedents; the
+  existing Mac administrator lab already has a no-RF lease/checklist/lockout state machine.
+- Hypothesis: a separately reviewed external source adapter can provide synthetic Basic ID,
+  Location, System, Self ID, Operator ID, status, and bearer combinations for detector compatibility
+  testing without modifying WA150 firmware or real identity/account data.
+- Distinguishing evidence: exact hardware/firmware identity, source configuration readback,
+  time-bounded transmit/stop proof, independent receiver decode, restart-no-resume behavior, and a
+  privacy-redacted test matrix in a controlled RF environment.
+- Current state: architecture candidate only. The current Mac build has no RF backend and must not
+  present dry-run state as transmitted or received evidence.
+
+## H-25 — live Mini 5 Pro admits conditional `UOMV1`
+
+- Known facts: exact current native code adds `UOMV1` only after runtime function discovery reports
+  function ID `0x6C` with the required flag; the module then exposes a real-name status GET and Sync
+  action, but no setter (C-131/C-132).
+- Hypothesis: the current Mini 5 Pro session may report this capability and make the official
+  privacy-reduced status key available.
+- Distinguishing evidence: same-owner read-only function inventory or official key-existence result,
+  followed only if admitted by a masked enum GET that distinguishes key absence from
+  `UNSUPPORTED`.
+- Current state: `UNKNOWN`; static product-139 identity does not establish live admission, and no
+  raw `0x11/0xD1` probe is authorized by this hypothesis.

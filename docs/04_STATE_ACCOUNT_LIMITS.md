@@ -21,8 +21,9 @@
 `C-020` / bounded negative `C-021`，motor-start external receiver observation `C-022`，缺少同步
 onboard/RF 记录 `C-023`，configured limits `C-024`，effective unauthenticated limit `C-025`，
 unavailable 解释规则 `C-013`，onboard status 与 RF 分离 `C-049`。飞机自报路径、七字节布局、公开
-状态模型和历史语料分别为 `C-056`--`C-059`；账号本地、服务端、FC 同步、实机 Boolean、诊断与
-三层解释分别为 `C-060`--`C-065`。
+状态模型和历史语料分别为 `C-056`--`C-059`；current product-139 owner/payload 为
+`C-115` / `C-116`；账号本地、服务端、FC 同步、实机 Boolean、诊断与三层解释分别为
+`C-060`--`C-065`。
 
 ## Remote ID 工作状态
 
@@ -32,8 +33,9 @@ unavailable 解释规则 `C-013`，onboard status 与 RF 分离 `C-049`。飞机
 - **对象/版本：** DJI Fly 已恢复业务层与 DJI Fly 1.21.10 / MSDK 5.18.0 相关模型。
 - **前提与路线：** 飞机 RID/EID 子系统状态进入 `RidWorkingStatusPushMsg`，再由
   `KeyRidWorkingStatusPush`、Remote ID model 和 DJI Fly 状态界面消费。
-- **事实：** 该路径读取飞机提供的 RID/EID 支持、正常状态、地区值和失败原因；路径本身不扫描
-  Wi-Fi 或 BLE 空口。
+- **事实：** product-139 主 abstraction 挂载的 `RidImportModule` 注册该 key 为
+  listen/update-only `0x11/0x1C` observer，没有 getter、setter 或 action。该路径读取飞机提供的
+  RID/EID 支持、正常状态、地区值和失败原因；路径本身不扫描 Wi-Fi 或 BLE 空口。
 - **边界/不证明：** DJI Fly 显示正常只构成 onboard/self-test 层证据，不证明外部接收器能收到
   Remote ID，也不证明消息内容、节奏、信道或 RF 功率符合任何地区要求。
 - **公开依据：** 先前公开研究
@@ -184,6 +186,19 @@ unavailable 解释规则 `C-013`，onboard status 与 RF 分离 `C-049`。飞机
 - **公开依据：** 前述公开 state research。
 - **隐私/分发：** 最终公共记录只允许 yes/no/unknown，不允许保存实际身份值。
 
+### ACCOUNT-007：中国 UOM 实名状态是条件加载的网络认证链
+
+- **证据状态：STATIC**（C-131、C-132）
+- **对象/版本：** DJI Fly 1.21.10 current native `UOMV1` / `UOMRealNameStatusHelper` boundary。
+- **事实：** common FC 只在 runtime function discovery 接纳 function ID `0x6C` 后加载 `UOMV1`；
+  其只读 status getter 通过 `0x11/0xD1` 获取实名状态，而 Sync action衔接设备参数、
+  DeviceCenter 网络查询与设备检查结果。没有 setter。
+- **边界/不证明：** key 未加载与 status=`UNSUPPORTED` 是两种不同状态；UOM Sync 成功不证明
+  普通 DJI 账号三层登录均正确，也不证明飞机正在广播标准 RID。外部 helper 的完整 mapping、
+  route 与 exact Mini 5 Pro runtime admission 仍未知。
+- **隐私/分发：** 只允许状态 enum 或 unavailable；不记录实名标识、opaque device parameters、
+  账号、网络响应或 raw payload。
+
 ## 配置限值与有效运行时限制
 
 ### LIMIT-001：普通配置值在两个读取路线一致
@@ -234,6 +249,7 @@ unavailable 解释规则 `C-013`，onboard status 与 RF 分离 `C-049`。飞机
 | 是否完成独立 RF 验证 | `UNKNOWN` | 当前保留记录没有同步 onboard + RF 证据 | 广播 off/on、法规符合性 |
 | 本地账号是否可见为登录 | `UNKNOWN` | 已知本地 Boolean 的实现边界 | 服务端有效或 FC 已同步 |
 | FC 是否报告已有 UUID | `OBSERVED` | 两路均报告 false | RC 2 本地已退出、服务器 token 无效 |
+| China UOM real-name status | `UNKNOWN` | 条件 `UOMV1` getter/schema 已静态闭合 | live `0x6C` admission、当前实名状态或 RID RF 输出 |
 | 普通高度/距离配置 | `OBSERVED` | 500 m / 5000 m / distance disabled | effective 30/50 cap 不存在 |
 | effective real-name limit | `UNKNOWN` | 已恢复候选 read-only status 面 | 当前是否正在生效 |
 

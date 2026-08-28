@@ -289,3 +289,43 @@ The gate was then separated from the opaque RID cloud-control V2 namespace, Fran
 MSDK status-object setters, and firmware-only unknowns. Adjacent Java code was used only to
 corroborate the China cloud namespace and default policy; it was not described as exact 1.21.10
 Java. No code was executed and no network/device state changed.
+
+## 18. Legacy DroneID command correspondence
+
+The NDSS 2023 paper, pinned author repositories, DJI-derived midware, current app enum bytes, and
+community command ancestry were compared without sending a packet. The paper's undisclosed
+multi-field control was treated as an inference target rather than assumed equal to the nearest
+command name.
+
+The analysis independently reconstructed FlyC `Detection` `0x03/0xDA` subcommands `0x05`/`0x06`
+and its eight-field mask, then retained two decisive boundaries: the paper did not publish this
+tuple or identify the exact switch-test model/firmware, and its RF experiment kept packets while
+substituting selected values with `fake`. Proprietary OcuSync/AeroScope DroneID was kept separate
+from ASTM/FAA/EU Broadcast RID. Details are in
+[18_LEGACY_DRONEID_DETECTION.md](18_LEGACY_DRONEID_DETECTION.md).
+
+## 19. RID configuration-surface inventory
+
+The target was expanded beyond one master switch. Exact product-139 registration, access types,
+wire templates, parser behavior, caller context, credential sensitivity, readback, restore,
+persistence, and RF evidence were inventoried independently for working status, OPID, Japan DIPS,
+China UOM, app location, compliance serial, France EID, C0, type-6, and cloud-control surfaces.
+
+Each row was assigned an implementation level rather than converted directly into a UI control.
+LTE telephone upload, China app/cloud reporting, legacy masks, and set-only blobs were explicitly
+excluded from modern Broadcast RID editing. A separate synthetic OpenDroneID source was recorded as
+an architecture hypothesis for fields a DJI aircraft cannot expose safely. The normalized result is
+[19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md).
+
+## 20. China UOM exact route, parser, and admission pass
+
+The exact `OIDIdentifier` registration block, typed constructor, GET/SET wrappers, reply lambdas,
+`UOMV1` registration, direct status getter, runtime function-discovery callback, and recovered Sync
+response handlers were followed in the same DJI Fly `1.21.10` native input. Address/name evidence
+was used locally; no vendor disassembly was copied into the repository.
+
+This pass corrected an earlier assumption that all 18 GET-request bytes were zero-initialized: only
+the `[01,02]` prefix is visibly written. It separately closed the result/value reply offsets and the
+conditional function ID `0x6C` admission of `UOMV1`. External helper bodies were kept `UNKNOWN`
+instead of inferred from the instantiated generic template. No GET, Sync action, network request, or
+device operation was executed.

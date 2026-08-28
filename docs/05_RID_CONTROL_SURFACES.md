@@ -7,21 +7,27 @@
 机器索引中的核心对应关系为：generic switch negative `C-009`；France EID static route/semantics
 `C-010` / `C-011`；人工 GET negative `C-012`；unavailable rule `C-013`；EASA OPID `C-014`；
 Japan DIPS `C-015`；type-6 architecture/eligibility/inventory `C-016`--`C-018`；working-status
-`C-019`--`C-023`；localhost observer `C-034` / `C-035`；v0.10 `C-036` / `C-037`；V2.2/V2.3
+`C-019`--`C-023`、current owner/route `C-115`--`C-118`；localhost observer
+`C-034` / `C-035`；v0.10 `C-036` / `C-037`；V2.2/V2.3
 `C-038` / `C-039` / `C-055`；route epoch 与 quiescence `C-040`--`C-043`；typed EID retry
 `C-044`--`C-046`；state model 与历史 corpus `C-056`--`C-059`；EU C0、cloud policy、legacy
 inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C-078`；stable control
-未闭合 `C-053`；中国 OID network-report gate 与 current exact setter re-audit `C-106`--`C-109`。
+未闭合 `C-053`；中国 OID network-report gate 与 current exact setter re-audit `C-106`--`C-109`；
+legacy DroneID Detection `C-119`--`C-122`；地区身份/位置 `C-123`--`C-128`；China UOM
+reply/status/admission `C-130`--`C-132`。
 
 ## 总结矩阵
 
 | Claim | 表面 | 证据状态 | 当前公共结论 |
 | --- | --- | --- | --- |
 | RID-001 | ordinary Broadcast Remote ID | `NEGATIVE` | 未发现当前跨地区 Boolean 总开关 |
-| RID-002 | onboard working status | `STATIC` | `0x11/0x1C` 是 status/push，不是 setter |
+| RID-002 | onboard working status | `STATIC` | product-139 RID module 监听 `0x11/0x1C`；无 GET/SET/action |
 | RID-003 | France EID | `STATIC` | `0x03/0x77` 是法国专用 GET/SET schema |
 | RID-004 | France EID live artificial routes | `NEGATIVE` | 两个固定 GET 路由均为 unavailable |
 | RID-005 | EASA OPID | `STATIC` | `0x03/0x78` 是身份数据 GET/SET/DELETE |
+| RID-005A | Japan DIPS | `STATIC` | `0x11/0x4B` 是三段受管理登记凭据，不是 Boolean |
+| RID-005B | China UOM identifier | `STATIC` | `0x11/0xD6` tag route/reply 已闭合；live baseline/RF 未闭合 |
+| RID-005B2 | China UOM real-name status | `STATIC/UNKNOWN` | 条件 `0x11/0xD1` getter + account/network Sync；无 setter，live admission 未知 |
 | RID-006 | MSDK area strategy | `STATIC` | development delegate selector，不是实际地区/RF 证明 |
 | RID-007 | FlySafe type-6 | `STATIC` | 签名、账号/FC 绑定的 managed license state |
 | RID-008 | Mini 5 Pro type-6 entitlement | `UNKNOWN` | 资格、真实许可、FC 接受和 RF 效果均未闭合 |
@@ -32,6 +38,7 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 | RID-012 | localhost observer | `NEGATIVE` | 历史路线已撤回，不得再连接第二 broker client |
 | RID-013 | same-owner raw EID GET | `HYPOTHESIS` | 静态候选，当前不具备 live 准入条件 |
 | RID-014 | route-only V2.2/V2.3 | `NEGATIVE` | V2.2 撤销；V2.3 修复但仍 zero-send、未准入 |
+| RID-017 | legacy OcuSync DroneID mask | `STATIC/NEGATIVE` | `0x03/0xDA` 只提供旧协议字段 mask；不停止包且无 WA150 证据 |
 
 ## 普通 Broadcast Remote ID
 
@@ -54,11 +61,25 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 ### RID-002：`RidWorkingStatusPush` 是状态源
 
 - **证据状态：STATIC**
-- **对象/版本：** DJI Fly 1.21.10 native handler 与 MSDK working-state model。
-- **前提与路线：** `KeyRidWorkingStatusPush` 映射到 `0x11/0x1C`。
-- **事实：** 该命令由飞机 push/status handler 消费；当前恢复到七字节 flags/area/failure 布局。
+- **对象/版本：** 精确 DJI Fly 1.21.10 `libsdk_jni.so` product-139 native route 与 MSDK
+  working-state model。
+- **owner 闭环：** product-139 主 abstraction 的 `PrepareModules` 构造并挂载
+  `RidImportModule`；其 `Setup` 注册 `adsb_push_rid_working_status_pack`，绑定
+  `OnRIDWorkingStatusPush`，并建立 `KeyRidWorkingStatusPush`。该 Characteristic 为
+  listen/update-only：没有 getter、setter 或 action。
+- **wire/route：** observer 注册值为 `0x4011001C`，其中命令组/命令为 `0x11/0x1C`，其余高位是
+  observer flag。注册使用 runtime data-link/device identity；product-139 不启用额外 sender-sequence
+  比较。因此静态证据没有给出一个可安全 hand-build 的固定 sender/receiver tuple。
+- **payload：** handler 把七字节映射为 bit 0 `isRidSupport`、bit 1 `isEidSupport`、bit 8
+  `isRidNormal`、bit 9 `isEidNormal`、`int32le(payload+2)` area code 和 `payload[6]` failure
+  value。最后一项同时写入旧拼写 `failResion` 与修正后的 `failReason`。该 handler 只检查
+  response/payload 非空，未见长度门禁；自写 parser 必须自行严格要求七字节最小长度。
+- **地区支持派生：** product-139 注册 US=`bit0`、Cloud=`bit10`；EU/France/Japan 为向后兼容的
+  default-true 解释：只有 bit10=1 且相应 bit11/13/12=0 时才为 false。五个 Java key 都是
+  GET+LISTEN、无 SET，只由同一 push 更新。China 不在这组 support bit 中，属于独立
+  OID/UOM/UTMISS 平面。bits 8/9 仅经完整状态模型暴露，其余未命名 bit 没有找到业务 consumer。
 - **边界/不证明：** 它不是 setter；`isRidNormal` 或 `WORKING` 不证明独立 RF reception。live motors-off
-  未见 push 也不证明 unsupported。
+  未见 push 也不证明 unsupported。由于没有 GET builder，它也不是可主动轮询的 read-only query。
 - **公开依据：** [状态、账号与限飞层](04_STATE_ACCOUNT_LIMITS.md#remote-id-工作状态)。
 - **隐私/分发：** 不保存 raw status payload。
 
@@ -99,16 +120,85 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 
 ### RID-005：`0x03/0x78` 是身份数据面，不是广播 Boolean
 
-- **证据状态：STATIC**
+- **证据状态：STATIC**（C-014、C-124）
 - **对象/版本：** DJI Fly 1.21.10 product-139 `OperatorRegistrationNumber` registration。
 - **前提与路线：** FLYC `0x03/0x78` 的 String GET/SET action。
-- **事实：** action 区分 GET `[02]`、DELETE `[01]` 和经格式校验后的 SET。应用在 SET 前校验完整
-  operator registration 格式；GET 返回 result、length 和 data，SET/DELETE 返回 result。
+- **事实：** product-139 注册完整 GET/SET/listen String characteristic。action 区分 GET `[02]`、
+  DELETE `[01]` 和 SET `[00][0x10][16-byte data]`。SDK 在发送前要求 20 字符，校验前三位地区码
+  与 mod-36 校验位，但 wire 只携带前 16 字节。GET ACK 为 `[result,len,data...]`，SET/DELETE
+  ACK 为 `[result]`。
 - **边界/不证明：** 这是 EASA OPID identity plane，不是发射 enable、France EID 或 global RID。
-  static destination 仍可能被 runtime Characteristics 覆盖；没有进行 live OPID 事务。
+  receiver 使用 dynamic HostID，当前 tuple 仍为 `UNKNOWN`，不得硬编码。没有进行 live OPID
+  事务，重启持久性和 RF 字段均未验证。
 - **公开依据：** 前述 compatibility research。
 - **隐私/分发：** 不发布示例真实 OPID、私有后缀、完整 payload 或校验输入。任何 fixture 必须使用
   明显合成值。
+
+### RID-005A：Japan DIPS 是三段凭据，不是普通配置 Boolean
+
+- **证据状态：STATIC**（C-125）
+- **对象/版本：** exact DJI Fly 1.21.10 product-139 `RIDRegistedInfo` action / result listen。
+- **事实：** command 为 `0x11/0x4B`。注册代码为 30 hex -> 15 bytes（20-byte slot），shared key
+  为 32 hex -> 16 bytes，nonce 为 12 hex -> 6 bytes；SET 与 QUERY 均分三阶段，DELETE 实际是
+  对三段执行全零 SET。QUERY ACK 为 `[status,len,data...]`。
+- **边界：** 这是日本登记凭据导入/持久存储面。它非原子、含敏感 secret，且未闭合 Mini 5 Pro
+  接受、重启持久性或 RF 效果。账号/H5 只辅助取得凭据，未找到以本地 login Boolean 作为 wire
+  setter gate 的证据。
+- **处置：** 公共 UI 只允许 masked present/absent/unknown；不得记录 key/nonce、开放编辑/删除或
+  逐段尝试。
+
+### RID-005B：中国 UOM/OIDIdentifier 是八位实名标签面
+
+- **证据状态：STATIC**（C-123、C-130）
+- **对象/版本：** exact DJI Fly 1.21.10 product-139 `OIDIdentifierGet/Set` String characteristic。
+- **事实：** command 为 `0x11/0xD6` `china_uom_realname_tag`；`0x11/0xD5` 是 OID publish push，
+  不是 setter。product-139 registration 没有 HostID ExtraParam，receiver 固定为 type/index 18/4
+  (`0x92`)，timeout 500 ms、retry 3；只有缓存 ProductType 为 `0x70` 的其他产品分支才改为
+  index 0。SET 为 18 bytes：`[01][03 if empty else 01][16-byte field]`，其中最多复制输入前
+  8 bytes，field 其余位置补零。GET 同样分配 18 bytes，但 current builder 只明确写入前缀
+  `[01,02]`，后 16 bytes 没有可见初始化；旧 UI 拓扑把输入约束为八位数字。
+- **ACK/parser：** SET 与 GET 都从 response byte 1 取得 result；成功 GET 从 bytes 2--9 构造
+  恰好八字节的值。byte 0 语义仍未知，vendor lambdas 没有长度门禁；独立 parser 至少要求
+  SET ACK 2 bytes、GET ACK 10 bytes。不得把未知 GET tail 写成“官方固定零填充”。
+- **边界：** baseline、live ACK、restore、persistence 和 RF 映射仍未闭合。它是中国 UOM 实名
+  标签，不是 EASA OPID、普通 ASTM Basic ID 或 global RID switch。
+- **处置：** exact static schema 足以设计严格、掩码的未来只读诊断，但当前应用仍没有 admitted
+  live owner；不得实现编辑器。未来任何 GET builder 都必须确定性清零未定义 tail，而不是复制
+  vendor 的未初始化行为。
+
+### RID-005B2：中国 UOM 实名状态是条件加载的认证链，不是开关
+
+- **证据状态：STATIC**（C-131、C-132）
+- **direct getter：** `UOMRealNameStatusGet` 使用 `0x11/0xD1`、receiver type/index 2/0、request
+  `[01,00]`、timeout 500 ms、retry 3，不读取 HostID override。成功解释至少要求 4 bytes：先由
+  外部 helper 映射 byte 0，随后要求 bytes 1/2 为 `1/1`，再把 byte 3 映射为未认证、有效认证、
+  已取消、认证后取消、不支持或未知。当前 library 不包含两个外部 mapping body。
+- **runtime admission：** `UOMV1` 只在 common FC runtime function discovery 接纳 function ID
+  `0x6C` 且相应 flag 为 1 后创建；这时才注册 `UOMRealNameStatus` getter 和
+  `SyncUOMRealNameStatus` action。静态 product-139 身份不能证明 live Mini 5 Pro inventory 已接纳。
+- **sync boundary：** action 进入外部 helper，并在已恢复部分中衔接 device parameters、
+  DeviceCenter network query 和 device check result。它涉及账户/网络/实名状态，没有 setter、
+  baseline 或 restore 语义；key 未加载必须与返回 `UNSUPPORTED` 分开显示。
+- **处置：** 只允许在官方 runtime key 已存在时显示脱敏枚举状态；不得把 Sync action包装成
+  RID 广播开关或可逆配置。
+
+### RID-005C：位置、UAS ID 与电话必须分面解释
+
+- **证据状态：STATIC / NEGATIVE**（C-126--C-128）
+- **操作手位置：** exact `AppLocationUploadLogic` 约每 500 ms 取 client location，拒绝越界和
+  `(0,0)`，按 lat/lon × 1e6、alt × 100 和 timestamp 编码，经 `0x11/0x43`
+  `app_update_pos_enc` 送往设备。它证明 app-location -> device 数据面，但尚不能证明字段最终进入
+  WA150 Broadcast RID RF。
+- **飞机/UAS ID：** current `ComplianceSerialNumber` 是 get/listen-only characteristic，未找到 SET；
+  当普通 SerialNumber 恰为 14 字符时，exact 逻辑派生 `1581F + 14-char SN + 0` 的 20 字符
+  compliance form，否则沿用原值。该格式高度符合 compliance Basic-ID candidate，但是否等同 WA150
+  RF Basic ID 未闭合。`JNI_SetUASId -> SetUtmissUASId` 属中国 UTMISS/app reporting，不是
+  product-139 飞机广播 key。
+- **电话：** `LteUserPhoneNumberSet` 是 LTE HYBRID 业务的 set-only `0x03/0xDA` 子命令，无 GET/
+  readback；caller 定期上报经绑定/加密的手机号。它与 RID 无关，不能解释或实现为 operator-phone
+  RID 配置。普通标准 Broadcast RID 也没有登记电话 message element。
+- **隐私/处置：** 只显示权限/fix age/accuracy 或 masked identity；不显示原始坐标、电话、完整序列号，
+  不提供坐标/电话写入。
 
 ## MSDK area strategy 与 DJI Fly 内部地区注入
 
@@ -236,8 +326,10 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 - **前提与路线：** area/product selector 选择 opaque hex data 或 `DEFAULT`，再封装为 generic
   `CloudControlData` 并通过 command `0xDD` 的 set-only handler 发送。
 - **事实：** product 139 以 numeric product value 参与选择；`block_device` 命中会选择 DEFAULT，而不是
-  表示 RID off。该 key 没有 GET/listen readback，payload schema、signature rule、WA150 sample 和
-  RID status correlation 都未闭合。
+  表示 RID off。native writer 是 `set_cloud_control_data_pack`，命令为 `0x00/0xDD`。只有 transport
+  result 为零且 response 首字节 ACK 为零时才报告成功，并以原请求值更新本地 cache；ACK 不回显
+  飞机实际配置。该 key 没有 GET/listen readback，payload schema、signature rule、WA150 sample 和
+  `0x11/0x1C` 状态 correlation 都未闭合。
 - **边界/不证明：** generic `0xDD` 和 receiver tuple 不能识别成 RID switch。不得猜测、重放、持久化
   或公开 opaque blob。
 - **公开依据：** 前述公开 state/firmware research。
@@ -278,6 +370,22 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
   `ResetCloudControlSetting` 的已知业务 caller 属于云端速度限制恢复，不是 RID reset。
 - **边界：** 该阴性只覆盖当前可读 app/native surfaces。WA150 现有输入仍是加密 `.fw.sig`，
   因此不能据此断言固件内不存在隐藏 owner 或 setter。
+
+### RID-011C：当前 app 层不存在可准入的主动 RID 状态查询
+
+- **证据状态：STATIC / NEGATIVE**（C-115--C-118）
+- **闭合事实：** product-139 `RidImportModule` 是当前 `0x11/0x1C` 状态 owner，但只注册 push
+  observer；`dji_fly_rid_cloud_control_v2` 走另一个 `0x00/0xDD` set-only writer。
+- **writer 路由：** `KeyCloudControlData` 为 SET-only、无 GET element，也没有 characteristic-level
+  host override。writer 从 `CloudControlData` value 本身取 receiver type/index 与 hex payload；
+  current native 没有固定 tuple。相邻业务 caller 使用的 `(18,4)` 是调用值，不是 key metadata。
+- **阴性结果：** 没有找到 `KeyRidWorkingStatusPush` GET builder、CloudControlData GET/readback、
+  Reset/Disable/Debug、SET ACK 与 working-status 的 correlation，或一个静态固定且可安全复用的
+  receiver tuple。所谓 `ResetCloudControlSetting` 实际重置三种飞行模式的云控最大速度；
+  `GNSSCloudControlDataAction` 与 `IsEuCeEnableC0Rid` 也是不同表面。
+- **结论：** 当前唯一可准入的读取方式是被动观察官方 owner 已订阅后自然出现的
+  `0x11/0x1C` push；它不是 query，不能为了“读一下”主动发送猜测包。`0x00/0xDD` 的 success
+  也不是 RID applied/readback，更不能替代起桨后独立 BLE/Wi-Fi RF 验证。
 
 ## 观察路线、撤回与未准入设计
 
@@ -360,12 +468,28 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 - **对象/版本：** Drone-Hacks `2.0.29` 客户端、2026-08-28 公开兼容性快照与 CFC 文档。
 - **事实：** 客户端直接 `dhfc_config` 只有 FCC、NFZ、高度；公开 CFC 命令覆盖 FCC、LED、
   ATTI、NFZ、高度，支持清单不含 Mini 5 Pro，且未文档化 RID。通用 DUSS 名称表虽出现
-  ADSB RID/EID 标签，但没有数值、schema、caller、product gate、readback 或 live job。
+  ADSB RID/EID 标签，且 28 个 display-only 数值映射已经恢复（C-110/C-111）；该表存在
+  current-version 语义碰撞，仍没有适用于 WA150 的 schema、caller、product gate、readback
+  或 live job，因此不能用于发包。
 - **边界/不证明：** server job engine 的能力、`wa150` 型号登记和独立 FCC ModBox 兼容均不
   等于 Mini 5 Pro 软件/CFC/RID 支持。
 - **可借鉴：** 若未来闭合 WA150 authoritative owner，可采用“固件内窄 hook + 显式状态/readback
   + stock restore + 独立 RF A-B-A”的架构；当前没有 flash 准入。
 - **公开依据：** [Drone-Hacks 静态分析](17_DRONE_HACKS_STATIC_ANALYSIS.md)。
+
+### RID-017：旧式 FlyC `Detection` mask 不迁移到现代 Broadcast RID
+
+- **证据状态：STATIC / INFERENCE / NEGATIVE**（C-119--C-122）
+- **静态 schema：** DJI-derived midware 把 FlyC `Detection` 映射为 `0x03/0xDA`；
+  `SetSwitch` 请求为 `05 <mask:u32le>`，`GetSwitch` 请求为 `06`，mask 命名八个旧式
+  DroneID 字段。它与 NDSS 论文未公开数值的多字段控制具有高可信语义对应，但不是作者披露值。
+- **RF 事实：** 论文报告该控制不会停发 proprietary OcuSync DroneID 包；被选字段会变成字面值
+  `fake`。论文没有固定披露该开关实验的机型/固件或实际 host source route。
+- **当前边界：** 没有公开 primary evidence 表明 WA150 注册 `0x03/0xDA` `0x05/0x06`，或把该
+  mask 接到 ASTM/FAA/EU Broadcast RID。当前 DJI Fly 保留旧 generic class 只证明库库存。
+- **处置：** 仅作 legacy firmware search signature；不得作为 Mini 5 Pro sender、可调配置或
+  transmitter-off control。完整链见
+  [Legacy DJI DroneID `Detection` command](18_LEGACY_DRONEID_DETECTION.md)。
 
 ## 当前判定规则
 

@@ -144,6 +144,10 @@ Missing a single redacted timeline containing:
 
 Effect: onboard status and RF reception remain separate evidence sets.
 
+Current static narrowing: product-139's official owner listens to natural `0x11/0x1C` push and has
+no GET builder. The onboard half must therefore observe the already-subscribed push passively; an
+invented polling request is not an allowed substitute.
+
 ## B-14 — exact Ground country route
 
 Missing: passive evidence or exact current handler registration resolving Ground receiver/context,
@@ -171,6 +175,10 @@ Missing:
 - loader acceptance and recovery path proven without device risk.
 
 Effect: ciphertext patching cannot produce a flashable Remote ID modification.
+Public Mini 5 Pro photo metadata now independently ties both `0802` versions to the product, and
+public BLE/network advisories make `0802` the likely 0700 network-service repair owner. A fixed
+public search still found no plaintext, target key, trust-root replacement, recovery image, RID
+handler, exact 0700 diff, or reproducible PoC; the admission gate is unchanged.
 
 ## B-17 — NLD runtime causality
 
@@ -201,6 +209,30 @@ Missing:
 
 Effect: the generic local executor, server-owned job model, FCC quick action, FCC ModBox support,
 parameter editor, and older-product CFC cannot be promoted to a Mini 5 Pro RID implementation.
+The recovered ADSB numerical display table does not change this blocker because current DJI Fly
+already demonstrates command-name collisions and the table contains no payload/caller/readback.
+
+## B-19 — region-specific RID identity/config editors
+
+Static schemas now exist for France EID, EASA OPID, Japan DIPS, China UOM identifier, app-location
+upload, and several managed/opaque policy inputs. China UOM identifier now additionally has a fixed
+product-139 route and reply layout, while its separate real-name status owner is conditionally
+admitted by runtime function ID `0x6C`. Missing per surface:
+
+- exact live product/owner/HostID and a safe caller that does not replace DJI Fly's broker fd;
+- privacy-reduced baseline getter and canonical ACK/result parser where not statically closed; for
+  China UOM identifier, response byte 0/result enumeration and the first live ACK remain open;
+- write-then-GET independent readback rather than request cache or setter ACK;
+- bounded restore for empty, nonempty, partial, timeout, disconnect, and third-party-change states;
+- reboot/reconnect persistence and automatic cloud/area writer precedence;
+- synchronized onboard state and independent motor-on RF message-field evidence;
+- for China UOM status, exact live `0x6C` admission plus the external Sync helper/result mappings;
+  Sync has account/network semantics and no reversible setter.
+
+Effect: these rows may appear only as read-only or disabled truth-labelled cards. DIPS secrets,
+OPID, UOM identifiers, full serials, coordinates, telephone data, signed licenses, and cloud blobs
+must not enter public logs or editable fixtures. No current static schema is admitted as a Mini 5
+Pro free-form RID editor.
 
 ## Dependency order
 

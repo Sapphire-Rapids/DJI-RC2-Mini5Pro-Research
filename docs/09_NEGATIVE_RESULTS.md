@@ -314,3 +314,75 @@ stronger conclusion that cannot be drawn.
   setter handler. MSDK's America broadcast-enable method mutates a status object, not the device.
 - Does not establish: absence inside WA150 encrypted firmware, server-selected opaque policy, signed
   type-6 state, or future versions.
+
+## N-35 — Drone-Hacks ADSB display table as a current WA150 schema
+
+- Status: `NEGATIVE` for current-schema attribution; the numerical recovery itself is `STATIC`.
+- Positive fact: the exact Drone-Hacks `2.0.29` Debug path maps `RID_INFO` to `0x11/0x1A`,
+  `EID_INFO` to `0x11/0x35`, and 26 other ADSB labels to exact command IDs.
+- Conflict: it calls `0x11/0x0C` `PASS_THROUGH_REPORT` and `0x11/0x1C` `DEVICE_LIST_GET`, while
+  exact DJI Fly `1.21.10` maps those tuples to ADSB on/off handling and RID working-status push.
+- Result: the table is suitable for passive classification and static xref searches, not for
+  constructing a Mini 5 Pro request or inferring a RID setter.
+- Does not establish: that `0x11/0x1A` or `0x11/0x35` is unsupported by WA150 firmware; exact
+  current handler ownership, direction, payload, route, and product gate remain unknown.
+
+## N-36 — public WA150 plaintext, target key, and recovery route
+
+- Status: `NEGATIVE` within the fixed public scope searched on 2026-08-28.
+- Positive facts: public Mini 5 Pro metadata independently matches both known `0802` module versions;
+  public advisories identify BLE DUML/network surfaces through 0600; FCC reports identify a vendor
+  engineering test tool.
+- Result: no `0802` plaintext, symbols, target PRAK/STUE, replacement trust root, recovery image,
+  RID handler, 0700 plaintext diff, or reproducible public PoC was found.
+- Does not establish: absence from private/unindexed sources or from decrypted content resident on a
+  legitimately running device. It does not reduce the firmware-modification admission gate.
+
+## N-37 — active read-only RID status command in current DJI Fly
+
+- Status: `NEGATIVE` within the closed DJI Fly 1.21.10 product-139 status/cloud-control paths.
+- Positive fact: product-139 mounts `RidImportModule` and listens for `0x11/0x1C`; the seven-byte
+  status layout and regional capability bits are statically closed.
+- Result: the status key has no GET/set/action and the separate `0x00/0xDD` cloud-control key is
+  SET-only, value-routed, and returns no applied-state echo. No fixed safe receiver tuple,
+  reset/disable/debug handler, or static correlation between the two surfaces was found.
+- Does not establish: that firmware cannot emit the push or implement a hidden control. The only
+  admitted current read path is passive observation of a naturally emitted push after the official
+  owner has subscribed; it is not an active query or independent RF proof.
+
+## N-38 — legacy FlyC `Detection` mask as a Mini 5 Pro RID switch
+
+- Status: `NEGATIVE` for modern-product attribution; the legacy schema is `STATIC` and its
+  correspondence to the paper is a bounded `INFERENCE`.
+- Positive fact: DJI-derived midware maps `0x03/0xDA` subcommands `0x05`/`0x06` to an eight-field
+  DroneID mask matching the NDSS description.
+- RF result: the paper reports packets continued and selected fields were replaced with `fake`;
+  the control did not suppress the proprietary OcuSync DroneID transmission.
+- Result: no public primary evidence shows WA150 registers this handler or maps it to ASTM/FAA/EU
+  Broadcast RID. Current DJI Fly retaining the generic old class is not product support.
+- Does not establish: permanent absence from WA150 firmware. Exact current handler/route evidence
+  would be required before even a read experiment, and a write additionally requires full
+  baseline/readback/restore/RF closure.
+
+## N-39 — LTE phone upload as a Remote ID operator-phone field
+
+- Status: `NEGATIVE` for RID attribution in exact DJI Fly 1.21.10.
+- Positive fact: `LteUserPhoneNumberSet` is a set-only `0x03/0xDA` LTE HYBRID business path whose
+  caller periodically uploads bound/encrypted telephone state and has no getter/readback.
+- Result: the path is unrelated to the product-139 Broadcast RID identity/configuration surfaces;
+  ordinary standards-based Broadcast RID has no operator telephone message element.
+- Does not establish: the source of a telephone displayed by proprietary detection software. A
+  China OID/UTMISS, account, or registration-service association remains possible and must be
+  investigated without retaining the real number.
+
+## N-40 — China UOM real-name status/sync as a RID broadcast switch
+
+- Status: `NEGATIVE` for broadcast-switch attribution; the current getter/admission chain is
+  `STATIC` (C-131/C-132).
+- Positive fact: conditionally loaded `UOMV1` exposes a `0x11/0xD1` status GET and a separate Sync
+  action that connects device parameters, a DeviceCenter network query, and a device check result.
+- Result: the surface reports/synchronizes China real-name authentication state. It has no setter,
+  baseline, restore, or evidence of controlling BLE/Wi-Fi Broadcast RID output.
+- Does not establish: whether the current Mini 5 Pro runtime inventory admits function ID `0x6C`,
+  whether authenticated state influences a separate aircraft policy, or how the external helper maps
+  every device result. Key absence and returned `UNSUPPORTED` must remain distinct.

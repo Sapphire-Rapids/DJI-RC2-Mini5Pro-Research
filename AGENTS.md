@@ -100,6 +100,32 @@ Later retractions override earlier progress summaries.
 16. `UAVOIDManager.native_SetOIDReportEnable` controls app-side China OID network submission and can
     return direct success without upload. It is not an aircraft BLE/Wi-Fi RID switch and has no
     recovered state getter. `CN_OPERATE_ID_EFFECT` is distinct from RID cloud-control V2.
+17. Drone-Hacks' Debug dictionary maps `RID_INFO` to `0x11/0x1A`, but it conflicts with current DJI
+    Fly semantics at `0x11/0x0C` and `0x11/0x1C`. Treat it as passive/search vocabulary, not a WA150
+    packet schema, getter, setter, or authorization to send guessed payloads.
+18. Product-139 mounts `RidImportModule`, but `KeyRidWorkingStatusPush` is listen/update-only and
+    `0x11/0x1C` has no recovered GET builder. The separate `KeyCloudControlData` is value-routed
+    SET-only `0x00/0xDD`; its ACK/cache is not an applied RID readback. Do not invent a polling
+    packet or promote cloud-control success to RF state.
+19. Public metadata matching both WA150 `0802` versions and public BLE/network advisories make
+    `0802` the strongest main/network owner candidate, not a proved RID owner or modifiable image.
+    No public plaintext, target key, trust-root replacement, recovery image, or 0700 PoC was found.
+20. Legacy FlyC `Detection` `0x03/0xDA`, subcommands `0x05`/`0x06`, is a high-confidence match for
+    the NDSS multi-field DroneID mask. The reported RF effect retained packets and substituted
+    selected fields with `fake`. It is proprietary OcuSync/AeroScope history, not a WA150
+    ASTM/FAA/EU Broadcast RID switch; never migrate it into a current sender from class inventory.
+21. Treat OPID `0x03/0x78`, Japan DIPS `0x11/0x4B`, China UOM `0x11/0xD6`, app location
+    `0x11/0x43`, compliance serial, France EID, and type-6 as separate identity/policy planes.
+    Exact schemas do not admit an editor without live HostID, baseline, readback, restore,
+    persistence, and RF closure. LTE phone and UTMISS app-report paths are not Broadcast RID fields.
+22. Product-139 China `OIDIdentifier` has no HostID ExtraParam and uses fixed receiver `0x92`,
+    timeout 500 ms, retry 3. Its GET builder establishes only `[01,02]` in an 18-byte request; the
+    tail is not visibly initialized, so never publish it as zero-filled or reproduce undefined
+    bytes. Replies use result byte 1 and an eight-byte GET value at bytes 2--9; enforce minimum
+    lengths 2/10 and keep the value masked. Separate conditional `UOMV1` status `0x11/0xD1` from
+    this tag: runtime function ID `0x6C` must admit the module, its Sync action enters an external
+    account/network helper, and it has no setter or restore semantics. Neither surface is an RF
+    switch.
 
 ## Privacy and redaction
 

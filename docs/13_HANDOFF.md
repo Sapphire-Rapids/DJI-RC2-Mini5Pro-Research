@@ -34,17 +34,53 @@ Read:
 
 Static anchors:
 
-- `RidWorkingStatusPush`, command `0x11/0x1C`;
-- seven-byte raw layout: little-endian flag word, four-byte area, one failure byte;
+- product-139 `PrepareModules -> RidImportModule::Setup -> OnRIDWorkingStatusPush`;
+- `KeyRidWorkingStatusPush`, command `0x11/0x1C`, listen/update-only with no GET/SET/action;
+- seven-byte raw layout: bits 0/1 RID/EID support, bits 8/9 RID/EID normal, four-byte area,
+  one failure byte;
 - preserve raw failure reason before a higher model drops it.
 
-Missing evidence: synchronized motor-off/motor-on onboard state plus independent receiver data.
+Missing evidence: synchronized motor-off/motor-on onboard state plus independent receiver data. The
+current app has no active status GET builder; observe the official owner's natural push passively
+rather than inventing a request.
 
 Do not treat `UAVOIDManager.native_SetOIDReportEnable(false)` as the missing RF switch. In the exact
 `1.21.10` native path it selects app-side China OID network submission versus `DirectSuccess`; no
 aircraft broadcast write or gate getter exists. `CN_OPERATE_ID_EFFECT` and
-`dji_fly_rid_cloud_control_v2` are distinct namespaces. Read RID-011A/011B in
+`dji_fly_rid_cloud_control_v2` are distinct namespaces. Read RID-011A/011B/011C in
 [05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md) before reusing any “report enable” name.
+The latter is `KeyCloudControlData`, a separate value-routed SET-only `0x00/0xDD` transport. Its
+success ACK/cache contains the request, not returned applied RID state.
+
+### RID experiment control matrix
+
+Read [19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md) before adding a
+configuration field or UI control. The target now includes region-specific identity, status,
+location-health, timing, managed policy, and a separate synthetic-source lane—not just one toggle.
+
+Every item must be labelled `READ-ONLY LIVE`, `PASSIVE OWNER`, `STATIC LOCKED`, `MANAGED`,
+`OPAQUE BLOCKED`, `LEGACY EXCLUDED`, or `SYNTHETIC SOURCE`. An exact static setter remains disabled
+until live HostID, baseline, canonical ACK, independent readback, restore, persistence, and RF
+A-B-A are all closed. Keep OPID, DIPS, China UOM, France EID, C0, type-6, app location, compliance
+serial, LTE phone, and cloud-control as separate planes.
+
+### China UOM identifier and real-name status
+
+Read RID-005B/RID-005B2 in [05_RID_CONTROL_SURFACES.md](05_RID_CONTROL_SURFACES.md) before adding
+any China item. Keep two owners separate:
+
+- product-139 `OIDIdentifier` is a static `0x11/0xD6` eight-byte identity surface with fixed
+  receiver `0x92`, 500 ms/retry 3, result at response byte 1, and GET value at bytes 2--9;
+- conditional `UOMV1` status uses `0x11/0xD1`, receiver 2/0, request `[01,00]`, and appears only
+  after runtime function ID `0x6C` admission;
+- `SyncUOMRealNameStatus` enters an external account/network helper and has no setter or restore
+  semantics.
+
+The identifier GET builder's 16-byte request tail is not visibly initialized in current vendor
+code; do not publish it as zero-filled or copy uninitialized behavior. A future diagnostic must
+zero its own buffer, strictly require reply lengths 2/10, mask the returned value, and remain
+static-locked until live admission/baseline/restore/RF gates close. For status, key-not-admitted and
+returned `UNSUPPORTED` are different outcomes. Never log the identifier or opaque Sync material.
 
 ### Account and effective limits
 
@@ -114,6 +150,11 @@ Read:
 Do not redistribute the local binary corpus. Reproduce static claims only from legally obtained
 inputs whose hashes match the artifact/source register.
 
+Public product metadata now independently matches WA150 `0802` versions in both 0600 and 0700, and
+public BLE/network advisories make it the strongest network-service repair owner candidate. This is
+not a RID ownership proof or firmware-modification path. The current public search found no
+plaintext, target key, trust-root replacement, recovery image, exact 0700 diff, or reproducible PoC.
+
 ### NLD FCC comparison
 
 Read [16_NLDFCC_STATIC_ANALYSIS.md](16_NLDFCC_STATIC_ANALYSIS.md) before using the NLD or FreeFCC
@@ -141,8 +182,25 @@ Drone-Hacks as protocol or firmware precedent. Keep these layers separate:
 
 Do not map `wm1695` to Mini 5 Pro; the public definitions map Mini 5 Pro to `wa150` and `wm1695` to
 O3 Air Unit. Do not infer software or RID support from the public FCC flag or hardware ModBox list.
+The Debug dictionary numerically maps `RID_INFO` to `0x11/0x1A` and `EID_INFO` to `0x11/0x35`, but
+it disagrees with current DJI Fly at `0x11/0x0C` and `0x11/0x1C`. Use it only to classify passive
+traffic or seed an exact current-handler search; do not construct a request from the label alone.
 The useful next handoff question is whether WA150's authoritative RID owner can be closed in verified
 plaintext or an exact live read-only path—not how to invoke the generic custom-packet engine.
+
+### Legacy DroneID comparison
+
+Read [18_LEGACY_DRONEID_DETECTION.md](18_LEGACY_DRONEID_DETECTION.md) before reusing
+`DataFlycDetection`, `fc_monitor`, or the NDSS DroneID result. Keep these facts together:
+
+- `0x03/0xDA`, subcommands `0x05`/`0x06`, is a high-confidence independently reconstructed match,
+  not a tuple disclosed by the paper;
+- the paper did not identify the exact switch-test model/firmware or physical source route;
+- RF packets continued and selected legacy values became `fake`;
+- the target was proprietary OcuSync/AeroScope DroneID, not ASTM/FAA/EU Broadcast RID;
+- old generic class presence does not establish a WA150 handler.
+
+Use the tuple only as a static search signature. Do not add it to a current product sender or UI.
 
 ## Documentation-only tasks available without device access
 

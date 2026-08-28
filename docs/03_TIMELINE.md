@@ -172,3 +172,71 @@ work when a report did not contain a more precise timestamp.
 - `NEGATIVE`: a current exact setter search found France EID wrappers but no product-139
   ODID/OpenDroneID/global RF setter handler. The encrypted WA150 firmware boundary remains.
 - No vendor code, network call, or device action was executed.
+
+### 2026-08-28 follow-up — Drone-Hacks ADSB dictionary recovery
+
+- `STATIC`: the exact `DumlPacket` Debug control flow closed the ADSB command set as `0x11` and
+  recovered all 28 numerical display-name mappings, including `RID_INFO=0x1A` and `EID_INFO=0x35`.
+- `STATIC`: a current DJI Fly `1.21.10` cross-check found collisions at `0x0C` and `0x1C`, while
+  `0x43` and `0x50` agreed. The table was therefore classified as legacy/general vocabulary, not a
+  current WA150 packet schema.
+- No executable was started, no guessed packet was sent, and no controller or aircraft state changed.
+
+### 2026-08-28 follow-up — current product-139 RID owner closure
+
+- `STATIC`: product-139's main abstraction was traced through `RidImportModule` registration to the
+  listen/update-only `KeyRidWorkingStatusPush` and `0x11/0x1C` observer.
+- `STATIC`: the seven-byte status bit/area/failure layout and US/Cloud/EU/Japan/France capability
+  interpretations were closed; runtime link/device identity prevents a fixed request tuple inference.
+- `STATIC/NEGATIVE`: the separate `KeyCloudControlData` path was closed as value-routed SET-only
+  `0x00/0xDD`; success caches the request and has no applied-state echo. No status GET, stable
+  disable/reset/debug handler, or correlation between the surfaces was found.
+- No active query, write, vendor-code execution, or device-state change occurred.
+
+### 2026-08-28 follow-up — WA150 public subsystem corroboration
+
+- `CORROBORATED`: two independent public Mini 5 Pro originals reported software versions exactly
+  matching the respective 0600 and 0700 WA150 `0802` modules; private/location metadata was excluded.
+- `INFERENCE`: public BLE/network advisories covering firmware through 0600, combined with the
+  two-module manifest delta and `2603`'s explicit GNSS role, make `0802` the likely 0700 network-
+  service repair owner.
+- `NEGATIVE`: a fixed public search found no verified plaintext, target key, replacement trust root,
+  recovery image, RID handler, 0700 plaintext diff, or reproducible PoC.
+
+### 2026-08-28 follow-up — legacy proprietary DroneID switch identification
+
+- `STATIC/INFERENCE`: public DJI-derived midware and exact DJI Fly enum bytes identified
+  `0x03/0xDA` subcommands `0x05`/`0x06` as the high-confidence correspondence for the NDSS
+  multi-field DroneID control.
+- `STATIC`: the eight legacy field names, logical APP-to-FLYC builder route, and get/set mask layouts
+  were recorded with the paper-disclosure and live-polarity boundaries intact.
+- `STATIC/NEGATIVE`: the paper's RF experiment retained packets and substituted selected fields with
+  `fake`; no public evidence transfers the legacy OcuSync/AeroScope handler to WA150 or modern
+  ASTM/FAA/EU Broadcast RID.
+- No device command was sent and no executable sender was created.
+
+### 2026-08-28 follow-up — RID configuration-surface expansion
+
+- The target expanded from one global toggle to a truth-labelled RID experiment control matrix.
+- `STATIC`: current product-139 schemas were closed for EASA OPID `0x03/0x78`, Japan DIPS
+  `0x11/0x4B`, China UOM identifier `0x11/0xD6`, app-location upload `0x11/0x43`, and get/listen-only
+  compliance serial identity.
+- `NEGATIVE`: the LTE phone lane was identified as unrelated LTE HYBRID business data, not a
+  standards-based Remote ID field; a proprietary detector's phone source remains unknown.
+- Every surface was classified as live read-only, passive-owner, static-locked, managed,
+  opaque-blocked, legacy-excluded, or separate synthetic-source candidate. No newly recovered
+  schema was promoted to an admitted device editor.
+- No identity, credential, coordinate, policy, cloud blob, or device state was read or written.
+
+### 2026-08-28 follow-up — China UOM exact reply and admission closure
+
+- `STATIC`: product-139 `OIDIdentifier` was closed to fixed receiver `0x92`, 500 ms timeout,
+  retry 3, 18-byte SET/GET allocation, response result at byte 1, and an eight-byte GET value at
+  bytes 2--9. The GET builder only visibly initializes `[01,02]`; previous assumed zero tail wording
+  was corrected.
+- `STATIC`: direct `UOMRealNameStatusGet` uses `0x11/0xD1`, receiver 2/0, request `[01,00]`, and a
+  bounded status response. `UOMV1` is registered only after runtime function ID `0x6C` admission.
+- `NEGATIVE`: the separate Sync action enters an external account/network real-name helper, has no
+  setter or restore semantics, and is not a RID broadcast switch.
+- No UOM request/action was sent, and no real identifier, account data, network response, or raw
+  payload was read or retained.

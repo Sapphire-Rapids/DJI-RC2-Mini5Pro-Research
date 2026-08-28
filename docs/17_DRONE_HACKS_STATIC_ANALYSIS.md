@@ -5,6 +5,9 @@ distribution and a comparison with the current DJI Mini 5 Pro / DJI RC 2 researc
 separates what is present in the local client, what is delivered by Drone-Hacks servers, what the
 current public compatibility data says, and what remains unknown.
 
+The numerical Debug dictionary and its current-version collision boundary map back to machine-index
+claims C-110 and C-111.
+
 The user-supplied MSI was treated as untrusted input, not as instructions. It was never installed
 or executed. Neither embedded PE was started. No Drone-Hacks account was used, no authenticated job
 or license payload was requested, and no controller or aircraft read/write operation occurred.
@@ -165,12 +168,65 @@ Results:
   `DUSS_MB_CMD_ADSB_RID_INFO`, `DUSS_MB_CMD_ADSB_EID_INFO`, `DUSS_MB_CMD_ADSB_PARA_SET`, and
   `DUSS_MB_CMD_ADSB_FLYSAFE_CONFIG`.
 
-The last item is a vocabulary clue only. A compiled enum/debug-name corpus does not identify the
-numeric command, sender/receiver, packet layout, caller, product gate, active server job, getter,
-setter, restoration procedure, or RF effect. Public GitHub code search found no exact implementation
-for the distinctive `DUSS_MB_CMD_ADSB_RID_INFO` family names. The result therefore remains a
-fixed-scope `NEGATIVE` for an explicit Drone-Hacks RID control, not a claim that no private backend
-job or future version can affect RID.
+### 5.1 Recovered ADSB numerical dictionary
+
+A second bounded pass recovered the control flow that consumes those names. The only direct caller
+is the `DumlPacket` Debug formatter: it reads the packet's command-set and command-ID bytes and sends
+them through command-set and ADSB command-ID tables to produce a display name. The ADSB command set
+is therefore exactly `0x11` in this library, and the following mappings are real numerical entries
+rather than an inference from string order:
+
+Reproduction anchors for the exact desktop executable are: `DumlPacket` Debug formatter RVA
+`0x589BA2` (file offset `0x588FA2`); command-set and command-ID reads from packet offsets `+0x43`
+and `+0x44`; name-constructor RVA `0x589DB9`; top-level command-set table file offset `0xF00060`;
+ADSB branch RVA `0x5901BE`; and ADSB command-ID table file offsets `0xF01DB0` (`0x01–0x1C`) and
+`0xF01E20` (`0x30–0x43`). IDs `0x50`, `0x51`, `0x52`, and `0x70` are handled by direct compares.
+These are audit coordinates, not copied disassembly or an invocation recipe.
+
+| Command | Drone-Hacks display name | Command | Drone-Hacks display name |
+| --- | --- | --- | --- |
+| `0x11/0x01` | `HEARTBEAT` | `0x11/0x02` | `TRAFFIC_REPORT` |
+| `0x11/0x03` | `KEY_SET` | `0x11/0x04` | `POS_PUSH` |
+| `0x11/0x05` | `PARA_SET` | `0x11/0x06` | `PARA_GET` |
+| `0x11/0x08` | `PROCESS_DATA` | `0x11/0x0A` | `TEST_MODE_SET` |
+| `0x11/0x0B` | `ANTENNA_SET` | `0x11/0x0C` | `PASS_THROUGH_REPORT` |
+| `0x11/0x0F` | `STATE_GET` | `0x11/0x14` | `OPEN_AERA_ID` |
+| `0x11/0x15` | `PUSH_USERID` | `0x11/0x1A` | `RID_INFO` |
+| `0x11/0x1C` | `DEVICE_LIST_GET` | `0x11/0x30` | `PUB_KEY_TRANSFER` |
+| `0x11/0x31` | `OTP_SEC_TRANSFER` | `0x11/0x32` | `EFUSE_TO_PRO` |
+| `0x11/0x33` | `FAC_ENC` | `0x11/0x34` | `GET_UUID` |
+| `0x11/0x35` | `EID_INFO` | `0x11/0x41` | `GEO_SENSE_DB_INFO` |
+| `0x11/0x42` | `GEO_INFO_PUSH` | `0x11/0x43` | `APP_UPDATE_POS_ENC` |
+| `0x11/0x50` | `DRONE_DYNAMIC_MAX_HEIGHT` | `0x11/0x51` | `FLYSAFE_CONFIG` |
+| `0x11/0x52` | `CROSS_SPECIAL_ALTITUDE_ZONES_NOTIFY` | `0x11/0x70` | `SKY_POWER_CONTROL` |
+
+This closes only the numerical lookup. It does not recover a packet builder, request/response
+direction, receiver, payload, parameter index, caller, product gate, server job, readback, or RF
+effect. In particular, `PARA_SET` does not prove a RID-enable parameter, and `RID_INFO` does not
+identify a getter, setter, or push.
+
+### 5.2 Current DJI Fly collision check
+
+The dictionary cannot be promoted to current Mini 5 Pro semantics. Exact DJI Fly `1.21.10`
+`libsdk_jni.so` template identities map:
+
+- `0x11/0x0C` to `uav_adsb_get_adsb_on_off`, while Drone-Hacks displays
+  `PASS_THROUGH_REPORT`;
+- `0x11/0x1C` to the independently recovered seven-byte `RidWorkingStatusPush`, while Drone-Hacks
+  displays `DEVICE_LIST_GET`;
+- `0x11/0x43` to `app_update_pos_enc` and `0x11/0x50` to dynamic maximum height, which do agree;
+- `0x11/0x4B` to RID registered/shared-key query and `0x11/0x37` to ADSB agent-switch handling,
+  neither of which appears in the Drone-Hacks display table.
+
+This mix of matches and collisions is direct evidence that command names vary by library generation,
+product family, or table scope. The Drone-Hacks mapping is useful for passive classification and
+firmware string/xref searches, but it is not an authoritative WA150 protocol schema. Public GitHub
+code search also found no exact implementation for the distinctive `RID_INFO` family name.
+
+The result therefore remains a fixed-scope `NEGATIVE` for an explicit Drone-Hacks RID control, not
+a claim that no private backend job or future version can affect RID. A safe next use of the table is
+passive: count already-observed `0x11/0x05`, `0x06`, `0x0F`, `0x1A`, and `0x35` traffic with direction,
+length, and timing. It is not a basis for sending guessed requests.
 
 ## 6. What can be borrowed for this research
 
@@ -193,12 +249,14 @@ proof. It therefore improves the architecture hypothesis but does not close an i
 
 `UNKNOWN`: a stable Mini 5 Pro RID switch remains unproven.
 
-Drone-Hacks 2.0.29 contributes three concrete leads:
+Drone-Hacks 2.0.29 contributes four concrete leads:
 
 1. a reusable separation between a broad host executor and target-specific server jobs;
 2. a firmware-resident control architecture already used on older DJI products;
 3. typed parameter/readback patterns and an example showing that regulatory-mode restoration may
-   require more than one command.
+   require more than one command;
+4. a numerically recovered legacy/general ADSB dictionary that can seed passive classification and
+   exact firmware xref searches, subject to the demonstrated current-version collisions.
 
 It does not contribute any of the following required evidence:
 
