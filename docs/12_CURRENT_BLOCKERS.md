@@ -246,10 +246,23 @@ answer because its maximum-height positive control also timed out. A-023 reached
 A-024 then tested both legacy and modern Binder routes with known maximum height; both positive
 controls ended in `ECode 1` after about 3.1 seconds, so target F7/F8/F9 were not sent (C-145).
 
+A-025 now closes only the offline implementation prerequisite for the next branch. Its FlySafe lane
+is fixed to system-Binder transaction 4, `02:04 -> 12:04`, `11/11`, bounded V3/V4 traversal and
+privacy-reduced output; the exact final artifact passed its recorded audit and has a local delivery
+copy but has not been copied to RC 2 removable storage, installed, or run (C-150/C-151). Therefore
+no live inventory fact exists yet.
+
+The current app-side schema also no longer supplies the missing aircraft consumer. Exact DJI Fly
+1.21.10 typed `LicenseData` parsing stops at fields 1--5 and treats field 7 as unknown; the separate
+MSDK schema is what identifies it as `LicenseDataRID` (C-152). Current Fly's generic `11/12` carries
+only ID and action, and bounded app-side tracing found no edge to `0802`, motor/armed state, or the
+BLE/Wi-Fi broadcaster (C-153). This does not close encrypted aircraft firmware.
+
 Missing:
 
 - a materially different official in-process owner/authenticated route or verified WA150 handler;
-- read-only genuine type-6 inventory/support/version state, without retaining license material;
+- one live A-025 result that distinguishes Binder/query unavailable from a canonical, privacy-reduced
+  genuine type-6 inventory baseline without retaining license material;
 - aircraft-side evidence that changing the genuine type-6 enabled state is consumed by the RID
   broadcaster rather than only reflected in an SDK status object;
 - only after a new owner path passes a same-route positive control: target metadata/value baseline,
@@ -257,11 +270,16 @@ Missing:
 - reconnect/power-cycle persistence classification;
 - external detector online plus operator-initiated motor-on RF A-B-A.
 
+If separate approved instrumentation captures a raw unknown field-7 reply, retain it only in excluded
+private evidence for schema verification; public output remains limited to redacted counts, level,
+status bits, and result class.
+
 Effect: known generic F7/F8 attach routes are closed for the current session. The third-party
 `0x11/0x1C` Binder listener is also closed as a false-negative oracle by independent RF evidence
 (C-146). Do not repeat either route family without a new owner fact. The shortest active dependency
-is now a modern read-only type-6 inventory query, followed by same-item controlled enable-state
-readback/restore and WA150 `0802` aircraft-side ownership. Static discovery of another setter is
+is now installing/running the already audited A-025 modern read-only type-6 inventory query, followed
+by same-item controlled enable-state readback/restore and WA150 `0802` aircraft-side ownership.
+Static discovery of another setter is
 insufficient without baseline, readback, restore, persistence, and RF observation.
 
 ## Dependency order
@@ -269,7 +287,7 @@ insufficient without baseline, readback, restore, persistence, and RF observatio
 The evidence dependencies are:
 
 ```text
-bounded modern 11/11 inventory query via existing system Binder
+A-025 live bounded 11/11 inventory query via existing system Binder
   -> privacy-reduced genuine type-6 level/enabled/valid baseline
   -> prove exact same-item 11/12 response and 11/11 readback/restore design
   -> verified 0802/aircraft-side consumer or independent RF effect

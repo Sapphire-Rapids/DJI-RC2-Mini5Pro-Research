@@ -382,7 +382,8 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 ### RID-008A：现代 query / set-enable schema 已静态闭合
 
 - **证据状态：STATIC**
-- **对象/版本：** MSDK 5.18.0 native FlySafe implementation。
+- **对象/版本：** MSDK 5.18.0 native FlySafe implementation，并与 DJI Fly 1.21.10 exact
+  `libflightrestrictcore.so` 比较。
 - **前提与路线：** FC serial -> JNI query -> module mediator -> support/version gate -> V2/V3/V4
   session -> PackProvider。
 - **事实：** query `PackType 0x38` 映射到 `0x11/0x11`；set-enable `PackType 0x39` 映射到
@@ -390,31 +391,82 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   product/version 可改变 receiver route；runtime product 139 的静态 product-tree fallback 最终选择
   `0x92`，前提是 live runtime product 确认等于 139。V3/V4 start body 为 `[00,01]`，page N 为
   `[00,(N<<1)&ff]`；ACK 第一字节是 protocol result，后续 group/record body 分别为 protobuf
-  `LicenseGroupInfo` 与 `status_bitmap + License`。`License.data` oneof field 7 才是 RID，其内部
-  level 是 field 1；domain type 6 与 protobuf field 7 是两个命名空间（C-149）。
+  `LicenseGroupInfo` 与 `status_bitmap + License`。在独立 MSDK 5.18 schema 中，
+  `License.data` oneof field 7 是 RID，其内部 level 是 field 1；domain type 6 与 protobuf field 7
+  是两个命名空间（C-149）。
 - **current DJI Fly model boundary：** current native transport 能传递 signed onboard blob 并
   执行 generic query/set-enable，但已恢复的 1.21.10 server JSON/model switch 只识别 type 0..4，
-  不原生解释 type 6 level。独立只读 parser 必须按 FC protobuf 严格分类，不能依赖 Fly UI 正确
-  命名 type 6。
+  不原生解释 type 6 level。exact current Fly `LicenseData` typed parser 也只处理 fields 1--5；
+  field 7/tag `0x3a` 进入 `UnknownFieldSet`，没有生成 typed `LicenseDataRID`（C-152）。独立只读
+  parser 是 MSDK-compatible exploration，不能依赖 Fly UI 命名 type 6，也不能说
+  current Fly 本身已理解 field 7。
 - **边界/不证明：** numeric command 已知不等于可安全 hand-build。support/version push、session owner、
   route、真实许可、readback/restore 和独立 RF 效果仍未实证。
 - **公开依据：** 前述公开 state/firmware research。
 - **隐私/分发：** 不提供 sender、license ID、signed payload 或可执行 sender。
 
-### RID-008C：现代只读 inventory 是当前最短判别实验
+### RID-008C：A-025 已离线实现现代只读 inventory
 
-- **证据状态：HYPOTHESIS/IMPLEMENTED-OFFLINE**
-- **固定请求：** 通过既有 system `protocol` Binder 使用 sender type/index `2/4`、receiver
-  `18/4`，只允许 `0x11/0x11`。先发 V3/V4 start `[00,01]`；只有 canonical success group
-  response 才按声明 count 有界读取 page，强制正常 result-1 terminator、无 duplicate ID、无 selector
-  wrap。该版本禁止并且不实现 `0x11/0x12`。
-- **输出边界：** 只显示 query available/unavailable、总数、type-6 数量、level、enabled、valid 和
-  uninterpreted status bits；不输出或持久化 license ID、SN、user ID、描述、时间、签名或 blob。
+- **证据状态：STATIC（C-150/C-151）**
+- **对象/版本：** self-developed A-025，versionCode 8、versionName
+  `0.5.0-flysafe-readonly`。
+- **固定请求：** 通过既有 system `protocol` Binder transaction 4 `sendWithListen`，固定 sender
+  type/index `2/4`、receiver `18/4`、`0x11/0x11` 和每次 6,000 ms。V3/V4 start 固定
+  `[00,01]`，page N 固定 `[00,(N<<1)&ff]`；group 与 record 只接受 ccode 0，终止只接受
+  ccode 1 且 data 为空。声明 count 上限 127、page call 上限 128、总窗口上限 90 秒；parser 对
+  独立实现的 MSDK-compatible candidate protobuf schema 做 wire type、长度、深度、字段预算、
+  singular duplicate、oneof 和终止 count 一致性检查并 fail closed。它识别 field 7 是兼容性探索，
+  不表示 current DJI Fly 自身理解该字段。
+- **输出边界：** 只显示总数、已解析数、page call 数、type-6 数量、level、enabled、valid、invalid
+  和未解释 status bits。license ID 只转换为本会话随机加盐的 SHA-256 判重值；salt、fingerprint 和
+  response copy 在解析后清零。SN、user ID、description、date、geometry、signature、blob 与 raw
+  protobuf 不输出或持久化。
+- **命令边界：** FlySafe lane 没有获准的 `0x11/0x12` tuple，allow-list 单元测试明确拒绝它；旧
+  `0x11/0x1C` UI 按钮也已移除。`flysafe-readonly` 只描述这条新增 lane；工件仍保留 A-024 已有且
+  分别受门禁约束的 F7/F9、France EID 与 OPID 实验功能，不能把整个 APK 表述为全局无写能力。
+- **工件审计：** 最终 `111,889` 字节 APK 的 SHA-256 为
+  `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`；clean
+  `testDebugUnitTest lint assembleDebug` 成功，42 tests 全通过、lint 0 errors/9 warnings，第二次
+  clean build byte-identical，v2 signature 与 zip alignment 通过。APK 声明零 Android permission、
+  无 packaged native library，检查未发现 network/socket/shell path。二进制不进入本仓库。
+- **设备状态：** 已生成本地交付副本，但 A-025 尚未复制到 RC 2 removable storage、安装或运行。
+  以上只证明离线实现与 exact final-artifact identity，不证明 live Binder 接受、inventory 可用、
+  当前 FC 存在 genuine type 6 或任何 RF 行为。
 - **判别：** canonical inventory 中没有 genuine type 6，则这条 managed switch 路线在当前 FC
   停止；存在 type 6 才允许后续单独实现同一 ID 的 baseline -> transition -> readback -> restore。
   Binder failure 只能报告“modern query unavailable”，不能报告 inventory empty。
 - **最终真值：** 即便 readback 显示 type-6 enabled，仍要由操作者起桨并让独立检测器做
   enabled/disabled/restored 的 RF A-B-A，才能证明 Mini 5 Pro 实际广播受它控制。
+
+### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
+
+- **证据状态：** C-152 为 `STATIC`；C-153 为 `NEGATIVE`。
+- **exact current Fly parser：** SHA-256
+  `17da8363e1ddba47313a74801099e6fdf1e6c4b57ef749222b0cf6e3ceb018f3` 的
+  `libflightrestrictcore.so` 中，`v3::LicenseData::MergePartialFromCodedStream` 位于 Ghidra
+  `0x004f4af8` / ELF VA `0x003f4af8`。它只 typed-decode fields 1--5；field 7/tag `0x3a`
+  调用 protobuf `SkipField(..., UnknownFieldSet)`。exported field symbol 只覆盖
+  Area/Circle/Country/Height/Polygon；current Fly core、smali 与 protected bundle 的有界 exact-name
+  inventory 对 `RID_UNLOCK`、`LicenseDataRID`、`RidUnlockType` 均为零命中。
+- **独立 MSDK 对照：** SHA-256
+  `1749d31c8ececb15b3da7c07a967ac9946ac05a0aaffd9e3d3840bd7db09e1ed` 的 MSDK 5.18
+  `libDJIFlySafeCore-CSDK.so` parser 位于 Ghidra `0x008ff040` / ELF VA `0x007ff040`，处理
+  fields 1--8，并为 field 7 分配 `LicenseDataRID`。这是 A-025 candidate decoder 的 compatibility
+  依据，不是 current Fly runtime 证据。`DefaultUASDelegate` 保留逻辑的相关 method 又在 bytecode
+  offset 0 立即 return/return false，后续 body 只能作为不可达 design evidence。
+- **generic setter：** current Fly `SetLicenseStateV3Session::SetEnable` 位于 Ghidra
+  `0x0053505c` / ELF VA `0x0043505c`，只构造
+  `[00][license_id_u32le][01 enable | 02 disable][00]`。请求不携带 license type、RID level、region、
+  motor/armed、BLE/Wi-Fi 或 module ID；`LicenseUnlockFCManager::SetEnable` 只检查 support/version。
+- **有界阴性：** current app/static xref 没有把 type 6、field 7 或 `0x11/0x12 enabled` 连接到
+  WA150 `0802` broadcaster、motor transition 或 BLE/Wi-Fi enable。`0x92` 是 packed protocol
+  receiver，不能当作 firmware module `0802` 的身份证明。
+- **边界/不证明：** `UnknownFieldSet` 可能保留 field-7 raw bytes；以上不证明 FC 不会返回 field 7、
+  type 6 不可用或 encrypted WA150 内没有 consumer。当前仍没有 aircraft-side RID enable consumer
+  或可逆 firmware patch offset。type-6/license enable、RID status/HMS、RID cloud policy 与真实
+  motor-gated RF 是四条尚未闭合的链，不能互相代替。
+- **隐私/分发：** 厂商 SO、反编译工程、raw protobuf、license data 与私有回复均不进入本仓库；只
+  公开 exact hashes、addresses、高层独立结论和不成立的外推。
 
 ### RID-008B：旧式固定 inventory request 超时
 

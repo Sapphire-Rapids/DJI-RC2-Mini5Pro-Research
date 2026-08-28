@@ -49,6 +49,12 @@
   wire 已闭合为 `0x11/0x11` / `0x11/0x12`，product-139 receiver 为 `0x92`。这证明了设计语义，
   但 Mini 5 Pro 是否有资格、是否存在真实许可、当前 runtime 是否执行该分支及 RF 是否变化仍为
   `UNKNOWN`。
+- Exact current DJI Fly 1.21.10 `LicenseData` typed parser 只处理 fields 1--5；field 7/tag `0x3a`
+  进入 `UnknownFieldSet`。把 field 7 解成 `LicenseDataRID` 的是独立 MSDK 5.18 工件，A-025 因此是
+  MSDK-compatible exploration，不是“current Fly 已理解 type 6”的证据。current Fly
+  `11/12` 也只是 license-ID-plus-action generic setter；有界静态追踪没有找到它到 WA150 `0802`、
+  motor/armed 或 BLE/Wi-Fi broadcaster 的 consumer。该阴性不覆盖 encrypted aircraft firmware，
+  `0x92` 也不是 module `0802` 身份。
 - DJI Fly `1.21.10` 的中国 OID `setReportEnable` 已闭合为 App/RC 网络上报 gate：关闭时跳过
   云提交并 direct-success，但不写飞机 BLE/Wi-Fi 广播。当前 exact setter 复查仍只找到 France
   EID wrapper，没有 product-139 ODID/OpenDroneID/global RF setter。
@@ -75,13 +81,22 @@
   `0x11/0x1C` 状态时间线。25 项测试、lint 0 errors、两次逐字节相同构建及 APK 审计通过，
   已安装运行。legacy `0A:05 -> 03:00` 与 modern `02:04 -> 12:04` 正对照均以 `ECode 1`
   timeout，故 target F7/F8/F9 未发送；passive timeline 后续已由独立 RF 对照判为假阴性。
+- 当前离线候选 A-025 `0.5.0-flysafe-readonly` / code 8（SHA-256
+  `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`，`111,889` bytes）
+  已实现固定 system-Binder `02:04 -> 12:04`、`11/11` 的现代 FlySafe V3/V4 有界清单查询。
+  count/page/overall 上限为 127/128/90 秒，只输出 count、RID level 与 status bits；identity/raw
+  data 不输出，`11/12` 无获准路径，旧 `11/1C` 按钮已移除。42 tests、lint 0 errors、clean
+  assemble 与 byte-identical rebuild 通过，APK 零权限、无 native/network/socket/shell path；尚未
+  复制到 RC 2 removable storage、安装或运行。`flysafe-readonly` 只指新增 lane，同一 APK 仍保留
+  旧的门禁式 F7/F9、France EID 与 OPID 实验功能。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
   A-024 又证明两条 Binder route 连 height 正对照都失败，因此 current generic-parameter
-  attach 路线已关闭；target 从未发送，未发送 F9。下一主线是通过 system Binder 只读查询现代
-  FlySafe type-6 inventory，并追其 enable state 到 `NO_BROADCAST`/真实 RF 的因果链；并行继续
-  WA150 `0802` broadcaster/policy owner。
+  attach 路线已关闭；target 从未发送，未发送 F9。下一主线是将已审计 A-025 运行一次 system
+  Binder 现代 FlySafe type-6 inventory，只区分 query unavailable 与 canonical privacy-reduced
+  result；若存在 genuine type 6，再追其 enable state 到 `NO_BROADCAST`/真实 RF 的因果链；并行
+  继续 WA150 `0802` broadcaster/policy owner。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
 - NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 authenticated Base64 envelope、

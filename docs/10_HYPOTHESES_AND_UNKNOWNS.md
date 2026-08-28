@@ -30,16 +30,20 @@ Every hypothesis below is testable and remains separate from factual findings.
 
 ## H-04 — stable control via genuine type-6 `RID_UNLOCK`
 
-- Known facts: signed account/FC-bound type 6 exists in public MSDK schema, has EU/China levels,
-  and the preserved delegate design maps a matching enabled license to `NO_BROADCAST`. That app-side
-  branch only mutates an SDK status object; it sends no Key/native/DUML command. Current native
-  inventory/set-enable endpoints are `0x11/0x11` and `0x11/0x12`, with product-139 receiver `0x92`.
+- Known facts: signed account/FC-bound type 6 exists in the separate public MSDK schema and has
+  EU/China levels. The preserved delegate design maps a matching enabled license to `NO_BROADCAST`,
+  but its relevant methods start with an immediate return and the retained body only mutates an SDK
+  status object. Exact current Fly typed `LicenseData` parsing stops at fields 1--5 and sends field 7
+  to `UnknownFieldSet`; its generic `0x11/0x12` request carries only license ID and enable/disable
+  action. No app-to-WA150 broadcaster consumer has been recovered (C-152/C-153).
 - Hypothesis: a genuine, eligible Mini 5 Pro license can be inventoried, enabled/disabled, restored,
   consumed by the aircraft-side RID broadcaster, and observed over RF.
 - Missing: server eligibility, genuine record, live support/version, exact route, current baseline,
-  FC acceptance, aircraft-side consumer, rollback, and independent RF A-B-A.
-- Next discriminator: a bounded read-only modern V3/V4 inventory query through the existing system
-  Binder. Only a canonical response containing a genuine type-6 record can admit a later same-item
+  FC acceptance, aircraft-side consumer, rollback, and independent RF A-B-A. License enable,
+  status/HMS, cloud policy, and motor-gated RF remain four separate chains.
+- Next discriminator: the audited A-025 bounded read-only modern inventory query through the existing
+  system Binder. Its MSDK-compatible field-7 decoder is an independent compatibility exploration;
+  only a canonical response containing a genuine type-6 record can admit a later same-item
   baseline/readback/restore experiment.
 - Current state: `UNKNOWN`.
 

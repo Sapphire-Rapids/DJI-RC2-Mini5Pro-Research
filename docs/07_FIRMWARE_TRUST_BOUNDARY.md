@@ -134,8 +134,34 @@ PRAK/STUE、可替换信任根、恢复镜像、RID handler、0700 明文差分�
 | ARM64 `libsdk_jni.so` | `87,313,856` B | `5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188075ada61f5a7b46286` | `STATIC`，厂商 SO 不分发 |
 | ARM64 `libsdk_key_value.so` | `12,684,576` B | `09f4aa8aef65f720da09a1dad79c8851e05d619affaf73708bf6747341208336` | `STATIC`，厂商 SO 不分发 |
 | ARM64 `libsdk_base.so` | `7,720,240` B | `e5b290ebc6aa6e409e116cc0d3b84fb4e49c70f6c552feffacd5b15c7c83e873` | `STATIC`，厂商 SO 不分发 |
+| ARM64 `libflightrestrictcore.so` | `5,490,392` B | `17da8363e1ddba47313a74801099e6fdf1e6c4b57ef749222b0cf6e3ceb018f3` | `STATIC`，current Fly FlySafe core；厂商 SO 不分发 |
+| MSDK 5.18 ARM64 `libDJIFlySafeCore-CSDK.so` | `10,839,728` B | `1749d31c8ececb15b3da7c07a967ac9946ac05a0aaffd9e3d3840bd7db09e1ed` | `STATIC`，独立 public-SDK 对照；不进入仓库 |
 
 这些输入支持精确版本的 key、handler、route、RVA、Build ID、调用边界和失败路径描述。它们不证明当前 RC 2 已加载相同文件，不证明静态 product-139 handler 已被当前会话选择，也不证明任何请求或写入已经执行。
+
+### 6.1 Current Fly 与 MSDK 的 type-6 schema 边界（C-152）
+
+`STATIC`：exact current Fly `libflightrestrictcore.so` 的 `LicenseData` parser 只 typed-decode
+fields 1--5。field 7/tag `0x3a` 走 protobuf `SkipField`/`UnknownFieldSet`；exported symbol 也只覆盖
+Area、Circle、Country、Height 与 Polygon。对 current Fly core、smali 和 protected bundle 的有界
+exact-name inventory 没有找到 `RID_UNLOCK`、`LicenseDataRID` 或 `RidUnlockType`。
+
+独立 MSDK 5.18 `libDJIFlySafeCore-CSDK.so` 则 typed-decode fields 1--8，并为 field 7 建立
+`LicenseDataRID`/`level`。这两个 binary/schema 不能合并为一个“current DJI Fly 已识别 type-6”
+结论。UnknownFieldSet 可能保留 raw field-7 bytes，因此 current Fly 的 typed-parser boundary 也不
+证明 FC 不会返回 field 7 或 aircraft firmware 不会消费相应状态。
+
+### 6.2 Generic set-enable 与 aircraft-side consumer 阴性（C-153）
+
+`NEGATIVE`：exact current Fly V3 set-enable builder 只编码固定 zero、little-endian license ID、
+enable/disable action 和结尾 zero；manager 只做 support/version gate。请求不包含 license type、RID
+level、region、motor/armed、BLE/Wi-Fi 或 module ID。在 current app 静态范围内，没有找到 type 6、
+field 7 或 `0x11/0x12` enabled state 到 WA150 `0802` broadcaster、motor transition 或 BLE/Wi-Fi
+enable 的 consumer/xref。
+
+该阴性不覆盖加密 WA150 plaintext，不能证明 aircraft firmware 中不存在 consumer。packed receiver
+`0x92` 是协议 endpoint，不是 firmware module `0802` 身份；目前也没有可逆 Mini 5 Pro RID patch
+offset。故这一结果收紧而不降低第 8 节的固件修改门禁。
 
 ## 7. 非刷写完整性实验
 

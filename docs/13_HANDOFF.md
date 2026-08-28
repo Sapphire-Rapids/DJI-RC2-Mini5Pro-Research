@@ -47,12 +47,35 @@ Current exact anchors:
 
 Do not repeat the generic F7 attach route or change only sender/receiver tuples. Reopen this exact
 parameter only after finding a materially different official in-process owner/authenticated route
-or a verified WA150 handler. The immediate action is now the A-024 passive timeline:
+or a verified WA150 handler. A-024's passive timeline is also complete: it produced zero callbacks
+while an independent detector confirmed real motor-on RID, so that third-party listener is a
+false-negative truth source and must not be repeated.
 
-1. one motors-off 30-second `0x11/0x1C` window;
-2. one 30-second window with operator-started motors and a stop before window end;
-3. correlate only privacy-reduced status/route/timing, then move to RID diagnostics, genuine type-6
-   inventory, and WA150 `0802/E3` ownership.
+### Current candidate: A-025 modern FlySafe inventory
+
+A-025 `0.5.0-flysafe-readonly` / code 8 is the current offline candidate (C-150/C-151). Its exact
+`111,889`-byte APK SHA-256 is
+`b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`. A local delivery copy
+exists, but it has not been copied to RC 2 removable storage, installed, or run.
+
+The new FlySafe lane is fixed to system `protocol` Binder transaction 4, route
+`02:04 -> 12:04`, `11/11`, 6,000 ms, group selector `00 01`, and page selector
+`00 (index<<1)`. Count is capped at 127, page calls at 128, and total duration at 90 seconds. It
+accepts only ccode 0 records and a data-less ccode 1 terminator, then strictly parses an independently
+implemented MSDK-compatible candidate schema. Recognition of
+field 7 is a compatibility exploration, not proof that current DJI Fly understands it. The UI reports
+only count, RID level, and status bits. License IDs are session-salted only for duplicate
+detection; identifiers, signed data, and raw replies are not displayed or retained.
+
+The FlySafe allow-list contains no `11/12` tuple and its test rejects that command. The old
+`11/1C` button is removed. The suffix `flysafe-readonly` applies only to the new lane: separately
+gated F7/F9, France EID, and OPID experimental controls remain in the APK, so reviewers must not
+describe the entire artifact as globally write-free.
+
+The next bounded action is one motors-off A-025 inventory run with the aircraft linked. Treat Binder
+failure as query unavailable, not empty inventory. Only a canonical result containing a genuine
+type-6 record may advance to a separately reviewed same-ID baseline/readback/restore design; RF truth
+still requires operator-initiated motors and the independent detector.
 
 ### RID working status
 
@@ -157,18 +180,25 @@ Static mappings:
 - set-enable `PackType 0x39 -> 0x11/0x12`;
 - V2 one-byte index query; V3/V4 group/status-protobuf flow;
 - product-139 final receiver `0x92` for V2/V3/V4;
-- type 6 `RID_UNLOCK`, levels 1 EU and 2 China;
+- separate MSDK 5.18 schema type 6 `RID_UNLOCK`, levels 1 EU and 2 China;
 - retained official consumer design maps enabled + region-matched + product-supported type 6 to
   `broadcastRemoteIdEnabled=false` / `NO_BROADCAST`, but that branch only changes the SDK status
-  object and does not itself send an aircraft command.
+  object, starts behind an immediate return, and does not itself send an aircraft command.
 
-Immediate implementation target: one bounded, read-only modern V3/V4 query through the existing
-system `protocol` Binder, route `2/4 -> 18/4`, command `0x11/0x11`, starting with `[00,01]`. It must
-not implement/send `0x11/0x12`, must cap pages below selector wrap, and must output only aggregate
-type-6 level/enabled/valid state. A transport failure is “query unavailable,” not “empty inventory.”
+Current Fly correction: its exact typed `LicenseData` parser handles fields 1--5 and sends field 7
+to `UnknownFieldSet`; only the separate MSDK artifact typed-decodes field 7 as `LicenseDataRID`
+(C-152). Its `11/12` setter is generic ID-plus-action, and no current app xref connects type 6,
+field 7, or enabled state to WA150 `0802`, motor/armed state, or BLE/Wi-Fi enable (C-153). Receiver
+`0x92` is not firmware-module identity.
+
+A-025 now implements the bounded, read-only modern V3/V4 query offline as described in the current
+candidate section above. It has not been copied to RC 2 removable storage, installed, or run. A
+transport failure is “query unavailable,” not “empty inventory.”
 
 Missing: live support/version, canonical Binder response, genuine account item, aircraft-side
-consumer, same-item baseline/restore, and RF. Never create or publish license material.
+consumer, same-item baseline/restore, and RF. If separate approved instrumentation obtains raw
+unknown field-7 bytes, keep them only in excluded private evidence; never create or publish license
+material.
 
 ### Region and RF policy
 

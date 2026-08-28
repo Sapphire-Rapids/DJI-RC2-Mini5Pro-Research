@@ -455,6 +455,20 @@ stronger conclusion that cannot be drawn.
 - Result: the listener received zero callbacks and zero valid or malformed frames, while the
   independent detector confirmed real aircraft RID broadcast in the same experiment.
 - Consequence: do not repeat this protocol-Binder listener or use its zero count as off,
-  unsupported, no-RID, or no-RF evidence. It cannot validate a future switch transition.
+  unsupported, no-RID, or no-RF evidence. It cannot validate a future switch transition. A-025
+  removes this listener from the UI; that static removal is C-151, not a new live result.
 - Does not establish: that DJI Fly's in-process official observer is silent, that the FC never emits
   `0x11/0x1C`, or that other health/HMS channels cannot report RID state.
+
+## N-46 — current-app type-6 to aircraft-broadcaster consumer
+
+- Status: `NEGATIVE` for the bounded current DJI Fly 1.21.10 static scope; machine claim C-153.
+- Exact anchors: current Fly's V3 `11/12` builder carries only zero, little-endian license ID,
+  enable/disable action, and final zero; its manager adds only support/version gating. Current typed
+  `LicenseData` parsing stops at fields 1--5 and treats field 7 as unknown (C-152).
+- Result: no type-6, field-7, or `11/12 enabled` consumer/xref was found to WA150 `0802`, motor/armed
+  transition, or BLE/Wi-Fi broadcaster enable. The retained MSDK delegate changes app status only and
+  begins behind an immediate return.
+- Does not establish: absence inside encrypted WA150 firmware, type-6 non-support, or no FC field-7
+  response. Receiver `0x92` is a protocol endpoint rather than module `0802` identity. No reversible
+  firmware patch offset has been recovered.

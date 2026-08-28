@@ -139,12 +139,13 @@ Later retractions override earlier progress summaries.
     aircraft-direct `0x0A -> 0x03` both returned one-byte status `03`, while same-session known
     height/distance controls succeeded. Direct USB `0x82 -> 0x92` also failed a known-height
     positive control, so it is not evidence about parameter support. Do not repeat raw USB route
-    variants. A-024 `0.4.1-research` is the replacement current candidate: it first requires a
+    variants. A-024 `0.4.1-research` is the installed historical replacement: it first requires a
     maximum-height F7/F8 positive control on a Binder route before interpreting the RID target,
     serializes operations, keeps F9 locked behind validated metadata/range/baseline, and adds one
     full-window passive `0x11/0x1C` timeline. It was installed and both legacy and modern Binder
     routes failed the known-height F7 positive control with `ECode 1` after about 3.1 seconds; code
-    therefore did not send target F7/F8/F9. The passive timeline result remains pending.
+    therefore did not send target F7/F8/F9. Its passive timeline was later closed as the
+    false-negative result in correction 26.
 25. Adjacent RC331 `ActQueue` maps callback `ECode 1` to request retry exhaustion. This explains the
     observed A-023/A-024 terminal class but does not prove exact v07 byte identity, packet
     transmission, receiver support, parameter absence, or RF state. C-145 closes the two tested
@@ -164,6 +165,19 @@ Later retractions override earlier progress summaries.
     current Mini 5 Pro executes it. Current native inventory/set-enable endpoints are `0x11/0x11`
     and `0x11/0x12`, with product-139 receiver `0x92`; query only through a bounded read-only probe,
     never invent or expose license IDs or send set-enable before a genuine baseline exists.
+29. A-025 `0.5.0-flysafe-readonly` is the current offline inventory candidate. Its exact SHA-256 is
+    `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`; it has not been copied to
+    RC 2 removable storage, installed, or run. Its new lane is fixed to system-Binder transaction 4,
+    route `02:04 -> 12:04`, `11/11`, bounded selectors/parser, and privacy-reduced output. It has no
+    admitted `11/12` tuple and the old `11/1C` button is removed. The suffix applies only to the
+    FlySafe lane: separately gated legacy F7/F9, France EID, and OPID controls remain in the APK, so
+    never call the entire artifact globally write-free.
+30. Current DJI Fly 1.21.10 typed `LicenseData` parsing stops at fields 1--5; field 7/tag `0x3a` is
+    retained only as an unknown field. `LicenseDataRID` field-7 semantics come from a separate MSDK
+    5.18 artifact and make A-025 an independent compatibility decoder, not proof that current Fly
+    recognizes type 6. Current Fly `11/12` carries only license ID and action, and no app-side edge to
+    WA150 `0802`, motor state, or BLE/Wi-Fi enable was found. Do not turn that bounded negative into
+    firmware absence, equate receiver `0x92` with module `0802`, or claim a patch offset.
 
 ## Privacy and redaction
 

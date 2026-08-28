@@ -20,6 +20,18 @@
   listener as a false-negative truth/readback path.
 - Added C-147--C-149 for the official minimum status parser, the type-6 region-matched
   `NO_BROADCAST` design semantics, and the exact current product-139 inventory/set-enable wire.
+- Registered A-025 `0.5.0-flysafe-readonly` and C-150/C-151: the fixed, bounded, privacy-reduced
+  system-Binder `11/11` inventory lane and its exact final-artifact audit. The FlySafe lane admits no
+  `11/12`, and the false-negative `11/1C` UI button is removed.
+- Recorded the exact A-025 boundary: 42 passing tests, lint with zero errors, byte-identical clean
+  rebuild, zero permissions, no packaged native library or inspected network/socket/shell path, and
+  no copy to RC 2 removable storage, install, or execution. The version suffix is lane-specific;
+  separately gated older F7/F9, EID, and OPID controls remain.
+- Added C-152 to separate the exact current DJI Fly 1.21.10 fields-1--5 `LicenseData` parser from the
+  independent MSDK 5.18 field-7 `LicenseDataRID` schema used by A-025's compatibility decoder.
+- Added C-153 for the bounded aircraft-consumer negative: current Fly `11/12` carries only license ID
+  and action, with no recovered edge to WA150 `0802`, motor/armed state, or BLE/Wi-Fi enable. This
+  does not cover encrypted aircraft firmware or establish a patch offset.
 - Changed the active implementation path to a bounded read-only modern `0x11/0x11` inventory query;
   `0x11/0x12` remains absent and prohibited until a genuine type-6 baseline exists.
 - Updated the blocker, handoff, experiment matrix, artifact state, hypothesis, timeline, README, and
@@ -30,7 +42,8 @@
 
 - The two user-supplied result photographs were used only to transcribe redacted protocol outcomes;
   PID, UID, device identity, and image files are not committed.
-- A-023/A-024 APKs and all implementation source remain outside this documentation-only repository.
+- A-023/A-024/A-025 APKs and all implementation source remain outside this documentation-only
+  repository.
 - No target F7, F8, F9, reset, account action, license action, firmware write, or RF claim is made.
 
 ## 0.3.2 - 2026-08-28

@@ -431,12 +431,14 @@ by FlySafe `SetEnable`.
 
 Current DJI Fly and MSDK native implementations were then cross-compared: inventory and set-enable
 are `0x11/0x11` and `0x11/0x12`; product 139 resolves to receiver `0x92`; V3/V4 begin with `[00,01]`
-and return group/status-plus-protobuf records. A strict offline parser distinguishes domain type 6
-from protobuf oneof field 7, caps page/count/field/length/varint behavior, and does not expose raw
-IDs or identity fields.
+and return group/status-plus-protobuf records. Exact follow-up separated their schemas: current Fly
+typed `LicenseData` parsing stops at fields 1--5 and sends field 7 to `UnknownFieldSet`, whereas the
+independent MSDK artifact typed-decodes field 7 as `LicenseDataRID`. A strict offline compatibility
+parser distinguishes domain type 6 from MSDK protobuf oneof field 7, caps
+page/count/field/length/varint behavior, and does not expose raw IDs or identity fields.
 
-The next executable was scoped to a single read-only modern inventory function through the already
-used system Binder. It allows `0x11/0x11` only, starts with the V3/V4 group query, bounds page
-selection below wrap, and reports only aggregate type-6 level/enabled/valid state. `0x11/0x12` is
-not implemented in this stage. Only a canonical genuine type-6 result can admit the later
+A-025 was then scoped to a single read-only modern inventory function through the already used
+system Binder. Its FlySafe lane allows `0x11/0x11` only, starts with the V3/V4 group query, bounds
+page selection below wrap, and reports only aggregate type-6 level/enabled/valid state.
+`0x11/0x12` is not admitted in this stage. Only a canonical genuine type-6 result can admit the later
 baseline-transition-readback-restore experiment and motor-on independent RF A-B-A.

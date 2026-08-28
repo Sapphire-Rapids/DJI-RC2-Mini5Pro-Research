@@ -331,3 +331,36 @@ work when a report did not contain a more precise timestamp.
   inputs. No current genuine type-6 ID, enabled baseline, mutation, restore, or RF effect exists.
 - Implementation direction changed to a bounded, privacy-reduced, read-only modern inventory query.
   The next APK version must not implement or send `0x11/0x12` until inventory proves a genuine item.
+
+### 2026-08-29 — A-025 modern FlySafe inventory checkpoint
+
+- `STATIC`: A-025 `0.5.0-flysafe-readonly` / code 8 added one system-Binder transaction-4
+  `sendWithListen` query lane fixed to `02:04 -> 12:04`, `11/11`, and 6,000 ms. It sends group
+  selector `00 01`, then bounded page selectors `00 (index<<1)`, accepts ccode 0 records and only a
+  data-less ccode 1 terminator.
+- `STATIC`: the independent parser caps declared count at 127, page calls at 128, and total duration
+  at 90 seconds. It strictly checks protobuf shape and count/terminator agreement; duplicate IDs are
+  detected only through session-salted fingerprints. Identity, description, signed material, and raw
+  replies are not emitted, and temporary reply/fingerprint material is cleared.
+- `STATIC`: the FlySafe request allow-list has no `11/12` tuple and its test rejects that command.
+  The false-negative `11/1C` listener button was removed. The version suffix describes this FlySafe
+  lane only; separately gated earlier F7/F9, France EID, and OPID controls remain in the APK.
+- `STATIC`: clean unit tests, lint, and assemble completed; 42 tests passed, lint reported 0 errors
+  and 9 warnings, and a second clean build was byte-identical. V2 signature and zip alignment checks
+  passed. The exact `111,889`-byte APK has SHA-256
+  `b137540f041cceb50a215bb95144c9f7ccf57fa4db4d2e7fc2108cb6ae68db80`, declares zero Android
+  permissions, packages no native library, and has no inspected network/socket/shell path.
+- `STATIC`: A local delivery copy was made, but A-025 was not copied to RC 2 removable storage,
+  installed, or run. No live Binder ACK, inventory, genuine type-6 record, state transition, or RF
+  behavior is recorded; the APK and source remain outside this documentation repository.
+
+### 2026-08-29 — exact current-Fly field-7 and aircraft-consumer boundary
+
+- `STATIC`: exact DJI Fly 1.21.10 `libflightrestrictcore.so` parsing was compared with the separate
+  MSDK 5.18 FlySafe core. Current Fly typed `LicenseData` parsing handles fields 1--5 and sends field
+  7 to `UnknownFieldSet`; MSDK alone typed-decodes field 7 as `LicenseDataRID`.
+- `STATIC`: current Fly's generic V3 `11/12` setter carries license ID and enable/disable action but
+  no license type, RID level, region, motor/armed, bearer, or module field.
+- `NEGATIVE`: bounded app-side tracing found no edge from type 6/field 7/set-enable to WA150 `0802`,
+  motor transition, or BLE/Wi-Fi enable. Encrypted aircraft plaintext was unavailable, so no
+  firmware-absence conclusion or patch offset was recorded.
