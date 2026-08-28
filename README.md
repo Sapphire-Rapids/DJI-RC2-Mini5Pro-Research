@@ -1,5 +1,8 @@
 # DJI RC 2 / Mini 5 Pro research archive
 
+[![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-28 的实机观察、
 固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题。
 

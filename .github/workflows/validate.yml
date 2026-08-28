@@ -1,0 +1,25 @@
+name: Validate research archive
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - name: Check Markdown links
+        run: ruby scripts/check_markdown_links.rb
+      - name: Check evidence indexes
+        run: ruby scripts/check_evidence_csv.rb
+      - name: Check public-data boundary
+        run: sh scripts/check_sensitive_patterns.sh --all
+      - name: Check whitespace
+        run: git show --check --oneline --no-renames HEAD
