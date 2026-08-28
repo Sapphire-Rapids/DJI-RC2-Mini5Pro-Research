@@ -401,3 +401,14 @@ stronger conclusion that cannot be drawn.
 - Does not establish: that WA150 firmware rejects every raw request or that the inherited agent
   switch has no undocumented live side effect. Those questions require a separate passive trace and
   AirSense-specific experiment; they do not justify a RID toggle.
+
+## N-42 — public Mini 5 Pro `RIDCtrlEnable` implementation
+
+- Status: `NEGATIVE` within fixed public repositories and indexed exact-string searches (C-140).
+- Positive facts: FreeFCC publicly corroborates a real RC 2 modern `0x82` transport, `0x92`
+  destination, and `03/F9` hash-parameter frame form on a Mini 5 Pro-tested project. Public DJI and
+  community sources independently close the generic F7/F8/F9 layout and hash algorithm.
+- Result: no independent public implementation, issue, commit, or indexed code hit was found for
+  exact `RIDCtrlEnable` or `rid_ctrl_enable_0`. The FreeFCC frame uses a different hash/feature.
+- Does not establish: that private or unindexed work does not exist, that every frame in a successful
+  multi-frame profile was individually accepted, or that WA150 supports hash `0x3CBD864F`.

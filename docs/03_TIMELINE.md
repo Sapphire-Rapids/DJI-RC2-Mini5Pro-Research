@@ -258,3 +258,9 @@ work when a report did not contain a more precise timestamp.
   not observed in this record.
 - The proprietary SKYROVER APK, libraries, and decompilation output remain excluded. No SKYROVER
   code was copied into the MIT implementation or documentation repository.
+- `STATIC`: a full current same-family RID inventory found no second RID-named FCConfig parameter.
+  The remaining writable items were classified as regional EID/identity/registration commands or
+  opaque set-only cloud policy; status, support, import-result, and compliance keys were read-only.
+- `NEGATIVE`: fixed public repositories plus indexed exact-string searches found no independent
+  Mini 5 Pro/RC 2 `RIDCtrlEnable` implementation. FreeFCC corroborated the modern route and F9 frame
+  form only; its feature and hash were different.

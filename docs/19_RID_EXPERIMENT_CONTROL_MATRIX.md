@@ -17,7 +17,8 @@ New machine-index claims covered here are C-123 (China UOM), C-124 (EASA OPID), 
 C-126 (app location), C-127 (telephone exclusion), C-128 (compliance identity), and C-129 (separate
 synthetic-source hypothesis). The exact China UOM reply/status closure adds C-130 through C-132.
 Dynamic bundle separation adds C-133 through C-135. The independent same-family `RIDCtrlEnable`
-chain and Mini 5 Pro admission experiment add C-136 through C-138.
+chain, Mini 5 Pro admission experiment, full current inventory, and public-prior-art boundary add
+C-136 through C-140.
 
 ## 2. Implementation levels
 

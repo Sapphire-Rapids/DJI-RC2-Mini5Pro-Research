@@ -15,7 +15,8 @@ inventory、type-6 query/enable、area strategy 与 broadcast-effect `C-071`--`C
 未闭合 `C-053`；中国 OID network-report gate 与 current exact setter re-audit `C-106`--`C-109`；
 legacy DroneID Detection `C-119`--`C-122`；地区身份/位置 `C-123`--`C-128`；China UOM
 reply/status/admission `C-130`--`C-132`；动态 RID bundle 与 namespace `C-133` / `C-134`；
-AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C-136`--`C-138`。
+AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C-136`--`C-138`；
+同族配置全量盘点与公开先例阴性 `C-139` / `C-140`。
 
 ## 总结矩阵
 
@@ -147,6 +148,16 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **Mini 5 Pro 当前边界：** 精确 DJI Fly `1.21.10` native 未出现同名 KeyValue/FC parameter；
   这只说明 DJI Fly 没有内置该 wrapper，不说明 WA150 飞控一定没有参数。最短判别实验固定为
   hash `0x3CBD864F` 的一次 F7，成功后一次 F8；F7 返回一字节错误时，不再发送 F8/F9。
+- **同族全量盘点：** RID 命名的 FCConfig `_0` 参数只发现 `rid_ctrl_enable_0`。其他真实
+  writable 面均属于专用协议：France EID `03/77`、OPID `03/78`、Japan registration
+  `11/4B`，以及无 GET/readback、schema 不公开的 `odm_rid_cloud_control -> 00/DD` opaque
+  policy。`RidWorkingStatusPush`、地区 support、import result 与 compliance identity 都是只读；
+  catalog-only `EidOpen`/`EidClose`/`EIDBroadcastEnable` 没有 current caller/native handler。
+- **公开实现检索：** fixed-revision GitHub 项目及 exact-string indexes 未找到第二份
+  `RIDCtrlEnable`/`rid_ctrl_enable_0` 的 Mini 5 Pro/RC 2 实现。FreeFCC 只独立支持 modern
+  `0x82` transport、`0x92` destination 和 `03/F9` 形式；其 feature/hash 不同，不能当 RID
+  接受证据。公开 MSDK V5 有区域 strategy 与 status getter，但普通 RID 没有 enable setter，
+  只有 France EID 暴露 setter。
 - **实现状态：** clean-room Android `0.3.0-research` 只允许固定 EID/OPID/RID command，
   RID 按钮使用 RC 2 已解析的 `protocol` Binder service 和 modern `0x82 -> 0x92` route。
   F7/F8 成功会保存本次 Boolean baseline；F9 后立即 F8 读回，恢复按钮写回同一 baseline。

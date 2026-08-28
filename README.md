@@ -38,6 +38,9 @@
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
   EID、OPID、DIPS 和 China OID 分开。DJI Fly `1.21.10` 没有同名 wrapper，因此 Mini 5 Pro
   是否支持仍由当前实机 F7/F8 决定，不能仅凭静态同族 SDK 宣称已实现。
+- 同族 RID key/native-handler 全量盘点没有发现第二个可直接落地的 global Boolean；公开固定
+  revision 与 exact-string 检索也没有独立 Mini 5 Pro 实现。FreeFCC 仅交叉支持 modern route
+  和 F9 framing，其参数与功能不同。
 - Product-139 的 France EID 静态路径已闭合到 `0x03/0x77`，但它是法国专用 EID，不是
   global RID。两个固定人工 USB GET 路由均未获得 canonical ACK；DJI Fly 私有 owner 路径未实测。
 - FlySafe type-6 `RID_UNLOCK` 是账号/FC 绑定的签名许可类别，具备 enable-state 语义；当前

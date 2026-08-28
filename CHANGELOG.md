@@ -10,6 +10,9 @@
   FLYC `03/F7-F9` family, and static modern `0x82 -> 0x92` route as C-136 and C-137.
 - Added C-138/H-27/B-20 for the decisive Mini 5 Pro F7/F8 admission test and subsequent reversible
   F9/readback/restore plus motor-on independent RF A-B-A.
+- Added C-139/C-140: a full same-family RID configuration inventory found no second closed global
+  Boolean, and a fixed public search found no independent Mini 5 Pro implementation. Modern
+  FreeFCC transport/framing is retained only as corroboration for a different hash/feature.
 - Registered the exact official input as A-022 and the clean-room fixed RC 2 Binder client
   `0.3.0-research` as A-023. The client APK was copied to RC 2 removable storage; install/run/live
   reply remain pending.
