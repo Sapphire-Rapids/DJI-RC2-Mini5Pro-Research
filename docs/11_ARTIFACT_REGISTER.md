@@ -17,7 +17,7 @@
 | A-003 | Corrected route-only resolver；self-developed；V2.3 | `29,019` | `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` | `NOT ADMITTED`；从未复制、安装、附加或运行；只作索引、不分发；只公开 hash |
 | A-004 | RC 2 adjacent Android OTA；input-sample；RC331 `10.00.0700/0205` | `985,959,104` | `f707cf3dc0be2894b111ce4973d0206e896a2c7e9c4ebe43de1040b528cf49ce` | `STATIC`；相邻样本；排除且不分发；只公开 metadata |
 | A-005 | RC 2 protected platform package；input-sample；RC331 `10.00.0700/0200` | `454,223,680` | `d8a8fe5b418ee6461f6971d9dfad77bc4491d15160d47d5cf8f7481dc7113949` | `STATIC`；仅作输入分析；排除且不分发；只公开 metadata |
-| A-006 | DJI Fly analyzed application sample；input-sample；`1.21.10` | `719,464,897` | `0312228ad536381509c09dbfdf1c7e3d4c825c5936199f444058b112985deb3a` | `STATIC`；仅作输入分析；排除且不分发；只公开 metadata |
+| A-006 | DJI Fly analyzed application sample；input-sample；`1.21.10` | `719,464,897` | `0312228ad536381509c09dbfdf1c7e3d4c825c5936199f444058b112985deb3a` | `OBSERVED`；仅在 disposable emulator 安装/运行并作 runtime 分析；排除且不分发；只公开 metadata |
 | A-007 | DJI MSDK public analysis inputs；input-sample；`5.18.0` | 未登记 | 未登记 | `STATIC`；仅作输入分析；只保留公开 reference |
 | A-008 | WA150 encrypted aircraft package sample；input-sample；product-139 family | 未登记 | 未登记 | `STATIC`；仅作输入分析；排除且不分发；只公开 metadata |
 | A-009 | ARM64 JVMTI environment canary；self-developed；V0 | `8,528` | `4a3867251a745ce5db6c0513c23def5c97e53a57e17f4d611621895e4e323c73` | `NOT ADMITTED`；从未复制、安装或附加；只作索引、不分发；只公开 hash |
@@ -45,6 +45,7 @@
 | A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `STATIC`；exact package 离线提取并审计；当前实机安装文件 hash 未读回；排除且不分发 |
 | A-032 | RC331 v07 APEX `adbd` CNXN-gate derivative；input-sample；userspace copy | `1,497,232` | `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` | `NOT ADMITTED`；MTP staging/readback 闭合；未复制到内部存储、未 chmod、未执行；vendor derivative 排除且不分发 |
 | A-033 | FindUAS RC 2 RID Admin；self-developed；`0.8.0-flysafe-diagnostic-export` / code 12 | `204,449` | `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177` | `STATIC`；exact audit；MTP staged/readback matched；未安装或运行；sealed APK 排除，源码公开 |
+| A-034 | DJI Fly runtime private mapping；runtime-derived input；`1.21.10` disposable emulator | `205,443,072` | `2926709cc6896c7315d003c4e61208d5a9fa53ae73cda897d820a581c5c8325c` | `OBSERVED`；authorized read-only emulator process-memory copy；仅本地分析；排除且不分发；只公开 hash |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -326,7 +327,20 @@ zipalign、zero permissions、no native/network/socket/shell/external-process pa
 （C-182）。`UNKNOWN`：没有安装、启动、Binder 结果、inventory、状态改变或 RF 观察。sealed APK
 和 signing material 不入库；独立源码与测试发布在 `apps/rc2-rid-admin`。
 
-## 16. 更新与一致性检查
+## 16. A-006 与 A-034：exact 1.21.10 disposable-emulator runtime inputs
+
+A-006 是此前已登记的 exact DJI Fly `1.21.10` APK。本轮只在 disposable ARM64 Android 11
+emulator 安装并运行：普通 onboarding 到达主 Activity，authorized emulator shell 又打开了
+non-exported license-manager Activity。该观察改变的只是 A-006 的 device-use state；它不产生 RC 2、
+飞机、账号、inventory 或 RF 结论。
+
+A-034 是同一 emulator app process 的一个 private read/write mapping，由 authorized root
+`/proc/PID/mem` 只读复制取得。独立 boundary scanner 从中恢复 22 个 structurally valid DEX image
+用于本地 exact-current Java 分析。A-034、extracted DEX、decompiled source 与 raw process logs 均不
+入库；GitHub 只保留 whole-file identity、方法、事实、边界和独立 scanner 源码。direct Frida attach
+未产出工件并使 app 退出，单独记录为 C-187。
+
+## 17. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

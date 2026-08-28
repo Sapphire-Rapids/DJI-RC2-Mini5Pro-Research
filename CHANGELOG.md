@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.4.1 - 2026-08-29
+
+### Added
+
+- Registered C-183--C-187 and A-034 for the exact DJI Fly `1.21.10` disposable-emulator runtime
+  study. The non-exported official license-manager Activity rendered, authorized read-only process
+  memory recovery produced a local current-Java analysis set, and all vendor bytes remain excluded.
+- Closed the exact current same-process aircraft-license owner through the component, Activity,
+  view model, `FlightRestrictImpl`, `JNIFSUnlockManager` and native current-device query.
+- Closed the exact generic existing-license action through the native current-device setter and
+  Boolean-array row refresh. The action was not executed and is not represented as a proven RID
+  switch.
+- Added `host-tools/runtime-dex-scan`, an independently written bounded DEX-image scanner with
+  synthetic tests. It operates only on an already acquired authorized memory file and contains no
+  process-dumping, injection, device-control or vendor code.
+
+### Corrected
+
+- Replaced the stale statement that current protected Java/type-6 rendering was unrecovered. Exact
+  current Java defines only license types 0--4 plus unknown and protobuf fields 1--5; unknown records
+  fall through to a tolerant polygon model. DJI Fly `1.21.10` therefore cannot be treated as a
+  semantic type-6 `RID_UNLOCK` reader even though its official query/action transport exists.
+- Recorded direct Frida attach as a narrow emulator negative: it found candidates but destroyed the
+  script/application before producing output. This injection path is not to be repeated on RC 2.
+
+### Publication boundary
+
+- The exact DJI Fly APK, runtime mapping, extracted DEX, decompiled source, raw process logs, local
+  paths and any account/device data remain excluded. Public records contain only identities,
+  independent source, high-level control flow, testable claims and explicit evidence boundaries.
+
+### Verification
+
+- The published RC 2 RID Admin source completed clean JVM tests (`132`, zero failures/errors), lint
+  and debug assembly under Gradle `8.10.2` with JDK 21.
+- Published host source compiled successfully; protocol, quiescence, firmware-target and runtime-DEX
+  suites completed `123` synthetic/device-free tests with zero failures.
+- Markdown-link, claims/artifacts CSV, sensitive-pattern and whitespace validation passed before
+  publication.
+
 ## 0.4.0 - 2026-08-29
 
 ### Added

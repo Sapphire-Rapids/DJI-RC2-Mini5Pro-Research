@@ -182,16 +182,20 @@ native/network/socket/shell/external-process path passed. It is staged as remova
 `Download/FindUAS_A033_DIAG_EXPORT.apk`; fresh readback size/hash matched. It has not been installed
 or run.
 
-Before that external diagnostic, use the materially different official owner identified by C-180.
+Before that external diagnostic, use the materially different official owner identified by
+C-180/C-184.
 Read [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md) and perform its one-time
 manual read-only sequence: DJI Fly -> Profile/Me -> Settings -> `证书列表` / Unlocking License List ->
 `飞机内证书` / Aircraft Unlocking Licenses. Capture the complete result/error and do not toggle a
 row. Then install/run A-033 once and return the public text file. This first pass requires no motor
 start or detector and contains no state change.
 
-Do not interpret a generic row switch as a verified RID switch. Exact current protected Java bodies,
-type-6 rendering, aircraft application, restore semantics and motor-on independent RF A-B-A remain
-open.
+Do not interpret a generic row switch as a verified RID switch. Exact current protected Java is now
+recovered: it closes the existing-ID native action but defines only license types 0--4 plus unknown,
+protobuf fields 1--5, and sends unknown records to a tolerant polygon fallback (C-185/C-186). Thus
+current UI type-6 rendering is negatively closed rather than merely unknown. Live RC 2 inventory,
+semantic type-6 identity, aircraft application, restore semantics and motor-on independent RF A-B-A
+remain open.
 
 ### RID working status
 

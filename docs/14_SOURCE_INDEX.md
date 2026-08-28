@@ -36,6 +36,16 @@ here does not imply that all of its claims were accepted.
 - [AOSP platform frameworks/base](https://android.googlesource.com/platform/frameworks/base/).
   Used for Android `attach-agent`, Settings intents, and permission behavior.
 
+## Exact local input identities (excluded from publication)
+
+- DJI Fly official Android package `1.21.10` / versionCode `3115981`, A-006, `719,464,897` bytes,
+  SHA-256 `0312228ad536381509c09dbfdf1c7e3d4c825c5936199f444058b112985deb3a`.
+  It was installed only on a disposable ARM64 Android 11 emulator. The exact non-exported license
+  Activity rendered there, and an authorized read-only root process-memory copy supported local
+  current-Java analysis (C-183--C-187). The APK, memory mapping A-034, extracted DEX, decompiled
+  source and raw logs are excluded; only independently written scanner source and high-level facts
+  are published.
+
 ## Reverse-source snapshots and protocol prior art
 
 - [SKYROVER_src](https://github.com/MAVProxyUser/SKYROVER_src/tree/8186e19241c913318b140bf37c5eafba005f1e7c)

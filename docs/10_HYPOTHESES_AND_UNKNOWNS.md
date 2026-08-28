@@ -359,3 +359,18 @@ Every hypothesis below is testable and remains separate from factual findings.
   not be collapsed into success/failure.
 - Current state: `NOT ADMITTED` and entirely unexecuted. MTP staging is not runtime evidence; no
   internal path is preselected until the baseline is observed.
+
+## H-31 — official aircraft tab can supply transport truth but not type-6 semantics（C-183--C-186）
+
+- Known facts: exact current Java closes the official Activity/view-model/native query owner and the
+  generic existing-ID setter. The same Java version defines only license types 0--4 plus unknown,
+  protobuf fields 1--5, and routes unknown records into a tolerant polygon model.
+- Hypothesis: on the linked RC 2/Mini 5 Pro session, the official aircraft tab can distinguish a
+  completed same-process query from login/link/version/support failure even though its row type may
+  be semantically wrong.
+- Distinguishing evidence: one motor-off observation of the official aircraft tab, preserving exact
+  completion/error and only privacy-reduced visible row metadata, followed by one A-033 external
+  diagnostic export. An odd polygon/unknown row is recorded as a candidate mismatch, never promoted
+  to type 6 without an independent canonical parser or signed source identity.
+- Current state: `UNKNOWN` on RC 2. Emulator rendering proves only Activity viability. No toggle,
+  `0x11/0x12`, motor action or RF test belongs to this first observation.

@@ -101,7 +101,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 
 | Surface | Facts | Current disposition |
 | --- | --- | --- |
-| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; exact current package declares a non-exported official license-manager Activity; A-026 passive gate ended unobserved/zero-query; A-027 ended `ProtocolException`/ambiguous; A-028 localized it to group transport callback failure before protobuf/pages/terminator, with zero `11/12`; A-033 adds privacy-reduced export but is unrun; current Fly typed parsing stops at fields 1--5 while separate MSDK defines field-7 RID | `MANAGED`; next query is the official same-process aircraft tab followed by one A-033 diagnostic, not another route guess; no canonical inventory, support, entitlement, RID, or RF evidence exists; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
+| FlySafe type-6 `RID_UNLOCK` | official web background + exact `Rid` product + account product/FC-SN approval; signed group/import/inventory/existing-ID action chain; exact generic `0x11/0x11` / `0x11/0x12` wire; exact current package declares and emulator-renders a non-exported official license-manager Activity; recovered current owner reaches native query/set with current device ID; A-026 passive gate ended unobserved/zero-query; A-027 ended `ProtocolException`/ambiguous; A-028 localized it to group transport callback failure before protobuf/pages/terminator, with zero `11/12`; A-033 adds privacy-reduced export but is unrun; current Fly Java has only types 0--4/unknown and fields 1--5, then misroutes unknown to a tolerant polygon fallback, while separate MSDK defines field-7 RID | `MANAGED`; official aircraft tab is same-process transport evidence but not semantic type-6 truth; next query is that tab followed by one A-033 diagnostic, not another route guess; no canonical inventory, support, entitlement, RID, or RF evidence exists; never fabricate/upload/replay a license, and require same-item restore plus a proved aircraft consumer/RF result before calling it a switch |
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
@@ -144,9 +144,11 @@ length. Its artifact audit and MTP identity checks passed (C-170--C-172). The in
 
 A-033 packages that privacy-reduced diagnostic into a file-manager-readable MediaStore report while
 preserving the same command/route/selectors and zero-`11/12` direct-button boundary (C-181/C-182).
-It remains uninstalled and unrun. C-180 establishes a higher-information official same-process
-surface: DJI Fly's non-exported license-manager Activity and aircraft tab. The first live pass must
-inspect that tab without toggling, then run A-033 once; see
+It remains uninstalled and unrun. C-180/C-183/C-184 establish a higher-information official
+same-process surface: DJI Fly's non-exported license-manager Activity and aircraft tab. C-185 closes
+an equally important limitation: the current Java UI cannot semantically identify type 6 and may
+misclassify an unknown record as a polygon license. The first live pass must inspect that tab without
+toggling, then run A-033 once; see
 [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md).
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing

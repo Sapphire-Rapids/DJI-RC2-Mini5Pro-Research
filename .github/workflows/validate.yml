@@ -40,3 +40,5 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_*.py'
       - name: Test firmware metadata and target locks
         run: python -m unittest discover -s host-tools/firmware-acquisition -p 'test_*.py'
+      - name: Test runtime DEX boundary scanner
+        run: python -m unittest discover -s host-tools/runtime-dex-scan -p 'test_*.py'

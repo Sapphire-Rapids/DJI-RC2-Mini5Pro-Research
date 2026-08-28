@@ -15,7 +15,7 @@
 | --- | --- | --- |
 | 遥控器 | DJI RC 2；界面固件 `07.00.0100` | exact signed system/`0205` package 已验证；mounted live files/properties 仍未读回，其他平台结论仍可能来自相邻样本 |
 | 飞机 | DJI Mini 5 Pro；静态候选 WA150 / product 139 | product/route 需在 live session 重新确认 |
-| DJI Fly | 重点分析样本 1.21.10 | 静态样本，不自动等同于 RC 2 当前已加载 APK |
+| DJI Fly | 重点分析样本 1.21.10 | exact APK 已在 disposable emulator 运行并作 runtime 分析；仍不自动等同于 RC 2 当前已加载 APK |
 | MSDK | 重点交叉验证 5.18.0 | schema/handler 证据不等于消费级产品支持 |
 | 主机 | macOS；飞机与 RC 2 分别枚举为 DJI USB 设备 | 序列号、端口位置和私人数据不公开 |
 
@@ -147,11 +147,15 @@
   0 errors/15 warnings、两次 byte-identical clean build、v2/zipalign、零权限及无
   native/network/socket/shell/external-process path 已通过。MTP fresh readback 匹配；尚未安装或
   运行，不能据此宣称 inventory、RID 状态或 RF 控制。
-- Exact DJI Fly 1.21.10 声明非 exported 的 `UnlockLicenseManagerActivity`，并保留 license-manager
-  actions、`queryFCLicensesJni`/`setLicenseEnableJni` 与账号/飞机证书列表资源。相邻同族可执行源码
-  显示官方设置页进入该 Activity，飞机 tab 通过同进程 owner 查询并可能呈现 generic switch。
-  当前版本 protected Java body 与 type-6 rendering 尚未恢复，所以返回电脑后的第一优先实机步骤
-  是只读查看 DJI Fly 的“证书列表/飞机内证书”，而不是再猜 external Binder route。
+- Exact DJI Fly 1.21.10 的运行时 Java 已从一次性 ARM64 Android 11 emulator 中恢复并仅在本地
+  分析：官方 `UnlockLicenseManagerActivity` 的飞机 tab 确实沿同进程 component/view-model、
+  `FlightRestrictImpl`、`queryFCLicensesJni` 到 native current-device query；generic row switch
+  沿 existing license ID + Boolean 到 `setLicenseEnableJni`，本研究未执行写入。该 Activity 也已在
+  emulator 中真实渲染，证明 UI/owner 存在但不是 RC 2/飞机结果。
+- Exact current Java 同时给出一个重要阴性：`LicenseType` 只有 0--4 + `UNKNOWN`，`LicenseData`
+  只有 fields 1--5，未知记录会落入可容忍空 polygon 的普通兜底。也就是说 DJI Fly 1.21.10 UI
+  不能语义识别 type-6 `RID_UNLOCK`，可能误分类；这不否定 native/FC/opaque server 支持。下一步
+  仍应只读查看 official aircraft list，再跑一次 A-033，而不是继续猜 external Binder route。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
@@ -222,7 +226,7 @@
 - [docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md](docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md)：RID
   状态、身份、地区、策略、managed/opaque/legacy 面的可读/可写/恢复/RF 与 UI 准入矩阵。
 - [docs/20_OFFICIAL_FLYSAFE_UI_PATH.md](docs/20_OFFICIAL_FLYSAFE_UI_PATH.md)：DJI Fly 官方同进程
-  FlySafe 清单入口、证据边界与一次性只读实机步骤。
+  FlySafe owner、generic existing-ID action、current type-6 Java incompatibility 与一次性只读实机步骤。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
 - [projects/README.md](projects/README.md)：完整源码目录、状态与发布边界。
@@ -244,7 +248,8 @@
   [firmware acquisition](host-tools/firmware-acquisition/README.md)、
   [IMaH analysis](host-tools/imah-analysis/README.md)、
   [ELF analysis](host-tools/elf-analysis/README.md)、
-  [Ghidra scripts](host-tools/ghidra-scripts/README.md)。
+  [Ghidra scripts](host-tools/ghidra-scripts/README.md)、
+  [runtime DEX boundary scanner](host-tools/runtime-dex-scan/README.md)。
 - 历史实验：[country/area round trips](experiments/device-write/README.md) 与
   [JVMTI experiment sequence](experiments/jvmti/README.md)。撤回或尚未准入的路线保留原状态，
   不因为源码公开而变成已验证功能。

@@ -256,6 +256,15 @@ Later retractions override earlier progress summaries.
     a non-exported official license-manager Activity; inspect its aircraft list manually before
     another external Binder route experiment. A UI row or switch is inventory/management evidence,
     not type-6 identity, aircraft application, or RF proof.
+37. Exact DJI Fly `1.21.10` runtime Java is no longer an unresolved protected-body gap. A disposable
+    ARM64 Android 11 emulator rendered the non-exported license Activity, and authorized read-only
+    process-memory recovery closed the current owner through `FlightRestrictImpl` and
+    `JNIFSUnlockManager`. The current Java model defines only license types 0--4 plus unknown and
+    protobuf fields 1--5; unknown falls into a tolerant polygon fallback. Therefore an official row
+    is transport/inventory evidence but cannot semantically prove type 6. The generic existing-ID
+    setter exists but was never executed. Direct Frida attach produced no artifact and must not be
+    repeated on RC 2. Vendor APK/memory/DEX/decompiled output remain local and excluded; only the
+    independent boundary scanner and evidence record are public.
 
 ## Privacy and redaction
 

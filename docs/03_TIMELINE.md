@@ -521,9 +521,7 @@ work when a report did not contain a more precise timestamp.
 
 - `STATIC`：exact DJI Fly 1.21.10 declares a non-exported
   `UnlockLicenseManagerActivity`, license-manager actions/resources, and native query/set-enable
-  entry names. Pinned adjacent same-family Java maps the settings entry to that Activity and its
-  aircraft tab to official inventory/action calls (C-180). Exact current protected Java bodies and
-  type-6 rendering remain unknown.
+  entry names (C-180).
 - `STATIC`：A-033 `0.8.0-flysafe-diagnostic-export` adds zero-permission MediaStore export at
   `Download/FindUAS/FindUAS_RID_A033_latest.txt` without changing A-028's fixed `11/11` protocol or
   zero-`11/12` direct-button boundary. Two clean builds were byte-identical; 132 tests, lint
@@ -534,3 +532,24 @@ work when a report did not contain a more precise timestamp.
 - `UNKNOWN`：A-033 has not been installed or run. The prepared next RID session is manual read-only
   inspection of DJI Fly's aircraft-license tab, followed by one A-033 diagnostic run; no toggle,
   motor action, or RF experiment is included.
+
+### 2026-08-29 — exact DJI Fly 1.21.10 runtime owner recovery
+
+- `OBSERVED`：a disposable ARM64 Android 11 emulator completed exact official DJI Fly `1.21.10`
+  onboarding and rendered the non-exported license-manager Activity through an authorized emulator
+  shell. Account and aircraft tabs appeared; without an aircraft, the aircraft tab requested a
+  connection (C-183). This is not an RC 2 or aircraft result.
+- `NEGATIVE`：a direct Frida attach identified runtime DEX candidates but destroyed the script and
+  application before producing output. The injection path is not to be repeated on RC 2 (C-187).
+- `OBSERVED`：an ordinary read-only root copy of the emulator process's private read/write mapping
+  succeeded. A small independently written boundary scanner recovered 22 structurally valid DEX
+  images for local analysis; vendor memory, DEX and decompiled output remain excluded (C-183).
+- `STATIC`：exact current Java closes the official aircraft tab through the component, Activity,
+  view model, `FlightRestrictImpl`, `JNIFSUnlockManager.queryFCLicensesJni` and the native query with
+  current device ID (C-184).
+- `STATIC`：the exact generic row action passes an existing license ID and Boolean through the
+  current-device native setter, then refreshes displayed row states from a Boolean-array callback.
+  The action was not executed (C-186).
+- `STATIC`：exact current `LicenseType` and `LicenseData` model only types/tags 0--4/1--5. Unknown
+  values fall into a tolerant polygon model, so this Java UI cannot semantically identify type 6
+  `RID_UNLOCK`; separate MSDK 5.18 type-6 support remains a different artifact (C-185).

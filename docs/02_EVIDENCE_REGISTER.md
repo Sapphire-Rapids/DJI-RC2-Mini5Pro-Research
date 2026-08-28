@@ -256,13 +256,18 @@ Details: [09_NEGATIVE_RESULTS.md](09_NEGATIVE_RESULTS.md),
 | C-055 | `UNKNOWN` | No new independent V2.3 post-fix audit conclusion exists | V2.3 remains `NOT ADMITTED` |
 | C-129 | `HYPOTHESIS` | A separate external OpenDroneID source could provide synthetic configurable standards fields | No RF backend/hardware/readback/stop/reception evidence is implemented or admitted |
 
-## Official FlySafe UI and A-033 handoff
+## Official FlySafe UI, exact current owner, and A-033 handoff
 
 | ID | Status | Claim | Boundary |
 | --- | --- | --- | --- |
-| C-180 | `STATIC` | Exact DJI Fly 1.21.10 declares the non-exported license-manager Activity/actions/JNI names; adjacent same-family executable Java maps the settings entry and aircraft tab to official query/set-enable calls | Exact protected current Java bodies and type-6 rendering remain unknown; UI state is not RF proof |
+| C-180 | `STATIC` | Exact DJI Fly 1.21.10 declares the non-exported license-manager Activity and current runtime recovery closes its same-process component/view-model/native query and generic set-enable owner chain | Current Java type-6 semantics are separately negative; UI state is not RF proof |
 | C-181 | `STATIC` | A-033 is the exact zero-permission diagnostic-export build; 132 tests, lint, reproducible build, signing/alignment and final-artifact checks passed | No install/run/Binder/inventory/RF result; direct button remains `11/11` only |
 | C-182 | `OBSERVED` | A-033 removable-SD staging and fresh full readback matched its registered size and SHA-256 | Staging only; device and MTP identifiers are excluded |
+| C-183 | `OBSERVED` | Exact DJI Fly 1.21.10 completed onboarding and rendered its non-exported license Activity in a disposable ARM64 Android 11 emulator; authorized root process-memory reading recovered 22 bounded runtime DEX images locally | Emulator only; no RC 2/aircraft/inventory/RF evidence and no vendor bytes are published |
+| C-184 | `STATIC` | Exact current Java closes the aircraft tab through `FlightRestrictImpl` and `JNIFSUnlockManager.queryFCLicensesJni` to the native current-device query | Same-process ownership is not a successful live RC 2 query or type-6/RF proof |
+| C-185 | `STATIC` | Exact current Java defines license types 0--4 plus unknown and protobuf fields 1--5 only; an unknown record falls through to a tolerant polygon model | Current Java cannot semantically identify type 6; native/FC/opaque-server support remains open |
+| C-186 | `STATIC` | Exact current generic row switch passes an existing license ID and Boolean through the native current-device setter, then refreshes row states from its Boolean-array callback | Never executed; no entitlement creation, type-6 identity, restore, aircraft application, or RF proof |
+| C-187 | `NEGATIVE` | Direct Frida attach in the disposable emulator found candidates but destroyed the script/app before output; read-only root process-memory copying worked instead | Narrow emulator result; do not repeat injection on RC 2 and do not publish vendor dumps/DEX/output |
 
 Details: [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md),
 [11_ARTIFACT_REGISTER.md](11_ARTIFACT_REGISTER.md), and

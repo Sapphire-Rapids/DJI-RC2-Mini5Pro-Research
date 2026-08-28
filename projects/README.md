@@ -34,6 +34,7 @@ change Remote ID behavior on a device.
 | `host-tools/imah-analysis/` | IMaH audit and deliberately non-flashable integrity experiment wrappers | Offline source only; upstream GPL tool and firmware are external |
 | `host-tools/elf-analysis/` | AArch64 ELF inspection helpers and one fixed runtime-route manifest | Static analysis only; vendor ELF inputs and output are excluded |
 | `host-tools/ghidra-scripts/` | Targeted Ghidra symbol/xref/decompiler helpers | Source only; no program database, vendor binary, or decompiler output |
+| `host-tools/runtime-dex-scan/` | Small bounded DEX-image scanner for an already authorized raw-memory file | Host-tested source and synthetic tests only; no process dumper, vendor memory, DEX or decompiled output |
 | `experiments/device-write/` | Historical bounded country/area round-trip scripts | FC/Sky `CN -> US -> CN` observed; Ground write unacknowledged; no RID/RF conclusion |
 | `experiments/jvmti/` | Six source-only Android/JVMTI research stages | V2.2 is `RETRACTED`; V2.3 and the other stages remain `NOT ADMITTED` |
 

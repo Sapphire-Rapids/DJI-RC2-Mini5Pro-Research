@@ -112,7 +112,9 @@ Effect: Java false is ambiguous and no write baseline exists.
 
 Static source is now closed: current DJI Fly gets version only from passive `03/09` Area Info and
 support from passive `03/42` WhiteList Info; cache defaults `255/false` do not distinguish
-uninitialized from unsupported. Missing:
+uninitialized from unsupported. Exact current runtime recovery now also closes the official
+same-process owner from Activity/view model through `FlightRestrictImpl` and
+`JNIFSUnlockManager.queryFCLicensesJni` to the native current-device query (C-183/C-184). Missing:
 
 - usable current-connection observations of both passive pushes;
 - current support=true and negotiated V2/V3/V4 version derived from those observations;
@@ -126,8 +128,10 @@ uninitialized from unsupported. Missing:
 Effect: fixed legacy inventory requests, version guessing, cache defaults, missed pushes, A-027's
 ambiguous result, and A-028's group transport callback failure are not evidence of unsupported or
 empty inventory. External Binder cannot see DJI's device token; a same-sender/window pair is only a
-proxy, and missing pushes remain unknown. C-180 identifies the official same-process UI as the next
-ground-truth read; its presence does not make a displayed switch RF proof.
+proxy, and missing pushes remain unknown. C-180/C-184 identify the official same-process UI as the
+next ground-truth transport read. C-185 also proves that current Java cannot semantically identify
+type 6 and may map an unknown record to an ordinary polygon row, so UI presence/text/switch is not
+type-6 identity or RF proof.
 
 ## B-11 — genuine type-6 entitlement
 
@@ -142,6 +146,8 @@ separate. Missing:
 - genuine account-issued, FC-bound type-6 item;
 - successful FC import/visibility rather than server presence alone;
 - provenance, validity, enabled baseline, and matching region level;
+- a semantic type-6 oracle independent of current Fly Java's 0--4/fields-1--5 model and tolerant
+  polygon fallback (C-185);
 - same-item readback after any transition;
 - exact restore and final inventory;
 - onboard status and independent motor-on RF A-B-A.
@@ -149,7 +155,8 @@ separate. Missing:
 Effect: static SetEnable schema, region/country changes, a copied license, or a server-list item cannot
 establish a stable Mini 5 Pro switch. If either official visibility Boolean is false, the lawful path
 is a DJI FlySafe research/experimental support request or a separately supported aircraft for parser
-validation; never fabricate, transfer, or replay a license.
+validation; never fabricate, transfer, or replay a license. The exact current generic action
+(C-186) changes only an existing ID and has not been executed; it does not remove any of these gates.
 
 ## B-12 — effective 30/50 m restriction observation
 

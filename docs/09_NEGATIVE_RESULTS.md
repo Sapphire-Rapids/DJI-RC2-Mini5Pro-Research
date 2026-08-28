@@ -473,7 +473,9 @@ stronger conclusion that cannot be drawn.
 - Status: `NEGATIVE` for the bounded current DJI Fly 1.21.10 static scope; machine claim C-153.
 - Exact anchors: current Fly's V3 `11/12` builder carries only zero, little-endian license ID,
   enable/disable action, and final zero; its manager adds only support/version gating. Current typed
-  `LicenseData` parsing stops at fields 1--5 and treats field 7 as unknown (C-152).
+  `LicenseData` parsing stops at fields 1--5 and treats field 7 as unknown (C-152). Exact recovered
+  Java further shows only types 0--4 plus unknown, then routes unknown to a tolerant polygon fallback
+  rather than a type-6 model (C-185).
 - Result: no type-6, field-7, or `11/12 enabled` consumer/xref was found to WA150 `0802`, motor/armed
   transition, or BLE/Wi-Fi broadcaster enable. The retained MSDK delegate changes app status only and
   begins behind an immediate return.
@@ -552,3 +554,16 @@ stronger conclusion that cannot be drawn.
 - Does not establish: unsupported state, empty inventory, no `RID_UNLOCK`, RID off, or RF state.
   The result image is not committed, and no identifier, raw reply, license material, motor action,
   or independent RF observation is recorded.
+
+## N-51 — direct Frida attach is not the current runtime-recovery path
+
+- Status: `NEGATIVE` for one direct attach to exact DJI Fly `1.21.10` in a disposable ARM64 Android
+  11 emulator; machine claim C-187.
+- Result: the attach enumerated runtime DEX candidates, then the script and app process were
+  destroyed before an output file was written.
+- Consequence: do not repeat injection against RC 2. An ordinary authorized root read of the
+  emulator process mapping supplied the needed local evidence without modifying the target process,
+  and the public helper only scans an already acquired file.
+- Does not establish: universal Frida incompatibility, anti-instrumentation behavior on RC 2, or any
+  aircraft/entitlement/RF fact. No vendor dump, DEX, decompiled output, private identifier or raw
+  process log is committed.

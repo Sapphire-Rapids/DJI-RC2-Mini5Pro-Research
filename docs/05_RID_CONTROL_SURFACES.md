@@ -17,7 +17,8 @@ legacy DroneID Detection `C-119`--`C-122`；地区身份/位置 `C-123`--`C-128`
 reply/status/admission `C-130`--`C-132`；动态 RID bundle 与 namespace `C-133` / `C-134`；
 AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C-136`--`C-138`；
 同族配置全量盘点与公开先例阴性 `C-139` / `C-140`。
-`rid_ctrl_enable_0` 两条 direct F7 实机结果为 `C-141`。
+`rid_ctrl_enable_0` 两条 direct F7 实机结果为 `C-141`；exact current official owner、type-6
+Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ## 总结矩阵
 
@@ -35,7 +36,7 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 | RID-005B | China UOM identifier | `STATIC` | `0x11/0xD6` tag route/reply 已闭合；live baseline/RF 未闭合 |
 | RID-005B2 | China UOM real-name status | `STATIC/UNKNOWN` | 条件 `0x11/0xD1` getter + account/network Sync；无 setter，live admission 未知 |
 | RID-006 | MSDK area strategy | `STATIC` | development delegate selector，不是实际地区/RF 证明 |
-| RID-007 | FlySafe type-6 | `STATIC` | 签名、账号/FC 绑定的 managed license state |
+| RID-007 | FlySafe type-6 | `STATIC` | 签名、账号/FC 绑定的 managed license state；current Java UI 不能语义识别 type 6 |
 | RID-008 | Mini 5 Pro type-6 entitlement | `UNKNOWN` | 资格、真实许可、FC 接受和 RF 效果均未闭合 |
 | RID-009 | EU C0 policy | `NEGATIVE` | live F7 未返回 metadata，未执行 F8/F9 |
 | RID-010 | broadcast-effect policy | `NEGATIVE` | live F7 未返回 metadata，bitmap 语义未知 |
@@ -462,11 +463,13 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   `License.data` oneof field 7 是 RID，其内部 level 是 field 1；domain type 6 与 protobuf field 7
   是两个命名空间（C-149）。
 - **current DJI Fly model boundary：** current native transport 能传递 signed onboard blob 并
-  执行 generic query/set-enable，但已恢复的 1.21.10 server JSON/model switch 只识别 type 0..4，
-  不原生解释 type 6 level。exact current Fly `LicenseData` typed parser 也只处理 fields 1--5；
-  field 7/tag `0x3a` 进入 `UnknownFieldSet`，没有生成 typed `LicenseDataRID`（C-152）。独立只读
-  parser 是 MSDK-compatible exploration，不能依赖 Fly UI 命名 type 6，也不能说
-  current Fly 本身已理解 field 7。
+  执行 generic query/set-enable，但 exact recovered 1.21.10 `LicenseType` 只定义 0--4 加
+  `UNKNOWN(255)`，`LicenseData` oneof 只定义 fields 1--5，`LicenseType.find` 没有 typed field 时
+  返回 unknown。更关键的是，`WhiteListLicense.parseFromProtoBufData` 把所有非 0--3 类型（包括
+  unknown）送进可容忍空 polygon 的 pentagon fallback。因此 current UI 不只是“不认识 field 7”，
+  还可能把 type-6 record 误建模成普通多边形许可（C-185）。独立只读 parser 是
+  MSDK-compatible exploration，不能依赖 Fly UI 命名 type 6，也不能说 current Fly 本身已理解
+  field 7。
 - **边界/不证明：** numeric command 已知不等于可安全 hand-build。support/version push、session owner、
   route、真实许可、readback/restore 和独立 RF 效果仍未实证。
 - **公开依据：** 前述公开 state/firmware research。
@@ -621,6 +624,27 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
   protobuf、page 或 terminator，也没有 set-enable request。当前 UI 未显示 Reply failure/ecode/
   callback diagnostic；不能解释为 unsupported、empty inventory、no `RID_UNLOCK`、RID off 或 RF。
   下一判别是显示该既有 Reply 诊断，不重复同一黑盒请求。
+
+### RID-008I：exact official owner 与 generic existing-ID switch 已恢复
+
+- **证据状态：** emulator Activity 为 `OBSERVED`（C-183）；owner、type model 与 action path 为
+  `STATIC`（C-184--C-186）；direct Frida attach 为有界 `NEGATIVE`（C-187）。
+- **对象/版本：** exact official DJI Fly `1.21.10`，在 disposable ARM64 Android 11 emulator
+  完成普通 onboarding 并由 authorized root shell 打开 non-exported Activity。
+- **UI 观察：** account/aircraft 两个 license tab 正常渲染；无 aircraft 时，aircraft tab 要求连接。
+  这只是 emulator UI 观察，不是 RC 2 inventory 或 FC result。
+- **owner chain：** current `LicenseManageComponent -> UnlockLicenseManagerActivity ->
+  UnlockLicenseManageView -> ULUavLicenseVM -> FlightRestrictImpl -> JNIFSUnlockManager`，查询最终
+  以 current device ID 进入 native FC-license query（C-184）。
+- **generic action：** row adapter 从 `WhiteListLicense.isEnabled()` 取得 baseline，把 existing
+  license ID + desired Boolean 交给 native current-device setter；success callback 返回 Boolean
+  array 更新所有 row。此写入从未执行，也不能自己生成 entitlement（C-186）。
+- **type-6 boundary：** exact current Java 只有 types 0--4/unknown 与 fields 1--5；unknown 又落到
+  tolerant polygon fallback（C-185）。所以 official current UI 是 same-process transport truth，
+  却不是 reliable type-6 semantic truth。显示一个 generic switch 不能叫 RID switch。
+- **方法与分发：** direct Frida attach 未产出文件且使 app 退出；不在 RC 2 重复。read-only root
+  process-memory copy 仅在 disposable emulator 使用，通用 boundary scanner 以独立源码公开；vendor
+  dump、DEX、decompiled source 与 private data 不公开。
 
 ### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
 
