@@ -240,6 +240,11 @@ The earlier absence of a concrete global-control name is no longer the immediate
 same-family static evidence now closes `RIDCtrlEnable -> rid_ctrl_enable_0 -> 0x3CBD864F ->
 03/F7-F9`, and A-023 implements the fixed RC 2 Binder path.
 
+Both previously validated direct routes have now answered F7 with one-byte status `0x03` while
+same-session known-parameter controls succeeded (C-141). Raw USB `0x82 -> 0x92` is not an alternate
+answer because its maximum-height positive control also timed out. The unresolved scope is now only
+the actual RC 2 `protocol` Binder modern route.
+
 Missing:
 
 - confirmation that exact A-023 is installed and running on RC 2;
@@ -249,10 +254,10 @@ Missing:
 - reconnect/power-cycle persistence classification;
 - external detector online plus operator-initiated motor-on RF A-B-A.
 
-Effect: this is the shortest active dependency. A one-byte nonzero F7 status closes only current
-Mini 5 Pro admission of this exact hash/route. A positive F7/F8 permits the internal reversible
-write test immediately; it still requires the later motor-on receiver observation to establish
-actual broadcast behavior.
+Effect: this is the shortest active dependency. A Binder one-byte nonzero F7 status would close the
+remaining current Mini 5 Pro route for this exact hash. A positive F7/F8 permits the internal
+reversible write test immediately; it still requires the later motor-on receiver observation to
+establish actual broadcast behavior.
 
 ## Dependency order
 

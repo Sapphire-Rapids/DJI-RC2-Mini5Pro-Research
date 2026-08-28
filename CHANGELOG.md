@@ -16,6 +16,9 @@
 - Registered the exact official input as A-022 and the clean-room fixed RC 2 Binder client
   `0.3.0-research` as A-023. The client APK was copied to RC 2 removable storage; install/run/live
   reply remain pending.
+- Added C-141 from a live read-only probe: both validated direct routes returned F7 status `0x03`
+  for `0x3CBD864F` while same-session known-parameter controls succeeded. Direct USB modern routing
+  failed its own height control, so only the RC 2 Binder modern route remains open; no F9 was sent.
 - Updated the control matrix, handoff, source index, timeline, README, AGENTS contract, claim CSV,
   and artifact CSV so another researcher can continue at the single live F7/F8 step.
 

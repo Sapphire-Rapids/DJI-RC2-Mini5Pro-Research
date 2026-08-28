@@ -371,3 +371,10 @@ was copied to RC 2 removable storage.
 This process did not copy vendor implementation code or distribute vendor artifacts. Static
 same-family support was kept separate from Mini 5 Pro support: the next evidence is one live fixed
 F7/F8 result from the exact client, not another broad symbol search or a France-EID substitution.
+
+A subsequent direct read-only pass added the fixed hash to the previously positive-controlled USB
+probe and kept F9/FA unreachable. RC 2 routed and aircraft-direct legacy endpoints both returned
+one-byte F7 status `03`; immediately adjacent known height/distance controls returned valid F7/F8.
+The static modern `0x82 -> 0x92` tuple was then tested directly on USB, but a known maximum-height
+control also timed out. This separated a real direct-route parameter retrieval failure from an
+unusable raw-USB modern route and reduced the remaining live test to the RC 2 Binder client.

@@ -64,6 +64,10 @@
   readback 和 restore 流程，最终 APK SHA-256 为
   `271ca3a415c7258919889a44983145671d6771be64803f6fe75289937bdc7c59`，并已复制到 RC 2
   removable storage；安装、运行和 live reply 尚未记录。
+- 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
+  `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
+  连 height control 也 timeout，因此现在只剩 staged APK 的 `protocol` Binder
+  `0x82 -> 0x92` 结果；未发送 F9。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
 - NLD FCC Smart RC `2.0.0.6` 的普通 FCC 路径使用 authenticated Base64 envelope、

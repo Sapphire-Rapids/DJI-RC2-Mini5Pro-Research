@@ -278,5 +278,6 @@ Every hypothesis below is testable and remains separate from factual findings.
 - Follow-on if positive: capture baseline, write the opposite Boolean once with F9, confirm by F8,
   restore the captured baseline, and confirm again. Reconnect persistence and motor-on independent
   RF A-B-A are separate observations.
-- Current state: `UNKNOWN`. `0.3.0-research` has been copied to RC 2 removable storage; installation,
-  execution, Binder result, FC reply, and RF effect have not yet been recorded.
+- Current state: direct routes are `NEGATIVE` for F7 metadata retrieval with same-session positive
+  controls (C-141). `0.3.0-research` has been copied to RC 2 removable storage; installation,
+  execution, Binder-modern result, and RF effect have not yet been recorded.

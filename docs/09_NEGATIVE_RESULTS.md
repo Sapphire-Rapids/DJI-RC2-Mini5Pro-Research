@@ -412,3 +412,17 @@ stronger conclusion that cannot be drawn.
   exact `RIDCtrlEnable` or `rid_ctrl_enable_0`. The FreeFCC frame uses a different hash/feature.
 - Does not establish: that private or unindexed work does not exist, that every frame in a successful
   multi-frame profile was individually accepted, or that WA150 supports hash `0x3CBD864F`.
+
+## N-43 — `rid_ctrl_enable_0` on validated direct F7 routes
+
+- Status: `NEGATIVE` for metadata retrieval on two exact direct routes; underlying observations are
+  `OBSERVED` (C-141).
+- Result: RC 2 routed `0xAA -> 0x03` and aircraft-direct `0x0A -> 0x03` each returned a canonical
+  one-byte F7 payload `03` for hash `0x3CBD864F`. F8 and F9 were not sent.
+- Positive controls: the same RC 2 session returned valid F7/F8 for height, distance, and
+  distance-limit enabled; the aircraft session returned valid F7/F8 for height.
+- Modern-route control: raw USB `0x82 -> 0x92` returned no matching response for the target and also
+  no response for known maximum height. It is therefore not a valid direct-USB negative against the
+  parameter.
+- Does not establish: the official name of status `0x03`, absence behind the RC 2 `protocol` Binder
+  route, absence in every firmware/product, or any RF behavior.

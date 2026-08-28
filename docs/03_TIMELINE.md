@@ -264,3 +264,14 @@ work when a report did not contain a more precise timestamp.
 - `NEGATIVE`: fixed public repositories plus indexed exact-string searches found no independent
   Mini 5 Pro/RC 2 `RIDCtrlEnable` implementation. FreeFCC corroborated the modern route and F9 frame
   form only; its feature and hash were different.
+
+### 22:59–23:04 — live `rid_ctrl_enable_0` direct F7 probe
+
+- `OBSERVED`: fixed F7 hash `0x3CBD864F` returned a canonical one-byte `03` payload through both
+  RC 2 routed `0xAA -> 0x03` and aircraft-direct `0x0A -> 0x03` paths.
+- `OBSERVED`: in the same sessions, RC 2 height/distance/distance-enable and aircraft height
+  controls returned valid F7 metadata and F8 values; current configured values were unchanged.
+- `NEGATIVE`: direct-route metadata retrieval failed for the candidate. No target F8, F9, reset, or
+  other mutation was sent.
+- `NEGATIVE` only for route usability: raw USB `0x82 -> 0x92` timed out for both the candidate and a
+  known height control. This leaves the RC 2 `protocol` Binder modern route unresolved.

@@ -135,6 +135,12 @@ Later retractions override earlier progress summaries.
     observed. If F7/F8 succeeds, record the baseline and proceed directly to one F9/readback/restore
     loop; if F7 returns a nonzero one-byte status, record that bounded negative and do not reinterpret
     France EID or AirSense as substitutes.
+24. Live direct F7 is now closed for hash `0x3CBD864F`: RC 2 routed `0xAA -> 0x03` and
+    aircraft-direct `0x0A -> 0x03` both returned one-byte status `03`, while same-session known
+    height/distance controls succeeded. Direct USB `0x82 -> 0x92` also failed a known-height
+    positive control, so it is not evidence about parameter support. Do not repeat raw USB route
+    variants; the only remaining current-session admission result is A-023 through the RC 2
+    `protocol` Binder modern route.
 
 ## Privacy and redaction
 

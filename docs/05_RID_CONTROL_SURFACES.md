@@ -17,6 +17,7 @@ legacy DroneID Detection `C-119`--`C-122`；地区身份/位置 `C-123`--`C-128`
 reply/status/admission `C-130`--`C-132`；动态 RID bundle 与 namespace `C-133` / `C-134`；
 AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C-136`--`C-138`；
 同族配置全量盘点与公开先例阴性 `C-139` / `C-140`。
+`rid_ctrl_enable_0` 两条 direct F7 实机结果为 `C-141`。
 
 ## 总结矩阵
 
@@ -148,6 +149,11 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **Mini 5 Pro 当前边界：** 精确 DJI Fly `1.21.10` native 未出现同名 KeyValue/FC parameter；
   这只说明 DJI Fly 没有内置该 wrapper，不说明 WA150 飞控一定没有参数。最短判别实验固定为
   hash `0x3CBD864F` 的一次 F7，成功后一次 F8；F7 返回一字节错误时，不再发送 F8/F9。
+- **direct live result：** 2026-08-28，同一当前会话中，RC 2 routed `0xAA -> 0x03` 与
+  aircraft-direct `0x0A -> 0x03` 对该 hash 的 F7 都返回 canonical one-byte `03`；RC 2
+  height/distance/distance-enable 与 aircraft height 正对照均成功返回 F7 metadata 和 F8
+  value。直接把 static modern `0x82 -> 0x92` 用到 USB 时，目标和已知 height control 都无
+  response，因此该 timeout 只否定 direct-USB route，不回答 Binder route。未发送 F8/F9。
 - **同族全量盘点：** RID 命名的 FCConfig `_0` 参数只发现 `rid_ctrl_enable_0`。其他真实
   writable 面均属于专用协议：France EID `03/77`、OPID `03/78`、Japan registration
   `11/4B`，以及无 GET/readback、schema 不公开的 `odm_rid_cloud_control -> 00/DD` opaque
@@ -161,7 +167,7 @@ AirSense 候选排除 `C-135`；独立 `RIDCtrlEnable` 特征与 FC 参数链 `C
 - **实现状态：** clean-room Android `0.3.0-research` 只允许固定 EID/OPID/RID command，
   RID 按钮使用 RC 2 已解析的 `protocol` Binder service 和 modern `0x82 -> 0x92` route。
   F7/F8 成功会保存本次 Boolean baseline；F9 后立即 F8 读回，恢复按钮写回同一 baseline。
-  APK 已复制到 RC 2 removable storage；尚未记录安装、执行或 command reply。
+  APK 已复制到 RC 2 removable storage；尚未记录安装、执行或 Binder command reply。
 - **下一步：** 先取 F7/F8 完整回包。若成功，执行一次 baseline -> opposite -> readback ->
   baseline -> final readback；随后在接收器在线、由操作者起桨的条件下做独立 RF A-B-A。
 - **隐私/分发：** 只公开固定参数事实、self-developed APK hash 和脱敏结果；不提交 SKYROVER
