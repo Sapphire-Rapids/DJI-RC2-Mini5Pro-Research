@@ -498,9 +498,11 @@ Do not repeat these emulator-closed routes on RC 2:
 - an uncommitted PackageInstaller `apk_tmp_file` staging directory;
 - the old external Binder F7/F8 route variants or passive `0x11/0x1C` listener.
 
-First close C-207's written standard-RID bearer/motor-timing A-B-A, then use read-only positive
-controls to decide whether the C-192--C-199 WA150 by-index/by-hash candidate route is live. In the
-same-process lane, exact domain/path admission for the already-working ART TI query remains next, or
-the independent userspace-ADB path if policy has no shared executable label. The first RC 2 ART TI
-execution is query-only and succeeds only with a fresh callback plus unchanged DJI Fly PID. Do not
-add a state-changing path until a real baseline, route, readback and exact restore are closed.
+First close C-207's written standard-RID bearer/motor-timing A-B-A using
+[`21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md`](21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md), then use
+read-only positive controls to decide whether the C-192--C-199 WA150 by-index/by-hash candidate
+route is live. In the same-process lane, exact domain/path admission for the already-working ART TI
+query remains next, or the independent userspace-ADB path if policy has no shared executable label.
+The first RC 2 ART TI execution is query-only and succeeds only with a fresh callback plus unchanged
+DJI Fly PID. Do not add a state-changing path until a real baseline, route, readback and exact
+restore are closed.
