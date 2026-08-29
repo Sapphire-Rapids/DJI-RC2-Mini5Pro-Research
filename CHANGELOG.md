@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.4.8 - 2026-08-29
+
+### Added
+
+- Added `host-tools/rid-switch-tool/rid_eu_by_hash_switch_control.py`, a bounded
+  by-hash A-B-A switch for the single parameter `EU_CE_enable_c0_rid_0`
+  (`0xF80992FE`). It keeps the same positive control, baseline, single F9 forward
+  write, readback, immediate restore and fail-closed safety mode as
+  `rid_switch_control.py`, and adds an optional `--rid-ctrl-bridge` read-only probe
+  of `rid_ctrl_enable_0` in the same session.
+- Added `host-tools/rid-switch-tool/test_rid_eu_by_hash_switch_control.py` (10 offline
+  tests) pinning the single target, the name/hash identity, the positive control, the
+  transport allow-list and the fail-closed command gate.
+- Added `apps/rc2-rid-admin/.../RidEuC0Parameter.java`, a strict by-hash F7/F8/F9
+  codec for `EU_CE_enable_c0_rid_0` that recomputes the FLYC parameter-name hash and
+  fails closed on name/hash mismatch, mirroring the host-tool semantics.
+- Added `apps/rc2-rid-admin/.../RidEuC0ParameterTest.java` (12 tests) pinning the
+  name/hash identity, reference hash vectors, F7/F8 layouts, F9 payload and Boolean
+  gate.
+
+### Boundary
+
+- All of this is `STATIC` offline source and synthetic tests. No live by-hash
+  read/write is claimed, the bridge steps are read-only, and none of it proves Remote
+  ID RF behaviour. `EU_CE_enable_c0_rid_0` is an EU C0 policy candidate, not a global
+  RID master switch.
+
 ## 0.4.7 - 2026-08-29
 
 ### Added

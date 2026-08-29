@@ -28,6 +28,10 @@ Implemented runtime operations:
   target hash is interpreted;
 - fixed `rid_ctrl_enable_0` (`0x3CBD864F`) F7 metadata probe, F8 read, F9 Boolean write,
   repeated readback, pre-operation rollback and session-baseline restore;
+- strict by-hash codec `RidEuC0Parameter` for the wa150 EU C0 row
+  `EU_CE_enable_c0_rid_0` (`0xF80992FE`), with the FLYC parameter-name hash recomputed and
+  fail-closed name/hash identity; it mirrors the host-tool codec but performs no I/O and
+  is not wired to a live write path;
 - France EID GET / SET off / SET on (`0x03/0x77`), with automatic GET readback;
 - session-baseline restore;
 - EU operator-registration-number GET / SET / DELETE (`0x03/0x78`), with automatic GET readback
