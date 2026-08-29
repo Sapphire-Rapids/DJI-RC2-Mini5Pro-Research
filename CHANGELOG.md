@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.10 - 2026-08-29
+
+### Added
+
+- Recorded independent community corroboration of the legacy FLYC `0x03/0xDA` (cmd 218)
+  `fc_monitor` privacy-mask family (purpose/DroneID-name/mask get-set subcommands `01`–`06`,
+  sender PC 10/1 to receiver FLYC 3/6, DroneID at mask bit 3) from pinned `CIAJeepDoors.py` and
+  `comm_mkdupc.py` (C-200).
+- Recorded the community author's reliability boundary for that legacy surface: it only sends
+  NULL/`fakeSN`, some firmware still randomly sends valid location packets, later DJI Fly/iOS
+  reset the bits, and it is not reliable (C-201).
+- Recorded the public DragonSDR DroneID receiver O4 capability boundary: O4 (Mini 5) DroneID is
+  encrypted and receiver-alone yields session hash plus frequency/RSSI, with full telemetry
+  requiring a licensed DragonScope config and DroneID broadcast only while motors spin (C-202).
+
+### Boundary
+
+- No official DJI RID feature or legal text was added; the new claims are community prior-art
+  documentation for the legacy OcuSync/AeroScope mask surface and for independent-receiver scope.
+- No live write or RF measurement was performed; all new evidence is pinned public text
+  (`CORROBORATED`/`NEGATIVE`) and does not establish a Mini 5 Pro transmitter-off switch.
+
 ## 0.4.9 - 2026-08-29
 
 ### Added

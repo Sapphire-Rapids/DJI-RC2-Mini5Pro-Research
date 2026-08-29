@@ -587,3 +587,16 @@ work when a report did not contain a more precise timestamp.
   EU C0 F7/F8/F9 tuples separately (C-199).
 - `STATIC`: panel positive-control name corrected to `g_config.flying_limit.max_height_0` for hash
   `0x0371238A`. Offline source and synthetic tests only; no live EU C0 read/write is claimed.
+
+### 2026-08-29 — legacy mask corroboration and O4 receiver boundary
+
+- `CORROBORATED`: pinned `CIAJeepDoors.py` (`a9a8b4430e847f22c75d4f89b14fe17388c82602`) reproduces
+  the legacy `0x03/0xDA` (cmd 218) `fc_monitor` family `01`–`06` (purpose/DroneID-name/privacy-mask
+  get-set) with sender PC 10/1 -> receiver FLYC 3/6 and DroneID at mask bit 3 (C-200).
+- `NEGATIVE`: the same project's root README (`baedd24600cecd100d8d66f8350cae336f799dbf`) states the
+  legacy mask only sends NULL/`fakeSN`, some firmware still randomly sends valid location packets,
+  later DJI Fly/iOS reset the bits, and it is not reliable (C-201).
+- `CORROBORATED`: public DragonSDR DroneID docs (`8d0126b91b943f5c22a0503a8414bc2441892328`) state
+  O4 (Mini 5) DroneID is encrypted and receiver-alone yields session hash + frequency/RSSI, with
+  full telemetry requiring a licensed DragonScope config; DroneID is broadcast only while motors
+  spin (C-202). This bounds the independent-receiver A-B-A for the O4 target.

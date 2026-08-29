@@ -183,6 +183,12 @@ Current static narrowing: product-139's official owner listens to natural `0x11/
 no GET builder. The onboard half must therefore observe the already-subscribed push passively; an
 invented polling request is not an allowed substitute.
 
+Independent-receiver narrowing: public DragonSDR DroneID documentation states O4 drones such as the
+Mini 5 broadcast encrypted DroneID, so a receiver without a licensed O4 decoder yields only a
+per-session hash ID plus frequency/RSSI, and DroneID is sent only while motors are spinning (C-202).
+An O4 A-B-A therefore corroborates presence/absence through hash/RSSI rather than plaintext Basic ID
+or position; a plaintext-bearing receiver is a separate requirement.
+
 ## B-14 — exact Ground country route
 
 Missing: passive evidence or exact current handler registration resolving Ground receiver/context,

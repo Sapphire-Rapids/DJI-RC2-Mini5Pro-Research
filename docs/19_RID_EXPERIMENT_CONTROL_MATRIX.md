@@ -55,7 +55,7 @@ level.
 | Broadcast start/stop timing | aircraft firmware plus independent receiver | A-024 Binder listener was false-negative while the independent detector confirmed real motor-on RID | no safe trigger | `READ-ONLY LIVE`; use the independent receiver for RF truth and do not repeat the tested Binder listener |
 | Operator-location health | RC/Android location provider -> link -> aircraft | permission, age, accuracy, RID failure class | no current selector or coordinate setter | `PASSIVE OWNER`; privacy-reduced status only, never location spoofing |
 | Aircraft/UAS identity | FC/device identity and compliance derivation | static get/listen-only candidate; no admitted live read | no current setter found | `STATIC LOCKED`; live route, privacy-safe read, and actual RF Basic ID correspondence remain unclosed |
-| RF bearer | aircraft BLE/Wi-Fi scheduler | external receiver observation | no selector found | `READ-ONLY LIVE`; show only an independently observed bearer, never infer it from China cloud tracking masks |
+| RF bearer | aircraft BLE/Wi-Fi scheduler | external receiver observation; public DragonSDR docs state O4 (Mini 5) DroneID is encrypted and receiver-alone yields session hash plus frequency/RSSI, so an O4 A-B-A corroborates presence/absence via hash/RSSI rather than plaintext Basic ID/position unless a licensed O4 decoder is used (C-202) | no selector found | `READ-ONLY LIVE`; show only an independently observed bearer, never infer it from China cloud tracking masks |
 
 The seven-byte working-status layout is:
 
@@ -105,7 +105,7 @@ association and must not be inferred from Basic ID or stored in public logs.
 | RID cloud-control V2 | area/product-selected value-routed SET-only `0x00/0xDD`; success caches the request and has no applied-state echo | `OPAQUE BLOCKED`; no blob editor, replay, or toggle |
 | CCC broadcast-effect parameter | current mapping exists, but live metadata is unavailable and bitmap semantics/wire width/RF effect are open | `OPAQUE BLOCKED` |
 | Drone-Hacks ADSB dictionary | numerical display vocabulary with current semantic collisions | `LEGACY EXCLUDED`; passive/static search only |
-| Legacy FlyC `Detection` | `0x03/0xDA` `0x05`/`0x06` field mask; paper reports packets continue with `fake` fields | `LEGACY EXCLUDED`; proprietary OcuSync/AeroScope, no WA150 transfer |
+| Legacy FlyC `Detection` | `0x03/0xDA` `0x05`/`0x06` field mask; NDSS paper reports packets continue with `fake` fields; pinned CIAJeepDoors reproduces the same `fc_monitor` family and its author warns the mask only sends NULL/`fakeSN`, some firmware still randomly sends valid location packets, and later DJI Fly/iOS reset the bits | `LEGACY EXCLUDED`; proprietary OcuSync/AeroScope field substitution, no WA150 transfer and not a reliable transmitter-off control (C-200/C-201) |
 | Name-only ADS-B debug/test commands | labels without current product-139 caller/schema/readback | `OPAQUE BLOCKED`; no guessed packets |
 
 A-025 fixes the candidate inventory request to system-Binder transaction 4,

@@ -228,6 +228,16 @@ corroborated.
   Used only for the laboratory USB-C/`DjiSdrConsole-v2.2.8` test setup and RF-chain description.
   The reports do not publish the tool/protocol or mention Remote ID.
 
+- [CIAJeepDoors](https://github.com/MAVProxyUser/CIAJeepDoors/tree/baedd24600cecd100d8d66f8350cae336f799dbf)
+  at `baedd24600cecd100d8d66f8350cae336f799dbf`, with
+  [CIAJeepDoors.py](https://github.com/MAVProxyUser/CIAJeepDoors/blob/a9a8b4430e847f22c75d4f89b14fe17388c82602/CIAJeepdoors_1.3/CIAJeepDoors.py)
+  pinned at `a9a8b4430e847f22c75d4f89b14fe17388c82602`. Used only as community corroboration that the
+  legacy `0x03/0xDA` `fc_monitor` surface is a field mask/substitution band-aid (author states it
+  sends NULL/`fakeSN`, some firmware still randomly sends valid location packets, and later DJI
+  Fly/iOS reset the bits). It is not adopted as a Mini 5 Pro switch.
+- [o-gs/dji-firmware-tools comm_mkdupc.py](https://github.com/o-gs/dji-firmware-tools/blob/8db4ba6d20590c28455029732af6572aec07e029/comm_mkdupc.py)
+  at `8db4ba6d20590c28455029732af6572aec07e029`, for the `COMM_DEV_TYPE` enum values (PC 10, FLYC 3)
+  used by the pinned CIAJeepDoors route.
 ## Legacy proprietary DroneID research
 
 - Schiller et al., [Drone Security and the Mysterious Case of DJI's DroneID](https://www.ndss-symposium.org/wp-content/uploads/2023/02/ndss2023_f217_paper.pdf),
@@ -242,6 +252,15 @@ corroborated.
   and [CmdIdFlyc](https://github.com/MAVProxyUser/SKYROVER_src/blob/8186e19241c913318b140bf37c5eafba005f1e7c/uav/midware/data/config/P3/CmdIdFlyc.java).
   Used to reconstruct the high-confidence `0x03/0xDA`, subcommand `0x05`/`0x06`, eight-field-mask
   correspondence. This reconstruction is not an author-disclosed command or WA150 support proof.
+
+## Independent receiver capability references
+
+- [DragonSDR DJI DroneID receiver](https://github.com/alphafox02/dragonsdr_dji_droneid/tree/8d0126b91b943f5c22a0503a8414bc2441892328)
+  at `8d0126b91b943f5c22a0503a8414bc2441892328`. Used only for the public O4 capability boundary:
+  O2/O3 DroneID is unencrypted while O4 drones such as the Mini 5 broadcast encrypted DroneID
+  (receiver-alone yields session hash plus frequency/RSSI; full telemetry requires a licensed
+  DragonScope config), and DroneID is sent only while motors are spinning. Community docs, not an
+  independent RF measurement by this project.
 
 ## Synthetic standards-based source references
 
