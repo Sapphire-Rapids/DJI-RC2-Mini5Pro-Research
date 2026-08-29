@@ -1,6 +1,26 @@
 # Changelog
 
-## 0.4.3 - 2026-08-29
+## 0.4.4 - 2026-08-29
+
+### Added
+
+- Added `host-tools/rid-switch-tool`, an operator-run USB DUML control for the single RID candidate
+  parameter `rid_ctrl_enable_0` (`0x3CBD864F`) over the verified read-only FC path. It gates every
+  write behind a same-session maximum-height positive control and a strict F7/F8 Boolean baseline,
+  performs one forward F9 write, reads the value back, and immediately restores the captured
+  baseline with a final F8 readback. It has no generic payload/route/command/parameter interface
+  and never starts motors.
+- Extended `rid_param_protocol.py` with a gated F9 request encoder (`encrypt_request_frame` with an
+  explicit write allow-list), an F9 write-body builder, and an F9 write-ACK parser. Read-only paths
+  remain unchanged and still refuse write commands by default.
+- Added synthetic tests for the new codec and the switch tool gate/width helper.
+
+### Boundary
+
+- The tool is `STATIC` (offline source and synthetic tests) and `NOT ADMITTED` as a device write.
+  A green F8 readback records only an onboard parameter value; it does not prove Remote ID RF
+  behaviour. Live motor-on RF observation remains operator-initiated with an independent receiver.
+
 
 ### Documentation
 

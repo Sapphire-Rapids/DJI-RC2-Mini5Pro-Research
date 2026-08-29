@@ -300,7 +300,7 @@ class FrameTests(unittest.TestCase):
             frame[9:-2],
         )
 
-    def test_simple_packet_helper_refuses_write_command(self):
+    def test_read_helper_refuses_write_command_by_default(self):
         frame = self.duml.build_packet(
             source=0xAA,
             target=0x03,
@@ -312,6 +312,74 @@ class FrameTests(unittest.TestCase):
         )
         with self.assertRaises(protocol.ParamProtocolError):
             protocol.encrypt_read_request_frame(frame, duml=self.duml)
+        with self.assertRaises(protocol.ParamProtocolError):
+            protocol.encrypt_request_frame(frame, duml=self.duml)
+
+    def test_write_request_can_be_simple_encrypted_when_opted_in(self):
+        frame = self.duml.build_packet(
+            source=0xAA,
+            target=0x03,
+            cmd_type=0x40,
+            cmd_set=0x03,
+            cmd_id=0xF9,
+            payload=(0xD7757AD2).to_bytes(4, "little") + b"\x01",
+            sequence=0x1234,
+        )
+        encrypted = protocol.encrypt_request_frame(
+            frame, duml=self.duml, allowed_commands=protocol.WRITE_COMMANDS
+        )
+        self.assertEqual(encrypted[8], 0x43)
+        self.assertEqual(
+            self.duml.calc_crc16(encrypted, len(encrypted) - 2),
+            int.from_bytes(encrypted[-2:], "little"),
+        )
+        self.assertEqual(
+            protocol.simple_filter(encrypted[9:-2], 0x1234),
+            frame[9:-2],
+        )
+
+    def test_write_request_encryption_refuses_unknown_command(self):
+        frame = self.duml.build_packet(
+            source=0xAA,
+            target=0x03,
+            cmd_type=0x40,
+            cmd_set=0x03,
+            cmd_id=0xFA,
+            payload=(0xD7757AD2).to_bytes(4, "little"),
+            sequence=0x1234,
+        )
+        with self.assertRaises(protocol.ParamProtocolError):
+            protocol.encrypt_request_frame(
+                frame, duml=self.duml, allowed_commands=protocol.WRITE_COMMANDS
+            )
+
+
+class WriteBodyTests(unittest.TestCase):
+    def test_write_body_is_hash_then_boolean_value(self):
+        body = protocol.build_write_request_body(b"\x01", parameter_hash=0x3CBD864F)
+        self.assertEqual(body, bytes.fromhex("4f86bd3c01"))
+
+    def test_write_body_rejects_non_boolean_value(self):
+        with self.assertRaises(protocol.ParamProtocolError):
+            protocol.build_write_request_body(b"\x02", parameter_hash=0x3CBD864F)
+        with self.assertRaises(protocol.ParamProtocolError):
+            protocol.build_write_request_body(b"", parameter_hash=0x3CBD864F)
+
+    def test_write_body_rejects_out_of_range_hash(self):
+        with self.assertRaises(protocol.ParamProtocolError):
+            protocol.build_write_request_body(b"\x01", parameter_hash=-1)
+
+
+class WriteAckTests(unittest.TestCase):
+    def test_empty_ack_is_success(self):
+        self.assertEqual(protocol.parse_f9_write_ack(b""), 0)
+
+    def test_zero_status_ack_is_success(self):
+        self.assertEqual(protocol.parse_f9_write_ack(b"\x00"), 0)
+
+    def test_nonzero_status_ack_is_reported(self):
+        with self.assertRaises(protocol.ParamStatusError):
+            protocol.parse_f9_write_ack(b"\x03")
 
 
 class SafetyBoundaryTests(unittest.TestCase):

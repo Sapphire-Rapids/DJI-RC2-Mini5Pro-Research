@@ -259,6 +259,7 @@
   [exact-v07 adbd patch generator](host-tools/adbd-userspace-patch/README.md)、
   [system-UID bridge probes](host-tools/system-uid-bridge-probe/README.md)、
   [device read probes](host-tools/device-read-probes/README.md)、
+  [RID switch control](host-tools/rid-switch-tool/README.md)、
   [firmware acquisition](host-tools/firmware-acquisition/README.md)、
   [IMaH analysis](host-tools/imah-analysis/README.md)、
   [ELF analysis](host-tools/elf-analysis/README.md)、

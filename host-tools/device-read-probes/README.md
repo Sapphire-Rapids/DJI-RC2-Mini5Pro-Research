@@ -14,8 +14,11 @@ They are independently written research tools, not DJI software.
   regulatory compliance.
 
 `aircraft_readonly_params.py` and `aircraft_readonly_uid_status.py` are transport wrappers around
-the matching RC2 probes. `rid_param_protocol.py` is the original strict F7/F8 decoder shared by the
-RID-policy and EID probes; its synthetic tests are included.
+the matching RC2 probes. `rid_param_protocol.py` is the strict F7/F8 decoder plus the gated F9
+write-body/ACK codec shared by the RID-policy, EID, and RID-switch tools; its synthetic tests are
+included. The bounded F9 write path itself lives in
+[`../rid-switch-tool/rid_switch_control.py`](../rid-switch-tool/rid_switch_control.py) and is not
+reachable from any probe in this directory.
 
 ## Dependencies and tests
 

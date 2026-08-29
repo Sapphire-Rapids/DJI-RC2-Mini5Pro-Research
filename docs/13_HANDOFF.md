@@ -89,6 +89,14 @@ or a verified WA150 handler. A-024's passive timeline is also complete: it produ
 while an independent detector confirmed real motor-on RID, so that third-party listener is a
 false-negative truth source and must not be repeated.
 
+The independent USB DUML path is now separately instrumented in
+[`host-tools/rid-switch-tool/rid_switch_control.py`](../host-tools/rid-switch-tool/rid_switch_control.py).
+It reaches FC `03/F7-F9` for `rid_ctrl_enable_0` only, behind a same-session maximum-height positive
+control, a strict F7/F8 Boolean baseline, one forward F9 write, readback, and an immediate restore.
+This is `STATIC`/`NOT ADMITTED` source; it is not live evidence, it does not retry the closed Binder
+attach routes, and its F8 readback is not RF proof. Run it only with the operator present and the
+external receiver ready for the motor-on A-B-A check.
+
 ### Closed passive branch: A-026 gated FlySafe inventory
 
 A-025 remains the fixed V3/V4 baseline but the user has now reported its installation complete;

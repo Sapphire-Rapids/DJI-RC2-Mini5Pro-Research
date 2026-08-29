@@ -23,7 +23,7 @@ The tools do not all have the same transport boundary:
 | `rid_rc2_loopback_parser.py` | Offline parser for previously obtained loopback byte streams; it opens no socket and sends no data. |
 | `flysafe_rid_product_eligibility_probe.py` | Anonymous public-endpoint checks and privacy-reduced parsing of response-body-only JSON. It has no credential/cookie option and never submits an unlock request. |
 | `function_discovery_protocol.py` | Transport-free `0x00/0xB8` request-payload and page codec. Building bytes is not evidence that a target supports the command. |
-| `rid_param_protocol.py` | Offline F7/F8 reply parsing and read-request body transformation; it has no USB transport. |
+| `rid_param_protocol.py` | Offline F7/F8 reply parsing, gated F9 write-body encoding and write-ACK parsing, and request-body SIMPLE-keystream transformation; it has no USB transport and performs no write. |
 | `aircraft_bulk_capture.py` | USB-IN-only aircraft summary; emits aggregate routing metadata rather than payloads. |
 | `rc2_bulk_capture.py` | USB-IN-only RC 2 capture helper. It emits complete frames and payloads to stdout, so its output can contain private telemetry and must never be committed. |
 | `usb_duml_command_census.py` | USB-IN-only aggregate command-header census for the fixed aircraft and RC 2 interfaces. |
