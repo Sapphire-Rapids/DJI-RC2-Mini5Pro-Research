@@ -40,6 +40,7 @@ def load_tool(path: Path):
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load IMaH parser: {path}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module.__name__] = module
     spec.loader.exec_module(module)
     return module
 

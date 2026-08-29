@@ -173,7 +173,9 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   policy。`RidWorkingStatusPush`、地区 support、import result 与 compliance identity 都是只读；
   catalog-only `EidOpen`/`EidClose`/`EIDBroadcastEnable` 没有 current caller/native handler。
 - **公开实现检索：** fixed-revision GitHub 项目及 exact-string indexes 未找到第二份
-  `RIDCtrlEnable`/`rid_ctrl_enable_0` 的 Mini 5 Pro/RC 2 实现。FreeFCC 只独立支持 modern
+  `RIDCtrlEnable`/`rid_ctrl_enable_0` 的 Mini 5 Pro/RC 2 实现；2026-08-30 的社区调查
+  （FreeFCC/djiparam/GlassFalcon/O4 研究）同样未找到第二份 global-RID Boolean 实现，且
+  public wa150 参数表没有 `rid_ctrl_enable_0` 行（C-221/C-222）。FreeFCC 只独立支持 modern
   `0x82` transport、`0x92` destination 和 `03/F9` 形式；其 feature/hash 不同，不能当 RID
   接受证据。公开 MSDK V5 有区域 strategy 与 status getter，但普通 RID 没有 enable setter，
   只有 France EID 暴露 setter。
@@ -751,6 +753,13 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   覆盖飞控参数，`cmd_set=3`/`cmd_id=0xF9` 的 DUML 写入会在每次 reconnect 被覆盖（C-198）。该
   文本未指名 `EU_CE_enable_c0_rid_0` 的 owner，也未证明 RID 相关 C0 flag 与高度 C0 cap 同层；
   因此可靠开关必须包含断开/重连后的持久性负结果或假设，不能以单次 A-B-A 作为可靠性结论。
+
+- **EU C0 参数块边界：** public `lmdegreeds/djiparam` wa150 表显示 `EU_CE_enable_c0_rid`
+  是索引 1306-1315 连续 EU C0 class 块内的一行；其中 `EU_CE_Reg_RID_Enable` 与
+  `eu_ce_support_remote_set_level` 在公开表中声明 min 0 / max 0（非可写 Boolean 范围），
+  且 public GlassFalcon SDK 记载 by-index `0xE0`-`0xE3` 仅在 PC/assistant 源身份 `0x0a` 下
+  被接受（C-213/C-214/C-215）。这进一步把该行族标为 EU C0 class/registration 标志，而非
+  单一发射机总开关；仍须 live by-index/by-hash 基线与独立接收机 RF 证据，不能以参数名外推。
 
 ### RID-010：broadcast-effect policy 映射存在，但 bit 语义和 live metadata 未闭合
 

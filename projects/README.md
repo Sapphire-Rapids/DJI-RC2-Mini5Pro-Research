@@ -28,6 +28,7 @@ change Remote ID behavior on a device.
 | `libraries/rid-type6-inventory-parser/` | Strict V3/V4 type-6 inventory parser | Static/host-tested compatibility parser |
 | `libraries/rid-quiescence-model/` | Request-quiescence model and Python tests | Model only; does not prove Android runtime quiescence |
 | `libraries/protocol-probes/` | Bounded Python codecs, parsers, read probes and passive listeners | 68 synthetic host tests passed; device acceptance and RF effects remain `NOT ADMITTED` |
+| `libraries/opendroneid-synthetic-codec/` | Independently written standardized Remote ID message codec for the separate synthetic source lane | Source + synthetic tests only; no RF/transmit adapter; not a Mini 5 Pro control result |
 | `host-tools/adb-handshake-probe/` | Minimal libusb ADB descriptor/handshake probe and tests | Live v07 currently reaches host `CNXN` with no device ADB packet before timeout |
 | `host-tools/adbd-userspace-patch/` | Exact-input userspace `adbd` gate patch generator and tests | Patch logic only; do not include input/output binaries; not yet a live v07 shell result |
 | `host-tools/system-uid-bridge-probe/` | Small system-UID protocol checks and readonly EID helper source | Research helpers; preserve their local admission contracts |

@@ -60,7 +60,7 @@ bearer evidence.
 | --- | --- |
 | Date | 2026-__-__ |
 | Local timezone | __ |
-| Aircraft / firmware | Mini 5 Pro / UNKNOWN |
+| Aircraft / firmware | Mini 5 Pro / 01.00.0600 |
 | RC 2 / firmware | RC 2 / 07.00.0100 |
 | DJI Fly session state | UNKNOWN |
 | Receiver model / app | __ / __ |
