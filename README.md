@@ -3,7 +3,7 @@
 [![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-29 的实机观察、
+这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-30 的实机观察、
 固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题，并逐步
 纳入可复现的自研 APK 源码、host tools、tests 和合成 fixtures。
 
@@ -13,6 +13,8 @@
 [`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md) 中的精简提示词。它把本项目准确界定为
 用户自有实验设备上的 Remote ID 互操作性/合规验证，并一次写清允许动作、硬性禁区和实证完成
 标准，避免把合法的本地实验误写成未授权访问或泛化的安全绕过任务。
+已有研究的快速接手请直接复制
+[`NEXT_AGENT_HANDOFF_PROMPT.md`](NEXT_AGENT_HANDOFF_PROMPT.md)。
 
 ## 研究对象快照
 
@@ -174,6 +176,12 @@
   type-6 candidate，只输出 count/level/status，license ID 只保留在内存。五个 synthetic host cases
   与 helper DEX/AArch64 agent build 通过（C-191）。下一步是为 RC 2 准入 same-process loader，
   不再继续猜 external Binder route。
+- Same-process loader 的三个捷径已在 disposable emulator 关闭：普通 `/data/app/...==/...so`
+  会在首个 `=` 被 agent-spec parser 截断；delimiter-free `trace_data_file` 在 canary 前结束 target，
+  但相同 bytes 从 delimiter-free `apk_data_file` 能稳定派发并回调；uncommitted PackageInstaller
+  `apk_tmp_file` 又被 target search deny，session 已 abandon（C-208--C-210）。下一步是 exact RC 2
+  caller/target domain 与合法共享可执行路径/descriptor 的交集，两个新 APK 源码仅作为阴性记录，
+  不是上机候选（C-211）。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
@@ -253,7 +261,9 @@
 
 - Android 应用：[RC 2 RID Admin](apps/rc2-rid-admin/README.md)、
   [隐藏设置启动器](apps/rc2-settings-launcher/README.md)、
-  [v0.10 admission probe](apps/rid-admission-probe/README.md)。
+  [v0.10 admission probe](apps/rid-admission-probe/README.md)、
+  [normal-path carrier negative](apps/rc2-flysafe-agent-carrier/README.md) 与
+  [PackageInstaller staging negative](apps/rc2-flysafe-agent-staging-payload/README.md)。
 - 协议与模型：[protocol probes](libraries/protocol-probes/README.md)、
   [RID switch wire codec](libraries/rid-switch-wire-codec/README.md)、
   [type-6 inventory parser](libraries/rid-type6-inventory-parser/README.md)、

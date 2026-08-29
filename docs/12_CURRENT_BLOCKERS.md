@@ -458,3 +458,21 @@ exact signed-v07 adbd + gate (C-174/C-175)
   -> one host CNXN and exact first-packet classification
   -> if device: adb shell id + fixed properties
 ```
+
+## 2026-08-30 loader checkpoint
+
+The ART TI query code and exact owner/callback path are no longer the immediate blocker. Three
+deployment shortcuts are now retired on emulator evidence:
+
+1. normal `/data/app/...==/...so` direct attach: parser delimiter failure (C-208);
+2. delimiter-free generic trace path: target terminated before canary, while identical bytes worked
+   under delimiter-free `apk_data_file` (C-209);
+3. uncommitted PackageInstaller staging: target search denied on `apk_tmp_file`, session abandoned
+   (C-210).
+
+Within the same-process lane, the next smallest blocker is C-211: identify the actual RC 2 DJI Fly
+signer/SELinux domain and Fuli caller domain, then find a legitimate delimiter-free path/descriptor
+at their policy intersection. If no intersection exists, prioritize the already separate
+userspace-ADB route or an existing system-mediated loader. The overall project sequence still begins
+with C-207's written standard-RID bearer/timing A-B-A and read-only admission of the C-192--C-199
+WA150 parameter candidates. A-035 and A-036 should not be installed on RC 2 as currently written.

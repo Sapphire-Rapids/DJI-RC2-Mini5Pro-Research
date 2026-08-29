@@ -624,3 +624,20 @@ work when a report did not contain a more precise timestamp.
   host that the Mini 5 Pro broadcasts plaintext standardized Remote ID with a readable Basic ID
   when motors spin (C-207). The switch work now targets the standard ASTM F3411 / EN 4709 bearer;
   the DJI-private DroneID family is parked.
+### 2026-08-30 — ART TI loader path discrimination
+
+- `NEGATIVE`: the source-built carrier installed normally on the disposable Android 11 emulator,
+  but its extracted `/data/app/...==/...so` path was split at the first `=` by the agent-spec parser.
+  No canary or callback appeared and DJI Fly's PID stayed unchanged (C-208/A-035).
+- `NEGATIVE`: copying the exact same SO bytes to a delimiter-free `trace_data_file` path terminated
+  the target before canary. The bytes were then copied to a delimiter-free `apk_data_file` path;
+  attach completed, the query returned `417`, and the target PID stayed unchanged. This controlled
+  comparison closes that trace-label/path class rather than the agent bytes (C-209).
+- `NEGATIVE`: a system-UID uncommitted PackageInstaller session accepted a streamed source-built
+  payload, but the `apk_tmp_file` staging directory denied target search before agent load. No
+  canary/callback appeared, PID stayed unchanged, and session abandon removed the directory
+  (C-210/A-036).
+- No RC 2, aircraft, account, motor, RF or setter action occurred. Both Android projects are
+  published as source-only negative experiments. The next loader discriminator is the actual RC 2
+  caller/target SELinux domains and a legitimate delimiter-free shared executable path or mediated
+  descriptor (C-211).

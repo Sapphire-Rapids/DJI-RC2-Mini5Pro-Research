@@ -152,8 +152,13 @@ output，以及 ART TI canary/owner/query 的本地 emulator 日志。
 - `OBSERVED`：ART TI `0x70010200` owner/query 取得 nonzero current device ID、dispatch=1、callback
   `417` 且 PID 不变（C-189/C-190）；无 aircraft，因此没有 success payload。
 - `STATIC`：公开 source-only parser/build 支持 C-191；生成 DEX/SO 不入库。
+- `NEGATIVE`：ordinary installed path 在首个 `=` 被截断（C-208）；delimiter-free
+  `trace_data_file` 在 canary 前结束 target，但相同 bytes 于 delimiter-free `apk_data_file`
+  成功执行 query（C-209）；uncommitted `apk_tmp_file` staging 被 target search deny，session 已
+  abandon（C-210）。
 - 处置：APK/mapping/DEX/decompiled source/raw logs 全部排除；仅 A-006/A-034 identity、独立 scanner
-  source、事实与边界入库。不得从本地文件复制 vendor method body。
+  source、A-035/A-036 source/hash、事实与边界入库。不得从本地文件复制 vendor method body、
+  raw AVC、session ID 或绝对路径。
 
 ## 12. coding agent 接手规则
 

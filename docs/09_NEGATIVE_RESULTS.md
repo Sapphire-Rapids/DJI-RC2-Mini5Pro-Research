@@ -581,3 +581,34 @@ stronger conclusion that cannot be drawn.
   TI route only after an RC 2 loader is independently admitted.
 - Does not establish: a universal JVMTI defect, RC 2 loader availability, inventory, entitlement,
   setter behavior or RF effect. The raw crash log and all vendor bytes remain excluded.
+
+## N-53 — a normal modern installed path cannot be used directly as the agent specification
+
+- Status: `NEGATIVE` on the disposable Android 11 emulator; machine claim C-208.
+- Result: the installed carrier exposed `/data/app/...==/.../lib/...so`; Android split the agent
+  specification at the first `=`, so the target never loaded the agent. PID remained stable and no
+  FindUAS canary or callback appeared.
+- Consequence: do not copy the carrier APK to RC 2 to repeat this exact route. The source is retained
+  as a delimiter regression fixture.
+- Does not establish: bad agent bytes, ART TI failure, or impossibility of a delimiter-free loader.
+
+## N-54 — a generic delimiter-free trace path is not a safe substitute
+
+- Status: `NEGATIVE` on the disposable Android 11 emulator; machine claim C-209.
+- Result: the exact SO bytes under a `trace_data_file` path terminated the target before canary. A
+  fresh process then loaded the same bytes from delimiter-free `apk_data_file`, dispatched once,
+  returned callback `417`, and kept its PID.
+- Consequence: do not use a generic trace directory on RC 2. The positive control isolates the
+  tested path/label class rather than proving one exact enforcement check.
+- Does not establish: an RC 2 target domain, a generally safe APK path, inventory, setter or RF.
+
+## N-55 — uncommitted PackageInstaller staging is not target-searchable
+
+- Status: `NEGATIVE` on the disposable Android 11 emulator; machine claim C-210.
+- Result: system UID created and streamed A-036 into an uncommitted session, but the generated
+  delimiter-free directory was `apk_tmp_file`; target search was denied before canary. PID remained
+  stable, and abandoning the session removed the temporary directory.
+- Consequence: do not repeat the same staging-label route on RC 2 without materially new policy
+  evidence. Source remains as a reproducible packaging/staging negative.
+- Does not establish: that the RC 2 system app cannot use any mediated loader or that a committed
+  package/other label would have the same policy.

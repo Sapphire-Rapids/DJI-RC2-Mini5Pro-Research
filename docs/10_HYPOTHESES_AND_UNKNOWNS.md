@@ -379,3 +379,18 @@ Every hypothesis below is testable and remains separate from factual findings.
   polygon row is never promoted to type 6 without the independent field-7 parser.
 - Current state: `UNKNOWN` on RC 2. The emulator closes owner/callback plumbing but not device
   loading or aircraft inventory. No setter, motor action or RF test belongs to the first RC 2 run.
+
+## H-32 — the remaining loader problem is a caller/target path-policy intersection（C-208--C-211）
+
+- Known negatives: ordinary extracted APK paths contain the parser delimiter; `trace_data_file`
+  terminated the emulator target before canary; uncommitted `apk_tmp_file` denied target search.
+  The same SO bytes did work from a delimiter-free `apk_data_file` path, so the agent/query itself
+  is still the positive control.
+- Hypothesis: an RC 2 solution requires either a delimiter-free file label that the real privileged
+  caller can create and the real DJI Fly domain can search/read/map/execute, or a legitimate
+  system-mediated loader that avoids exposing the modern installed path as an agent specification.
+- Distinguishing evidence: first identify the exact live DJI Fly signer/domain and Fuli caller
+  domain, then compute their policy intersection from the matching firmware. If no shared label
+  exists, stop path guessing and prioritize userspace ADB or an existing system service/API.
+- Current state: `UNKNOWN`. No live RC 2 loader attempt was made in this phase, and A-035/A-036 are
+  negative records rather than candidates for operator installation.

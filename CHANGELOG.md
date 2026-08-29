@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.13 - 2026-08-30
+
+### Added
+
+- Published the source-only normal-path carrier and uncommitted PackageInstaller staging projects,
+  with A-035/A-036 artifact identities and explicit emulator-negative status. Generated APK/SO/DEX,
+  vendor bytes, raw logs and identifiers remain excluded.
+- Registered C-208--C-211 for installed-path delimiter truncation, the trace-label negative plus
+  identical-byte `apk_data_file` positive control, the `apk_tmp_file` search denial/session abandon,
+  and the remaining exact RC 2 caller/target policy-intersection hypothesis.
+- Added `NEXT_AGENT_HANDOFF_PROMPT.md`, an outcome-first takeover prompt pointing to the authoritative
+  claims, current RID-control candidates, retired routes, evidence standard and hard device boundary.
+
+### Corrected
+
+- Removed the staging README's incorrect query-success statement. The emulator created and streamed
+  the session, but target search was denied before agent load and no callback occurred.
+- Corrected the claim that the staging APK is DEX-free: it has no application classes or components,
+  but AGP emits one 600-byte synthetic `R`-class DEX despite `android:hasCode="false"`.
+- Reclassified both loader APKs as negative regression fixtures rather than RC 2 candidates.
+
 ## 0.4.12 - 2026-08-29
 
 ### Added
@@ -209,6 +230,7 @@
   A green F8 readback records only an onboard parameter value; it does not prove Remote ID RF
   behaviour. Live motor-on RF observation remains operator-initiated with an independent receiver.
 
+## 0.4.3 - 2026-08-29
 
 ### Documentation
 

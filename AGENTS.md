@@ -7,6 +7,8 @@ For a new Codex task, start from the concise authorized-lab scope in
 [`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md). It states the project outcome, allowed local
 work, reversible-device boundary and completion evidence once; this file then supplies the detailed
 repository and evidence rules.
+For an immediate takeover of the current research state, use
+[`NEXT_AGENT_HANDOFF_PROMPT.md`](NEXT_AGENT_HANDOFF_PROMPT.md).
 
 ## Repository boundary
 
@@ -279,6 +281,13 @@ Later retractions override earlier progress summaries.
     any unique existing license ID in memory/out of logs (C-191). This proves emulator owner/callback
     plumbing, not an RC 2 loader, inventory, entitlement, setter, restore or RF effect. The next
     route is an admitted RC 2 same-process loader; A-033 remains an external-Binder comparison.
+39. Three emulator deployment variants are now closed and must not be repeated on RC 2 without new
+    evidence. A normal extracted `/data/app/...==/...so` path is truncated at the first `=` by the
+    agent-spec parser (C-208). A delimiter-free `trace_data_file` path terminated the target before
+    canary while the same bytes worked from delimiter-free `apk_data_file` (C-209). An uncommitted
+    PackageInstaller `apk_tmp_file` staging directory denied target search and was abandoned
+    (C-210). The next discriminator is the actual RC 2 caller/target domains and a legitimate shared
+    executable path or mediated descriptor; neither source-only APK is an active RC 2 candidate.
 
 ## Privacy and redaction
 
