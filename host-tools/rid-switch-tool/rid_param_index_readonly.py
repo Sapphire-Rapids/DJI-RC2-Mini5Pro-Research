@@ -9,6 +9,11 @@ observed.
 The probe first verifies the parameter table identity (0xE0 CRC/count), then
 for each candidate RID index performs get_info (0xE1) and read value (0xE2).
 A name mismatch or a status error is reported as unavailable, never guessed.
+
+For each candidate it also reports the by-hash bridge value computed from the
+candidate's ``_0`` name form through the independent FLYC parameter-name hash.
+This read-only metadata lets an operator map an on-board by-index name to the
+by-hash F7/F8/F9 identifier without writing anything.
 """
 
 from __future__ import annotations
@@ -62,6 +67,21 @@ def load_duml_module():
     spec = importlib.util.spec_from_file_location("rid_index_duml", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load DUML implementation from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_hash_module():
+    path = (
+        Path(__file__).resolve().parent.parent.parent
+        / "libraries"
+        / "protocol-probes"
+        / "dji_flyc_parameter_hash.py"
+    )
+    spec = importlib.util.spec_from_file_location("rid_index_hash", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load hash module from {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -137,6 +157,7 @@ def main() -> None:
 
     protocol = load_index_protocol_module()
     duml = load_duml_module()
+    hash_module = load_hash_module()
     config = transport_config(args.transport)
     if args.route == "modern":
         if args.transport != "aircraft":
@@ -244,6 +265,10 @@ def main() -> None:
                     expected_index=candidate["index"],
                 )
                 record["info"] = protocol.info_summary(info)
+                record["by_hash_bridge"] = {
+                    "name": f"{candidate['name']}_0",
+                    "hash": f"0x{hash_module.dji_flyc_parameter_hash(candidate['name'] + '_0'):08X}",
+                }
 
                 value_payload = exchange(
                     protocol.CMD_READ_VALUE,

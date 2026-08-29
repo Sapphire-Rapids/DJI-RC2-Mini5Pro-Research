@@ -27,7 +27,7 @@ CMD_TYPE_REQUEST_ACK = 0x40
 
 RID_POLICY_PARAMETERS = (
     {
-        "name": "g_config.flying_limit.max_height",
+        "name": "g_config.flying_limit.max_height_0",
         "hash": 0x0371238A,
         "semantic_kind": "int",
     },

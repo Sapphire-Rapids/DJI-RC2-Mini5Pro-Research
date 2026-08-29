@@ -9,7 +9,9 @@ payload, route, command, or parameter interface.
 Commands reachable here are FLYC 0x03/0xF7 (metadata), 0x03/0xF8 (value), and
 0x03/0xF9 (write). F7/F8/F9 payloads and replies are SIMPLE-keystream protected;
 plaintext wire mode is also supported for the read probes. The tool starts
-motors for nothing and measures no radio state.
+motors for nothing and measures no radio state. An optional ``--index-bridge``
+read-only step maps the by-index wa150 RID row ``EU_CE_enable_c0_rid`` to its
+by-hash name ``EU_CE_enable_c0_rid_0`` without writing either parameter.
 """
 
 from __future__ import annotations
@@ -34,9 +36,19 @@ RID_PARAM_NAME = "rid_ctrl_enable_0"
 RID_PARAM_HASH = 0x3CBD864F
 RID_SEMANTIC_KIND = "bool"
 
-POSITIVE_CONTROL_NAME = "g_config.flying_limit.max_height"
+POSITIVE_CONTROL_NAME = "g_config.flying_limit.max_height_0"
 POSITIVE_CONTROL_HASH = 0x0371238A
 POSITIVE_CONTROL_KIND = "int"
+
+# By-index wa150 row EU_CE_enable_c0_rid (index 1306) corresponds to the by-hash
+# name ``EU_CE_enable_c0_rid_0``. Its hash is computed by the independent helper
+# ``libraries/protocol-probes/dji_flyc_parameter_hash.py`` and pinned in that
+# module's regression vectors. This optional read-only bridge lets one session
+# confirm that the by-hash F7/F8 path resolves the same RID policy parameter that
+# the by-index table names.
+INDEX_BRIDGE_NAME = "EU_CE_enable_c0_rid_0"
+INDEX_BRIDGE_HASH = 0xF80992FE
+INDEX_BRIDGE_KIND = "bool"
 
 
 def build_target_raw(baseline_raw: bytes, target: bool) -> bytes:
@@ -67,6 +79,21 @@ def load_duml_module():
     spec = importlib.util.spec_from_file_location("rid_switch_duml", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load DUML implementation from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_hash_module():
+    path = (
+        Path(__file__).resolve().parent.parent.parent
+        / "libraries"
+        / "protocol-probes"
+        / "dji_flyc_parameter_hash.py"
+    )
+    spec = importlib.util.spec_from_file_location("rid_switch_hash", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load hash module from {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -245,6 +272,12 @@ def main() -> None:
         help="DUML payload protection for the fixed F7/F8/F9 (default: simple)",
     )
     parser.add_argument(
+        "--index-bridge",
+        action="store_true",
+        help="before the RID baseline, read-only F7/F8 probe the by-index wa150 "
+        "row EU_CE_enable_c0_rid via its _0 by-hash name (default: off)",
+    )
+    parser.add_argument(
         "--target",
         choices=("on", "off"),
         help="Forward write target; without it the tool only probes and reports the baseline",
@@ -261,6 +294,11 @@ def main() -> None:
 
     protocol_module = load_protocol_module()
     duml = load_duml_module()
+    hash_module = load_hash_module()
+    if hash_module.dji_flyc_parameter_hash(POSITIVE_CONTROL_NAME) != POSITIVE_CONTROL_HASH:
+        raise SystemExit("positive-control name/hash mismatch; refusing to run")
+    if hash_module.dji_flyc_parameter_hash(INDEX_BRIDGE_NAME) != INDEX_BRIDGE_HASH:
+        raise SystemExit("index-bridge name/hash mismatch; refusing to run")
     config = transport_config(args.transport)
     if args.route == "modern":
         if args.transport != "aircraft":
@@ -329,6 +367,24 @@ def main() -> None:
             record("positive_control", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
             report["state"] = "route_not_verified"
             raise RuntimeError("positive control failed; refusing to touch the RID parameter") from exc
+
+        # Optional read-only bridge: by-index wa150 row -> by-hash name.
+        if args.index_bridge:
+            try:
+                _, _, bridge_f7, bridge_f8 = probe_parameter(
+                    session,
+                    name=INDEX_BRIDGE_NAME,
+                    hash_value=INDEX_BRIDGE_HASH,
+                    kind=INDEX_BRIDGE_KIND,
+                )
+                record("index_bridge", "pass", {
+                    "parameter": INDEX_BRIDGE_NAME,
+                    "hash": f"0x{INDEX_BRIDGE_HASH:08X}",
+                    "f7_length": len(bridge_f7),
+                    "f8_length": len(bridge_f8),
+                })
+            except (TimeoutError, RuntimeError, protocol_module.ParamProtocolError, usb1.USBError) as exc:
+                record("index_bridge", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
 
         # Baseline: F7 metadata then F8 value for the RID parameter.
         try:

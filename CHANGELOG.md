@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.4.7 - 2026-08-29
+
+### Added
+
+- Added `libraries/protocol-probes/dji_flyc_parameter_hash.py`, an independent,
+  source-only re-implementation of the public DJI flight-controller parameter-name
+  hash (`GBK` encode, `hash = ((hash << 8) + byte) % 0xFFFFFFFB`) with pinned ASCII
+  regression vectors covering the current RID policy parameters, the wa150 EU C0 rows,
+  and the known-good positive controls. It performs no I/O.
+- Added the by-hash/by-index bridge: `rid_param_index_readonly.py` reports the computed
+  `_0`-form hash for each wa150 RID row, and `rid_switch_control.py` (`--index-bridge`)
+  and `rid_index_switch_control.py` (`--hash-bridge`) each add a read-only F7/F8 probe of
+  `EU_CE_enable_c0_rid_0` (`0xF80992FE`) to anchor the by-index row to its by-hash name.
+
+### Fixed
+
+- Corrected the by-hash positive-control name: `0x0371238A` is
+  `g_config.flying_limit.max_height_0` (not `g_config.flying_limit.max_height`), and the
+  read probe's three labels were corrected to `g_config.flying_limit.max_height_0`,
+  `g_config.flying_limit.max_radius_0`, and
+  `g_config.advanced_function.radius_limit_enabled_0`. The corrected names match the hash
+  now that the algorithm is pinned.
+
+### Boundary
+
+- All of this is `STATIC` offline source and synthetic tests; no live by-hash or by-index
+  read/write result is claimed, and none of it proves Remote ID RF behaviour. The bridge is
+  read-only metadata only.
+
 ## 0.4.6 - 2026-08-29
 
 ### Added

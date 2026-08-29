@@ -8,8 +8,8 @@ or generated output.
 
 - `STATIC`: the source is an independently written research implementation of the documented wire
   shapes and parsing rules.
-- `OBSERVED`: all 68 self-contained host unit tests passed during the public-source import on
-  2026-08-29.
+- `OBSERVED`: all self-contained host unit tests passed during the public-source import on
+  2026-08-29; the count grows as codec and hash-regression tests are added.
 - `NOT ADMITTED`: passing those tests does not establish that a Mini 5 Pro accepts a route, that a
   value is applied, or that Remote ID RF behavior changes.
 
@@ -25,6 +25,7 @@ The tools do not all have the same transport boundary:
 | `function_discovery_protocol.py` | Transport-free `0x00/0xB8` request-payload and page codec. Building bytes is not evidence that a target supports the command. |
 | `rid_param_protocol.py` | Offline F7/F8 reply parsing, gated F9 write-body encoding and write-ACK parsing, and request-body SIMPLE-keystream transformation; it has no USB transport and performs no write. |
 | `rid_param_index_protocol.py` | Offline by-index FLYC codec for the `0xE0`--`0xE3` table/get-info/read/write commands recovered from the public wa150 parameter table and `lmdegreeds/djiparam`. Transport-free; the `0xE3` write encoder is separate and gated. |
+| `dji_flyc_parameter_hash.py` | Independent re-implementation of the public DJI parameter-name hash (`GBK`, `(hash << 8) + byte mod 0xFFFFFFFB`) that maps a name to the by-hash F7/F8/F9 identifier. Pure function; pinned ASCII regression vectors only. |
 | `aircraft_bulk_capture.py` | USB-IN-only aircraft summary; emits aggregate routing metadata rather than payloads. |
 | `rc2_bulk_capture.py` | USB-IN-only RC 2 capture helper. It emits complete frames and payloads to stdout, so its output can contain private telemetry and must never be committed. |
 | `usb_duml_command_census.py` | USB-IN-only aggregate command-header census for the fixed aircraft and RC 2 interfaces. |

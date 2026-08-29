@@ -9,6 +9,11 @@ command, or parameter interface.
 
 Commands reachable: FLYC 0x03/0xE0 (table), 0x03/0xE1 (get_info), 0x03/0xE2
 (read), 0x03/0xE3 (write). No motor is started and no radio state is measured.
+
+An optional ``--hash-bridge`` read-only step maps the same parameter to its
+by-hash name ``EU_CE_enable_c0_rid_0`` (hash ``0xF80992FE``) with an F7/F8
+probe, anchoring the by-index row and the by-hash identifier to each other
+without writing.
 """
 
 from __future__ import annotations
@@ -36,6 +41,12 @@ RID_NAME = "EU_CE_enable_c0_rid"
 WA150_TABLE_CRC = 0x5F8B2AE1
 WA150_TABLE_COUNT = 1557
 
+# The by-hash name for the same wa150 row. Its hash is pinned by the independent
+# helper libraries/protocol-probes/dji_flyc_parameter_hash.py.
+HASH_BRIDGE_NAME = "EU_CE_enable_c0_rid_0"
+HASH_BRIDGE_HASH = 0xF80992FE
+HASH_BRIDGE_KIND = "bool"
+
 
 def load_protocol_module():
     path = (
@@ -62,6 +73,35 @@ def load_duml_module():
     spec = importlib.util.spec_from_file_location("rid_index_switch_duml", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load DUML implementation from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_hash_module():
+    path = (
+        Path(__file__).resolve().parent.parent.parent
+        / "libraries"
+        / "protocol-probes"
+        / "dji_flyc_parameter_hash.py"
+    )
+    spec = importlib.util.spec_from_file_location("rid_index_switch_hash", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load hash module from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_hash_protocol_module():
+    path = (
+        Path(__file__).resolve().parent.parent
+        / "device-read-probes"
+        / "rid_param_protocol.py"
+    )
+    spec = importlib.util.spec_from_file_location("rid_index_switch_hash_protocol", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load by-hash protocol from {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -201,6 +241,28 @@ def probe_value(session: IndexSession):
     return attrs, info, value
 
 
+def probe_hash_bridge(session: IndexSession, hash_protocol):
+    """Read-only F7/F8 of the by-hash name for the same wa150 row."""
+
+    payload = HASH_BRIDGE_HASH.to_bytes(4, "little")
+    f7_payload = session.exchange(hash_protocol.CMD_GET_PARAM_INFO_BY_HASH, payload)
+    metadata = hash_protocol.parse_f7_metadata(
+        f7_payload,
+        expected_name=HASH_BRIDGE_NAME,
+        semantic_kind=HASH_BRIDGE_KIND,
+    )
+    f8_payload = session.exchange(
+        hash_protocol.CMD_GET_PARAM_VALUE_BY_HASH, payload
+    )
+    value = hash_protocol.parse_f8_value(
+        f8_payload,
+        expected_hash=HASH_BRIDGE_HASH,
+        metadata=metadata,
+        semantic_kind=HASH_BRIDGE_KIND,
+    )
+    return metadata, value, f7_payload, f8_payload
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Bounded USB DUML by-index A-B-A for EU_CE_enable_c0_rid."
@@ -222,12 +284,22 @@ def main() -> None:
         default=2.0,
         help="per-reply receive window in seconds (default: 2.0)",
     )
+    parser.add_argument(
+        "--hash-bridge",
+        action="store_true",
+        help="after the by-index baseline, read-only F7/F8 probe the same row via "
+        "its _0 by-hash name EU_CE_enable_c0_rid_0 (default: off)",
+    )
     args = parser.parse_args()
     if not 0.25 <= args.reply_seconds <= 5.0:
         raise SystemExit("--reply-seconds must be between 0.25 and 5.0")
 
     protocol = load_protocol_module()
     duml = load_duml_module()
+    hash_module = load_hash_module()
+    hash_protocol = load_hash_protocol_module()
+    if hash_module.dji_flyc_parameter_hash(HASH_BRIDGE_NAME) != HASH_BRIDGE_HASH:
+        raise SystemExit("hash bridge name/hash mismatch; refusing to run")
     config = transport_config(args.transport)
 
     context = usb1.USBContext()
@@ -288,6 +360,28 @@ def main() -> None:
             record("baseline", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
             report["state"] = "baseline_unavailable"
             raise RuntimeError("no same-session by-index baseline; no write attempted") from exc
+
+        if args.hash_bridge:
+            try:
+                bridge_metadata, bridge_value, bridge_f7, bridge_f8 = probe_hash_bridge(
+                    session, hash_protocol
+                )
+                record("hash_bridge", "pass", {
+                    "parameter": HASH_BRIDGE_NAME,
+                    "hash": f"0x{HASH_BRIDGE_HASH:08X}",
+                    "value": bridge_value.decoded,
+                    "raw_hex": bridge_value.raw.hex(),
+                    "metadata": hash_protocol.metadata_summary(bridge_metadata),
+                    "f7_length": len(bridge_f7),
+                    "f8_length": len(bridge_f8),
+                })
+            except (
+                TimeoutError,
+                RuntimeError,
+                hash_protocol.ParamProtocolError,
+                usb1.USBError,
+            ) as exc:
+                record("hash_bridge", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
 
         report["state"] = "baseline"
         if args.target is None:

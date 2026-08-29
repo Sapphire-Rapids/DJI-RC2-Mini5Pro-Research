@@ -23,6 +23,11 @@ Two parameter families are covered:
   (index 1306) and neighbours, recovered from the public `lmdegreeds/djiparam`
   parameter table.
 
+The parameter-name hash that links the two families is implemented in
+[`../../libraries/protocol-probes/dji_flyc_parameter_hash.py`](../../libraries/protocol-probes/dji_flyc_parameter_hash.py).
+`EU_CE_enable_c0_rid` (by index) and `EU_CE_enable_c0_rid_0` (`0xF80992FE`, by hash)
+name the same wa150 row, and both tools can read-only report that bridge.
+
 ## Commands reachable
 
 - `rid_switch_control.py`: F7/F8/F9 by hash, gated; only `rid_ctrl_enable_0`.
@@ -42,6 +47,9 @@ starts motors nor measures RF.
 # by-hash: probe only, then report the rid_ctrl_enable_0 baseline (no write)
 python3 rid_switch_control.py --transport rc2 --wire-mode simple
 
+# by-hash: also map the by-index wa150 row EU_CE_enable_c0_rid -> _0 hash (read-only)
+python3 rid_switch_control.py --transport aircraft --index-bridge --wire-mode simple
+
 # by-hash: A-B-A write OFF, read back, restore baseline, read back again
 python3 rid_switch_control.py --transport aircraft --target off --wire-mode simple
 
@@ -50,6 +58,9 @@ python3 rid_param_index_readonly.py --transport aircraft
 
 # by-index: probe EU_CE_enable_c0_rid only, then report the baseline (no write)
 python3 rid_index_switch_control.py --transport aircraft
+
+# by-index: also map the same row to its _0 by-hash name (read-only F7/F8)
+python3 rid_index_switch_control.py --transport aircraft --hash-bridge
 
 # by-index: A-B-A write OFF, read back, restore baseline, read back again
 python3 rid_index_switch_control.py --transport aircraft --target off
@@ -60,7 +71,7 @@ Dependencies: Python 3.10+ and `libusb1`
 
 ## Gate order (by-hash write)
 
-1. Positive control `g_config.flying_limit.max_height` (`0x0371238A`) must round-trip
+1. Positive control `g_config.flying_limit.max_height_0` (`0x0371238A`) must round-trip
    F7/F8 on the chosen route. A failed positive control aborts before any RID request.
 2. `rid_ctrl_enable_0` F7 metadata must match the fixed name, and F8 must return a
    strict Boolean baseline.
