@@ -671,9 +671,13 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   observed count、识别 MSDK-compatible field-7 RID candidate；exactly one 时 ID 只留在 process
   memory，公开日志仅 count/level/status。五个 synthetic host cases 与 helper DEX/AArch64 build
   通过。
-- **下一依赖：** ordinary third-party APK 不能凭打包该 agent 就 attach DJI Fly。先准入 RC 2
-  userspace ADB shell 或其他 same-process loader，再做一次 query-only fresh callback/PID check；
-  在 real success callback 唯一识别 type 6 前不加入 setter。
+- **loader 阴性：** ordinary `/data/app/...==/...so` 会在首个 `=` 被截断（C-208）；generic
+  `trace_data_file` 在 canary 前结束 target，而同 bytes 从 delimiter-free `apk_data_file` 正常
+  callback（C-209）；uncommitted `apk_tmp_file` 又被 target search deny（C-210）。三条均不在
+  RC 2 重复。
+- **下一依赖：** 先闭合 exact RC 2 caller/target domain 的合法 delimiter-free path/descriptor
+  交集，或准入 userspace ADB/system-mediated loader，再做一次 query-only fresh callback/PID
+  check；在 real success callback 唯一识别 type 6 前不加入 setter（C-211）。
 
 ### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
 

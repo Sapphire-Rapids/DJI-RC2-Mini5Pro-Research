@@ -21,6 +21,8 @@ change Remote ID behavior on a device.
 | `apps/rc2-rid-admin/` | Current FindUAS RC 2 RID query/management APK source and unit tests | Mixed: A-028 was built/run; current A-033 was audited and staged but is uninstalled/unrun; the source also contains gated or unresolved controls |
 | `apps/rc2-settings-launcher/` | Minimal launcher for hidden Android settings on RC 2 | Utility source; installation/use does not establish RID behavior |
 | `apps/rid-admission-probe/` | Zero-permission v0.10 Android admission probe and retained historical observer source | v0.10 `NOT ADMITTED`; historical localhost observer is `RETRACTED` and must remain excluded from the active source set |
+| `apps/rc2-flysafe-agent-carrier/` | Normal extracted-path ART TI carrier and command-display regression fixture | Emulator `NEGATIVE`: modern installed path is split at its first `=`; source only, not an RC 2 candidate |
+| `apps/rc2-flysafe-agent-staging-payload/` | Uncommitted PackageInstaller native-entry staging fixture | Emulator `NEGATIVE`: `apk_tmp_file` directory search denied and session abandoned; source only, not an RC 2 candidate |
 | `libraries/rid-switch-controller/` | Bounded-lease/control state model | Host-tested model; not a proven device transport |
 | `libraries/rid-switch-wire-codec/` | FlySafe query/set wire codecs and correlator | Static/host-tested; not a live Mini 5 Pro control result |
 | `libraries/rid-type6-inventory-parser/` | Strict V3/V4 type-6 inventory parser | Static/host-tested compatibility parser |

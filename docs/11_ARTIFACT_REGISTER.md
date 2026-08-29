@@ -46,6 +46,8 @@
 | A-032 | RC331 v07 APEX `adbd` CNXN-gate derivative；input-sample；userspace copy | `1,497,232` | `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` | `NOT ADMITTED`；MTP staging/readback 闭合；未复制到内部存储、未 chmod、未执行；vendor derivative 排除且不分发 |
 | A-033 | FindUAS RC 2 RID Admin；self-developed；`0.8.0-flysafe-diagnostic-export` / code 12 | `204,449` | `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177` | `STATIC`；exact audit；MTP staged/readback matched；未安装或运行；sealed APK 排除，源码公开 |
 | A-034 | DJI Fly runtime private mapping；runtime-derived input；`1.21.10` disposable emulator | `205,443,072` | `2926709cc6896c7315d003c4e61208d5a9fa53ae73cda897d820a581c5c8325c` | `OBSERVED`；authorized read-only emulator process-memory copy；仅本地分析；排除且不分发；只公开 hash |
+| A-035 | FindUAS FlySafe agent carrier；self-developed；`0.1.0-emulator-observed` | `23,032` | `16a59c1996e817891dfb84208202cb942456095d4ee98dfa7d8eb17c4c10f289` | `NEGATIVE`；disposable emulator normal installed path 在首个 `=` 被截断；未在 RC 2 使用；generated APK 排除、源码公开 |
+| A-036 | FindUAS FlySafe ART TI staging payload；self-developed；`0.1.0-emulator-observed` | `38,998` | `20a96fdd834e921b546105fd0b2314393a33d242690f731a776c867f70e47069` | `NEGATIVE`；disposable emulator uncommitted `apk_tmp_file` search denied，session 已 abandon；未在 RC 2 使用；generated APK 排除、源码公开 |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -340,7 +342,24 @@ A-034 是同一 emulator app process 的一个 private read/write mapping，由 
 入库；GitHub 只保留 whole-file identity、方法、事实、边界和独立 scanner 源码。direct Frida attach
 未产出工件并使 app 退出，单独记录为 C-187。
 
-## 17. 更新与一致性检查
+## 17. A-035 与 A-036：source-only loader negatives
+
+A-035 packages the exact independently written query SO with legacy extraction and displays the
+normal installed filesystem path. Its manifest has zero permissions; the built APK contains the
+exact `17,344`-byte SO whose SHA-256 is
+`15813976fbbdd842f91f90f76628c01200711f3bb6669a7944e6f7706c1ea891`. Emulator installation
+confirmed extraction, but the path's first `=` was treated as agent options, so no load occurred
+(C-208). This artifact is a negative regression fixture, not an RC 2 candidate.
+
+A-036 stores the same SO uncompressed in an APK with no Android component or permission. AGP emitted
+one synthetic 600-byte `R`-class DEX despite `android:hasCode="false"`; the record therefore does
+not call it DEX-free. A system-UID emulator process created and streamed an uncommitted session, but
+target search of its `apk_tmp_file` directory was denied. Abandon removed the directory (C-210).
+
+Both generated APKs and the generated SO remain excluded. Only original Gradle/manifest/source/test
+and build instructions are published.
+
+## 18. 更新与一致性检查
 
 修改本表时必须同时更新 `evidence/artifacts.csv`，并运行：
 

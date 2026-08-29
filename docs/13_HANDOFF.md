@@ -483,3 +483,24 @@ sh scripts/check_sensitive_patterns.sh
 Then inspect the staged file list. Only Markdown, CSV, scripts, license, and repository metadata are
 expected. APK, SO, firmware, images, captures, key files, build directories, or host-local paths are
 release blockers.
+
+## 2026-08-30 takeover checkpoint
+
+Start with [`../NEXT_AGENT_HANDOFF_PROMPT.md`](../NEXT_AGENT_HANDOFF_PROMPT.md), then read this file,
+[`12_CURRENT_BLOCKERS.md`](12_CURRENT_BLOCKERS.md),
+[`20_OFFICIAL_FLYSAFE_UI_PATH.md`](20_OFFICIAL_FLYSAFE_UI_PATH.md), and claims C-188--C-211.
+
+Do not repeat these emulator-closed routes on RC 2:
+
+- standard JVMTI 1.2 late attach;
+- the carrier's ordinary installed `/data/app/...==/...so` command;
+- a generic `trace_data_file` copy;
+- an uncommitted PackageInstaller `apk_tmp_file` staging directory;
+- the old external Binder F7/F8 route variants or passive `0x11/0x1C` listener.
+
+First close C-207's written standard-RID bearer/motor-timing A-B-A, then use read-only positive
+controls to decide whether the C-192--C-199 WA150 by-index/by-hash candidate route is live. In the
+same-process lane, exact domain/path admission for the already-working ART TI query remains next, or
+the independent userspace-ADB path if policy has no shared executable label. The first RC 2 ART TI
+execution is query-only and succeeds only with a fresh callback plus unchanged DJI Fly PID. Do not
+add a state-changing path until a real baseline, route, readback and exact restore are closed.

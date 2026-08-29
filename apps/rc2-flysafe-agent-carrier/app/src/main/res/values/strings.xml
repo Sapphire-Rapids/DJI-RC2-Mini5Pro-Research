@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FindUAS FlySafe Agent Carrier</string>
+    <string name="summary">只负责显示已安装 ART TI 查询库的精确路径，并复制三条诊断命令。应用本身不会执行命令、注入进程或写入飞机状态。</string>
+    <string name="library_path_label">已安装查询库：</string>
+    <string name="copy_pid">1. 复制读取 DJI Fly PID 命令</string>
+    <string name="copy_attach">2. 复制只读查询 agent attach 命令</string>
+    <string name="copy_log">3. 复制读取 FindUAS 查询日志命令</string>
+    <string name="copied">命令已复制</string>
+    <string name="boundary">RC 2 首次实验只查询，不含 setter。先记录 PID，执行 attach，再读取日志并复查 PID。安装此 APK 本身不会改变 RID。</string>
+</resources>

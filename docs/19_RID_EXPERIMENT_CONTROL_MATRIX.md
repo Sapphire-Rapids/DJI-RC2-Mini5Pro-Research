@@ -148,8 +148,10 @@ It remains an external-Binder comparison. C-180/C-183/C-184 establish the offici
 owner, and C-188--C-190 now observe its exact private query/callback through Android 11 ART TI in a
 disposable emulator. With no aircraft the callback was `417`; target PID remained stable. C-191
 adds the source-only success parser, while C-185 retains the current Java UI type-6 incompatibility.
-The next live dependency is an admitted RC 2 same-process loader, not another external route guess;
-see [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md).
+The next live dependency is an admitted RC 2 same-process loader, not another external route guess.
+C-208--C-210 retire ordinary installed-path, generic trace-label and uncommitted staging shortcuts;
+C-211 narrows the work to the actual caller/target policy intersection or a system-mediated loader.
+See [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md).
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing
 found no edge from type 6/field 7/`11/12` to WA150 `0802`, motor state, or BLE/Wi-Fi enable. This is a
@@ -205,7 +207,8 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 2. Treat A-026's `GATE_UNOBSERVED`, A-027's ambiguous `ProtocolException`, and A-028's group
    transport callback failure as historical narrow negatives. The exact ART TI owner/query callback
    is now emulator-observed; admit an RC 2 loader and run the query-only agent once. Do not repeat
-   another external route guess or standard JVMTI 1.2 attach.
+   another external route guess, standard JVMTI 1.2 attach, normal installed-path attach, generic
+   trace path or uncommitted `apk_tmp_file` staging.
 3. Advance only after one canonical privacy-reduced inventory; report type-6 count/level/enabled/
    valid and preserve unavailable versus empty.
 4. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,

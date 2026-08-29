@@ -107,6 +107,23 @@ and an executable file label. The RC 2 admission dependency is now a usable user
 another proved same-process loader, followed by one query-only run with a fresh callback and stable
 PID.
 
+### Loader path experiments
+
+Three narrow emulator experiments now refine that admission dependency:
+
+- the A-035 carrier's normal `/data/app/...==/...so` path was split at the first `=` by the
+  ActivityManager agent-spec parser; no load occurred (C-208);
+- the exact same SO bytes under delimiter-free `trace_data_file` terminated the target before
+  canary, while delimiter-free `apk_data_file` loaded them, dispatched once, returned `417`, and
+  retained the PID (C-209);
+- the A-036 uncommitted PackageInstaller session produced delimiter-free `apk_tmp_file` staging,
+  but target directory search was denied before load; abandon removed it (C-210).
+
+These results leave a precise RC 2 question: which legitimate file type or mediated descriptor is
+both creatable by the actual privileged caller and searchable/readable/mappable/executable by the
+actual DJI Fly domain, without `=` in the agent specification (C-211)? Until signer/domain and
+matching policy answer that question, neither source-only APK is an RC 2 candidate.
+
 ## Prepared operator observation
 
 Keep motors stopped and do not toggle a license in this pass.
@@ -151,6 +168,7 @@ The exact current owner and generic existing-ID action are closed statically, cu
 semantics are closed negatively, and the exact private query plus callback is now observed in the
 disposable emulator through ART TI. The success-side raw inventory parser is implemented and
 synthetically tested, but the emulator cannot produce an aircraft callback. RC 2 still lacks an
-admitted same-process loader. The official per-license enable/disable surface is pinned at the
-Cloud API and MSDK 5.8 levels, but no genuine type-6 row has been observed on Mini 5 Pro. No license
-toggle, `0x11/0x12` action, motor start or RF experiment has been performed as part of this path.
+admitted same-process loader; three path shortcuts are now explicitly retired. The official
+per-license enable/disable surface is pinned at the Cloud API and MSDK 5.8 levels, but no genuine
+type-6 row has been observed on Mini 5 Pro. No license toggle, `0x11/0x12` action, motor start or RF
+experiment has been performed as part of this path.
