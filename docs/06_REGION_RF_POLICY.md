@@ -267,7 +267,18 @@ official EIRP ceiling 分别登记为 `C-066`--`C-070`；最终已知 region sta
   [否定结果](09_NEGATIVE_RESULTS.md)。
 - **隐私/分发：** 不发布现场位置、身份或原始 capture。
 
-## O4 DroneID 独立接收边界（DJI 私有 DroneID，区别于标准 Remote ID）
+## 标准 Remote ID bearer 已确认为明文（当前目标）
+
+- **证据状态：OBSERVED**（C-207）
+- **对象/版本：** Mini 5 Pro + RC 2，操作者实测（2026-08-29）。
+- **事实：** 操作者用已验证的标准 Remote ID 检测装置配合 FindUAS 上位机确认：起桨时 Mini 5 Pro
+  广播明文标准 Remote ID，Basic ID 可读。当前开关研究聚焦这条标准 bearer（ASTM F3411 / EN 4709）。
+- **边界/不证明：** 尚未把 Basic ID 明文值、标准 bearer 类型（BLE 或 Wi-Fi）、字段集合与电机
+  起/停时序写成书面 A-B-A 记录；本次未做任何 toggle 或 write。
+- **公开依据：** [19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md)、
+  [README.md](../README.md)。
+
+## O4 DroneID 独立接收边界（DJI 私有 DroneID，区别于标准 Remote ID，暂缓）
 
 - **证据状态：CORROBORATED**（C-202、C-203）
 - **对象/版本：** 公开 `alphafox02/dragonsdr_dji_droneid`（`8d0126b91b943f5c22a0503a8414bc2441892328`）

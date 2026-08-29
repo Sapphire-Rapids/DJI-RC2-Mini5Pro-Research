@@ -40,6 +40,10 @@
 
 ## 当前结论摘要
 
+- **RF bearer 已确认（C-207）**：操作者用已验证的标准 Remote ID 检测装置 + FindUAS 上位机确认，
+  Mini 5 Pro 起桨时广播的是**明文标准 Remote ID**（ASTM F3411 / EN 4709，BLE/Wi-Fi），Basic ID 可读。
+  当前开关研究聚焦这条标准 bearer；DJI 私有 OcuSync DroneID（含 O4 加密边界）**暂缓、不作为目标**。
+
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
   EID、OPID、DIPS 和 China OID 分开。DJI Fly `1.21.10` 没有同名 wrapper，因此 Mini 5 Pro

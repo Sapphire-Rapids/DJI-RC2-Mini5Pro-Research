@@ -55,7 +55,7 @@ level.
 | Broadcast start/stop timing | aircraft firmware plus independent receiver | A-024 Binder listener was false-negative while the independent detector confirmed real motor-on RID | no safe trigger | `READ-ONLY LIVE`; use the independent receiver for RF truth and do not repeat the tested Binder listener |
 | Operator-location health | RC/Android location provider -> link -> aircraft | permission, age, accuracy, RID failure class | no current selector or coordinate setter | `PASSIVE OWNER`; privacy-reduced status only, never location spoofing |
 | Aircraft/UAS identity | FC/device identity and compliance derivation | static get/listen-only candidate; no admitted live read | no current setter found | `STATIC LOCKED`; live route, privacy-safe read, and actual RF Basic ID correspondence remain unclosed |
-| RF bearer | aircraft BLE/Wi-Fi scheduler | external receiver observation; public DragonSDR docs state DJI-private OcuSync DroneID is encrypted on O4 (Mini 5) and receiver-alone yields session hash plus frequency/RSSI, but this boundary is limited to the private DroneID protocol (C-202); public RUB-SysSec DroneSecurity NDSS 2023 FAQ states standardized Bluetooth/Wi-Fi Remote ID is a distinct plaintext protocol per EN 4709 / ASTM F3411 (C-203), so a standard Remote ID receiver reads Basic ID directly with no DJI decoder | no selector found | `READ-ONLY LIVE`; show only an independently observed bearer, never infer it from China cloud tracking masks |
+| RF bearer | aircraft BLE/Wi-Fi scheduler | external receiver observation; the operator confirmed with a verified standard Remote ID detector plus the FindUAS host that the Mini 5 Pro broadcasts plaintext standardized Remote ID with a readable Basic ID (C-207). The standardized Bluetooth/Wi-Fi Remote ID is a plaintext protocol per EN 4709 / ASTM F3411 (C-203, C-206); the DJI-private OcuSync DroneID encrypted-O4 boundary (C-202) is parked and out of scope for the current switch work | no selector found | `READ-ONLY LIVE`; use the standard Remote ID receiver for RF truth, show only an independently observed bearer, never infer it from China cloud tracking masks |
 
 The seven-byte working-status layout is:
 
@@ -197,6 +197,9 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 
 ## 5. Product implementation order
 
+0. Record a written motor-on A-B-A against the confirmed plaintext standard Remote ID bearer:
+   capture the readable Basic ID and standard bearer type (BLE vs Wi-Fi) with the independent
+   receiver, tie it to motor on/off timing, and keep the DJI-private DroneID family parked (C-207).
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
 2. Treat A-026's `GATE_UNOBSERVED`, A-027's ambiguous `ProtocolException`, and A-028's group
