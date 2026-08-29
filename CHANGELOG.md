@@ -1,6 +1,24 @@
 # Changelog
 
-## 0.4.4 - 2026-08-29
+## 0.4.5 - 2026-08-29
+
+### Added
+
+- Added `libraries/protocol-probes/rid_param_index_protocol.py`, an offline by-index FLYC codec for
+  the `0xE0` (table attributes), `0xE1` (get_info), `0xE2` (read), and `0xE3` (write) parameter
+  commands, with strict name/index/width validation and a gated write encoder.
+- Added `host-tools/rid-switch-tool/rid_param_index_readonly.py`, a read-only USB DUML probe that
+  verifies the wa150 parameter-table identity through `0xE0` and re-checks each candidate RID
+  index's on-board name through `0xE1` before reading `0xE2`. It never reaches `0xE3`.
+- Recorded the public `lmdegreeds/djiparam` by-index command family and wa150 parameter table as a
+  pinned source; its EU C0 RID rows are policy candidates, not a global master switch.
+
+### Boundary
+
+- The by-index command family is a third, independent parameter-access path alongside by-hash
+  `F7/F8/F9`. It is `STATIC` offline source only: no live by-index read or write is claimed, and a
+  green `0xE2` readback still does not prove Remote ID RF behaviour.
+
 
 ### Added
 

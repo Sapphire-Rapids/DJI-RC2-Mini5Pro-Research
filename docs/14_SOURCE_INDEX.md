@@ -109,6 +109,15 @@ here does not imply that all of its claims were accepted.
 - [dji-neo2-tools](https://github.com/linnin233/dji-neo2-tools/tree/f0b715ad5f064c25439e389cb892befa7c2e3cff)
   at `f0b715ad5f064c25439e389cb892befa7c2e3cff`.
   Used only for public extraction/runtime precedent; product/version transfer was not assumed.
+- [lmdegreeds/djiparam](https://github.com/lmdegreeds/djiparam/tree/1b396b1a0adedfd81810d7ba535e0d1ff387a10d)
+  at `1b396b1a0adedfd81810d7ba535e0d1ff387a10d`.
+  Used only for the by-index FLYC parameter command family (`0xE0` table attributes, `0xE1`
+  get_info, `0xE2` read, `0xE3` write) and its bundled Mini 5 Pro (`wa150`) parameter table. Its
+  RID rows (`EU_CE_enable_c0_rid` index 1306, `EU_CE_Reg_RID_Enable` 1308,
+  `eu_ce_support_remote_set_level` 1315) are EU C0 policy candidates, not a global Remote ID master
+  switch. The tool's deployment path requires an unlocked RC 2 (system shell and permissive SELinux)
+  and is outside this repository's boundary; only the independently written by-index codec and
+  read-only USB probe are adopted.
 
 ## Community FCC/regulatory tools
 
