@@ -224,6 +224,7 @@ Details: [18_LEGACY_DRONEID_DETECTION.md](18_LEGACY_DRONEID_DETECTION.md).
 | C-177 | `STATIC` | A-032 changes only exact-v07 gate materialization `cset w21, lt -> mov w21, wzr`, preserving the normal TLS/auth path; output SHA-256 is `3fceaa...225f` | Offline derivative design only; no loader/FunctionFS/auth/shell result and no binary redistribution |
 | C-178 | `OBSERVED` | A-032 was staged by MTP as removable-SD `Download/RC2_ADBD_CNXN.bin`; fresh size and full readback SHA matched | Staging only; no internal copy, chmod, execution, daemon stop, ADB result, or state change |
 | C-179 | `NOT ADMITTED` | One bounded operator session is prepared to capture live gates and try the exact staged userspace copy before one host `CNXN` | Entire execution remains pending; any mismatch stops before launch and shell identity must be read, not inferred |
+| C-212 | `CORROBORATED` | A pinned public RC 2 researcher reports framework/TEE tamper state followed by a DJI Fly update boot-logo loop, with all documented software recovery attempts failed | Adjacent public report, not this RC 2 `07.00.0100`; it is a bricking precedent, not a route or recovery procedure |
 
 Details: [08_ANDROID_ADB.md](08_ANDROID_ADB.md).
 

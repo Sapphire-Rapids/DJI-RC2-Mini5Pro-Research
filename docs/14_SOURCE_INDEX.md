@@ -290,6 +290,13 @@ corroborated.
 - [FindUAS repository at `15f331c`](https://github.com/Sapphire-Rapids/FindUAS/tree/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc).
   Contains the redacted public state, RF, firmware, compatibility, and ADB documents that preceded
   this independent archive.
+- [whitelewi1-ctrl/dji-rc2-research](https://github.com/whitelewi1-ctrl/dji-rc2-research/tree/fc5949a844fb5234591c8b53ec75af3f9b7bd8a4)
+  at `fc5949a844fb5234591c8b53ec75af3f9b7bd8a4`. Used only as a public RC 2 bricking precedent:
+  the researcher obtained a system shell through a DJI internal Developer Assistant APK, patched
+  framework state, and later observed a DJI Fly update detect TEE/eFuse tamper state and trap the
+  device at boot logo; all documented software recovery attempts failed (C-212). It is not adopted
+  as a route or tool, and its adjacent firmware/test-key state is not equated with this production
+  RC 2 `07.00.0100`.
 
 ## Source-handling rule
 
