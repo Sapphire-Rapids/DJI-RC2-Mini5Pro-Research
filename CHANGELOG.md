@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.4.11 - 2026-08-29
+
+### Added
+
+- Corrected the DroneID vs standardized Remote ID distinction: the DragonSDR encrypted-O4 boundary
+  is limited to DJI's private OcuSync DroneID protocol, while standardized Broadcast Remote ID
+  (ASTM F3411 / EN 4709 BLE/Wi-Fi) is plaintext and readable by a standard receiver with no
+  DJI-licensed decoder (C-202 reworded, C-203 added).
+- Recorded the official DJI Cloud API FlySafe device methods `unlock_license_switch` and
+  `unlock_license_list` with type 6 "RID unlocking" and `rid_unlock.level` 1=EU / 2=China (C-204).
+- Recorded the official MSDK 5.8.0 `RidUnlockType` (EUROPEAN/CHINA),
+  `FlyZoneLicenseInfo.getRidUnlockType()`, and `setFlyZoneLicensesEnabled` enable/disable setter
+  (C-205).
+- Recorded the OpenDroneID receiver-android README plaintext ASTM F3411 / prEN 4709-002 receiver
+  reference (C-206).
+
+### Boundary
+
+- No official DJI RID feature, legal text, or regulation text was added; new claims are pinned
+  official API/MSDK documentation and standards-community receiver references only.
+- The FlySafe type-6 enable/disable surface is now pinned at the Cloud API and MSDK 5.8 levels, but
+  Mini 5 Pro entitlement, a genuine type-6 license, and a motor-on standardized-RID RF effect remain
+  unproved. No live write or RF measurement was performed.
+
 ## 0.4.10 - 2026-08-29
 
 ### Added
@@ -11,14 +35,22 @@
 - Recorded the community author's reliability boundary for that legacy surface: it only sends
   NULL/`fakeSN`, some firmware still randomly sends valid location packets, later DJI Fly/iOS
   reset the bits, and it is not reliable (C-201).
-- Recorded the public DragonSDR DroneID receiver O4 capability boundary: O4 (Mini 5) DroneID is
-  encrypted and receiver-alone yields session hash plus frequency/RSSI, with full telemetry
-  requiring a licensed DragonScope config and DroneID broadcast only while motors spin (C-202).
+- Recorded the public DragonSDR DroneID receiver O4 capability boundary, scoped to DJI's private
+  OcuSync DroneID protocol: O4 (Mini 5) private DroneID is encrypted and receiver-alone yields
+  session hash plus frequency/RSSI, with full telemetry requiring a licensed DragonScope config and
+  private DroneID broadcast only while motors spin (C-202).
+- Recorded the DroneID vs standardized Remote ID distinction: pinned RUB-SysSec DroneSecurity
+  NDSS 2023 README FAQ states DJI's Drone-ID is not the same as standardized Bluetooth/Wi-Fi
+  Remote ID (EN 4709 EU / ASTM F3411 US) and the standard bearer is readable by a plain smartphone
+  app (C-203).
 
 ### Boundary
 
 - No official DJI RID feature or legal text was added; the new claims are community prior-art
   documentation for the legacy OcuSync/AeroScope mask surface and for independent-receiver scope.
+- The encrypted-O4 boundary is limited to DJI's private OcuSync DroneID telemetry. Standardized
+  Broadcast Remote ID (ASTM F3411 / EN 4709 BLE/Wi-Fi) is plaintext and readable by a standard
+  Remote ID receiver without any DJI-licensed decoder.
 - No live write or RF measurement was performed; all new evidence is pinned public text
   (`CORROBORATED`/`NEGATIVE`) and does not establish a Mini 5 Pro transmitter-off switch.
 

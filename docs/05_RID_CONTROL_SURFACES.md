@@ -352,7 +352,12 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   / product / unlock-version 匹配 -> 上传到 FC -> pull inventory -> enable/disable 现有 license。
 - **事实：** 官方 schema 定义 `RID_UNLOCK == 6`；level 1 为 European，level 2 为 China。V2、V3、
   V4 选择不同的 signed onboard data 和 wire session。DJI Fly 的 upload-then-enable callback 只在
-  upload success 后调用 enable。
+  upload success 后调用 enable。官方 Cloud API FlySafe 文档进一步给出设备侧启停方法
+  `unlock_license_switch`（`license_id` + `enable` bool，reply 返回 `result` + `license_id`）与
+  `unlock_license_list`（`common_fields.type` 值 6 为 “RID unlocking”，`rid_unlock.level` 1=EU
+  RID unlocking、2=China RID unlocking）（C-204）。官方 MSDK 5.8.0 也定义 `RidUnlockType`
+  （EUROPEAN/CHINA）与 `FlyZoneLicenseInfo.getRidUnlockType()`，并用通用
+  `setFlyZoneLicensesEnabled(info, isEnabled, callback)` 启停一条已拉取的 license（C-205）。
 - **控制语义：** MSDK 5.18 保留的 `DefaultUASDelegate` 实现只在 license type 为
   `RID_UNLOCK`、`enabled=true`、level 与当前 area strategy 匹配时派生
   `isRidLicenseOpened=true`：level 1 只匹配 European，level 2 只匹配 China。若产品构造 gate
@@ -363,7 +368,10 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 - **边界/不证明：** type-6 不是本地 Boolean，不能合成、修改、重放或伪造。静态架构不证明当前
   Mini 5 Pro 有资格、已有真实许可、FC 接受或 enable 后 RF 变化。
 - **公开依据：** DJI 官方 FlySafe/Cloud API/MSDK；前述公开
-  [state research](https://github.com/Sapphire-Rapids/FindUAS/blob/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc/docs/DJI_RC2_STATE_RESEARCH.md#current-official-rid_unlock-account-to-fc-chain)。
+  [state research](https://github.com/Sapphire-Rapids/FindUAS/blob/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc/docs/DJI_RC2_STATE_RESEARCH.md#current-official-rid_unlock-account-to-fc-chain)；
+  官方 Cloud API FlySafe 文档（`unlock_license_switch`/`unlock_license_list`，type 6 + `rid_unlock.level`）
+  与 MSDK 5.8.0 `RidUnlockType`/`setFlyZoneLicensesEnabled` 详见
+  [14_SOURCE_INDEX.md](14_SOURCE_INDEX.md)。
 - **隐私/分发：** 不发布账号、token、Cookie、FC serial、license ID、signed blob、描述、时间、区域或
   server response 正文。
 
