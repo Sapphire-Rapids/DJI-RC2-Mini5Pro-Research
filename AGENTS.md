@@ -23,8 +23,8 @@ Gradle/CMake output, local SDK paths, or signing material. A source tree being p
 change an experiment from `NOT ADMITTED`, `RETRACTED`, or `UNKNOWN` to a validated capability.
 
 Do not commit vendor APKs, firmware, partitions, shared libraries, decompiled vendor code, copied
-vendor disassembly, raw private captures, accounts, sessions, signed licenses, device authorization
-keys, patched vendor binaries, flashable images, or temporary runtime dumps. Hashes, offsets,
+vendor disassembly, raw private captures, device authorization keys, patched vendor binaries,
+flashable images, or temporary runtime dumps. Hashes, offsets,
 minimal independently written patch/probe code, and high-level findings are allowed when the
 corresponding evidence and redistribution boundary are explicit.
 

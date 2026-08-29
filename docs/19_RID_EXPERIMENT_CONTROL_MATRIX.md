@@ -8,7 +8,8 @@ This document records what can be observed, what is statically writable but not 
 is official managed state, and what should instead be implemented on a separate synthetic laboratory
 source.
 
-“Adjustable” requires all of the following on the exact subject/version: authoritative owner,
+The sole product objective is a controllable Mini 5 Pro Remote ID switch. “Adjustable” requires all
+of the following on the exact subject/version: authoritative owner,
 baseline getter, bounded setter/action, canonical ACK, independent readback, restoration, persistence
 classification, and motor-on RF A-B-A evidence. A UI control is not evidence that a device accepted
 or applied a value.
@@ -35,7 +36,7 @@ machine-index claim until a live A-B-A result exists.
 | `READ-ONLY LIVE` | Current app/bridge has a bounded read path and preserves `unavailable` | Show current value and capture time; no editor |
 | `PASSIVE OWNER` | Exact official owner listens for natural state, but no active GET exists | Show only when obtained without replacing the owner or opening a second broker client |
 | `STATIC LOCKED` | Exact getter/setter/schema exists, but live route, baseline, restore, or RF gate is open | Disabled card with the missing gate; never a working-looking toggle |
-| `MANAGED` | Account/server/FC-bound licensed or credential state | Read only through the official authenticated owner; never synthesize or replay material |
+| `MANAGED` | Server/FC-bound state that must be observed through its official owner | Read through the admitted owner when available; use the separate aircraft-policy lane when it is readback-closed |
 | `OPAQUE BLOCKED` | Set-only blob, unknown semantics, absent readback, or name-only command | Do not expose raw editor/replay |
 | `LEGACY EXCLUDED` | Proven different protocol/product generation | Search signature only; do not migrate into a sender |
 | `SYNTHETIC SOURCE` | Standard message field suitable for a separate controlled RF source | Implement only with synthetic identity, lab lease, explicit RF backend, stop, and independent receiver |
