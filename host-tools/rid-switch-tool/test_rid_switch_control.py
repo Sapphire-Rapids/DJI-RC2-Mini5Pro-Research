@@ -74,6 +74,25 @@ class GateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             control.transport_config("unknown")
 
+    def test_positive_control_name_matches_its_hash(self):
+        hash_module = control.load_hash_module()
+        self.assertEqual(
+            hash_module.dji_flyc_parameter_hash(control.POSITIVE_CONTROL_NAME),
+            control.POSITIVE_CONTROL_HASH,
+        )
+        self.assertEqual(
+            control.POSITIVE_CONTROL_NAME,
+            "g_config.flying_limit.max_height_0",
+        )
+
+    def test_index_bridge_name_matches_its_hash(self):
+        hash_module = control.load_hash_module()
+        self.assertEqual(
+            hash_module.dji_flyc_parameter_hash(control.INDEX_BRIDGE_NAME),
+            control.INDEX_BRIDGE_HASH,
+        )
+        self.assertEqual(control.INDEX_BRIDGE_NAME, "EU_CE_enable_c0_rid_0")
+
 
 if __name__ == "__main__":
     unittest.main()

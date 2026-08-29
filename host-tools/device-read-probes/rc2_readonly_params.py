@@ -2,7 +2,8 @@
 
 Safety boundary: this tool only permits DUML FLYC commands 0xF7 (parameter
 metadata by hash) and 0xF8 (parameter value by hash), for the three parameter
-hashes hard-coded below.  It cannot send parameter-write/reset commands.
+names and hashes hard-coded below.  It cannot send parameter-write/reset
+commands.
 """
 
 from __future__ import annotations
@@ -32,9 +33,9 @@ CMD_GET_PARAM_INFO_BY_HASH = 0xF7
 CMD_GET_PARAM_VALUE_BY_HASH = 0xF8
 
 PARAMETERS = {
-    "height_limit": 0x0371238A,
-    "distance_limit": 0x425C0A94,
-    "distance_limit_enabled": 0x7ECE6D19,
+    "g_config.flying_limit.max_height_0": 0x0371238A,
+    "g_config.flying_limit.max_radius_0": 0x425C0A94,
+    "g_config.advanced_function.radius_limit_enabled_0": 0x7ECE6D19,
 }
 
 

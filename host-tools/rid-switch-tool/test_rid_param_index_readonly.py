@@ -47,6 +47,18 @@ class CandidateTests(unittest.TestCase):
         self.assertIn("eu_ce_support_remote_set_level", names)
         self.assertEqual([c["index"] for c in probe.CANDIDATES], [1306, 1308, 1315])
 
+    def test_by_hash_bridge_uses_underscore_zero_form(self):
+        hash_module = probe.load_hash_module()
+        expected = {
+            "EU_CE_enable_c0_rid": 0xF80992FE,
+            "EU_CE_Reg_RID_Enable": 0xA2C325CE,
+            "eu_ce_support_remote_set_level": 0xA8E96A09,
+        }
+        for candidate in probe.CANDIDATES:
+            bridged_name = candidate["name"] + "_0"
+            bridged_hash = hash_module.dji_flyc_parameter_hash(bridged_name)
+            self.assertEqual(bridged_hash, expected[candidate["name"]])
+
     def test_transport_config_is_fixed_allowlist(self):
         self.assertEqual(probe.transport_config("aircraft")["pid"], 0x0020)
         self.assertEqual(probe.transport_config("rc2")["pid"], 0x1021)

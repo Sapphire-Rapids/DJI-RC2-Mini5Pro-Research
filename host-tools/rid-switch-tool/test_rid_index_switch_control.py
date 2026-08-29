@@ -49,6 +49,14 @@ class TargetTests(unittest.TestCase):
         self.assertEqual(control.WA150_TABLE_CRC, 0x5F8B2AE1)
         self.assertEqual(control.WA150_TABLE_COUNT, 1557)
 
+    def test_hash_bridge_name_matches_its_hash(self):
+        hash_module = control.load_hash_module()
+        self.assertEqual(
+            hash_module.dji_flyc_parameter_hash(control.HASH_BRIDGE_NAME),
+            control.HASH_BRIDGE_HASH,
+        )
+        self.assertEqual(control.HASH_BRIDGE_NAME, "EU_CE_enable_c0_rid_0")
+
     def test_transport_config_is_fixed_allowlist(self):
         self.assertEqual(control.transport_config("aircraft")["pid"], 0x0020)
         self.assertEqual(control.transport_config("rc2")["pid"], 0x1021)

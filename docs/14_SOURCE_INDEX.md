@@ -75,6 +75,14 @@ here does not imply that all of its claims were accepted.
   stored/plaintext checksums without force or skipped chunks. Tool support is not target-key
   availability, signature bypass, or independent confirmation of A-027's product-139/RC331
   `02:04 -> 12:04` route.
+- [`comm_mkdupc.flyc_parameter_compute_hash`](https://github.com/o-gs/dji-firmware-tools/blob/195692263c2684cf1ddc4995f2736be6c0fb135e/comm_mkdupc.py#L746)
+  at `195692263c2684cf1ddc4995f2736be6c0fb135e`.
+  The public parameter-name hash (GBK encode, ``hash = ((hash << 8) + byte) % 0xFFFFFFFB``)
+  cross-checked here against the fixed RID hashes and the positive-control hashes. It was
+  independently re-implemented as
+  [`libraries/protocol-probes/dji_flyc_parameter_hash.py`](../libraries/protocol-probes/dji_flyc_parameter_hash.py)
+  with pinned regression vectors; the upstream loop is byte-ambiguous for multi-byte GBK names and
+  is used here only for ASCII parameter names.
 - [N3Live](https://github.com/brendan779/N3Live/tree/bb254b0d0b1f5ac79462e9fe3ea986fc91adeec0)
   at `bb254b0d0b1f5ac79462e9fe3ea986fc91adeec0`.
   Used for Goggles N3 USB/DUML framing corroboration and a generated command-name corpus. It does not

@@ -443,7 +443,7 @@ stronger conclusion that cannot be drawn.
   `0.4.1-research`; live service Binder alive with expected descriptor and Binder exception layers
   completing.
 - Positive control: known maximum-height hash `0x0371238A`, expected parameter name
-  `g_config.flying_limit.max_height`, command `03/F7`.
+  `g_config.flying_limit.max_height_0`, command `03/F7`.
 - Routes/results: legacy `0A:05 -> 03:00` returned callback `ECode 1` with no data after about
   3.1 seconds; modern `02:04 -> 12:04` returned the same class and timing. Neither positive control
   passed.
