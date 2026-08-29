@@ -8,6 +8,10 @@
   motor-off A-B-A record, including exact bearer class, message presence, frame count, and motor
   transition timestamps.
 - Linked the form from the RID experiment matrix, current blocker, and handoff instructions.
+- Added a read-only FindUAS local-history transcript tool that outputs privacy-reduced counts,
+  timestamps, RID-standard labels, field presence, and an optional opaque ID digest prefix. It does
+  not access devices and excludes full identifiers, coordinates, receiver IDs, raw frames, and
+  credentials.
 
 ### Boundary
 

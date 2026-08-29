@@ -48,6 +48,11 @@ Not allowed in the public form:
 If FindUASMac is used, its local `telemetry.jsonl` history may contain the full UAS ID, receiver
 identifier, and precise coordinates. Do not copy or commit that file, export target details, or
 quote its identifiers into this public form. Only the redacted fields above may be transcribed.
+The repository's offline tool
+[`../host-tools/finduas-transcript/finduas_redact_transcript.py`](../host-tools/finduas-transcript/finduas_redact_transcript.py)
+can summarize that local JSONL without emitting full identifiers or coordinates, but its output is
+only a supporting transcript and still requires operator motor-transition timestamps and receiver
+bearer evidence.
 
 ## Session identity
 
