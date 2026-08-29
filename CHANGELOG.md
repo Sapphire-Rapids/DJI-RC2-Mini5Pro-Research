@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.17 - 2026-08-30
+
+### Changed
+
+- Declared the controllable Mini 5 Pro Remote ID switch as the repository's sole objective.
+- Recorded the lab's confidential DJI and low-altitude-economy authorization context and stated that
+  authorization material is neither published nor registered on the physical test aircraft.
+- Removed the account/license/credential category from the active repository publication rule while
+  retaining privacy, vendor-material, and bricking boundaries.
+
 ## 0.4.16 - 2026-08-30
 
 ### Changed

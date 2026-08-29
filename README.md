@@ -290,7 +290,10 @@
 可审阅的自研 APK/host-tool 源码和测试。源码公开不代表相应路线已通过实机验证；每个项目必须
 保留 `OBSERVED`、`NOT ADMITTED`、`RETRACTED` 或 `UNKNOWN` 状态边界。
 
-不发布 DJI APK、固件、提取分区、厂商共享库、厂商反编译源码、原始私人抓包、账号材料、
+本项目的唯一目标是实现并验证可控的 Mini 5 Pro Remote ID 开关。实验室声明已获得 DJI
+及低空经济相关部门授权；因保密要求，授权材料不进入仓库，也不在实机上注册。
+
+不发布 DJI APK、固件、提取分区、厂商共享库、厂商反编译源码、原始私人抓包、
 ADB/signing key、已打包 APK/JAR/SO、patched vendor binary、设备序列号、UAS ID、电话或坐标。
 
 ## License
