@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.15 - 2026-08-30
+
+### Changed
+
+- Refocused the project objective from a general RID test control/panel to a controllable, readable,
+  restorable Mini 5 Pro Remote ID switch.
+- Reclassified RID/FlySafe state-changing work as goal-directed but gated by route admission,
+  same-item/policy baseline, readback, restoration, and independent RF A-B-A rather than being
+  categorically forbidden.
+
+### Added
+
+- Registered the pinned public RC 2 TEE/eFuse tamper bricking report as C-212 and cited it as the
+  reason TEE/eFuse/startup-trust-chain, bootloader, flashing, and uncontrolled DJI Fly update paths
+  remain prohibited.
+
 ## 0.4.14 - 2026-08-30
 
 ### Added

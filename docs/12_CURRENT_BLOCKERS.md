@@ -400,6 +400,12 @@ APEX/partition/boot state, or describe the staged file as an ADB workaround. The
 collects the baseline; only that evidence may generate the second command batch in the same assisted
 session.
 
+Bricking precedent: the pinned public RC 2 report C-212 records framework/TEE tamper followed by a
+DJI Fly update boot-logo loop and failure of every documented software recovery attempt. Before any
+privileged runtime experiment, require an explicit no-auto-update state, a bounded one-session
+action list, and a documented recovery stop point. Do not modify TEE/eFuse state, relock a modified
+boot chain, flash startup partitions, or treat physical EDL as an authorized fallback.
+
 ## Dependency order
 
 The evidence dependencies are:

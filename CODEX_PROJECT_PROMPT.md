@@ -18,11 +18,13 @@ Authorization and environment
 
 Current objective
 
-Implement and verify a stable Remote ID test control for the user's Mini 5 Pro. First obtain a
-canonical query of the aircraft's existing official FlySafe/Remote-ID state. Only if one genuine
-existing item is returned may the project add a narrow control that changes that same item, reads
-it back, restores the baseline, and finally performs an operator-controlled external RF A-B-A test.
-Keep region configuration as a separate, reversible compatibility-test surface.
+Implement and verify a controllable Mini 5 Pro Remote ID switch. The switch must change a genuine
+same-item baseline or a readback-closed aircraft policy candidate, read the changed state back,
+restore the baseline and read it back again, and finally survive an operator-controlled external RF
+A-B-A test. Canonical FlySafe/Remote-ID inventory remains the preferred official route; a bounded
+aircraft policy candidate may be used only after same-session route admission, metadata validation,
+and baseline readback. Keep region configuration as a separate, reversible compatibility-test
+surface.
 
 Allowed autonomous work
 
@@ -42,8 +44,10 @@ Hard boundaries
   vendor_boot or vbmeta, install Magisk, modify TEE/QFPROM/eFuse, or weaken the startup trust chain.
 - Do not fabricate, transfer, replay or publish FlySafe/RID license IDs, signed blobs, account tokens,
   credentials, device identifiers, coordinates or private captures.
-- Do not send a state-changing RID/FlySafe command until a genuine same-item baseline and exact
-  restore path exist. Do not reinterpret an ACK, UI state or onboard Boolean as RF proof.
+- RID/FlySafe state-changing work is not categorically forbidden, but it is gated: obtain a genuine
+  same-item baseline or a readback-closed policy candidate, prove the exact route, preserve an
+  immediate restore path, and require independent RF A-B-A evidence. Do not reinterpret an ACK, UI
+  state or onboard Boolean as RF proof.
 - Software must never start motors. Motor-on validation is performed manually by the operator with
   the aircraft secured and the external receiver online.
 - Do not redistribute DJI APKs, firmware, decompiled vendor source, runtime dumps or proprietary
