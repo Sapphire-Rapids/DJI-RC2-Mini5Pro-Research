@@ -132,6 +132,19 @@ here does not imply that all of its claims were accepted.
   and is outside this repository's boundary; only the independently written by-index codec and
   read-only USB probe are adopted.
 
+- [GlassFalcon](https://github.com/sworrl/GlassFalcon/tree/dadafaa7b8bb094c9db7c22dabba901c22b1ab62)
+  at `dadafaa7b8bb094c9db7c22dabba901c22b1ab62` (GPL-3.0). A vendor-independent DUML ground-control
+  SDK. Used only for the recorded fact that the by-index FLYC parameter family `0x03/0xE0`-`0xE3`
+  is honored only under the PC/assistant source identity `0x0a` and silently ignored under
+  mobile-app `0x02`, with index get_info/read/write layouts confirmed live on its own `wm240`
+  bench (C-213). It is Mavic 2 / DJI GO 4 prior art and is not a Mini 5 Pro or RC 2 result.
+- [luyii-code-1/dji-ocusync-droneid-research](https://github.com/luyii-code-1/dji-ocusync-droneid-research/tree/2ca1a92cf90d3c764bf589a0f49499e56b145d6a)
+  at `2ca1a92cf90d3c764bf589a0f49499e56b145d6a` (GPL-3.0). Reproducible O2/O4 DroneID PHY and
+  packet research from HackRF captures of a Mini 5 Pro. Used only for the O4 `AA`/`87`
+  SM2 + AES-128-CTR envelope, the CRC24A/DJI-CRC16 checks, the SM2 AA-to-note step, and the
+  GNSS-valid/takeoff trigger granularity (C-216). Private OcuSync DroneID only; it does not
+  affect the standardized Remote ID bearer conclusion.
+
 ## Community FCC/regulatory tools
 
 - [FreeFCC](https://github.com/doesthings/FreeFCC/tree/597157bd52120dfeb9677f79a8ad46b6027ce8dc)
@@ -145,6 +158,10 @@ here does not imply that all of its claims were accepted.
 - [FreeFCC protocol-provenance issue](https://github.com/doesthings/FreeFCC/issues/30).
   Used to preserve the unresolved minimal-causality boundary around the multi-frame profile and
   keepalive.
+- [FreeFCC NO_REMOTE_ID.md](https://github.com/doesthings/FreeFCC/blob/597157bd52120dfeb9677f79a8ad46b6027ce8dc/NO_REMOTE_ID.md)
+  and the published `app/src/main/assets/profiles/` JSON files. Used only for the public position
+  that Remote ID disabling is illegal and will never be a FreeFCC feature, and for the fact that
+  its FCC/4G/LED/CE-restore profiles carry no Remote ID parameter (C-217).
 - [SkylabFCCfree](https://github.com/danusha2345/SkylabFCCfree/tree/aa024985bf1556ab9c3b12f3d0f2305f63b021f5)
   tag/revision `v1.5.50` / `aa024985bf1556ab9c3b12f3d0f2305f63b021f5`.
   Used for its DUML command audit and profile comparison.
@@ -280,7 +297,10 @@ corroborated.
   decryption or DJI-licensed decoder (C-206).
 - [OpenDroneID Core C](https://github.com/opendroneid/opendroneid-core-c).
   Used for the standards-oriented Basic ID, Location/Vector, Authentication, Self ID, System,
-  Operator ID, and Message Pack data-model boundary. The library is not a DJI control API.
+  Operator ID, and Message Pack data-model boundary. The library is not a DJI control API. The encode reference vectors for the independently written
+  [`libraries/opendroneid-synthetic-codec/`](../libraries/opendroneid-synthetic-codec/README.md)
+  were regenerated against the Core C library at commit `12cbebb99ab050991921cd07352f71326186b980`
+  (Apache-2.0) and match byte-for-byte (C-223).
 - [OpenDroneID Linux transmitter](https://github.com/opendroneid/transmitter-linux).
   Used as public precedent for a separate controlled Bluetooth/Wi-Fi laboratory source. It does not
   imply that macOS or the attached DJI aircraft can transmit those messages through the same API.

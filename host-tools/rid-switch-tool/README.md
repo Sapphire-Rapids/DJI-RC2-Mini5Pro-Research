@@ -46,9 +46,23 @@ name the same wa150 row, and both tools can read-only report that bridge.
 Neither tool has a generic payload, route, command, or parameter interface. Neither
 starts motors nor measures RF.
 
+## One-shot read-only baseline session
+
+For a same-session, write-free baseline capture, run:
+
+```sh
+# by-index + by-hash read-only baseline in one batch (no --target is ever passed)
+./readonly_baseline_session.sh aircraft legacy
+```
+
+It writes two redacted JSON reports (`by_index.json`, `by_hash.json`) into a
+timestamped directory and never reaches a write or restore path. Review the
+reports for unexpected identifiers before sharing them.
+
 ## Usage
 
 ```sh
+
 # by-hash: probe only, then report the rid_ctrl_enable_0 baseline (no write)
 python3 rid_switch_control.py --transport rc2 --wire-mode simple
 

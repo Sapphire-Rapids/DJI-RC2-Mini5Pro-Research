@@ -89,6 +89,7 @@ def load_dji_flyc_parameter_hash_module(
     """
 
     import importlib.util
+    import sys
     from pathlib import Path
 
     resolved = Path(path) if path else Path(__file__).resolve()
@@ -96,5 +97,6 @@ def load_dji_flyc_parameter_hash_module(
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load {resolved}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module.__name__] = module
     spec.loader.exec_module(module)
     return module

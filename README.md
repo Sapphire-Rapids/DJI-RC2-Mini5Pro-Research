@@ -21,7 +21,7 @@
 | 对象 | 记录值 | 证据边界 |
 | --- | --- | --- |
 | 遥控器 | DJI RC 2；界面固件 `07.00.0100` | exact signed system/`0205` package 已验证；mounted live files/properties 仍未读回，其他平台结论仍可能来自相邻样本 |
-| 飞机 | DJI Mini 5 Pro；静态候选 WA150 / product 139 | product/route 需在 live session 重新确认 |
+| 飞机 | DJI Mini 5 Pro；固件 `01.00.0600`；静态候选 WA150 / product 139 | 固件为操作者确认（C-220）；product/route 仍需 live session 重新确认；`01.00.0600` 落在 CVE-2026-78306/77812 受影响窗口 |
 | DJI Fly | 重点分析样本 1.21.10 | exact APK 已在 disposable emulator 运行并作 runtime 分析；仍不自动等同于 RC 2 当前已加载 APK |
 | MSDK | 重点交叉验证 5.18.0 | schema/handler 证据不等于消费级产品支持 |
 | 主机 | macOS；飞机与 RC 2 分别枚举为 DJI USB 设备 | 序列号、端口位置和私人数据不公开 |
@@ -253,6 +253,10 @@
   状态、身份、地区、策略、managed/opaque/legacy 面的可读/可写/恢复/RF 与 UI 准入矩阵。
 - [docs/20_OFFICIAL_FLYSAFE_UI_PATH.md](docs/20_OFFICIAL_FLYSAFE_UI_PATH.md)：DJI Fly 官方同进程
   FlySafe owner、generic existing-ID action、current type-6 Java incompatibility 与一次性只读实机步骤。
+- [docs/21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md](docs/21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md)：C-207
+  电机 off→on→off 标准 RID A-B-A 观察表。
+- [docs/22_COMMUNITY_DUML_RID_SURVEY.md](docs/22_COMMUNITY_DUML_RID_SURVEY.md)：2026-08-30
+  社区 DUML/Remote ID 仓库调查与交叉引用。
 - [evidence/claims.csv](evidence/claims.csv)：机器可读 claim 索引。
 - [evidence/artifacts.csv](evidence/artifacts.csv)：机器可读工件索引。
 - [projects/README.md](projects/README.md)：完整源码目录、状态与发布边界。
@@ -268,7 +272,8 @@
   [RID switch wire codec](libraries/rid-switch-wire-codec/README.md)、
   [type-6 inventory parser](libraries/rid-type6-inventory-parser/README.md)、
   [bounded controller](libraries/rid-switch-controller/README.md)、
-  [quiescence model](libraries/rid-quiescence-model/README.md)。
+  [quiescence model](libraries/rid-quiescence-model/README.md)、
+  [OpenDroneID synthetic codec](libraries/opendroneid-synthetic-codec/README.md)。
 - 主机工具：[ADB handshake](host-tools/adb-handshake-probe/README.md)、
   [exact-v07 adbd patch generator](host-tools/adbd-userspace-patch/README.md)、
   [system-UID bridge probes](host-tools/system-uid-bridge-probe/README.md)、

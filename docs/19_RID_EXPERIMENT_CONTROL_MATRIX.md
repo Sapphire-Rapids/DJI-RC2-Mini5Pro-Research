@@ -197,7 +197,8 @@ The source adapter contract must require:
 
 Primary public implementation references are
 [OpenDroneID Core C](https://github.com/opendroneid/opendroneid-core-c) and its
-[Linux transmitter example](https://github.com/opendroneid/transmitter-linux). Their availability
+[Linux transmitter example](https://github.com/opendroneid/transmitter-linux). An independently written, byte-compatible Python codec for this message set is kept at
+[`libraries/opendroneid-synthetic-codec/`](../libraries/opendroneid-synthetic-codec/README.md) (C-223). Their availability
 does not mean the current Mac or attached DJI aircraft has a compatible transmit API.
 
 ## 5. Product implementation order

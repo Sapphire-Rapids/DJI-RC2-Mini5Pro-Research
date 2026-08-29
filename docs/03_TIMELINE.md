@@ -641,3 +641,70 @@ work when a report did not contain a more precise timestamp.
   published as source-only negative experiments. The next loader discriminator is the actual RC 2
   caller/target SELinux domains and a legitimate delimiter-free shared executable path or mediated
   descriptor (C-211).
+
+### 2026-08-30 — RC 2 loopback by-index DUML cross-check
+
+- `STATIC`: the public djiparam editor confirms the by-index FLYC family (`0xE0`-`0xE3`) is live on
+  the RC 2 localhost bus (`40008` inject src `0x02` -> dst `0x03`, `40007` read), recording
+  end-to-end get_info/read/write on wa151 (Lito X1) incl. a `forearm_led_ctrl` index-23 write, and
+  noting `40009` only routes privileged-uid injects and the `40007` reader churns DJI Fly's FPV
+  mirror (C-218).
+- `STATIC`: WA150_Mini5Pro and WA151_LitoX1 share firmware table CRC `0x5f8b2ae1` and are
+  disambiguated by count (1557 vs 1593) plus codename fallback (C-219).
+- These reconcile the GlassFalcon direct-USB `0x0a` sender gate (C-213) as transport-specific: the
+  by-index family can be reached under `0x02` over RC 2 localhost, but that deployment path requires
+  an unlocked RC (system shell + permissive SELinux), outside this repository's boundary.
+
+### 2026-08-30 — public DUML / Remote ID community survey
+
+- `STATIC`: public GlassFalcon SDK records that the by-index FLYC family `0x03/0xE0`-`0xE3` is
+  honored only under the PC/assistant source identity `0x0a`, not under mobile-app `0x02` (C-213).
+- `STATIC`: the wa150 table shows `EU_CE_enable_c0_rid` inside a contiguous EU C0 block whose
+  `EU_CE_Reg_RID_Enable` and `eu_ce_support_remote_set_level` rows are declared min 0 / max 0
+  (C-214); the same project documents a Neo 2 firmware-revision index shift (C-215).
+- `STATIC`: public Mini 5 Pro O4 DroneID research resolves the AA/87 + AES-128-CTR chain with the
+  SM2 AA-to-note step and GNSS/takeoff trigger granularity (C-216).
+- `CORROBORATED`: FreeFCC publishes `NO_REMOTE_ID.md` declaring no Remote ID disable ever, and its
+  profiles carry no RID parameter (C-217).
+- No vendor material, firmware, raw capture, serial, or credential was imported; the new facts are
+  recorded as pinned public-reference claims and a survey note (22_COMMUNITY_DUML_RID_SURVEY.md).
+### 2026-08-30 — aircraft firmware version confirmed
+
+- `OBSERVED`: the operator confirmed the Mini 5 Pro aircraft firmware is `01.00.0600` (C-220),
+  inside the CVE-2026-78306 / CVE-2026-77812 affected window; no RID-control conclusion changes.
+### 2026-08-30 — community survey refinements
+
+- `STATIC`: the public wa150 table has no `rid_ctrl_enable_0` or `ccc_broadcast_signal_quality`
+  row (only `EU_CE_enable_c0_rid` 1306 and `EU_CE_Reg_RID_Enable` 1308); `ccc_broadcast_signal_quality`
+  appears only in the wa020 Neo 2 table (C-221).
+- `CORROBORATED`: the dated survey found no second Mini 5 Pro global-RID Boolean implementation
+  beyond the SKYROVER `rid_ctrl_enable_0` chain (C-222).
+### 2026-08-30 — standardized Remote ID synthetic codec
+
+- `STATIC`: an independently written Python codec re-implements the standardized OpenDroneID
+  25-byte message set and Message Pack; its encode reference vectors match the upstream Core C
+  library byte-for-byte and 12 self-contained tests pass (C-223). It is confined to the separate
+  synthetic source lane: no RF, socket, USB, DUML, or aircraft-control path.
+### 2026-08-30 — by-index family third-source corroboration
+
+- `CORROBORATED`: the public `o-gs/dji-firmware-tools` tooling sends parameter requests with sender
+  `PC` (0x0a) to `FLYCONTROLLER` (0x03) and its get_info reply layout matches this repository's
+  `rid_param_index_protocol.py` (C-224); the wa150 table also carries `ccc_unsupport_control_type`
+  (250) and `ccc_poor_position_accuracy_on` (251) as China-broadcast siblings (C-221 refinement).
+### 2026-08-30 — cross-model EU C0 / RID parameter inventory
+
+- `STATIC`: across the public djiparam model tables, `EU_CE_enable_c0_rid` exists only in wa150/wa151
+  (index 1306), the zero-range EU C0 registration block spans wa020/wa150/wa151/wa234/wa341, and
+  `ccc_broadcast_signal_quality` exists only in wa020 (C-225).
+### 2026-08-30 — wa150 RID-family by-hash bridge matched to o-gs
+
+- `CORROBORATED`: the full wa150 RID/EU C0/China family was re-bridged to by-hash and matched
+  `o-gs` `flyc_parameter_compute_hash` across 15 names (`EU_CE_enable_c0_rid_0` 0xF80992FE,
+  `EU_CE_Reg_RID_Enable_0` 0xA2C325CE, `eu_ce_support_remote_set_level_0` 0xA8E96A09, and the
+  remaining rows) (C-226).
+### 2026-08-30 — host-tool importlib loader fix
+
+- Registered `importlib`-loaded sibling modules in `sys.modules` across 16 host-tool/library/experiment
+  files so the by-index/by-hash read-only probes (which load `@dataclass` protocol modules) no longer
+  crash on Python 3.13+; added a one-shot `readonly_baseline_session.sh` wrapper for a write-free
+  same-session baseline capture.

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import sys
 import json
 from pathlib import Path
 import time
@@ -53,6 +54,7 @@ def load_index_protocol_module():
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load index protocol from {path}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module.__name__] = module
     spec.loader.exec_module(module)
     return module
 
@@ -68,6 +70,7 @@ def load_duml_module():
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load DUML implementation from {path}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module.__name__] = module
     spec.loader.exec_module(module)
     return module
 
@@ -83,6 +86,7 @@ def load_hash_module():
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load hash module from {path}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module.__name__] = module
     spec.loader.exec_module(module)
     return module
 

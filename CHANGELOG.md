@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.4.18 - 2026-08-30
+
+### Fixed
+
+- Registered `importlib`-loaded sibling modules in `sys.modules` across the host tools, libraries and
+  experiments (16 files), fixing a `dataclasses`/`sys.modules` crash on Python 3.13+ when a
+  by-index/by-hash probe loads a `@dataclass`-bearing protocol module; the read-only RID probes
+  now execute on modern Python.
+
+### Added
+
+- Surveyed public DUML / Remote ID community repositories (FreeFCC, lmdegreeds/djiparam,
+  GlassFalcon, dji-ocusync-droneid-research) and recorded the new public-reference facts as
+  C-213 through C-217 plus a survey note (`docs/22_COMMUNITY_DUML_RID_SURVEY.md`).
+- Recorded the by-index FLYC sender-identity gate (`0x0a` only), the wa150 EU C0 block layout
+  including the zero-range `EU_CE_Reg_RID_Enable` / `eu_ce_support_remote_set_level` rows, the
+  Neo 2 index-drift warning, the O4 private DroneID AA/87 cryptographic chain, and FreeFCC's
+  explicit no-Remote-ID position.
+- Cross-referenced the EU C0 block boundary into `docs/05_RID_CONTROL_SURFACES.md` (RID-009) and
+  extended the evidence register, timeline, and source index.
+- Recorded the operator-confirmed Mini 5 Pro aircraft firmware `01.00.0600` as C-220, noted it
+  inside the CVE-2026-78306 / CVE-2026-77812 affected window, and reconciled the by-index sender
+  gate as transport-specific with the RC 2 localhost `40008` path (C-213/C-218/C-219).
+- Recorded the wa150 table absence of `rid_ctrl_enable_0` and the dated no-second-implementation
+  survey result (C-221/C-222).
+- Refined C-221 with the wa150 China-broadcast sibling rows and added third-source by-index
+  corroboration from `o-gs/dji-firmware-tools` (C-224).
+- Added a cross-model EU C0 / RID parameter inventory narrowing `EU_CE_enable_c0_rid` to the
+  Mini 5 Pro / Lito X1 pair while the zero-range EU C0 registration block spans five models (C-225).
+- Re-bridged the full wa150 RID/EU C0/China family to by-hash and matched `o-gs`
+  `flyc_parameter_compute_hash` across 15 names (C-226).
+- Added an independently written, byte-compatible standardized OpenDroneID synthetic wire codec
+  (`libraries/opendroneid-synthetic-codec/`) with Core C reference vectors and 12 tests, confined
+  to the separate synthetic source lane (C-223).
+
 ## 0.4.17 - 2026-08-30
 
 ### Changed
