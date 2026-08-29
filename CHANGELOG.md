@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.6 - 2026-08-29
+
+### Added
+
+- Added `host-tools/rid-switch-tool/rid_index_switch_control.py`, a bounded by-index
+  A-B-A tool for the single wa150 table parameter `EU_CE_enable_c0_rid` (index 1306).
+  It verifies the table CRC/count (`0xE0`) and the on-board name (`0xE1`) in the same
+  session, reads a strict baseline (`0xE2`), performs one forward `0xE3` write, reads
+  back, and immediately restores the captured baseline with a final readback. It has no
+  generic payload/route/command/parameter interface and never starts motors.
+- Added `host-tools/rid-switch-tool/test_rid_index_switch_control.py`, offline synthetic
+  tests pinning the fixed target index/name, the wa150 table identity constants, the
+  transport allow-list, and the fail-closed command gate.
+
+### Boundary
+
+- The tool is `STATIC` (offline source and synthetic tests) and `NOT ADMITTED` as a
+  device write. `EU_CE_enable_c0_rid` is an EU C0 policy candidate from the public wa150
+  table, not a global RID master switch, and a green `0xE2` readback does not prove
+  Remote ID RF behaviour. No live by-index read or write has been performed.
+
 ## 0.4.5 - 2026-08-29
 
 ### Added
