@@ -597,6 +597,23 @@ work when a report did not contain a more precise timestamp.
   legacy mask only sends NULL/`fakeSN`, some firmware still randomly sends valid location packets,
   later DJI Fly/iOS reset the bits, and it is not reliable (C-201).
 - `CORROBORATED`: public DragonSDR DroneID docs (`8d0126b91b943f5c22a0503a8414bc2441892328`) state
-  O4 (Mini 5) DroneID is encrypted and receiver-alone yields session hash + frequency/RSSI, with
-  full telemetry requiring a licensed DragonScope config; DroneID is broadcast only while motors
-  spin (C-202). This bounds the independent-receiver A-B-A for the O4 target.
+  DJI-private OcuSync DroneID is encrypted on O4 (Mini 5) and receiver-alone yields session hash +
+  frequency/RSSI, with full telemetry requiring a licensed DragonScope config and broadcast only
+  while motors spin (C-202). This encrypted boundary is limited to DJI's private DroneID protocol.
+- `CORROBORATED`: public RUB-SysSec DroneSecurity NDSS 2023 README FAQ states DJI's Drone-ID is not
+  the same as the standardized Bluetooth/Wi-Fi Remote ID, which follows EN 4709 (EU) / ASTM F3411
+  (US) and is readable by a plain smartphone app (C-203). The standardized Remote ID bearer is
+  therefore plaintext and independent-receiver A-B-A on it reads Basic ID without any DJI decoder.
+
+### 2026-08-29 — official FlySafe type-6 enable surface and standard-RID plaintext receiver
+
+- `CORROBORATED`: official DJI Cloud API FlySafe (`4ec6b0c7f9472aeb09a0a47949855d19c473ea07`)
+  defines the device methods `unlock_license_switch` (`license_id` + `enable`) and
+  `unlock_license_list` whose `type` 6 is "RID unlocking" and `rid_unlock.level` is 1=EU / 2=China
+  (C-204).
+- `CORROBORATED`: official MSDK 5.8.0 defines `RidUnlockType` (EUROPEAN/CHINA),
+  `FlyZoneLicenseInfo.getRidUnlockType()`, and `setFlyZoneLicensesEnabled(info, isEnabled, cb)` for
+  enabling/disabling an unlock license (C-205).
+- `CORROBORATED`: OpenDroneID receiver-android README states the example receiver complies with
+  ASTM F3411 / prEN 4709-002 BLE, WiFi NAN, and WiFi Beacon and decodes detailed content with no
+  decryption or DJI-licensed decoder (C-206).

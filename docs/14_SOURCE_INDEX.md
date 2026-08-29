@@ -19,12 +19,17 @@ here does not imply that all of its claims were accepted.
 - [DJI MSDK V5 FlyZone manager](https://developer.dji.com/api-reference-v5/android-api/Components/IFlyZoneManager/IFlyZoneManager.html)
   and [FlyZone license model](https://developer.dji.com/api-reference-v5/android-api/Components/IFlyZoneManager/IFlyZoneManager_FlyZoneLicenseInfo.html).
   Used to cross-check official login-required server download, FC-SN-matched push, aircraft pull,
-  and existing-license enable/disable semantics. Public MSDK APIs do not establish Mini 5 Pro
-  support or a genuine type-6 record.
+  and existing-license enable/disable semantics. MSDK 5.8.0 additionally documents `RidUnlockType`
+  (EUROPEAN/CHINA), `FlyZoneLicenseInfo.getRidUnlockType()`, and the generic
+  `setFlyZoneLicensesEnabled(info, isEnabled, callback)` enable/disable setter (C-205). Public
+  MSDK APIs do not establish Mini 5 Pro support or a genuine type-6 record.
 - [DJI Cloud API FlySafe](https://github.com/dji-sdk/Cloud-API-Doc/blob/4ec6b0c7f9472aeb09a0a47949855d19c473ea07/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/00.dock1/170.flysafe.md)
   at `4ec6b0c7f9472aeb09a0a47949855d19c473ea07`.
   Used to distinguish server-approved from aircraft-imported license inventory and corroborate
-  type 6 plus Europe/China levels. Dock/cloud semantics are not a consumer Mini 5 Pro API.
+  type 6 plus Europe/China levels. The device service methods `unlock_license_switch`
+  (`license_id` + `enable`) and `unlock_license_list` (`type` 6 "RID unlocking" +
+  `rid_unlock.level`) pin the official per-license enable/disable surface (C-204). Dock/cloud
+  semantics are not a consumer Mini 5 Pro API.
 - [DJI SDK compatibility help](https://repair.dji.com/help/content?customId=01700000763&lang=en&paperDocType=ARTICLE&re=US&spaceId=17).
   Used only for the current public `Mini 5 Pro: No SDK` boundary; DJI Fly's internal components are
   a separate subject.
@@ -256,14 +261,23 @@ corroborated.
 ## Independent receiver capability references
 
 - [DragonSDR DJI DroneID receiver](https://github.com/alphafox02/dragonsdr_dji_droneid/tree/8d0126b91b943f5c22a0503a8414bc2441892328)
-  at `8d0126b91b943f5c22a0503a8414bc2441892328`. Used only for the public O4 capability boundary:
-  O2/O3 DroneID is unencrypted while O4 drones such as the Mini 5 broadcast encrypted DroneID
-  (receiver-alone yields session hash plus frequency/RSSI; full telemetry requires a licensed
-  DragonScope config), and DroneID is sent only while motors are spinning. Community docs, not an
-  independent RF measurement by this project.
+  at `8d0126b91b943f5c22a0503a8414bc2441892328`. Used only for the public DJI-private O4 DroneID
+  capability boundary: O2/O3 private DroneID is unencrypted while O4 drones such as the Mini 5
+  broadcast encrypted private DroneID (receiver-alone yields session hash plus frequency/RSSI; full
+  telemetry requires a licensed DragonScope config), and the private DroneID is sent only while
+  motors are spinning. This encrypted boundary does not apply to standardized Broadcast Remote ID.
+  Community docs, not an independent RF measurement by this project.
+- [RUB-SysSec DroneSecurity](https://github.com/RUB-SysSec/DroneSecurity)
+  NDSS 2023 project README FAQ. States DJI's Drone-ID is not the same as the standardized
+  Bluetooth/Wi-Fi Remote ID because DJI uses a dedicated wireless protocol; the standard follows
+  EN 4709 (EU) / ASTM F3411 (US) and is readable with a plain smartphone app (C-203).
 
 ## Synthetic standards-based source references
 
+- [OpenDroneID receiver-android](https://github.com/opendroneid/receiver-android)
+  README. States the example receiver complies with the Bluetooth, WiFi NAN, and WiFi Beacon parts
+  of ASTM F3411 and ASD-STAN prEN 4709-002, and decodes detailed OpenDroneID content without any
+  decryption or DJI-licensed decoder (C-206).
 - [OpenDroneID Core C](https://github.com/opendroneid/opendroneid-core-c).
   Used for the standards-oriented Basic ID, Location/Vector, Authentication, Self ID, System,
   Operator ID, and Message Pack data-model boundary. The library is not a DJI control API.

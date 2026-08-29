@@ -130,11 +130,27 @@ Interpretation:
 - any later state experiment requires exact existing-item identity, baseline, immediate readback,
   restore, final readback and operator-started motor-on independent RF A-B-A closure.
 
+## Official type-6 enable surface
+
+The FlySafe type-6 path's per-license enable/disable surface is now pinned at two official levels:
+
+- DJI Cloud API FlySafe device method `unlock_license_switch` takes `license_id` + `enable` bool and
+  returns `result` + `license_id`; `unlock_license_list` returns `type` 6 "RID unlocking" with
+  `rid_unlock.level` 1=EU / 2=China (C-204).
+- MSDK 5.8.0 defines `RidUnlockType` (EUROPEAN/CHINA), `FlyZoneLicenseInfo.getRidUnlockType()`, and
+  the generic `setFlyZoneLicensesEnabled(info, isEnabled, callback)` setter (C-205).
+
+These pin the official switch shape but remain account/FC-bound managed state: they do not prove
+Mini 5 Pro entitlement, a genuine type-6 license, aircraft acceptance, or a standardized-RID RF
+effect. The standardized Remote ID bearer is plaintext (ASTM F3411 / EN 4709), so the independent
+detector A-B-A on that bearer needs no DJI-licensed decoder (C-203, C-206).
+
 ## Current disposition
 
 The exact current owner and generic existing-ID action are closed statically, current Java type-6
 semantics are closed negatively, and the exact private query plus callback is now observed in the
 disposable emulator through ART TI. The success-side raw inventory parser is implemented and
 synthetically tested, but the emulator cannot produce an aircraft callback. RC 2 still lacks an
-admitted same-process loader. No license toggle, `0x11/0x12` action, motor start or RF experiment
-has been performed as part of this path.
+admitted same-process loader. The official per-license enable/disable surface is pinned at the
+Cloud API and MSDK 5.8 levels, but no genuine type-6 row has been observed on Mini 5 Pro. No license
+toggle, `0x11/0x12` action, motor start or RF experiment has been performed as part of this path.

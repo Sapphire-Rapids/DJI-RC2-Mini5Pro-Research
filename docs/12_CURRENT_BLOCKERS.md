@@ -183,11 +183,15 @@ Current static narrowing: product-139's official owner listens to natural `0x11/
 no GET builder. The onboard half must therefore observe the already-subscribed push passively; an
 invented polling request is not an allowed substitute.
 
-Independent-receiver narrowing: public DragonSDR DroneID documentation states O4 drones such as the
-Mini 5 broadcast encrypted DroneID, so a receiver without a licensed O4 decoder yields only a
-per-session hash ID plus frequency/RSSI, and DroneID is sent only while motors are spinning (C-202).
-An O4 A-B-A therefore corroborates presence/absence through hash/RSSI rather than plaintext Basic ID
-or position; a plaintext-bearing receiver is a separate requirement.
+Independent-receiver narrowing: public DragonSDR documentation states DJI-private OcuSync DroneID is
+encrypted on O4 (Mini 5), so a DroneID receiver without a licensed DragonScope decoder yields only a
+per-session hash ID plus frequency/RSSI, and that private DroneID is sent only while motors are
+spinning (C-202). This boundary is limited to DJI's private DroneID protocol. Public RUB-SysSec
+DroneSecurity NDSS 2023 FAQ states DJI's Drone-ID is not the same as standardized Bluetooth/Wi-Fi
+Remote ID, which follows EN 4709 (EU) / ASTM F3411 (US) and is readable by a plain smartphone app
+(C-203). Standardized Broadcast Remote ID is therefore plaintext and a standard Remote ID receiver
+reads Basic ID directly without any DJI decoder; only the DJI-private O4 DroneID telemetry is limited
+to hash/RSSI without DragonScope.
 
 ## B-14 — exact Ground country route
 

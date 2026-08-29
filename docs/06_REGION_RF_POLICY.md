@@ -267,16 +267,20 @@ official EIRP ceiling 分别登记为 `C-066`--`C-070`；最终已知 region sta
   [否定结果](09_NEGATIVE_RESULTS.md)。
 - **隐私/分发：** 不发布现场位置、身份或原始 capture。
 
-## O4 DroneID 独立接收边界
+## O4 DroneID 独立接收边界（DJI 私有 DroneID，区别于标准 Remote ID）
 
-- **证据状态：CORROBORATED**（C-202）
-- **对象/版本：** 公开 `alphafox02/dragonsdr_dji_droneid`（`8d0126b91b943f5c22a0503a8414bc2441892328`）。
-- **事实：** 该公开接收端文档说明 O2/O3 DroneID 为未加密，而 O4（如 Mini 5）为加密 DroneID；
-  仅用接收器只能得到 per-session hash ID、频率和 RSSI，完整 serial/GPS 遥测需要另行授权的
-  DragonScope 配置，并且 DJI 无人机仅在电机转动时广播 DroneID（上电只激活 OcuSync 控制链路）。
+- **证据状态：CORROBORATED**（C-202、C-203）
+- **对象/版本：** 公开 `alphafox02/dragonsdr_dji_droneid`（`8d0126b91b943f5c22a0503a8414bc2441892328`）
+  与公开 RUB-SysSec DroneSecurity（NDSS 2023）项目 README FAQ。
+- **事实：** 公开接收端文档说明 DJI 私有 OcuSync DroneID 在 O2/O3 上未加密，而 O4（如 Mini 5）为
+  加密；仅用 DragonSDR 接收器只能得到 per-session hash ID、频率和 RSSI，完整 serial/GPS 遥测需要
+  另行授权的 DragonScope 配置，且 DJI 无人机仅在电机转动时广播该私有 DroneID（上电只激活 OcuSync
+  控制链路）。DroneSecurity FAQ 进一步明确 DJI 的 Drone-ID 不是标准化 BLE/Wi-Fi Remote ID：DJI 使用
+  专用无线协议，标准 Remote ID 依据 EN 4709（EU）与 ASTM F3411（US），用普通智能手机 app 即可解码。
 - **边界/不证明：** 这是社区文档而非本项目的独立 RF 测量；不证明本机 Mini 5 Pro 的确切 bearer/内容。
-  独立接收 A-B-A 在 O4 上只能通过 hash/RSSI 佐证有无，无法读取明文 Basic ID 或位置，除非使用
-  经授权的 O4 解码器。
+  上述“O4 加密、仅得 hash/RSSI”边界只适用于 DJI 私有 OcuSync DroneID 遥测，不适用于标准化 Broadcast
+  Remote ID：标准 Remote ID 是明文，标准 Remote ID 接收机无需任何 DJI 授权解码器即可读取 Basic ID。
+  因此独立接收 A-B-A 对标准 Remote ID 可直接读明文字段，对 DJI 私有 O4 DroneID 则只能佐证有无。
 - **公开依据：** [14_SOURCE_INDEX.md](14_SOURCE_INDEX.md)；控制矩阵见
   [19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md)。
 
