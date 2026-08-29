@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.3 - 2026-08-29
+
+### Documentation
+
+- Added `CODEX_PROJECT_PROMPT.md`, a concise reusable task prompt that accurately frames the work as
+  authorized interoperability and Remote ID compliance testing on user-owned lab devices.
+- The prompt states the current stable-control objective, allowed autonomous local work, reversible
+  live-device boundary, boot/TEE/credential/license/privacy prohibitions, GitHub update rule and
+  exact query/readback/restore/external-RF completion standard once rather than repeating ambiguous
+  “bypass” language.
+- Linked the prompt from the repository README and root `AGENTS.md`; detailed evidence rules remain
+  in `AGENTS.md` and are not weakened by the shorter task prompt.
+
 ## 0.4.2 - 2026-08-29
 
 ### Added

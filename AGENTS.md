@@ -3,6 +3,11 @@
 This file applies to the entire repository. It is the handoff contract for humans and coding
 agents maintaining the RC 2 / Mini 5 Pro research record.
 
+For a new Codex task, start from the concise authorized-lab scope in
+[`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md). It states the project outcome, allowed local
+work, reversible-device boundary and completion evidence once; this file then supplies the detailed
+repository and evidence rules.
+
 ## Repository boundary
 
 This repository contains independently written research documentation, machine-readable indexes,
