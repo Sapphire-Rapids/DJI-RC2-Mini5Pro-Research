@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.16 - 2026-08-30
+
+### Changed
+
+- Rewrote the project and next-agent prompts around the single objective of a controllable Mini 5
+  Pro Remote ID switch with readback, restoration, and independent RF A-B-A evidence.
+- Removed repetitive defensive language and consolidated the remaining boundaries into operational
+  rules: authorized lab scope, evidence closure, privacy/publication, and no unrecoverable
+  startup/TEE/eFuse state changes.
+
 ## 0.4.15 - 2026-08-30
 
 ### Changed
