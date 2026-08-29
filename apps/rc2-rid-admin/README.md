@@ -30,8 +30,9 @@ Implemented runtime operations:
   repeated readback, pre-operation rollback and session-baseline restore;
 - strict by-hash codec `RidEuC0Parameter` for the wa150 EU C0 row
   `EU_CE_enable_c0_rid_0` (`0xF80992FE`), with the FLYC parameter-name hash recomputed and
-  fail-closed name/hash identity; it mirrors the host-tool codec but performs no I/O and
-  is not wired to a live write path;
+  fail-closed name/hash identity; it mirrors the host-tool codec and is now wired to a
+  separate EU C0 read-only probe/off/on/restore surface whose write buttons stay disabled
+  until an F7/F8 baseline and live route pass;
 - France EID GET / SET off / SET on (`0x03/0x77`), with automatic GET readback;
 - session-baseline restore;
 - EU operator-registration-number GET / SET / DELETE (`0x03/0x78`), with automatic GET readback
@@ -71,6 +72,14 @@ deadline, route/value conflict, Activity stop, wrong selector sequence or query-
 permanently denies that one-shot permit. The gate is never persisted as a reusable permit. The app
 synchronously stores only the privacy-reduced terminal result and then terminates its process so
 Binder death removes the listener; reopening only displays that result.
+
+The `rid_ctrl_enable_0` surface and the `EU_CE_enable_c0_rid_0` surface are independent controls
+with independent metadata/baseline/route state. The EU C0 surface re-probes F7/F8 before every F9,
+reads back twice, restores the baseline on any unconfirmed state, and reports that one F8 readback
+does not imply persistence across a DJI Fly reconnect: pinned FreeFCC prior art documents a C0
+class runtime flag that overrides flight-controller parameters on every connection (C-198). This is
+a probe/inventory semantics label, not RF proof, and `EU_CE_enable_c0_rid_0` remains an EU C0
+policy candidate rather than a global RID master switch.
 
 Build:
 

@@ -93,11 +93,13 @@ Every hypothesis below is testable and remains separate from factual findings.
 ## H-09 — EU C0 RID policy status `0x03`
 
 - Known facts: static hash registration exists; both fixed F7 probes returned status `0x03`; known
-  hash controls succeeded.
+  hash controls succeeded. Pinned FreeFCC prior art documents a C0 class runtime flag that
+  overrides flight-controller parameters on every connection (C-198).
 - Competing hypotheses: missing registration on the live target, product/runtime gate, unsupported
   route, or explicit rejection.
 - Distinguishing evidence: exact enum mapping or same-owner key-value metadata result from a
-  matching live build.
+  matching live build, then a disconnect/reconnect persistence read before any write is treated as
+  reliable.
 - Current state: `UNKNOWN`; no F8/F9 baseline exists.
 
 ## H-10 — RC 2 SDR selector value 5
