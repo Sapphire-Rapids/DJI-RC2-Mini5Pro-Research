@@ -16,7 +16,8 @@ independent USB DUML path already proven for read-only parameter access.
 Two parameter families are covered:
 
 - **by-hash** FLYC `0x03/0xF7` (metadata), `0x03/0xF8` (read), `0x03/0xF9` (write) —
-  used by `rid_switch_control.py` for `rid_ctrl_enable_0` (`0x3CBD864F`).
+  used by `rid_switch_control.py` for `rid_ctrl_enable_0` (`0x3CBD864F`) and by
+  `rid_eu_by_hash_switch_control.py` for `EU_CE_enable_c0_rid_0` (`0xF80992FE`).
 - **by-index** FLYC `0x03/0xE0` (table), `0x03/0xE1` (get_info), `0x03/0xE2` (read),
   `0x03/0xE3` (write) — used by `rid_param_index_readonly.py` and
   `rid_index_switch_control.py` for the wa150 table's `EU_CE_enable_c0_rid`
@@ -31,6 +32,10 @@ name the same wa150 row, and both tools can read-only report that bridge.
 ## Commands reachable
 
 - `rid_switch_control.py`: F7/F8/F9 by hash, gated; only `rid_ctrl_enable_0`.
+- `rid_eu_by_hash_switch_control.py`: F7/F8/F9 by hash, gated; only
+  `EU_CE_enable_c0_rid_0`. It keeps the same positive control and the same
+  A-B-A/restore/fail-closed safety mode, and adds an optional `--rid-ctrl-bridge`
+  read-only probe of `rid_ctrl_enable_0` in the same session.
 - `rid_param_index_readonly.py`: E0/E1/E2 by index, read-only; the E3 write encoder is
   present only in the offline codec and is not reachable from the probe.
 - `rid_index_switch_control.py`: E0/E1/E2/E3 by index, gated; only
@@ -52,6 +57,15 @@ python3 rid_switch_control.py --transport aircraft --index-bridge --wire-mode si
 
 # by-hash: A-B-A write OFF, read back, restore baseline, read back again
 python3 rid_switch_control.py --transport aircraft --target off --wire-mode simple
+
+# by-hash EU C0: probe the EU_CE_enable_c0_rid_0 baseline only (no write)
+python3 rid_eu_by_hash_switch_control.py --transport aircraft --wire-mode simple
+
+# by-hash EU C0: also probe rid_ctrl_enable_0 in the same session (read-only)
+python3 rid_eu_by_hash_switch_control.py --transport aircraft --rid-ctrl-bridge --wire-mode simple
+
+# by-hash EU C0: A-B-A write OFF, read back, restore baseline, read back again
+python3 rid_eu_by_hash_switch_control.py --transport aircraft --target off --wire-mode simple
 
 # by-index: read the wa150 RID parameter names and values (read-only)
 python3 rid_param_index_readonly.py --transport aircraft
@@ -82,7 +96,9 @@ Dependencies: Python 3.10+ and `libusb1`
 The by-index probe never writes. It verifies the table identity through `0xE0`, then
 re-checks each candidate's on-board name through `0xE1` before interpreting `0xE2`.
 
-The by-index switch tool uses the same gate order as the by-hash tool, applied to
+The EU C0 by-hash switch tool uses the same gate order as `rid_switch_control.py`,
+applied to `EU_CE_enable_c0_rid_0` (`0xF80992FE`). The by-index switch tool uses the
+same gate order as the by-hash tool, applied to
 `EU_CE_enable_c0_rid` (index 1306): verify the wa150 table CRC/count through `0xE0`,
 verify the on-board name and width through `0xE1`, read a strict baseline through
 `0xE2`, then one forward `0xE3` write, a `0xE2` readback, and an immediate restore with
@@ -92,12 +108,14 @@ wa150 table, not a global RID master switch.
 ## Tests
 
 ```sh
-python3 -m unittest -v test_rid_switch_control.py test_rid_index_switch_control.py test_rid_param_index_readonly.py
+python3 -m unittest -v test_rid_switch_control.py test_rid_eu_by_hash_switch_control.py test_rid_index_switch_control.py test_rid_param_index_readonly.py
 ```
 
 Offline tests load the modules with a fake `usb1` and verify the value-width helpers,
 the fixed single-parameter target and table identity, the fixed candidate list, and the
 fail-closed dispatch gates without opening a device.
+The EU C0 by-hash codec is mirrored in the Android panel at
+`apps/rc2-rid-admin/.../RidEuC0Parameter.java` with its own name/hash identity test.
 The by-hash F9 codec tests live in `../device-read-probes/test_rid_param_protocol.py`,
 and the by-index codec tests in
 `../../libraries/protocol-probes/test_rid_param_index_protocol.py`.

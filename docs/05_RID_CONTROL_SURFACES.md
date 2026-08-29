@@ -726,6 +726,11 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 - **公开依据：** 先前公开
   [firmware research](https://github.com/Sapphire-Rapids/FindUAS/blob/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc/docs/DJI_RID_FIRMWARE_RESEARCH.md#current-official-dji-fly-native-boundary)。
 - **隐私/分发：** 可记录公开参数名/hash；不发布 raw responses 或 vendor library。
+- **离线工具：** `host-tools/rid-switch-tool/rid_eu_by_hash_switch_control.py` 现提供 bounded
+  by-hash A-B-A（F7/F8/F9）单目标 `EU_CE_enable_c0_rid_0`（`0xF80992FE`），带
+  `--rid-ctrl-bridge` 只读探针；Android 面板侧 `RidEuC0Parameter` codec 镜像其 F7/F8/F9 语义
+  （C-196/C-197）。两者均为 `STATIC` 离线源码，不改变本节的 live `NEGATIVE` 结论，也不提供
+  官方功能描述或合规条文。
 
 ### RID-010：broadcast-effect policy 映射存在，但 bit 语义和 live metadata 未闭合
 
