@@ -267,6 +267,19 @@ official EIRP ceiling 分别登记为 `C-066`--`C-070`；最终已知 region sta
   [否定结果](09_NEGATIVE_RESULTS.md)。
 - **隐私/分发：** 不发布现场位置、身份或原始 capture。
 
+## O4 DroneID 独立接收边界
+
+- **证据状态：CORROBORATED**（C-202）
+- **对象/版本：** 公开 `alphafox02/dragonsdr_dji_droneid`（`8d0126b91b943f5c22a0503a8414bc2441892328`）。
+- **事实：** 该公开接收端文档说明 O2/O3 DroneID 为未加密，而 O4（如 Mini 5）为加密 DroneID；
+  仅用接收器只能得到 per-session hash ID、频率和 RSSI，完整 serial/GPS 遥测需要另行授权的
+  DragonScope 配置，并且 DJI 无人机仅在电机转动时广播 DroneID（上电只激活 OcuSync 控制链路）。
+- **边界/不证明：** 这是社区文档而非本项目的独立 RF 测量；不证明本机 Mini 5 Pro 的确切 bearer/内容。
+  独立接收 A-B-A 在 O4 上只能通过 hash/RSSI 佐证有无，无法读取明文 Basic ID 或位置，除非使用
+  经授权的 O4 解码器。
+- **公开依据：** [14_SOURCE_INDEX.md](14_SOURCE_INDEX.md)；控制矩阵见
+  [19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md)。
+
 ## 当前未知与阻断点
 
 ### REG-011：最终 policy authority 与 persistence 未闭合

@@ -913,12 +913,16 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ### RID-017：旧式 FlyC `Detection` mask 不迁移到现代 Broadcast RID
 
-- **证据状态：STATIC / INFERENCE / NEGATIVE**（C-119--C-122）
+- **证据状态：STATIC / INFERENCE / NEGATIVE / CORROBORATED**（C-119--C-122、C-200/C-201）
 - **静态 schema：** DJI-derived midware 把 FlyC `Detection` 映射为 `0x03/0xDA`；
   `SetSwitch` 请求为 `05 <mask:u32le>`，`GetSwitch` 请求为 `06`，mask 命名八个旧式
   DroneID 字段。它与 NDSS 论文未公开数值的多字段控制具有高可信语义对应，但不是作者披露值。
 - **RF 事实：** 论文报告该控制不会停发 proprietary OcuSync DroneID 包；被选字段会变成字面值
   `fake`。论文没有固定披露该开关实验的机型/固件或实际 host source route。
+- **独立复现：** pinned `CIAJeepDoors.py`（`a9a8b4430e847f22c75d4f89b14fe17388c82602`）复现同一
+  `fc_monitor` 家族 `01`–`06`（purpose/DroneID 名称/privacy mask 的 get/set），固定路由 PC 10/1
+  -> FLYC 3/6，mask bit 3 为 DroneID；其作者明确警告该表面只发 NULL/`fakeSN`、部分固件仍随机发
+  有效位置包、新版 DJI Fly/iOS 会复位 bits，且不是可靠方案（C-200/C-201）。
 - **当前边界：** 没有公开 primary evidence 表明 WA150 注册 `0x03/0xDA` `0x05/0x06`，或把该
   mask 接到 ASTM/FAA/EU Broadcast RID。当前 DJI Fly 保留旧 generic class 只证明库库存。
 - **处置：** 仅作 legacy firmware search signature；不得作为 Mini 5 Pro sender、可调配置或

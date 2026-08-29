@@ -122,3 +122,52 @@ exact WA150 handler, baseline/readback, restoration, and independent RF evidence
 
 No vendor binary, decompiled source, raw RF capture, device identity, or executable sender is
 distributed with this note.
+
+## 7. Independent community reproduction and reliability boundary
+
+The public `MAVProxyUser/CIAJeepDoors` tool independently reproduces the same legacy `0x03/0xDA`
+(FLYC cmd id 218) `fc_monitor` family reconstructed in section 3. Its pinned `CIAJeepDoors.py`
+(commit `a9a8b4430e847f22c75d4f89b14fe17388c82602`) together with
+`o-gs/dji-firmware-tools` `comm_mkdupc.py` (commit `8db4ba6d20590c28455029732af6572aec07e029`)
+shows:
+
+| Operation | Request body |
+| --- | --- |
+| `set_purpose` | `01 <len> <purpose>` |
+| `get_purpose` | `02` |
+| `set_droneid` (name) | `03 <len> <name>` |
+| `get_droneid` (name) | `04` |
+| `set_privacy` (mask) | `05 <mask:u32le>` |
+| `get_privacy` (mask) | `06` |
+
+The fixed route is sender PC (`COMM_DEV_TYPE 10`, index 1) to receiver FLYCONTROLLER
+(`COMM_DEV_TYPE 3`, index 6), plain request/ACK-after-exec/no-encryption, FLYCONTROLLER cmd set
+(`0x03`) and cmd id 218 (`0xDA`). This matches the `DataFlycDetection` route and the
+`SetSwitch`/`GetSwitch` subcommands independently reconstructed earlier, and names mask bit 3 as
+DroneID while the remaining bits name serial, position, home point, flight purpose, UUID, and pilot
+position.
+
+The same repository's root README (commit `baedd24600cecd100d8d66f8350cae336f799dbf`) states the
+author's own reliability boundary: the tool does not stop broadcasts completely but only sends
+NULL/`fakeSN` fields, some firmware versions still randomly send a valid location packet, later
+DJI Fly and iOS versions reset the privacy bits, and the tool is explicitly not a reliable solution.
+The per-tool README also records SDR and AeroScope verification against EnhancedWiFi and OcuSync
+while leaving LightBridge unverified.
+
+This is a second, independent public confirmation that the legacy surface is field
+redaction/substitution rather than a transmitter-off or packet-suppression switch, and it does not
+transfer to WA150/Mini 5 Pro modern Broadcast Remote ID. Do not migrate the mask into a Mini 5 Pro
+sender or present it as a reliable RID switch.
+
+## 8. Sources added this revision
+
+- [MAVProxyUser/CIAJeepDoors](https://github.com/MAVProxyUser/CIAJeepDoors/tree/baedd24600cecd100d8d66f8350cae336f799dbf)
+  at `baedd24600cecd100d8d66f8350cae336f799dbf`, with
+  [CIAJeepDoors.py](https://github.com/MAVProxyUser/CIAJeepDoors/blob/a9a8b4430e847f22c75d4f89b14fe17388c82602/CIAJeepdoors_1.3/CIAJeepDoors.py)
+  pinned at `a9a8b4430e847f22c75d4f89b14fe17388c82602`.
+- [o-gs/dji-firmware-tools comm_mkdupc.py](https://github.com/o-gs/dji-firmware-tools/blob/8db4ba6d20590c28455029732af6572aec07e029/comm_mkdupc.py)
+  at `8db4ba6d20590c28455029732af6572aec07e029`, for the `COMM_DEV_TYPE` enum values and DUML
+  header semantics.
+
+No vendor binary, decompiled source, raw RF capture, device identity, or executable sender is
+distributed with this note.

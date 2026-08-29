@@ -50,6 +50,7 @@ Details: [07_FIRMWARE_TRUST_BOUNDARY.md](07_FIRMWARE_TRUST_BOUNDARY.md),
 | C-116 | `STATIC` | The seven-byte status maps support/normal bits, area code, and failure; product-139 also derives regional support bits | Handler lacks a local length gate; unmapped bits and live values remain open |
 | C-117 | `STATIC` | `KeyCloudControlData` is value-routed SET-only `0x00/0xDD`; ACK caches the request rather than returned applied state | No RID correlation, GET/readback, or stable disable semantics |
 | C-118 | `NEGATIVE` | No current active RID read-only command, fixed safe tuple, reset/disable/debug handler, or applied-state echo was found | Existing `0x11/0x1C` push may be observed passively; it is not a query |
+| C-202 | `CORROBORATED` | Pinned DragonSDR DroneID receiver docs state O4 drones such as the Mini 5 broadcast encrypted DroneID (receiver-alone yields session hash + frequency + RSSI; full telemetry needs a licensed DragonScope config), and DroneID is sent only while motors spin | Community docs, not an independent RF measurement; an O4 A-B-A can corroborate presence/absence via hash/RSSI but not plaintext Basic ID/position without a licensed O4 decoder |
 | C-123 | `STATIC` | Product-139 China `OIDIdentifier` Get/Set uses `0x11/0xD6`, fixed receiver `0x92`, 500 ms / retry 3, and 18-byte requests | GET tail bytes are not visibly initialized; live acceptance, restore, persistence, and RF mapping remain open |
 | C-124 | `STATIC` | Product-139 EASA OPID has current `0x03/0x78` GET/SET/DELETE schema | Dynamic HostID, live acceptance, persistence, restore, and RF remain open |
 | C-125 | `STATIC` | Product-139 Japan DIPS uses three-stage `0x11/0x4B` credential SET/QUERY | Non-atomic sensitive managed data; no live Mini 5 Pro closure |
@@ -199,6 +200,8 @@ Details: [17_DRONE_HACKS_STATIC_ANALYSIS.md](17_DRONE_HACKS_STATIC_ANALYSIS.md).
 | C-120 | `INFERENCE` | This is the high-confidence match for the NDSS paper's undisclosed multi-field DroneID control | The paper did not publish tuple/payload or exact switch-test model/firmware |
 | C-121 | `STATIC` | The paper reports packets continued while selected legacy fields became literal `fake` | It did not suppress packets and is not modern ASTM/FAA/EU RID |
 | C-122 | `NEGATIVE` | No public primary evidence transfers the handler or mask to WA150/Mini 5 Pro | Generic old class inventory is not current aircraft support |
+| C-200 | `CORROBORATED` | Pinned CIAJeepDoors source reproduces the legacy `fc_monitor` `0x03/0xDA` (cmd 218) subcommands `01`–`06` (purpose/DroneID-name/privacy-mask get-set) with sender PC 10/1 to receiver FLYCONTROLLER 3/6 and mask bit 3 as DroneID | Independent corroboration of the C-119 legacy OcuSync/AeroScope mask surface; not a Mini 5 Pro or modern Broadcast RID switch; no live write here |
+| C-201 | `NEGATIVE` | Pinned CIAJeepDoors root README states the tool only sends NULL/`fakeSN`, some firmware still randomly sends valid location packets, later DJI Fly/iOS reset the privacy bits, and it is not reliable; SDR/AeroScope testing covered EnhancedWiFi and OcuSync while LightBridge stayed unverified | Community author warnings, not this project's RF measurement; legacy field substitution, not a transmitter-off or packet-suppression control |
 
 Details: [18_LEGACY_DRONEID_DETECTION.md](18_LEGACY_DRONEID_DETECTION.md).
 
