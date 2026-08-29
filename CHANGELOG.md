@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.14 - 2026-08-30
+
+### Added
+
+- Added a fixed C-207 observation form for the standardized Remote ID motor-off → motor-on →
+  motor-off A-B-A record, including exact bearer class, message presence, frame count, and motor
+  transition timestamps.
+- Linked the form from the RID experiment matrix, current blocker, and handoff instructions.
+
+### Boundary
+
+- The form is a recording procedure only. It does not perform a write, admit a route, or establish
+  RF behavior. It excludes full identifiers, coordinates, raw frames, captures, account/license
+  material, and DJI-private DroneID telemetry.
+
 ## 0.4.13 - 2026-08-30
 
 ### Added

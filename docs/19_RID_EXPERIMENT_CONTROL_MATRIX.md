@@ -25,6 +25,8 @@ and its first live gate-unobserved/zero-query result adds C-165. A-027's fixed a
 artifact audit, delivery, and first ambiguous live result add C-166--C-169. A-028's diagnostic-only
 successor, delivery, and group-transport live result add C-170--C-173.
 The exact official UI surface and A-033 diagnostic-export audit/delivery add C-180--C-182.
+The privacy-reduced C-207 observation form adds a fixed recording procedure without adding a
+machine-index claim until a live A-B-A result exists.
 
 ## 2. Implementation levels
 
@@ -202,6 +204,9 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 0. Record a written motor-on A-B-A against the confirmed plaintext standard Remote ID bearer:
    capture the readable Basic ID and standard bearer type (BLE vs Wi-Fi) with the independent
    receiver, tie it to motor on/off timing, and keep the DJI-private DroneID family parked (C-207).
+   Use the one-session form in
+   [`21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md`](21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md) and do
+   not record full identifiers, coordinates, raw frames, captures, or private DroneID telemetry.
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
 2. Treat A-026's `GATE_UNOBSERVED`, A-027's ambiguous `ProtocolException`, and A-028's group

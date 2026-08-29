@@ -177,6 +177,12 @@ Missing a single redacted timeline containing:
 - independent receiver frame count/standard/field presence;
 - stop/post-state.
 
+Recording procedure: use the fixed privacy-reduced form in
+[`21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md`](21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md). It
+captures the independent receiver's exact bearer class, message presence, frame count, and motor
+transition times, while excluding full identifiers, coordinates, raw frames, captures, and private
+DroneID telemetry. Completing the form does not authorize any write or toggle.
+
 Effect: onboard status and RF reception remain separate evidence sets.
 
 Current static narrowing: product-139's official owner listens to natural `0x11/0x1C` push and has
