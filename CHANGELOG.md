@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.12 - 2026-08-29
+
+### Added
+
+- Recorded the operator's field confirmation that the Mini 5 Pro broadcasts plaintext standardized
+  Remote ID with a readable Basic ID when motors spin (C-207); the switch work now targets the
+  standard ASTM F3411 / EN 4709 bearer, and the DJI-private DroneID family is parked.
+
+### Boundary
+
+- No official DJI RID feature or legal text was added. The confirmation is an operator field
+  observation; the exact Basic ID value, BLE vs Wi-Fi bearer, field set, and written motor on/off
+  A-B-A timing remain unpinned, and no toggle or write was performed.
+
 ## 0.4.11 - 2026-08-29
 
 ### Added

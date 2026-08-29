@@ -617,3 +617,10 @@ work when a report did not contain a more precise timestamp.
 - `CORROBORATED`: OpenDroneID receiver-android README states the example receiver complies with
   ASTM F3411 / prEN 4709-002 BLE, WiFi NAN, and WiFi Beacon and decodes detailed content with no
   decryption or DJI-licensed decoder (C-206).
+
+### 2026-08-29 — standard Remote ID bearer confirmed plaintext
+
+- `OBSERVED`: the operator confirmed with a verified standard Remote ID detector plus the FindUAS
+  host that the Mini 5 Pro broadcasts plaintext standardized Remote ID with a readable Basic ID
+  when motors spin (C-207). The switch work now targets the standard ASTM F3411 / EN 4709 bearer;
+  the DJI-private DroneID family is parked.
