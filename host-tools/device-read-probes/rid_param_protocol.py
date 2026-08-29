@@ -19,9 +19,11 @@ CMD_TYPE_ACK_RESPONSE = 0xC0
 CMD_SET_FLYC = 0x03
 CMD_GET_PARAM_INFO_BY_HASH = 0xF7
 CMD_GET_PARAM_VALUE_BY_HASH = 0xF8
+CMD_WRITE_PARAM_BY_HASH = 0xF9
 READ_ONLY_COMMANDS = frozenset(
     {CMD_GET_PARAM_INFO_BY_HASH, CMD_GET_PARAM_VALUE_BY_HASH}
 )
+WRITE_COMMANDS = frozenset({CMD_WRITE_PARAM_BY_HASH})
 
 
 class ParamProtocolError(ValueError):
@@ -96,17 +98,28 @@ def simple_filter(data: bytes, sequence: int) -> bytes:
     return bytes(output)
 
 
-def encrypt_read_request_frame(frame: bytes, *, duml: Any) -> bytes:
-    """Encrypt one already-built, allow-listed F7/F8 request.
+def encrypt_request_frame(
+    frame: bytes,
+    *,
+    duml: Any,
+    allowed_commands: frozenset[int] = READ_ONLY_COMMANDS,
+) -> bytes:
+    """Encrypt one already-built FLYC request with the SIMPLE keystream.
 
-    This deliberately refuses every other command, including F9 and FA.
+    This deliberately refuses every command outside ``allowed_commands``. The
+    read-only default rejects F9 and FA; a caller must opt in to write commands
+    explicitly by passing ``WRITE_COMMANDS`` (or a subset of it).
     """
 
     _validate_raw_frame(frame, duml=duml)
     if frame[8] != CMD_TYPE_REQUEST_ACK:
-        raise ParamProtocolError("SIMPLE input is not a plaintext read request")
-    if frame[9] != CMD_SET_FLYC or frame[10] not in READ_ONLY_COMMANDS:
-        raise ParamProtocolError("SIMPLE input is not an allow-listed F7/F8 request")
+        raise ParamProtocolError("SIMPLE input is not a plaintext request")
+    if frame[9] != CMD_SET_FLYC:
+        raise ParamProtocolError("SIMPLE input is not a FLYC command")
+    if frame[10] not in allowed_commands:
+        raise ParamProtocolError(
+            f"SIMPLE input is not an allow-listed command (0x{frame[10]:02X})"
+        )
 
     encrypted = bytearray(frame)
     sequence = int.from_bytes(encrypted[6:8], "little")
@@ -115,6 +128,42 @@ def encrypt_read_request_frame(frame: bytes, *, duml: Any) -> bytes:
     checksum = duml.calc_crc16(encrypted, len(encrypted) - 2)
     encrypted[-2:] = checksum.to_bytes(2, "little")
     return bytes(encrypted)
+
+
+def encrypt_read_request_frame(frame: bytes, *, duml: Any) -> bytes:
+    """Encrypt one already-built F7/F8 request and reject every write command."""
+
+    return encrypt_request_frame(frame, duml=duml, allowed_commands=READ_ONLY_COMMANDS)
+
+
+def build_write_request_body(value_raw: bytes, *, parameter_hash: int) -> bytes:
+    """Build the exact F9 application payload ``[hash:u32le][value]``.
+
+    This helper only composes bytes. It validates the hash and the encoded
+    Boolean raw value range but performs no I/O and cannot transmit a packet.
+    """
+
+    if not 0 <= parameter_hash <= 0xFFFFFFFF:
+        raise ParamProtocolError("write parameter hash is outside u32")
+    if not value_raw:
+        raise ParamProtocolError("write value is empty")
+    if any(byte not in (0, 1) for byte in value_raw):
+        raise ParamProtocolError("write value is not a Boolean 0/1 payload")
+    return parameter_hash.to_bytes(4, "little") + bytes(value_raw)
+
+
+def parse_f9_write_ack(payload: bytes) -> int:
+    """Parse the application payload of one F9 write acknowledgement.
+
+    Accepted success shapes are an empty payload and ``[status==0]``. Any
+    non-empty payload whose first byte is nonzero raises ``ParamStatusError``.
+    """
+
+    if payload == b"":
+        return 0
+    if payload[0] == 0:
+        return 0
+    raise ParamStatusError(f"F9 returned status 0x{payload[0]:02X}")
 
 
 def parse_f7_metadata(
@@ -283,10 +332,15 @@ def validate_response_frame(
     expected_sequence: int,
     expected_command_id: int,
 ) -> bytes:
-    """Validate one plaintext or SIMPLE-encrypted response and return its payload."""
+    """Validate one plaintext or SIMPLE-encrypted response and return its payload.
 
-    if expected_command_id not in READ_ONLY_COMMANDS:
-        raise ParamProtocolError("refusing to validate a non-read command")
+    Both read (F7/F8) and write (F9) command IDs are accepted. This function
+    only validates transport identity and returns the decrypted payload; it
+    does not interpret a status byte or assert that a write was applied.
+    """
+
+    if expected_command_id not in (READ_ONLY_COMMANDS | WRITE_COMMANDS):
+        raise ParamProtocolError("refusing to validate an unknown command")
     _validate_raw_frame(frame, duml=duml)
     if frame[4] != expected_sender or frame[5] != expected_receiver:
         raise ParamProtocolError("DUML response route mismatch")
