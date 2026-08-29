@@ -25,8 +25,8 @@ class FindUASRedactTranscriptTest(unittest.TestCase):
             "manufacturer": "Sensitive Manufacturer",
             "model": "Sensitive Model",
             "ridStandard": "GB42590-2023",
-            "firstSeen": "2026-08-30T10:00:00Z",
-            "lastSeen": "2026-08-30T10:01:00Z",
+            "firstSeen": 809458461.819035,
+            "lastSeen": 809459021.819035,
         }
 
     def test_summary_preserves_only_public_fields(self):
@@ -37,6 +37,13 @@ class FindUASRedactTranscriptTest(unittest.TestCase):
         self.assertIn("UAS ID present: yes", summary)
         self.assertIn("Location fields present: true", summary)
         self.assertIn("air bearer", summary)
+
+    def test_swift_timestamps_are_rendered_as_utc_iso8601(self):
+        record = self.record()
+        summary = tool.summarize([record], digest_prefix=False)
+        self.assertIn("First seen: 2026-08-26T17:34:21.819Z", summary)
+        self.assertIn("Last seen: 2026-08-26T17:43:41.819Z", summary)
+
 
     def test_summary_does_not_leak_private_values(self):
         record = self.record()
@@ -94,6 +101,14 @@ class FindUASRedactTranscriptTest(unittest.TestCase):
         record = self.record()
         with self.assertRaisesRegex(ValueError, "leaked value"):
             tool.assert_no_sensitive_values(record["uasID"], [record])
+
+    def test_sensitive_guard_does_not_misfire_on_zero_coordinates(self):
+        record = self.record()
+        record["latitude"] = 0
+        record["longitude"] = 0
+        record["model"] = "0"
+        record["manufacturer"] = "2"
+        tool.assert_no_sensitive_values("Input records: 1", [record])
 
 
 if __name__ == "__main__":
