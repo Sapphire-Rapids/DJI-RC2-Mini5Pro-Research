@@ -567,3 +567,17 @@ stronger conclusion that cannot be drawn.
 - Does not establish: universal Frida incompatibility, anti-instrumentation behavior on RC 2, or any
   aircraft/entitlement/RF fact. No vendor dump, DEX, decompiled output, private identifier or raw
   process log is committed.
+
+## N-52 — standard JVMTI 1.2 is not the Android 11 late-load interface used here
+
+- Status: `NEGATIVE` for one source-only no-op late attach to exact DJI Fly `1.21.10` in the
+  disposable AArch64 Android 11 emulator; machine claim C-188.
+- Result: the non-debuggable target process terminated in a native crash before the agent emitted
+  its canary line.
+- Discriminator: Android 11 ART source requires ART TI `0x70010200` for this late-loaded path. An
+  independent agent requesting that exact version subsequently attached, reached the owner and
+  dispatched one query without changing the PID (C-189/C-190).
+- Consequence: do not repeat the standard-version attach on RC 2. Future work uses the observed ART
+  TI route only after an RC 2 loader is independently admitted.
+- Does not establish: a universal JVMTI defect, RC 2 loader availability, inventory, entitlement,
+  setter behavior or RF effect. The raw crash log and all vendor bytes remain excluded.

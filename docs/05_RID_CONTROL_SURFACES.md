@@ -646,6 +646,27 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   process-memory copy 仅在 disposable emulator 使用，通用 boundary scanner 以独立源码公开；vendor
   dump、DEX、decompiled source 与 private data 不公开。
 
+### RID-008J：ART TI 已闭合 exact private query/callback plumbing
+
+- **证据状态：** standard JVMTI 1.2 为 emulator `NEGATIVE`（C-188）；ART TI owner/query 为
+  emulator `OBSERVED`（C-189/C-190）；success parser 为 `STATIC`（C-191）。
+- **标准版本阴性：** standard JVMTI 1.2 late attach 在 canary 日志前导致 exact non-debuggable
+  DJI Fly emulator process native crash。Android 11 ART 的适用 late-load version 为
+  `0x70010200`，所以不在 RC 2 重复 standard attach。
+- **owner/query 正向：** ART TI agent 一次枚举 already-loaded classes，唯一命中 unlock/event
+  owner，取得两个 singleton 与 nonzero current device ID；随后通过独立 callback DEX 调用 exact
+  private current-device FC-license query。stage=0、dispatch=1、callback=`417`，前后 PID 相同。
+- **解释边界：** emulator 无 aircraft，因此没有 success payload；`417` 只证明 exact owner、native
+  invocation 与 callback plumbing，不证明 unsupported、no entitlement、empty inventory、RID off
+  或 RF。
+- **success parser：** source-only parser 解析 embedded `LicenseGroupModel` records、核对 declared /
+  observed count、识别 MSDK-compatible field-7 RID candidate；exactly one 时 ID 只留在 process
+  memory，公开日志仅 count/level/status。五个 synthetic host cases 与 helper DEX/AArch64 build
+  通过。
+- **下一依赖：** ordinary third-party APK 不能凭打包该 agent 就 attach DJI Fly。先准入 RC 2
+  userspace ADB shell 或其他 same-process loader，再做一次 query-only fresh callback/PID check；
+  在 real success callback 唯一识别 type 6 前不加入 setter。
+
 ### RID-008D：current Fly 未闭合 type-6 到 aircraft broadcaster
 
 - **证据状态：** C-152 为 `STATIC`；C-153 为 `NEGATIVE`。

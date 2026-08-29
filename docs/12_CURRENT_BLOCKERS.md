@@ -325,14 +325,18 @@ MSDK schema is what identifies it as `LicenseDataRID` (C-152). Current Fly's gen
 only ID and action, and bounded app-side tracing found no edge to `0802`, motor/armed state, or the
 BLE/Wi-Fi broadcaster (C-153). This does not close encrypted aircraft firmware.
 
+The official-owner transport is no longer hypothetical. On the disposable Android 11 emulator an
+ART TI `0x70010200` agent reached the exact loaded owners, obtained a nonzero current device ID and
+dispatched the private FC-license query once. The callback returned `417` because the emulator had
+no aircraft, and the DJI Fly PID remained unchanged (C-189/C-190). The independent success-side
+group/type-6 parser is implemented and synthetically tested (C-191). This closes the external-route
+guessing problem; it does not close RC 2 loading or produce a real inventory.
+
 Missing:
 
-- a materially different official in-process owner/authenticated route or verified WA150 handler;
-- a materially different official in-process/current-state owner or safe replay/trigger for the
-  FlySafe support/version state; the first A-026 passive window is already closed as unobserved and
-  should not be repeated unchanged;
-- privacy-reduced exposure of the existing Reply failure/ecode/callback diagnostic for the A-028
-  group transport failure, without exposing raw replies or license material;
+- an admitted RC 2 loader for the already-observed ART TI same-process query, preferably a usable
+  userspace ADB shell; an ordinary third-party APK alone cannot attach into DJI Fly;
+- one RC 2 query-only run with fresh stage/callback output and unchanged target PID;
 - one canonical, privacy-reduced genuine type-6 inventory baseline without retaining license material;
 - aircraft-side evidence that changing the genuine type-6 enabled state is consumed by the RID
   broadcaster rather than only reflected in an SDK status object;
@@ -347,15 +351,12 @@ status bits, and result class.
 
 Effect: known generic F7/F8 attach routes are closed for the current session. The third-party
 `0x11/0x1C` Binder listener is also closed as a false-negative oracle by independent RF evidence
-(C-146). Do not repeat either route family without a new owner fact. The shortest active dependency
-is now either the existing Reply failure/ecode/callback diagnostic or a materially different official
-in-process/current-state support/version owner, while the owner independently checks only the two
-official website eligibility booleans. A-026 returned unobserved/zero-query (C-165), and A-027
-returned `ProtocolException`-class ambiguous failure with no `11/12` (C-169); neither is support or
-entitlement evidence. A-028 further localized that result to group transport callback failure before
-protobuf/page/terminator (C-173). Only a future canonical inventory may advance. Same-item enable-state
-readback/restore and WA150 `0802` aircraft-side ownership follow only after a genuine canonical
-record.
+(C-146). Do not repeat either route family. The exact official private query and callback plumbing
+are now observed on the emulator; the shortest active dependency is an RC 2 same-process loader,
+which directly couples this blocker to B-21. A-026/A-027/A-028 remain historical third-party Binder
+comparisons rather than the next execution route. Only a canonical success callback may advance.
+Same-item enable-state readback/restore and WA150 `0802` aircraft-side ownership follow only after a
+genuine canonical record.
 Static discovery of another setter is
 insufficient without baseline, readback, restore, persistence, and RF observation.
 
@@ -391,8 +392,9 @@ The evidence dependencies are:
 exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
   -> A-027 fixed active read-only 11/11 = ProtocolException / ambiguous (C-169)
   -> A-028 = group transport callback failed before protobuf/page/terminator (C-173)
-  -> expose Reply failure/ecode/callback detail or recover official-owner state
-  -> one canonical privacy-reduced 11/11 inventory
+  -> exact owner + private query callback observed through emulator ART TI (C-189/C-190)
+  -> admit an RC 2 same-process loader
+  -> one canonical privacy-reduced native-query inventory
   -> privacy-reduced genuine type-6 level/enabled/valid baseline
   -> prove exact same-item 11/12 response and 11/11 readback/restore design
   -> verified 0802/aircraft-side consumer or independent RF effect

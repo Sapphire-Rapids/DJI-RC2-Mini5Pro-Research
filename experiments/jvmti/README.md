@@ -9,12 +9,13 @@ are part of the result:
 
 | Directory | Status | Meaning |
 | --- | --- | --- |
-| `jvmti_attach_canary/` | `NOT ADMITTED` | Minimal no-op attach canary; never installed or attached. |
+| `jvmti_attach_canary/` | `NOT ADMITTED` on RC 2; emulator `NEGATIVE` | Standard JVMTI 1.2 source canary; exact DJI Fly emulator target crashed before its log, so this interface is superseded by ART TI. |
 | `jvmti_eid_resolver_v1/` | `NOT ADMITTED` | Semantic-anchor resolver only; never installed or attached. |
 | `jvmti_eid_raw_get_v2/` | `NOT ADMITTED` | Permanently unresolved, fixed-zero-gated raw-GET prototype. |
 | `jvmti_eid_route_resolver_v2_1/` | `NOT ADMITTED` | Offline route/symbol preflight with a fixed-zero exception gate. |
 | `revoked-v2.2/` | `RETRACTED` | Rejected artifact retained for audit history; do not install or attach. |
 | `jvmti_eid_route_resolver_v2_3/` | `NOT ADMITTED` | V2.2 corrections implemented, but no independent post-fix live admission and no device run. |
+| `jvmti_flysafe_inprocess_query/` | `OBSERVED` on disposable emulator; `NOT ADMITTED` on RC 2 | Android 11 ART TI reached the exact DJI Fly owner and received a read-only query callback without a process restart. |
 
 Each project contains its original status, contracts, build inputs and audit scripts. Host tests
 that need exact DJI Fly native samples require an external, lawfully obtained fixture tree; those

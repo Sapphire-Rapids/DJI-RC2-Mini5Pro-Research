@@ -144,12 +144,12 @@ length. Its artifact audit and MTP identity checks passed (C-170--C-172). The in
 
 A-033 packages that privacy-reduced diagnostic into a file-manager-readable MediaStore report while
 preserving the same command/route/selectors and zero-`11/12` direct-button boundary (C-181/C-182).
-It remains uninstalled and unrun. C-180/C-183/C-184 establish a higher-information official
-same-process surface: DJI Fly's non-exported license-manager Activity and aircraft tab. C-185 closes
-an equally important limitation: the current Java UI cannot semantically identify type 6 and may
-misclassify an unknown record as a polygon license. The first live pass must inspect that tab without
-toggling, then run A-033 once; see
-[20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md).
+It remains an external-Binder comparison. C-180/C-183/C-184 establish the official same-process
+owner, and C-188--C-190 now observe its exact private query/callback through Android 11 ART TI in a
+disposable emulator. With no aircraft the callback was `417`; target PID remained stable. C-191
+adds the source-only success parser, while C-185 retains the current Java UI type-6 incompatibility.
+The next live dependency is an admitted RC 2 same-process loader, not another external route guess;
+see [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md).
 
 Current Fly's generic set-enable payload contains only license ID and action; bounded static tracing
 found no edge from type 6/field 7/`11/12` to WA150 `0802`, motor state, or BLE/Wi-Fi enable. This is a
@@ -200,9 +200,9 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 1. Expand the administrator panel with a truth-labelled configuration inventory. Existing live
    USB region/France-EID results stay read-only; locked/managed/opaque/legacy items remain disabled.
 2. Treat A-026's `GATE_UNOBSERVED`, A-027's ambiguous `ProtocolException`, and A-028's group
-   transport callback failure as separate narrow negatives. First inspect the official DJI Fly
-   aircraft-license tab without changing state, then run staged A-033 once and return its exported
-   failure/ecode/callback report. Do not repeat another external route guess.
+   transport callback failure as historical narrow negatives. The exact ART TI owner/query callback
+   is now emulator-observed; admit an RC 2 loader and run the query-only agent once. Do not repeat
+   another external route guess or standard JVMTI 1.2 attach.
 3. Advance only after one canonical privacy-reduced inventory; report type-6 count/level/enabled/
    valid and preserve unavailable versus empty.
 4. If and only if a genuine type-6 item exists, implement exact same-item baseline, one transition,

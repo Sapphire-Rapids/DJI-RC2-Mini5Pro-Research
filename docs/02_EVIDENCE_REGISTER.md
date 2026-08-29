@@ -268,10 +268,15 @@ Details: [09_NEGATIVE_RESULTS.md](09_NEGATIVE_RESULTS.md),
 | C-185 | `STATIC` | Exact current Java defines license types 0--4 plus unknown and protobuf fields 1--5 only; an unknown record falls through to a tolerant polygon model | Current Java cannot semantically identify type 6; native/FC/opaque-server support remains open |
 | C-186 | `STATIC` | Exact current generic row switch passes an existing license ID and Boolean through the native current-device setter, then refreshes row states from its Boolean-array callback | Never executed; no entitlement creation, type-6 identity, restore, aircraft application, or RF proof |
 | C-187 | `NEGATIVE` | Direct Frida attach in the disposable emulator found candidates but destroyed the script/app before output; read-only root process-memory copying worked instead | Narrow emulator result; do not repeat injection on RC 2 and do not publish vendor dumps/DEX/output |
+| C-188 | `NEGATIVE` | Standard JVMTI 1.2 late attach to exact non-debuggable DJI Fly in the disposable emulator ended in a native process crash before the canary logged | Emulator only; Android 11's ART TI version is the applicable late-load interface and the standard attach must not be repeated on RC 2 |
+| C-189 | `OBSERVED` | An independent ART TI `0x70010200` agent found the exact loaded FlySafe owner classes, obtained both owners plus a nonzero current device ID, and left the DJI Fly PID unchanged | Authorized emulator-shell reachability is not an RC 2 loader, inventory, setter or RF result |
+| C-190 | `OBSERVED` | The same-process agent dispatched the exact private current-device FC-license query once and received callback error `417`; stage was zero, dispatch count one and PID unchanged | No aircraft was attached, so no success payload/type-6 inventory existed; the error is not unsupported/no-license/RID-off/RF evidence |
+| C-191 | `STATIC` | The public source-only helper parses the embedded LicenseGroup envelope, reconciles counts and identifies a unique MSDK-compatible field-7 RID candidate while keeping its ID out of logs; five synthetic cases and the source build pass | No real success callback, RC 2 loader, genuine item, setter, restore or RF effect is established |
 
 Details: [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md),
-[11_ARTIFACT_REGISTER.md](11_ARTIFACT_REGISTER.md), and
-[RC 2 RID Admin source](../apps/rc2-rid-admin/README.md).
+[11_ARTIFACT_REGISTER.md](11_ARTIFACT_REGISTER.md),
+[RC 2 RID Admin source](../apps/rc2-rid-admin/README.md), and the
+[same-process query experiment](../experiments/jvmti/jvmti_flysafe_inprocess_query/README.md).
 
 ## Promotion rules
 

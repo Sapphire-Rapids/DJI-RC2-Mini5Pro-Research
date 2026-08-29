@@ -168,7 +168,26 @@ The next read-only change is to display the already existing Reply failure/ecode
 Do not repeat the same black-box request or retain result images, identifiers, raw replies, or
 license material.
 
-### Current candidate: A-033 export plus official DJI Fly UI
+### Current route: ART TI exact-owner query
+
+The materially different official-owner route is now observed on the disposable Android 11
+emulator (C-188--C-191). Standard JVMTI 1.2 crashed the exact non-debuggable target before logging
+and is retired for RC 2. ART TI `0x70010200` attached cleanly, found exactly one loaded unlock/event
+owner pair, obtained a nonzero current device ID and dispatched the private FC-license query once.
+With no aircraft, the callback returned `417`; the DJI Fly PID was unchanged.
+
+The public source-only experiment loads an independent callback DEX and parses only the embedded
+license-group envelope. It reports counts, type-6 level and status Booleans, keeps a unique existing
+ID in memory only, passes five synthetic host cases and builds its AArch64 agent. See
+[jvmti_flysafe_inprocess_query](../experiments/jvmti/jvmti_flysafe_inprocess_query/README.md).
+
+This closes owner/callback plumbing but not RC 2 loading. An ordinary third-party APK cannot attach
+into DJI Fly by containing the agent. The next device dependency is a usable userspace ADB shell or
+another proved same-process loader, followed by one query-only attach with a fresh callback and
+unchanged target PID. Do not add the setter before that RC 2 success callback identifies exactly one
+canonical type-6 candidate.
+
+### Historical external comparison: A-033 plus official DJI Fly UI
 
 A-033 `0.8.0-flysafe-diagnostic-export` / code 12 is C-181/C-182 and A-033. It preserves A-028's
 fixed `02:04 -> 12:04`, `11/11`, V3/V4 selectors and direct-button zero-`11/12` boundary. It adds
@@ -182,13 +201,9 @@ native/network/socket/shell/external-process path passed. It is staged as remova
 `Download/FindUAS_A033_DIAG_EXPORT.apk`; fresh readback size/hash matched. It has not been installed
 or run.
 
-Before that external diagnostic, use the materially different official owner identified by
-C-180/C-184.
-Read [20_OFFICIAL_FLYSAFE_UI_PATH.md](20_OFFICIAL_FLYSAFE_UI_PATH.md) and perform its one-time
-manual read-only sequence: DJI Fly -> Profile/Me -> Settings -> `证书列表` / Unlocking License List ->
-`飞机内证书` / Aircraft Unlocking Licenses. Capture the complete result/error and do not toggle a
-row. Then install/run A-033 once and return the public text file. This first pass requires no motor
-start or detector and contains no state change.
+A-033 remains useful only as a comparison with the failed external Binder route. The ART TI owner
+query above is now the next execution route after an RC 2 loader is admitted. Manual inspection of
+the official list remains optional supporting context and must not toggle a row.
 
 Do not interpret a generic row switch as a verified RID switch. Exact current protected Java is now
 recovered: it closes the existing-ID native action but defines only license types 0--4 plus unknown,
@@ -340,9 +355,8 @@ A-028 preserved the same protocol behavior and localized the result to
 `group transport callback failed`; `11/12 count=0` (C-173). Protobuf/pages/terminator were not
 reached. Its next discriminator is Reply failure/ecode/callback detail, not another identical run.
 
-Missing: the two owner-visible official eligibility booleans, a materially different official-owner
-support/version surface or A-028 Reply failure/ecode/callback detail, canonical Binder response,
-genuine account item, FC
+Missing: the two owner-visible official eligibility booleans, an admitted RC 2 loader for the
+observed ART TI query, a canonical success callback, genuine account item, FC
 import, aircraft-side consumer, same-item baseline/restore, and RF. If separate approved
 instrumentation obtains raw unknown field-7 bytes, keep them only in
 excluded private evidence; never create, transfer, or publish license material.

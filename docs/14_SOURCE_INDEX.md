@@ -35,6 +35,10 @@ here does not imply that all of its claims were accepted.
   boundaries.
 - [AOSP platform frameworks/base](https://android.googlesource.com/platform/frameworks/base/).
   Used for Android `attach-agent`, Settings intents, and permission behavior.
+- [AOSP ART Android 11 OpenJDK JVMTI](https://android.googlesource.com/platform/art/+/refs/tags/android-11.0.0_r40/openjdkjvmti/)
+  at tag `android-11.0.0_r40`. `OpenjdkJvmTi.cc` and `art_jvmti.h` establish the late-load ART TI
+  environment version `0x70010200` used by C-189/C-190. This primary-source fact does not itself
+  prove that an RC 2 caller can attach an agent.
 
 ## Exact local input identities (excluded from publication)
 
@@ -42,9 +46,9 @@ here does not imply that all of its claims were accepted.
   SHA-256 `0312228ad536381509c09dbfdf1c7e3d4c825c5936199f444058b112985deb3a`.
   It was installed only on a disposable ARM64 Android 11 emulator. The exact non-exported license
   Activity rendered there, and an authorized read-only root process-memory copy supported local
-  current-Java analysis (C-183--C-187). The APK, memory mapping A-034, extracted DEX, decompiled
-  source and raw logs are excluded; only independently written scanner source and high-level facts
-  are published.
+  current-Java analysis and the ART TI same-process query experiment (C-183--C-191). The APK,
+  memory mapping A-034, extracted DEX, decompiled source and raw logs are excluded; only
+  independently written scanner/agent/parser source and high-level facts are published.
 
 ## Reverse-source snapshots and protocol prior art
 

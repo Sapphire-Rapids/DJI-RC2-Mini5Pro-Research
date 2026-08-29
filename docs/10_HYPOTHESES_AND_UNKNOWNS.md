@@ -360,17 +360,20 @@ Every hypothesis below is testable and remains separate from factual findings.
 - Current state: `NOT ADMITTED` and entirely unexecuted. MTP staging is not runtime evidence; no
   internal path is preselected until the baseline is observed.
 
-## H-31 — official aircraft tab can supply transport truth but not type-6 semantics（C-183--C-186）
+## H-31 — exact same-process query can supply transport truth but current Java cannot supply type-6 semantics（C-183--C-191）
 
 - Known facts: exact current Java closes the official Activity/view-model/native query owner and the
   generic existing-ID setter. The same Java version defines only license types 0--4 plus unknown,
   protobuf fields 1--5, and routes unknown records into a tolerant polygon model.
-- Hypothesis: on the linked RC 2/Mini 5 Pro session, the official aircraft tab can distinguish a
-  completed same-process query from login/link/version/support failure even though its row type may
-  be semantically wrong.
-- Distinguishing evidence: one motor-off observation of the official aircraft tab, preserving exact
-  completion/error and only privacy-reduced visible row metadata, followed by one A-033 external
-  diagnostic export. An odd polygon/unknown row is recorded as a candidate mismatch, never promoted
-  to type 6 without an independent canonical parser or signed source identity.
-- Current state: `UNKNOWN` on RC 2. Emulator rendering proves only Activity viability. No toggle,
-  `0x11/0x12`, motor action or RF test belongs to this first observation.
+- New emulator fact: ART TI `0x70010200` reached the exact loaded owner, dispatched its private
+  current-device query and received callback `417` with no aircraft while the PID stayed unchanged.
+  The independent success parser can identify a unique MSDK-compatible field-7 candidate without
+  logging its ID. Standard JVMTI 1.2 is a retired crash path.
+- Hypothesis: once the same agent has an admitted RC 2 loader, the linked RC 2/Mini 5 Pro session
+  will return a canonical success group that the independent parser can classify even though the
+  current UI row type may be semantically wrong.
+- Distinguishing evidence: one motor-off query-only attach with a fresh callback, stable target PID,
+  declared/observed count equality and privacy-reduced type-6 count/level/status. A generic or odd
+  polygon row is never promoted to type 6 without the independent field-7 parser.
+- Current state: `UNKNOWN` on RC 2. The emulator closes owner/callback plumbing but not device
+  loading or aircraft inventory. No setter, motor action or RF test belongs to the first RC 2 run.

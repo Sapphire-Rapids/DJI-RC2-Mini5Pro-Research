@@ -1,7 +1,13 @@
 # FindUAS Android 11 JVMTI attach canary
 
-Status: **NOT ADMITTED**. Offline implementation and static audit complete; never installed and
-never attached to the RC 2.
+Status: **NOT ADMITTED on RC 2**. Offline implementation and static audit complete; never installed
+or attached on RC 2. A relocated source build was later attached only to exact DJI Fly `1.21.10` in
+a disposable Android 11 emulator and the target crashed before the canary logged (C-188).
+
+**Superseded interface warning:** this V0 requests standard JVMTI 1.2. Android 11's late-loaded
+non-debuggable ART path requires ART TI `0x70010200`; the source-only successor using that version
+attached cleanly (C-189/C-190). Do not use this V0 for an RC 2 attach. See
+[jvmti_flysafe_inprocess_query](../jvmti_flysafe_inprocess_query/README.md).
 
 This is a deliberately narrow V0 carrier APK for one future question: can Android 11 load a
 harmless, ABI-matched JVMTI agent into the already-running DJI Fly process? It does not inspect DJI

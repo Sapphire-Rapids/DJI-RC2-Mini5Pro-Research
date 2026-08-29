@@ -154,8 +154,17 @@
   emulator 中真实渲染，证明 UI/owner 存在但不是 RC 2/飞机结果。
 - Exact current Java 同时给出一个重要阴性：`LicenseType` 只有 0--4 + `UNKNOWN`，`LicenseData`
   只有 fields 1--5，未知记录会落入可容忍空 polygon 的普通兜底。也就是说 DJI Fly 1.21.10 UI
-  不能语义识别 type-6 `RID_UNLOCK`，可能误分类；这不否定 native/FC/opaque server 支持。下一步
-  仍应只读查看 official aircraft list，再跑一次 A-033，而不是继续猜 external Binder route。
+  不能语义识别 type-6 `RID_UNLOCK`，可能误分类；这不否定 native/FC/opaque server 支持。
+- Disposable Android 11 emulator 已进一步闭合 official owner 的真实调用：标准 JVMTI 1.2
+  late attach 会在 canary 日志前导致 exact DJI Fly 进程 native crash；改用 ART TI
+  `0x70010200` 后，同一 PID 内精确取得 FlySafe owner/current device ID，并成功派发一次 private
+  FC-license query。因 emulator 没有飞机，回调为 `417`，PID 保持不变（C-188--C-190）。
+- 新增 source-only
+  [same-process query experiment](experiments/jvmti/jvmti_flysafe_inprocess_query/README.md)：
+  success callback 独立解析嵌入式 license group，核对 count，识别 MSDK-compatible field-7
+  type-6 candidate，只输出 count/level/status，license ID 只保留在内存。五个 synthetic host cases
+  与 helper DEX/AArch64 agent build 通过（C-191）。下一步是为 RC 2 准入 same-process loader，
+  不再继续猜 external Binder route。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
@@ -250,7 +259,8 @@
   [ELF analysis](host-tools/elf-analysis/README.md)、
   [Ghidra scripts](host-tools/ghidra-scripts/README.md)、
   [runtime DEX boundary scanner](host-tools/runtime-dex-scan/README.md)。
-- 历史实验：[country/area round trips](experiments/device-write/README.md) 与
+- 实验源码：[same-process FlySafe query](experiments/jvmti/jvmti_flysafe_inprocess_query/README.md)、
+  [country/area round trips](experiments/device-write/README.md) 与
   [JVMTI experiment sequence](experiments/jvmti/README.md)。撤回或尚未准入的路线保留原状态，
   不因为源码公开而变成已验证功能。
 

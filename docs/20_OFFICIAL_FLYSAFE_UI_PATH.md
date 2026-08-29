@@ -79,6 +79,34 @@ exact current DJI Fly Java UI therefore cannot be treated as a semantic type-6 r
 RID switch. This does **not** prove that the native layer, FC firmware or a server-supplied opaque
 record lacks type-6 support.
 
+## Android 11 ART TI same-process query
+
+`NEGATIVE` then `OBSERVED`, exact DJI Fly `1.21.10` on the disposable AArch64 Android 11 emulator:
+
+- a no-op late-load agent requesting standard JVMTI 1.2 ended in a native DJI Fly process crash
+  before its canary logged (C-188);
+- Android 11 ART source identifies `0x70010200` as the late-loaded ART TI environment version;
+- an independently written agent using that version attached without restarting the process,
+  enumerated the already-loaded classes once, found exactly one unlock owner and one event owner,
+  obtained their singleton objects and a nonzero current device ID (C-189);
+- a second source-only agent loaded a tiny callback through `InMemoryDexClassLoader`, registered
+  only its two callback natives, invoked the existing private current-device FC-license query once,
+  and received failure code `417` (C-190);
+- agent stage was zero, dispatch count was one, and the DJI Fly PID before and after was identical.
+
+The emulator had no aircraft, so `417` is the boundary of this run: it validates the exact
+same-process owner, private-native invocation and callback plumbing, but supplies no successful
+inventory bytes. The public experiment contains an independent parser for the returned
+`LicenseGroupModel` envelope. It reconciles declared/observed record counts, recognizes the
+separate MSDK-compatible field-7 RID candidate and keeps a unique existing license ID only in
+memory; five synthetic host cases and the source build pass (C-191).
+
+This materially supersedes another external Binder route guess. It does not yet solve how an
+ordinary APK on RC 2 loads into DJI Fly: the emulator observation used an authorized root shell
+and an executable file label. The RC 2 admission dependency is now a usable userspace ADB shell or
+another proved same-process loader, followed by one query-only run with a fresh callback and stable
+PID.
+
 ## Prepared operator observation
 
 Keep motors stopped and do not toggle a license in this pass.
@@ -90,8 +118,8 @@ Keep motors stopped and do not toggle a license in this pass.
 5. If rows exist, record only visible generic type/status/validity/switch state. Do not infer type 6
    from an unlabeled row and do not open identity details.
 6. Close the page normally without changing any switch.
-7. Install and run A-033 once, then return
-   `Download/FindUAS/FindUAS_RID_A033_latest.txt` from removable storage.
+7. Keep A-033 available only as the historical external-Binder comparison. The next higher-value
+   assisted run is the source-only same-process query after an RC 2 loader is admitted.
 
 Interpretation:
 
@@ -104,7 +132,9 @@ Interpretation:
 
 ## Current disposition
 
-The exact current owner and generic existing-ID action are now closed statically, while current
-Java type-6 semantics are closed negatively. The RC 2 official-page observation and A-033 run remain
-pending operator availability. No license toggle, `0x11/0x12` action, motor start or RF experiment
+The exact current owner and generic existing-ID action are closed statically, current Java type-6
+semantics are closed negatively, and the exact private query plus callback is now observed in the
+disposable emulator through ART TI. The success-side raw inventory parser is implemented and
+synthetically tested, but the emulator cannot produce an aircraft callback. RC 2 still lacks an
+admitted same-process loader. No license toggle, `0x11/0x12` action, motor start or RF experiment
 has been performed as part of this path.

@@ -141,13 +141,17 @@
 
 该族只存在于本地排除区，覆盖 disposable ARM64 Android 11 emulator 上的 exact DJI Fly
 `1.21.10` Activity 观察、process mapping identity、bounded DEX recovery 与 decompiler working
-output。
+output，以及 ART TI canary/owner/query 的本地 emulator 日志。
 
 - `OBSERVED`：non-exported official license-manager Activity 在 emulator 中渲染；无 aircraft 时
   aircraft tab 请求连接（C-183）。
 - `STATIC`：local recovered Java 支持 C-184--C-186 的 current owner、generic action 与 type-6
   incompatibility 结论。
 - `NEGATIVE`：direct Frida attach 未产出文件并使 app 退出（C-187）。
+- `NEGATIVE`：standard JVMTI 1.2 late attach 在 canary 日志前结束 target process（C-188）。
+- `OBSERVED`：ART TI `0x70010200` owner/query 取得 nonzero current device ID、dispatch=1、callback
+  `417` 且 PID 不变（C-189/C-190）；无 aircraft，因此没有 success payload。
+- `STATIC`：公开 source-only parser/build 支持 C-191；生成 DEX/SO 不入库。
 - 处置：APK/mapping/DEX/decompiled source/raw logs 全部排除；仅 A-006/A-034 identity、独立 scanner
   source、事实与边界入库。不得从本地文件复制 vendor method body。
 

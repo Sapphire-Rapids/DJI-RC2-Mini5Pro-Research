@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.4.2 - 2026-08-29
+
+### Added
+
+- Registered C-188--C-191 for the disposable-emulator ART TI experiment: the standard JVMTI 1.2
+  late-load negative, clean ART TI `0x70010200` owner reachability, one exact private FC-license
+  query callback, and the independent success-side group/type-6 parser.
+- Added source-only `experiments/jvmti/jvmti_flysafe_inprocess_query`, including the AArch64 agent,
+  in-memory callback DEX source, exact compile-time callback stub, minimal protobuf parser, five
+  synthetic host cases and direct build scripts. Generated DEX/SO output is ignored and excluded.
+- The parser reconciles declared/observed record counts, identifies a unique MSDK-compatible
+  field-7 RID candidate, keeps its existing ID in memory only, and exposes counts, level and status
+  Booleans.
+
+### Observed boundary
+
+- On exact DJI Fly `1.21.10` in a disposable AArch64 Android 11 emulator, standard JVMTI 1.2 ended
+  in a native process crash before the canary logged. ART TI attached cleanly, found exactly one
+  loaded unlock/event owner pair, obtained a nonzero current device ID, dispatched the private
+  query once and received callback `417`; the PID before and after was identical.
+- No aircraft was connected, so no success payload, inventory or type-6 item was observed. The
+  result does not establish RC 2 loading, entitlement, setter behavior, restore or RF effect.
+
+### Verification
+
+- Five synthetic parser cases passed. The helper DEX and Android 30/AArch64 agent built with JDK 21,
+  build-tools 35 and NDK 27.2.12479018.
+- Vendor APK/DEX/process-memory bytes, raw logs, license IDs and generated binaries remain excluded.
+
 ## 0.4.1 - 2026-08-29
 
 ### Added

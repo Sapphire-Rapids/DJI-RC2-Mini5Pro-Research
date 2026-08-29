@@ -553,3 +553,22 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：exact current `LicenseType` and `LicenseData` model only types/tags 0--4/1--5. Unknown
   values fall into a tolerant polygon model, so this Java UI cannot semantically identify type 6
   `RID_UNLOCK`; separate MSDK 5.18 type-6 support remains a different artifact (C-185).
+
+### 2026-08-29 — ART TI same-process FlySafe query callback
+
+- `NEGATIVE`: a source-only no-op late-load agent requesting standard JVMTI 1.2 caused the exact
+  non-debuggable DJI Fly emulator process to terminate in a native crash before its canary logged.
+  Android 11 ART source instead identifies `0x70010200` as the applicable ART TI version (C-188).
+- `OBSERVED`: the ART TI canary attached cleanly. The owner probe enumerated the loaded classes
+  once, found exactly one unlock and event owner, obtained both singletons plus a nonzero current
+  device ID, and left the PID unchanged (C-189).
+- `OBSERVED`: the query agent loaded an independent callback through `InMemoryDexClassLoader`,
+  registered only its callback natives and invoked the exact private current-device FC-license
+  query once. Stage was zero, dispatch count one, callback failure was `417`, and the PID was still
+  unchanged (C-190).
+- The disposable emulator had no aircraft, so no success payload or inventory existed. Error `417`
+  is not support, entitlement, empty-inventory, RID-off or RF evidence.
+- `STATIC`: the public source-only successor adds an independent embedded-group parser, keeps a
+  unique license ID in memory only, exposes counts/level/status Booleans, passes five synthetic
+  host cases and builds its helper DEX plus AArch64 agent. Generated binaries and all vendor data
+  remain excluded (C-191).

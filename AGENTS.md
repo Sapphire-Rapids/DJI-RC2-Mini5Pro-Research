@@ -265,6 +265,15 @@ Later retractions override earlier progress summaries.
     setter exists but was never executed. Direct Frida attach produced no artifact and must not be
     repeated on RC 2. Vendor APK/memory/DEX/decompiled output remain local and excluded; only the
     independent boundary scanner and evidence record are public.
+38. Android 11 same-process FlySafe reachability is now observed on the disposable emulator.
+    Standard JVMTI 1.2 late attach crashed the exact non-debuggable DJI Fly process before its
+    canary logged; do not repeat it on RC 2. ART TI `0x70010200` attached cleanly, found exactly one
+    loaded unlock/event owner pair, obtained a nonzero current device ID, dispatched the private
+    FC-license query once, received callback `417` with no aircraft, and left the PID unchanged
+    (C-188--C-190). The independent success parser is source-only, synthetically tested and keeps
+    any unique existing license ID in memory/out of logs (C-191). This proves emulator owner/callback
+    plumbing, not an RC 2 loader, inventory, entitlement, setter, restore or RF effect. The next
+    route is an admitted RC 2 same-process loader; A-033 remains an external-Binder comparison.
 
 ## Privacy and redaction
 

@@ -36,7 +36,7 @@ change Remote ID behavior on a device.
 | `host-tools/ghidra-scripts/` | Targeted Ghidra symbol/xref/decompiler helpers | Source only; no program database, vendor binary, or decompiler output |
 | `host-tools/runtime-dex-scan/` | Small bounded DEX-image scanner for an already authorized raw-memory file | Host-tested source and synthetic tests only; no process dumper, vendor memory, DEX or decompiled output |
 | `experiments/device-write/` | Historical bounded country/area round-trip scripts | FC/Sky `CN -> US -> CN` observed; Ground write unacknowledged; no RID/RF conclusion |
-| `experiments/jvmti/` | Six source-only Android/JVMTI research stages | V2.2 is `RETRACTED`; V2.3 and the other stages remain `NOT ADMITTED` |
+| `experiments/jvmti/` | Seven source-only Android/JVMTI/ART TI research stages | V2.2 is `RETRACTED`; the exact-owner query is emulator-`OBSERVED` but RC 2-`NOT ADMITTED`; all other active stages retain their recorded status |
 
 Decompiled DJI/Fly/Fuli trees, extracted framework code, firmware, public-repository clones, Ghidra
 projects, virtual environments, raw logs, and downloaded commercial tools remain references rather
