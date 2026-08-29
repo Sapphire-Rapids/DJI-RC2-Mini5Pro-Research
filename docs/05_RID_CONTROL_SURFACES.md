@@ -731,6 +731,14 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   `--rid-ctrl-bridge` 只读探针；Android 面板侧 `RidEuC0Parameter` codec 镜像其 F7/F8/F9 语义
   （C-196/C-197）。两者均为 `STATIC` 离线源码，不改变本节的 live `NEGATIVE` 结论，也不提供
   官方功能描述或合规条文。
+- **面板独立通路：** `MainActivity` 现为 `EU_CE_enable_c0_rid_0` 增加与 `rid_ctrl_enable_0`
+  分离的只读探测/关闭/开启/恢复按钮；写按钮仅在 EU C0 F7/F8 基线与 live route 通过后解锁，
+  每次 F9 前重新探测 F7/F8，读回两次，任何未确认状态立即恢复基线（C-199）。UI 文案明确
+  单次 F8 读回不代表重连后保持。
+- **重连覆盖边界：** pinned FreeFCC 公开文本记载 DJI Fly 以 C0 class runtime flag 在每次连接时
+  覆盖飞控参数，`cmd_set=3`/`cmd_id=0xF9` 的 DUML 写入会在每次 reconnect 被覆盖（C-198）。该
+  文本未指名 `EU_CE_enable_c0_rid_0` 的 owner，也未证明 RID 相关 C0 flag 与高度 C0 cap 同层；
+  因此可靠开关必须包含断开/重连后的持久性负结果或假设，不能以单次 A-B-A 作为可靠性结论。
 
 ### RID-010：broadcast-effect policy 映射存在，但 bit 语义和 live metadata 未闭合
 

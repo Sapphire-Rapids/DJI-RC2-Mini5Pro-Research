@@ -1513,12 +1513,15 @@ final class DjiProtocolClient {
                     || (payload.length == 18 && payload[0] == 0 && payload[1] == 0x10);
         }
         if (cmdId == CMD_PARAM_INFO_BY_HASH) {
-            return isRidControlHash(payload) || isHeightLimitHash(payload);
+            return isRidControlHash(payload)
+                    || isHeightLimitHash(payload)
+                    || isEuC0Hash(payload);
         }
         if (cmdId == CMD_PARAM_READ_BY_HASH) {
-            return isRidControlHash(payload);
+            return isRidControlHash(payload) || isEuC0Hash(payload);
         }
-        return cmdId == CMD_PARAM_WRITE_BY_HASH && isRidControlBooleanWrite(payload);
+        return cmdId == CMD_PARAM_WRITE_BY_HASH
+                && (isRidControlBooleanWrite(payload) || isEuC0BooleanWrite(payload));
     }
 
     private static boolean isRidControlHash(byte[] payload) {
@@ -1527,6 +1530,14 @@ final class DjiProtocolClient {
                 && payload[1] == (byte) 0x86
                 && payload[2] == (byte) 0xbd
                 && payload[3] == 0x3c;
+    }
+
+    private static boolean isEuC0Hash(byte[] payload) {
+        return payload.length == 4
+                && payload[0] == (byte) 0xfe
+                && payload[1] == (byte) 0x92
+                && payload[2] == (byte) 0x09
+                && payload[3] == (byte) 0xf8;
     }
 
     private static boolean isHeightLimitHash(byte[] payload) {
@@ -1542,6 +1553,36 @@ final class DjiProtocolClient {
             return false;
         }
         if (!isRidControlHash(Arrays.copyOf(payload, 4))) {
+            return false;
+        }
+        int width = payload.length - 4;
+        boolean zero = true;
+        for (int index = 4; index < payload.length; index++) {
+            zero &= payload[index] == 0;
+        }
+        if (zero) {
+            return true;
+        }
+        if (payload[4] == 1) {
+            for (int index = 5; index < payload.length; index++) {
+                if (payload[index] != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return width == 4
+                && payload[4] == 0
+                && payload[5] == 0
+                && payload[6] == (byte) 0x80
+                && payload[7] == 0x3f;
+    }
+
+    private static boolean isEuC0BooleanWrite(byte[] payload) {
+        if (payload.length != 5 && payload.length != 6 && payload.length != 8) {
+            return false;
+        }
+        if (!isEuC0Hash(Arrays.copyOf(payload, 4))) {
             return false;
         }
         int width = payload.length - 4;

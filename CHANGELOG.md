@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.4.9 - 2026-08-29
+
+### Added
+
+- Wired `RidEuC0Parameter` into `MainActivity` as a separate EU C0 surface for
+  `EU_CE_enable_c0_rid_0` (`0xF80992FE`): read-only F7/F8 probe plus off/on/restore
+  buttons with independent metadata/baseline/route state. Write buttons stay disabled
+  until an F7/F8 baseline and live route pass, every F9 re-probes F7/F8, readback is
+  sampled twice, and any unconfirmed state restores the baseline.
+- Extended the `DjiProtocolClient` parameter allow-list to admit the EU C0 F7/F8/F9
+  tuples separately from `rid_ctrl_enable_0`, plus a new allow-list test.
+
+### Fixed
+
+- Corrected the panel positive-control name `HEIGHT_LIMIT_NAME` to
+  `g_config.flying_limit.max_height_0`, matching hash `0x0371238A`.
+
+### Boundary
+
+- Pinned public FreeFCC prior art (C-198) documents a C0 class runtime flag that
+  overrides flight-controller parameters on every connection, so a single F8 readback
+  is not a reconnect-persistence or reliability result. All panel wiring is offline
+  source plus synthetic tests (C-199); no live EU C0 read/write is claimed and the
+  Binder generic attach route has not been shown to carry the EU C0 parameter.
+
 ## 0.4.8 - 2026-08-29
 
 ### Added

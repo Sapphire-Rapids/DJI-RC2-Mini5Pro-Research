@@ -152,4 +152,35 @@ public final class DjiProtocolClientAllowlistTest {
         assertThrows(IllegalArgumentException.class,
                 () -> DjiProtocolClient.callbackWaitMillis(0));
     }
+
+    @Test
+    public void euC0ByHashCommandsAreAllowListedSeparatelyFromRidCtrl() {
+        // F7 metadata (hash 0xF80992FE) and F8 read are read-only and allowed on both routes.
+        DjiProtocolClient.validateAllowedRequest(
+                DjiProtocolClient.RC2_LEGACY_FC, 0x03,
+                DjiProtocolClient.CMD_PARAM_INFO_BY_HASH,
+                new byte[] {(byte) 0xfe, (byte) 0x92, 0x09, (byte) 0xf8}, 1000);
+        DjiProtocolClient.validateAllowedRequest(
+                DjiProtocolClient.MODERN_FC4, 0x03,
+                DjiProtocolClient.CMD_PARAM_READ_BY_HASH,
+                new byte[] {(byte) 0xfe, (byte) 0x92, 0x09, (byte) 0xf8}, 1000);
+
+        // F9 Boolean write in both width-1 and float32 forms.
+        DjiProtocolClient.validateAllowedRequest(
+                DjiProtocolClient.RC2_LEGACY_FC, 0x03,
+                DjiProtocolClient.CMD_PARAM_WRITE_BY_HASH,
+                new byte[] {(byte) 0xfe, (byte) 0x92, 0x09, (byte) 0xf8, 1}, 1000);
+        DjiProtocolClient.validateAllowedRequest(
+                DjiProtocolClient.RC2_LEGACY_FC, 0x03,
+                DjiProtocolClient.CMD_PARAM_WRITE_BY_HASH,
+                new byte[] {(byte) 0xfe, (byte) 0x92, 0x09, (byte) 0xf8,
+                        0, 0, (byte) 0x80, 0x3f}, 1000);
+
+        // A different hash is not admitted for the EU C0 F8 read path.
+        assertThrows(IllegalArgumentException.class,
+                () -> DjiProtocolClient.validateAllowedRequest(
+                        DjiProtocolClient.RC2_LEGACY_FC, 0x03,
+                        DjiProtocolClient.CMD_PARAM_READ_BY_HASH,
+                        new byte[] {0x4f, (byte) 0x86, (byte) 0xbd, 0x3c, 1}, 1000));
+    }
 }

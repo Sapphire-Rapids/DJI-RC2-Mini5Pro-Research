@@ -48,11 +48,17 @@ public final class MainActivity extends Activity {
     private RidControlParameter.Metadata ridControlMetadata;
     private Boolean ridControlBaseline;
     private DjiProtocolClient.Route ridControlRoute;
+    private Button ridEuC0DisableButton;
+    private Button ridEuC0EnableButton;
+    private Button ridEuC0RestoreButton;
+    private RidEuC0Parameter.Metadata ridEuC0Metadata;
+    private Boolean ridEuC0Baseline;
+    private DjiProtocolClient.Route ridEuC0Route;
     private String ridRouteProbeDiagnostic;
 
     private static final int PARAM_READBACK_ATTEMPTS = 4;
     private static final int HEIGHT_LIMIT_HASH = 0x0371238A;
-    private static final String HEIGHT_LIMIT_NAME = "g_config.flying_limit.max_height";
+    private static final String HEIGHT_LIMIT_NAME = "g_config.flying_limit.max_height_0";
     private static final String RESULT_PREFS = "flysafe_gate_result";
     private static final String RESULT_KEY = "last_privacy_reduced_result";
 
@@ -144,6 +150,23 @@ public final class MainActivity extends Activity {
         ridRestoreButton = button("恢复本次读取到的候选参数基线", () ->
                 runOperation("正在恢复候选参数…", this::restoreRidControl));
         content.addView(ridRestoreButton);
+        content.addView(text(
+                "EU C0 独立通路：只对 EU_CE_enable_c0_rid_0（0xF80992FE）执行"
+                        + " F7/F8 只读探测；只有 F7/F8 基线通过后，开关按钮才会发送 F9。"
+                        + " 该参数是 EU C0 策略候选，不是全局 RID 主开关；写入不代表空口广播改变。",
+                14,
+                Color.DKGRAY));
+        content.addView(button("探测并读取 EU C0 参数（只读）", () ->
+                runOperation("正在探测 EU C0 参数…", this::readRidEuC0)));
+        ridEuC0DisableButton = button("关闭 EU C0 候选参数并读回", () ->
+                runOperation("正在关闭 EU C0 候选参数…", () -> setAndReadRidEuC0(false)));
+        content.addView(ridEuC0DisableButton);
+        ridEuC0EnableButton = button("开启 EU C0 候选参数并读回", () ->
+                runOperation("正在开启 EU C0 候选参数…", () -> setAndReadRidEuC0(true)));
+        content.addView(ridEuC0EnableButton);
+        ridEuC0RestoreButton = button("恢复 EU C0 候选参数基线", () ->
+                runOperation("正在恢复 EU C0 候选参数…", this::restoreRidEuC0));
+        content.addView(ridEuC0RestoreButton);
         content.addView(button("刷新 EID 状态", () -> runOperation("正在读取 EID…", this::readEid)));
         content.addView(button("关闭法国 EID 并读回", () ->
                 runOperation("正在关闭并读回…", () -> setAndReadEid(false))));
@@ -245,6 +268,19 @@ public final class MainActivity extends Activity {
         }
         if (ridRestoreButton != null) {
             ridRestoreButton.setEnabled(candidateReady);
+        }
+        boolean euC0CandidateReady = idle
+                && ridEuC0Metadata != null
+                && ridEuC0Baseline != null
+                && ridEuC0Route != null;
+        if (ridEuC0DisableButton != null) {
+            ridEuC0DisableButton.setEnabled(euC0CandidateReady);
+        }
+        if (ridEuC0EnableButton != null) {
+            ridEuC0EnableButton.setEnabled(euC0CandidateReady);
+        }
+        if (ridEuC0RestoreButton != null) {
+            ridEuC0RestoreButton.setEnabled(euC0CandidateReady);
         }
     }
 
@@ -774,6 +810,213 @@ public final class MainActivity extends Activity {
         return setAndReadRidControl(ridControlBaseline);
     }
 
+    private String readRidEuC0() throws Exception {
+        RidEuC0Read read = probeRidEuC0(client());
+        return ridEuC0Display("EU C0 候选参数", read)
+                + "\nROUTE PROBE: " + ridRouteProbeDiagnostic
+                + "\n据 FreeFCC 公开记载，DJI Fly 的 C0 class 运行时标志会在每次连接时覆盖飞控参数；"
+                + "单次 F8 读回不等于重连后仍保持。"
+                + diagnosticBlock("EU C0 F7", read.metadataReply)
+                + diagnosticBlock("EU C0 F8", read.valueReply);
+    }
+
+    private RidEuC0Read probeRidEuC0(DjiProtocolClient client) throws Exception {
+        DjiProtocolClient.Route route = findWorkingParameterRoute(client);
+        DjiProtocolClient.Reply metadataReply = client.request(
+                route,
+                DjiProtocolClient.CMD_PARAM_INFO_BY_HASH,
+                RidEuC0Parameter.buildHashRequestPayload());
+        requireSuccess(metadataReply, "EU C0 F7");
+
+        final RidEuC0Parameter.Metadata metadata;
+        try {
+            metadata = RidEuC0Parameter.parseF7Metadata(metadataReply.data);
+        } catch (RidEuC0Parameter.ProtocolException exception) {
+            throw new IllegalStateException(exception.getMessage()
+                    + "\nROUTE PROBE: " + ridRouteProbeDiagnostic
+                    + diagnosticBlock("EU C0 F7", metadataReply), exception);
+        }
+
+        RidEuC0Read read = readRidEuC0Value(client, route, metadata, metadataReply);
+        ridEuC0Route = route;
+        ridEuC0Metadata = metadata;
+        if (ridEuC0Baseline == null) {
+            ridEuC0Baseline = read.value.isEnabled();
+        }
+        return read;
+    }
+
+    private RidEuC0Read readRidEuC0Value(
+            DjiProtocolClient client,
+            DjiProtocolClient.Route route,
+            RidEuC0Parameter.Metadata metadata,
+            DjiProtocolClient.Reply metadataReply) throws Exception {
+        DjiProtocolClient.Reply valueReply = client.request(
+                route,
+                DjiProtocolClient.CMD_PARAM_READ_BY_HASH,
+                RidEuC0Parameter.buildHashRequestPayload());
+        requireSuccess(valueReply, "EU C0 F8");
+        final RidEuC0Parameter.Value value;
+        try {
+            value = RidEuC0Parameter.parseF8Value(valueReply.data, metadata);
+        } catch (RidEuC0Parameter.ProtocolException exception) {
+            throw new IllegalStateException(exception.getMessage()
+                    + diagnosticBlock("EU C0 F8", valueReply), exception);
+        }
+        return new RidEuC0Read(metadata, value, metadataReply, valueReply);
+    }
+
+    private String setAndReadRidEuC0(boolean enabled) throws Exception {
+        DjiProtocolClient client = client();
+        // Refresh F7/F8 and the live route immediately before every write.
+        RidEuC0Read before = probeRidEuC0(client);
+        if (before.value.isEnabled() == enabled) {
+            return ridEuC0Display("EU C0 候选参数已经是目标值，未发送 F9", before)
+                    + "\n这只代表参数值，不代表真实 RID 空口广播；重连后可能被 DJI Fly 覆盖。";
+        }
+
+        byte[] setPayload = RidEuC0Parameter.buildSetPayload(enabled, ridEuC0Metadata);
+        DjiProtocolClient.Reply setReply = null;
+        Throwable setIssue = null;
+        try {
+            setReply = client.request(
+                    ridEuC0Route,
+                    DjiProtocolClient.CMD_PARAM_WRITE_BY_HASH,
+                    setPayload);
+            requireSuccess(setReply, "EU C0 F9");
+            requireEuC0ParamWriteStatus(setReply);
+        } catch (Throwable throwable) {
+            setIssue = throwable;
+        }
+
+        RidEuC0Read readback = null;
+        Throwable readbackIssue = null;
+        try {
+            readback = pollRidEuC0Value(client, enabled);
+        } catch (Throwable throwable) {
+            readbackIssue = throwable;
+        }
+        if (readback != null && readback.value.isEnabled() == enabled) {
+            return ridEuC0Display("EU C0 候选参数写入并连续读回一致", readback)
+                    + (setIssue == null ? "" : "\nF9 ACK 异常，但 F8 已确认目标值：" + setIssue)
+                    + "\n尚未证明 RID 广播改变，且重连后可能被 DJI Fly C0 运行时标志覆盖；"
+                    + "必须结合独立接收机做断开/重连后的空口 A-B/A。"
+                    + diagnosticBlock("EU C0 F9", setReply)
+                    + diagnosticBlock("EU C0 F8", readback.valueReply);
+        }
+
+        boolean restoreValue = before.value.isEnabled();
+        DjiProtocolClient.Reply restoreReply = null;
+        Throwable restoreIssue = null;
+        try {
+            restoreReply = client.request(
+                    ridEuC0Route,
+                    DjiProtocolClient.CMD_PARAM_WRITE_BY_HASH,
+                    RidEuC0Parameter.buildSetPayload(restoreValue, ridEuC0Metadata));
+            requireSuccess(restoreReply, "EU C0 F9 ROLLBACK");
+            requireEuC0ParamWriteStatus(restoreReply);
+        } catch (Throwable throwable) {
+            restoreIssue = throwable;
+        }
+
+        RidEuC0Read restored = null;
+        Throwable rollbackReadIssue = null;
+        try {
+            restored = pollRidEuC0Value(client, restoreValue);
+        } catch (Throwable throwable) {
+            rollbackReadIssue = throwable;
+        }
+        if (restored != null) {
+            throw new IllegalStateException(
+                    "EU C0 候选参数写入未能可靠确认，已恢复操作前状态："
+                            + (restoreValue ? "开启" : "关闭")
+                            + "\n原 F9：" + issueSummary(setIssue)
+                            + "\n原 F8：" + issueSummary(readbackIssue)
+                            + "\n恢复 F9：" + issueSummary(restoreIssue)
+                            + diagnosticBlock("EU C0 ROLLBACK F9", restoreReply)
+                            + diagnosticBlock("EU C0 ROLLBACK F8", restored.valueReply));
+        }
+        throw new IllegalStateException(
+                "EU C0 候选参数状态 UNKNOWN：写入后无法确认，恢复也未能读回。"
+                        + "请勿继续点击写入；重新连接后先做只读探测。"
+                        + "\n原 F9：" + issueSummary(setIssue)
+                        + "\n原 F8：" + issueSummary(readbackIssue)
+                        + "\n恢复 F9：" + issueSummary(restoreIssue)
+                        + "\n恢复 F8：" + issueSummary(rollbackReadIssue)
+                        + diagnosticBlock("EU C0 ROLLBACK F9", restoreReply),
+                rollbackReadIssue);
+    }
+
+    private RidEuC0Read pollRidEuC0Value(DjiProtocolClient client, boolean expected)
+            throws Exception {
+        RidEuC0Read lastRead = null;
+        Throwable lastIssue = null;
+        for (int attempt = 1; attempt <= PARAM_READBACK_ATTEMPTS; attempt++) {
+            Thread.sleep(200L * attempt);
+            try {
+                lastRead = readRidEuC0Value(client, ridEuC0Route, ridEuC0Metadata, null);
+                if (lastRead.value.isEnabled() == expected) {
+                    // Require a second consistent sample so a transient cache value is not enough.
+                    Thread.sleep(200);
+                    RidEuC0Read confirmation = readRidEuC0Value(
+                            client, ridEuC0Route, ridEuC0Metadata, null);
+                    if (confirmation.value.isEnabled() == expected) {
+                        return confirmation;
+                    }
+                    lastRead = confirmation;
+                }
+            } catch (Throwable throwable) {
+                lastIssue = throwable;
+            }
+        }
+        if (lastRead != null) {
+            throw new IllegalStateException(
+                    "EU C0 F8 未连续读回预期值 " + (expected ? 1 : 0)
+                            + diagnosticBlock("EU C0 F8 LAST", lastRead.valueReply));
+        }
+        if (lastIssue instanceof Exception) {
+            throw (Exception) lastIssue;
+        }
+        throw new IllegalStateException("EU C0 F8 读回失败：" + issueSummary(lastIssue));
+    }
+
+    private String restoreRidEuC0() throws Exception {
+        if (ridEuC0Baseline == null || ridEuC0Metadata == null) {
+            return "尚未取得 EU C0 基线，请先执行只读探测";
+        }
+        return setAndReadRidEuC0(ridEuC0Baseline);
+    }
+
+    private static void requireEuC0ParamWriteStatus(DjiProtocolClient.Reply reply) {
+        if (reply.data == null || reply.data.length < 1) {
+            // requireSuccess() has already required ccode == 0; F8 readback remains authoritative.
+            return;
+        }
+        int statusValue = reply.data[0] & 0xff;
+        if (statusValue != 0) {
+            throw new IllegalStateException(String.format(Locale.US,
+                    "EU C0 F9 status=0x%02X", statusValue)
+                    + diagnosticBlock("EU C0 F9", reply));
+        }
+    }
+
+    private String ridEuC0Display(String prefix, RidEuC0Read read) {
+        RidEuC0Parameter.Metadata metadata = read.metadata;
+        return prefix + "：" + (read.value.isEnabled() ? "开启" : "关闭")
+                + "；基线：" + (ridEuC0Baseline != null && ridEuC0Baseline ? "开启" : "关闭")
+                + "\nparam=" + metadata.getName()
+                + " hash=0x" + String.format(Locale.US, "%08X", metadata.getHash())
+                + " route=" + (ridEuC0Route == null ? "<unknown>" : ridEuC0Route.summary())
+                + " type=" + metadata.getType()
+                + " size=" + metadata.getSize()
+                + " attr=0x" + String.format(Locale.US, "%04X", metadata.getAttribute())
+                + " layout=" + read.value.getLayout()
+                + " raw=" + hex(read.value.getRaw())
+                + " min/max/default=" + hex(metadata.getMinimumRaw())
+                + "/" + hex(metadata.getMaximumRaw())
+                + "/" + hex(metadata.getDefaultRaw());
+    }
+
     private static void requireParamWriteStatus(DjiProtocolClient.Reply reply) {
         if (reply.data == null || reply.data.length < 1) {
             // The RC331 Pack layer may expose the one-byte result as ccode and leave data empty.
@@ -825,6 +1068,24 @@ public final class MainActivity extends Activity {
         RidControlRead(
                 RidControlParameter.Metadata metadata,
                 RidControlParameter.Value value,
+                DjiProtocolClient.Reply metadataReply,
+                DjiProtocolClient.Reply valueReply) {
+            this.metadata = metadata;
+            this.value = value;
+            this.metadataReply = metadataReply;
+            this.valueReply = valueReply;
+        }
+    }
+
+    private static final class RidEuC0Read {
+        final RidEuC0Parameter.Metadata metadata;
+        final RidEuC0Parameter.Value value;
+        final DjiProtocolClient.Reply metadataReply;
+        final DjiProtocolClient.Reply valueReply;
+
+        RidEuC0Read(
+                RidEuC0Parameter.Metadata metadata,
+                RidEuC0Parameter.Value value,
                 DjiProtocolClient.Reply metadataReply,
                 DjiProtocolClient.Reply valueReply) {
             this.metadata = metadata;

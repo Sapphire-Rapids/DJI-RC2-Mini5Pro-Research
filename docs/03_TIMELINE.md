@@ -572,3 +572,18 @@ work when a report did not contain a more precise timestamp.
   unique license ID in memory only, exposes counts/level/status Booleans, passes five synthetic
   host cases and builds its helper DEX plus AArch64 agent. Generated binaries and all vendor data
   remain excluded (C-191).
+
+### 2026-08-29 — EU C0 panel wiring and reconnect-override boundary
+
+- `CORROBORATED`: pinned public FreeFCC text (`597157bd52120dfeb9677f79a8ad46b6027ce8dc`) states
+  that DJI Fly enforces the 120 m CE ceiling through a C0 class runtime flag that overrides
+  flight-controller parameters on every connection, and that `cmd_set=3`/`cmd_id=0xF9` DUML writes
+  are overridden on reconnect (C-198). The text names no `EU_CE_enable_c0_rid_0` owner and does not
+  prove the RID-related C0 flag shares the altitude C0 cap layer.
+- `STATIC`: `MainActivity` adds an independent EU C0 surface for `EU_CE_enable_c0_rid_0`
+  (`0xF80992FE`): read-only F7/F8 probe, off/on/restore buttons gated on an F7/F8 baseline and live
+  route, F7/F8 re-probe before each F9, double F8 readback, and baseline restore on any unconfirmed
+  state; the existing `rid_ctrl_enable_0` surface is unchanged and the client allow-list admits the
+  EU C0 F7/F8/F9 tuples separately (C-199).
+- `STATIC`: panel positive-control name corrected to `g_config.flying_limit.max_height_0` for hash
+  `0x0371238A`. Offline source and synthetic tests only; no live EU C0 read/write is claimed.
