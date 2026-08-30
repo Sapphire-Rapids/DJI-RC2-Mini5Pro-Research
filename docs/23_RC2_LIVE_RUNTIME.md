@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-276；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-282；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -288,11 +288,69 @@ RID 值。`getOrNull()` 会经过可变拦截器，默认处理最终进入 `JNI
 其类初始化还会加载库。该原生同步入口的主体/缓存语义尚需核对，当前没有调用这些 getter、
 创建监听或读取 RID 字段。
 
+## 官方同步缓存入口闭合
+
+`STATIC`：exact Fly 1.19.4 的 `native_get_sync` 已对到同步 SDK GetValue、
+SDKFrameworkCore 和 CacheLayer 加锁查找，返回值经独立 Java byte array 序列化
+（C-277）。该链不进入异步请求或监听注册；内部会维护首次 key 日志集合，并可能扩展
+空缓存层级槽。官方 V1 tuple 选择 product index 0 的 FC `RidWorkingStatusPush`。
+
+新读取探针使用已初始化 JNI/key 类及原有 key 字段，检查现存 mediator、initialized 位、
+framework/cache 指针和匹配 vtable；不经过 Lazy 工厂或 Rx 拦截器。结果结构为四个
+Boolean、带长度的 area 字符串及两个 32-bit failure 字段，总长严格为 `16+L`。
+采集只取状态和 RID failure，跳过 area 内容；null 缓存单独记录。
+
+## RID 单次缓存采集已准备
+
+`STATIC`：A-051 经过 25 项 ASan/UBSan 宿主测试、两次相同 ARMv7 构建；L2 的九项真实
+mksh 测试、B3 的三项 Java/mksh 测试，以及 36 项 host protocol 测试通过（C-278）。
+exact v07 ARM32 app seccomp 过滤器允许自身读取所用的 `process_vm_readv`；read/pread64
+正控和 swapon 负控也已核对。生成 SO 保留在排除目录。
+
+L2 使用新的普通测试文件和 A-051 永久尝试记录，先核对原有应用/网络/目录/日志基线，
+再执行一次缓存读取。完整原生终态后回收匹配文件，并提供独立 CLEANUP；已读到值与
+null 缓存分别输出。旧 A-048 及其记录不变。
+
+`OBSERVED`：USB 文件传输会话曾连续打开失败，操作者重新插拔后恢复。新会话已准备，
+以下三份文件均通过完整 SD 读回（C-279）：
+
+- `Download/FindUAS_RID_CACHE.so`：A-051，14,376 bytes。
+- `Download/L2.sh`：A-052，22,121 bytes。
+- `Download/B3.sh`：A-053，10,513 bytes。
+
+## 实机 RID 缓存结果
+
+`OBSERVED`：操作者启动 B3 后，完整 RID_BASELINE 报告的 23 项检查全部通过（C-280）。
+RID_READ 再次执行同样检查，然后独占创建、核对 A-051 的普通测试文件，完成一次
+系统服务加载及一次同步缓存调用（C-281）。10,879-byte 完整报告、DONE 哈希及独立解析
+一致；唯一原生 enter/result 对应本轮 SID、PID/UID 和 32-bit ABI。
+
+| 缓存字段 | 结果 |
+| --- | --- |
+| `rid_support` | `1` |
+| `rid_normal` | `1` |
+| `eid_support` | `0` |
+| `eid_normal` | `0` |
+| `fail_reason` | `0` |
+
+`ready=1`、`stage=0`、`exception=0`、`query_count=1`、`value_present=1`；JNI、ART TI、
+解析和 Dispose 返回码均为 0。失败码取自正式 `failReason` 字段。多次日志快照包含同一对
+原生记录；并非多次采样。此结果为 SDK 缓存快照，没有接收时间戳；本轮按不起桨要求进行，
+未采集独立 RF。前后 AMS PID/UID 与 APK 哈希保持一致。
+
+`OBSERVED`：读取后核对文件身份/哈希/标签并删除。独立 RID_CLEANUP 返回
+`cleanup_already_absent=true`，没有再加载或读取。copy/attempt 记录也被主机独立回读匹配；
+STOP 与 CLOSED STOP 均已确认（C-282）。环境已释放、磁盘测试文件已回收，未卸载运行时
+映射或重启 Fly。A-048/A-051 的永久记录均保留。
+
 ## 下一步
 
-最小加载路线已在实机跑通，无需重复 A-048。后续聚焦 `native_get_sync` 的确切缓存行为，
-必要时先通过已初始化字段读取现存 owner/key/API 分支元数据。保持 A-048 永久尝试标记，
-不以新的会话号重放旧加载；后续探针使用独立工件身份和明确操作范围。
+官方同步缓存读取已实机完成，不重复基础加载测试。后续应把状态采样与 C-207 的已有
+独立 RID 接收记录/电机时序对齐，并继续核对具有独立读回和恢复路径的控制 owner。
+当前没有需要操作者继续执行的命令，开发助手页面可以退出。
 
-按操作者最新要求，进度仅同步本地仓库，暂停 GitHub 推送。
+## 同步状态
+
+按操作者的一次性要求，既有六个提交已推送至 GitHub main，终点为 `2f31394`。
+本轮新采集准备继续在本地记录，未再次推送。
 私有材料的定位类别见 [排除日志索引](15_LOG_INDEX.md)。

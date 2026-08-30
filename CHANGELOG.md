@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.29 - 2026-08-31
+
+- Closed the exact Fly 1.19.4 synchronous RID cache entry and serialized value format (C-277).
+- Added A-051 with one initialized-owner cache read, nullable results and bounded status-only
+  parsing; 25 native cases, nine loader tests, three receiver tests and 36 client tests pass (C-278).
+- Added L2/B3 staging and session handling. USB reconnection restored MTP; all three payloads
+  have matching full SD readbacks and the startup command was supplied (C-279).
+- The preceding six commits through `2f31394` were pushed on the operator's one-time request.
+  This new work remains local.
+- B3 then completed baseline/read/cleanup/STOP: one official cache call returned RID1/1, EID0/0
+  and failReason0; parsing/disposal succeeded, the file was removed, and independent cleanup plus
+  receipt readbacks and CLOSED STOP completed (C-280--C-282).
+
 ## 0.4.28 - 2026-08-31
 
 - Mapped the exact system-mediated loader and ART TI environment lifecycle (C-268).

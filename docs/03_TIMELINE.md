@@ -905,3 +905,16 @@ work when a report did not contain a more precise timestamp.
   STOP 和 CLOSED STOP 均确认，无第二次 attach、未重启 Fly（C-275）。
 - `STATIC`：继续核对 RID getter，区分 Lazy/默认 DTO、可变拦截器与 native_get_sync；
   下一步聚焦该原生同步入口的缓存语义（C-276）。
+
+### 官方 RID 缓存采集准备
+
+- 按操作者一次性请求，将既有六个提交直接推送至 GitHub main，终点 `2f31394`。
+- `STATIC`：闭合 exact Fly 1.19.4 原生同步缓存链、现存 owner 门及序列化格式（C-277）。
+- `STATIC`：完成独立 A-051、L2/B3 及解析/故障/恢复测试，核对 v07 app syscall 过滤器（C-278）。
+- `OBSERVED`：USB 会话打开失败后经操作者重新插拔恢复；三份采集文件 SD 完整回读匹配，
+  新会话已准备，并给出一次 B3 启动命令（C-279）。本轮尚未进行缓存读取，更新保持本地。
+- `OBSERVED`：操作者启动 B3，基线 23 项全部通过（C-280）。
+- `OBSERVED`：A-051 一次同步读取取得真实缓存值：RID 支持/正常1/1、EID0/0、失败码0；
+  原生解析及环境释放成功，Fly PID/UID/APK 稳定，测试文件回收（C-281）。
+- `OBSERVED`：独立清理确认文件不存在，copy/attempt 回读匹配，STOP/CLOSED STOP 完成；
+  没有第二次读取或 Fly 重启（C-282）。代码、结果和时间线继续同步本地。

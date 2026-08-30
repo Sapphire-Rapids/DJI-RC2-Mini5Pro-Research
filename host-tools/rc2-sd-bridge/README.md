@@ -202,3 +202,33 @@ setup as the receiver suite:
 ```sh
 python3 -m unittest discover -s tests -p 'test_canary_*.py' -v
 ```
+
+## B3 fixed RID cache lane
+
+The first B3 session is **OBSERVED** and closed: baseline/read/cleanup/STOP returned rc0,
+A-051 returned a real cached status, file absence and permanent receipts were independently
+checked, and CLOSED STOP was received (C-280--C-282).
+
+B3 supports `PING`, `SNAPSHOT`, `STOP`, `RID_BASELINE`, `RID_READ` and `RID_CLEANUP`.
+The three RID operations require the same-session B3 receiver marker. They run only the pinned
+L2 helper; L2 uses the independent A-051 probe and preserves the earlier A-048 receipts.
+
+```sh
+python3 bridge.py --state-dir /path/to/private-state stage-rid --b3 /path/to/B3.sh --l2 /path/to/L2.sh --probe /path/to/libfinduas_rid_cache.so
+python3 bridge.py --state-dir /path/to/private-state prepare
+# After the operator starts B3, collect the baseline before allocating one read.
+python3 bridge.py --state-dir /path/to/private-state submit RID_BASELINE
+python3 bridge.py --state-dir /path/to/private-state collect 0001
+```
+
+A complete, successful latest baseline with one outer `preflight_ready=true` is required for
+`RID_READ`. Uncertain upload keeps the same immutable job; even a failed terminal read consumes
+that session's single read allocation. `RID_CLEANUP` is separate and does not repeat the read.
+The global attempt receipt additionally protects against replay across new sessions.
+
+The native probe invokes the exact official synchronous cache entry once. Returned null is
+recorded separately from four parsed RID/EID state booleans and the numeric RID failure field.
+It skips the area string. Native terminal matching and file restoration precede normal completion;
+invalid/partial reports are preserved for recovery. Budgets remain 120/210/30 seconds for
+baseline/read/cleanup within a one-hour, 64-job session. Current staging and live results are
+recorded in [the runtime topic](../../docs/23_RC2_LIVE_RUNTIME.md).

@@ -380,3 +380,18 @@ A claim changes status only when new evidence directly satisfies the missing bou
   action.
 - `NEGATIVE -> RETRACTED`: later evidence shows the original test premise or interpretation was
   invalid; the original row remains in history.
+
+## Official RID synchronous cache route
+
+| ID | Status | Claim | Boundary |
+| --- | --- | --- | --- |
+| C-277 | `STATIC` | Exact Fly 1.19.4 synchronous JNI path reaches the locked SDK cache and returns independent serialized bytes; existing initialized owners avoid Lazy/interceptor paths | Local log-key/sparse-slot bookkeeping remains; live state and receive timestamp are not supplied by static analysis |
+
+| C-278 | `STATIC` | A-051/L2/B3 builds and 25 native, nine loader, three receiver and 36 host-protocol tests passed; exact v07 ARM32 app filter allows the self-read syscall | Synthetic/runtime-policy checks are separate from the pending live cache result |
+| C-279 | `OBSERVED` | USB reconnect restored MTP; all three RID files passed full SD readback and a new session was prepared; startup command supplied | No new cache value or A-051 execution report yet |
+
+| C-280 | `OBSERVED` | B3 started and the complete baseline passed all 23 checks with rc0 | Zero attach/cache reads in this baseline; RID_READ is separate |
+| C-281 | `OBSERVED` | One A-051 cache call returned RID support/normal1/1, EID0/0 and failReason0; parsing/disposal succeeded, PID/APK stable, verified file removed | SDK cache snapshot; receive time and independent RF not sampled |
+| C-282 | `OBSERVED` | Independent cleanup confirmed absence, copy/attempt receipts matched, and STOP/CLOSED STOP completed | Permanent receipts retained; no second query, runtime unload or Fly restart |
+
+Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).

@@ -330,6 +330,16 @@ Later retractions override earlier progress summaries.
     `native_get_sync`/cache question: Lazy factories, mutable interceptors and default DTOs must
     remain distinct from an observed current RID value.
 
+43. C-277--C-282 close the exact Fly `1.19.4` synchronous cache route and first live A-051 read.
+    A-051 is `14,376` bytes, SHA-256
+    `3dea20698eee556706189fd9910705fa60a1d80d0d18ba31a496fa443b38837b`; it uses initialized
+    JNI/key metadata and existing SDK owners, bypassing Lazy/Rx wrappers. One cache call returned
+    RID support/normal `1/1`, EID `0/0`, and formal failReason `0`; JNI/parse/disposal succeeded.
+    PID/UID/APK were stable, the file was removed and independently confirmed absent, receipts
+    matched, and B3 closed by STOP. Preserve A-051's permanent attempt marker. This is a cache
+    snapshot without a receive timestamp or paired RF record; the next work is temporal/RF
+    correlation and an authoritative reversible control owner.
+
 ## Privacy and redaction
 
 Never commit:

@@ -49,7 +49,7 @@ jobs:
       - name: Test runtime DEX boundary scanner
         run: python -m unittest discover -s host-tools/runtime-dex-scan -p 'test_*.py'
       - name: Test SD mailbox host protocol without a device
-        run: python -m unittest discover -s host-tools/rc2-sd-bridge -p 'test_bridge.py'
+        run: python -m unittest discover -s host-tools/rc2-sd-bridge -p 'test*bridge.py'
       - name: Test restricted report-audit rules
         run: python -m unittest discover -s apps/rid-admission-probe/scripts -p 'test_report_audit.py'
 
@@ -87,3 +87,8 @@ jobs:
         env:
           FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
         run: sh scripts/run_identity_canary_host_tests.sh
+      - name: Test RID cache probe with synthetic JNI and SDK state
+        working-directory: experiments/jvmti/jvmti_flysafe_inprocess_query
+        env:
+          FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
+        run: sh scripts/run_rid_cache_probe_host_tests.sh

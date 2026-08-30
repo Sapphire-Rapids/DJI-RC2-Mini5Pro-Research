@@ -417,4 +417,5 @@ hypotheses. No new listener or aircraft-control execution has occurred.
   in the same Fly process, reported its own identity/API success, disposed its environment and
   had its verified ordinary file removed with independent absence readback. This makes the
   tested A-048 path OBSERVED; other payloads and broader loader policies keep their own scope.
-  Next resolve the RID synchronous getter/cache path rather than repeat the canary.
+  C-277 later closed that synchronous path; C-281 received the first actual SDK cache value
+  and C-282 closed recovery. Timestamp/RF correlation remains separate from that observed read.
