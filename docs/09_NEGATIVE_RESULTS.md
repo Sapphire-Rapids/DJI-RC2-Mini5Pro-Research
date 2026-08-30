@@ -626,3 +626,11 @@ stronger conclusion that cannot be drawn.
   payload length and canceled the last callback. The received snapshot passed ZIP/manifest,
   per-file hash and APK-signature checks; the corrected guard passed 13 offline vectors (C-238).
 - Keep transport status and validated-content receipt separate. No operator re-export was needed.
+
+## N-58 — Android mksh heredoc needs a writable temporary directory
+
+- `OBSERVED`: F3 twice failed to create its AMS-parser heredoc temporary file under the caller's
+  default temporary directory. The raw report was received, but the strict parser rejected the
+  two unframed shell errors (C-262).
+- F4 uses a `printf` pipe. Eighteen Android mksh host scenarios and twelve temporary-directory
+  comparisons pass (C-263). Preserve F3 as historical; use F4 for the next diagnostic.

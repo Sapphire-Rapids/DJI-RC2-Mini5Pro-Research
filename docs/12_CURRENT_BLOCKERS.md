@@ -1,18 +1,15 @@
 # Current blockers and dependency gates
 
-Current update (C-262): F3 was received; Android mksh heredoc temporary-file creation failed. Work now fixes the helper and builds the operator-requested finite SD task session. No repeat F3 command is requested.
-
-
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-C-257--C-259 preserve the differing F2/pidof, AMS and separate proc-path observations. Current
-F3/A-045 collects AMS before/after and proc data in one report. It passed 18 full shell fixtures
-and 14 independent parser/capture vectors, then SD staging/full readback (C-260/C-261). F2 is
-archived with matching before/after readbacks and no deletion. The current step is the privately
-issued exact-path F3 launch; execution/report receipt remain pending. Do not repeat F2 or the
-manual proc commands. No internal canary copy/attach has occurred. See
-[the runtime topic](23_RC2_LIVE_RUNTIME.md).
+C-262 records F3 receipt: raw AMS entries share the same main PID and proc has
+`gid=3009,hidepid=2`, while the caller lacks group 3009. Android mksh rejected the heredoc
+temporary-file creation twice; the unmodified raw report fails strict parsing. F4 replaces
+the heredoc with a pipe. F4/B1 passed host checks and SD readback; the operator then started B1 once.
+PING/SNAPSHOT/PING and strict F4 receipt are closed by C-266/C-267. The current diagnostic
+session remains available within its lease; no further manual command is requested. Do not repeat F3 or the individual proc commands. No internal canary
+copy/attach has occurred. See [the runtime topic](23_RC2_LIVE_RUNTIME.md).
 Per the latest user instruction, continue local updates, validation and commits, but do not
 resume GitHub pushes without renewed user authorization. Historical pushes remain recorded.
 C-227--C-230 have already answered the two tested FLYC parameter
@@ -89,10 +86,10 @@ empty output. System/system_app identity, SELinux Permissive, ro.debuggable=1, w
 A-040 source size/hash all passed.
 
 C-258 records a DJI Fly HOME main-process entry with a private nonzero PID. C-259 separately
-returned a target-context path error without a mount-options line. F3/A-045 now brackets its
-proc reads with AMS queries and separates AMS-PID stability from proc-starttime stability.
-Review/fixtures and SD staging/readback are complete (C-260/C-261); await `F3_SAVED` or error
-from the private exact-path command. No process-absence or hidepid conclusion follows yet.
+returned a target-context path error without a mount-options line. F3/A-045 then supplied
+the live proc mount options, but its heredoc failed under Android mksh (C-262). F4 preserves
+the paired AMS/proc collection through a pipe and its report now passes strict parsing (C-267).
+The remaining target-proc visibility failure is recorded; do not repeat that same diagnostic.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -456,8 +453,8 @@ Missing live:
 
 Effect: A-032 remains `NOT ADMITTED`. Do not guess `/data` paths, run from removable storage, change
 APEX/partition/boot state, or describe the staged file as an ADB workaround. This contingency list
-is not the current operator instruction. B-03 awaits the staged F3 single-window AMS/proc
-report; internal-file baselines remain pending.
+is not the current operator instruction. B-03 proceeds through corrected F4 diagnostics and
+the SD task receiver; internal-file baselines remain pending.
 
 Bricking precedent: the pinned public RC 2 report C-212 records framework/TEE tamper followed by a
 DJI Fly update boot-logo loop and failure of every documented software recovery attempt. Before any
@@ -482,7 +479,8 @@ verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
   -> AMS HOME main-process record received; PID retained privately (C-258)
   -> separate target-context path error received (C-259)
   -> F3 reviewed/tested and SD-staged/readback matched (C-260/C-261)
-  -> await F3_SAVED/error and one-window AMS/proc report
+  -> F3 received: live hidepid=2; mksh heredoc temp creation failed (C-262)
+  -> F4/B1 staged and started; three host jobs and strict F4 receipt verified (C-266/C-267)
   -> internal-file and target-process baselines before loading
   -> A-040 pure ARMv7 ART TI canary and unchanged Fly PID
   -> verified independent RID-state observer and callback provenance

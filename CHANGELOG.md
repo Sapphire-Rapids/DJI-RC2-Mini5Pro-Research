@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.27 - 2026-08-31
+
+- Fixed F3's Android mksh heredoc failure in F4 by feeding AMS text through a pipe. Eighteen
+  complete mksh fixtures and twelve temp-policy comparisons passed (C-263).
+- Added the finite B1 receiver, MTP transport and host client. Receiver integration checks pass
+  (C-264); F4/B1 SD readback and session preparation completed (C-265).
+- After one operator startup, PING/SNAPSHOT/PING completed with verified reports (C-266). F4
+  strict parsing succeeds; AMS PID is stable and target-proc access remains unavailable (C-267).
+- Reconciled takeover and blocker summaries with the received F3 report, including the observed
+  proc policy and preserved raw parsing errors. GitHub synchronization remains paused.
+
 ## 0.4.26 - 2026-08-31
 
 - Added F3's paired AMS/proc diagnostics with strict main-process parsing, before/after AMS

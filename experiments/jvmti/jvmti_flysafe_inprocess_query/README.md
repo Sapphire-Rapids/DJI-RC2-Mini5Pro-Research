@@ -97,14 +97,14 @@ indexed in [the artifact register](../../../docs/11_ARTIFACT_REGISTER.md).
 
 ## Fixed Fuli baseline report script
 
-`scripts/rc2_fuli_baseline.sh` is the F3 source revision under local review. It has not been staged
-or run on RC 2. Its required SD name is `Download/F3.sh`; it accepts no arguments, validates the
+`scripts/rc2_fuli_baseline.sh` is the F4 source revision. It has been SD-staged with matching
+full readback and executed through B1; its strictly parsed report is received (C-267). Its required SD name is `Download/F4.sh`; it accepts no arguments, validates the
 hexadecimal volume name in its exact `$0` path and requires the existing report directory on that
-same SD. It exclusively creates `Download/FindUAS/Probe/FindUAS_F3_<UTC-date>_<pid>.txt` using
+same SD. It exclusively creates `Download/FindUAS/Probe/FindUAS_F4_<UTC-date>_<pid>.txt` using
 noclobber. There is no global storage enumeration, internal library copy, attach, permission/mount
 change, Fly launch request or DJI protocol action.
 
-The `finduas-rc2-fuli-baseline/v3` report keeps F2's identity, SELinux/Wi-Fi/debuggable reads,
+The `finduas-rc2-fuli-baseline/v4` report keeps F2's identity, SELinux/Wi-Fi/debuggable reads,
 `/data/app` listing, candidate-file check and staged A-040 size/hash checks. It adds two fixed
 `dumpsys activity -p dji.go.v5 lru` reads, each limited to three seconds, around the process reads:
 
@@ -134,22 +134,43 @@ truncation, unusable AMS data, unknown/false stability or source mismatch produc
 none of those outcomes aborts the remaining admitted reads. `COMPLETE` describes these baseline reads only.
 The report still records zero protocol requests, attaches and internal copies.
 
-`F3_SAVED` prints the report path for either report status; startup/write failure prints `F3_ERROR`,
-with `F3_END` as the final console marker. A received report must retain its schema and
+`F4_SAVED` prints the report path for either report status; startup/write failure prints `F4_ERROR`,
+with `F4_END` as the final console marker. A received report must retain its schema and
 `report_end=true`. Reports, actual volume identities and process identifiers stay private; no
 media-scan broadcast is sent. Deployment and the next operator command remain in
 [the live-runtime steps](../../../docs/23_RC2_LIVE_RUNTIME.md#下一步).
 
-F2/A-044 and its source remain recoverable at commit `238b902`; its SD script is `Download/F2.sh`.
+F3/A-045's exact source remains recoverable at commit `34c04be`. Its raw live report (C-262)
+contains two mksh heredoc temporary-file errors outside the report sections and fails strict
+parsing. F4 feeds the same AMS parser through a `printf` pipe, without a heredoc or temporary file.
+Eighteen complete host fixtures passed using the Android 11 mksh source; a separate twelve-case
+comparison reproduces the heredoc failure and verifies the pipe in writable and denied-temp cases.
+
+F2/A-044 and its source remain recoverable at commit `238b902`; its SD script is archived.
 C-257's 2,553-byte F2 report passed full MTP/envelope validation. Its sole failed command was
 `pidof dji.go.v5` (rc 1, empty); the other eleven commands passed, including A-040 source size/hash.
 AMS later reported a HOME main-process entry (C-258), while a separate read of that earlier
-process's context returned a path error without a mount-options line (C-259). F3 puts the AMS and
-proc observations into one window; it does not infer why those earlier observations differ.
+process's context returned a path error without a mount-options line (C-259). F3's raw report
+then records proc `gid=3009,hidepid=2`, while the caller lacks group 3009. F4 preserves the paired
+AMS/proc collection and records each read failure independently.
 
 F1/A-043 remains historical, with its original source at commit `463c0d5`. Its launcher retained
 the unexpanded SD wildcard (C-252). F2 removed global `/storage` enumeration and changed its
 filename/schema/markers; its earlier launch is not an instruction to repeat F1 or F2 now.
+
+## B1 SD diagnostic receiver
+
+`scripts/rc2_sd_bridge.sh` starts one finite mailbox worker from `Download/B1.sh`. It reads the
+host-prepared active session, detaches its standard streams from Fuli's synchronous Shell page,
+and accepts only `PING`, `SNAPSHOT` and `STOP`. It stops after one hour or 64 sequential jobs.
+Each job is claimed once; a complete closed report precedes its size/hash-bound done marker.
+SNAPSHOT verifies and executes the fixed F4 text from memory with a 45-second timeout.
+
+The eleven real mksh/Java integration scenarios cover startup EOF, inherited FD3, partial/invalid
+jobs, prior-result collisions, helper replacement, TTL and the task limit. A-046/A-047 are
+SD-staged with full matching readback. One operator startup then enabled the verified
+PING/SNAPSHOT/PING round trip and F4 report receipt (C-266/C-267). The [host client, protocol and tests](../../../host-tools/rc2-sd-bridge/README.md)
+keep live session state and output outside the published source tree.
 
 ## Exact observed emulator result
 

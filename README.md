@@ -1,8 +1,5 @@
 # DJI RC 2 / Mini 5 Pro research archive
 
-最新进展（C-262）：F3 已收到，定位到 Android mksh 的 heredoc 临时文件失败。正在修正诊断，并按用户请求实现有限会话的 SD 任务收发，减少手工输入。
-
-
 [![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -65,13 +62,12 @@
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
 - **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
   `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
-- **当前实机进展（C-245--C-261）**：报告、Shell system 身份与目录基线已收到，canary 仍未内部复制或 attach。
-  F2 报告的唯一失败为 pidof 未返回结果；AMS 随后给出 Fly HOME 主进程条目，但一次分离的
-  proc 路径读取失败（C-257--C-259），因此改为同次报告收集 AMS 前后记录与 proc 信息。
-  当前 F3/A-045 已通过 18 个完整 shell fixtures 和 14 个独立 parser/capture vectors，
-  暂存为 `Download/F3.sh`，完整读回匹配（C-260/C-261）。F2 已移入 Archive，前后读回一致、无删除。
-  当前等待已私下发送的精确路径命令返回 `F3_SAVED` 或错误，不重跑 F2 或继续手工 proc 查询；
-  操作见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。字段 owner 独立推进，合成 codec 保持离线。
+- **当前实机进展（C-245--C-267）**：报告、Shell system 身份与目录基线已收到。
+  F3 的完整原始报告记录 `/proc` 的 `gid=3009,hidepid=2`，前后原始 AMS 记录使用同一主 PID。
+  Android mksh 创建 heredoc 临时文件被拒，导致 F3 解析失败；原始报告保留，修正后不再重跑 F3。
+  B1 已由操作者启动；PING → F4 → PING 的三项自动往返与报告核验完成（C-266/C-267）。
+  F4 已修好解析问题，当前 INCOMPLETE 仅记录 pidof/proc 的读取失败。
+  操作见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。canary 尚未内部复制或 attach。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
@@ -120,7 +116,7 @@
 - 只改该 gate-value instruction、保留 ordinary TLS/auth path 的 A-032 userspace copy 已生成；
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
   没有通过 A-032 获得 ADB shell。开发助手 Shell 身份及父目录读取另由 C-246/C-247 闭合。
-  A-032 保留为备选；当前 F3/A-045 已暂存并读回匹配，等待同次 AMS/proc 报告（C-261），
+  A-032 保留为备选；B1 自动诊断及 F4 严格报告已收到，AMS PID 稳定、目标 proc 读取受限（C-266/C-267），
   操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
 - 当前 Android probe 为 v0.12（A-039），文件名 `Download/FindUAS_A039_V012.apk`。
   首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；安装后复测也已收到 COMPLETE
