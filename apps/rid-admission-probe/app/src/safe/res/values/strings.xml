@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FindUAS RID Bridge Probe</string>
-    <string name="probe_intro">v0.11 保留 v0.8 只读能力检查，并加固仅针对本应用进程的 Android/ART 身份段：严格比较前后两次 /proc/self/maps 中的 libart.so 映射，通过 O_NOFOLLOW 只读打开其精确非符号链接 regular 文件，并核对纳秒级元数据、完整 SHA-256 与 GNU build-id；只有匹配固定 RC 2 身份时才核对 Agent::Unload 与 Runtime::AttachAgent 两个固定文件区间。哈希只读取、不加载或执行目标代码。检查结束后仅将本报告写入 SD 卡 Download/FindUAS/Probe；报告含本地诊断信息，请作为私有材料保管。没有网络权限，不连接任何本机端口，不发送 DUML，不 attach，不执行 DJI 协议 Binder 应用事务，也不反射或枚举 DJI/ART 私有类。</string>
+    <string name="probe_intro">v0.12 保留 v0.8 只读能力检查，并加固仅针对本应用进程的 Android/ART 身份段：严格比较前后两次 /proc/self/maps 中的 libart.so 映射，通过 O_NOFOLLOW 只读打开其精确非符号链接 regular 文件，并核对纳秒级元数据、完整 SHA-256 与 GNU build-id；只有匹配固定 RC 2 身份时才核对 Agent::Unload 与 Runtime::AttachAgent 两个固定文件区间。哈希只读取、不加载或执行目标代码。检查结束后仅将本报告写入 SD 卡 Download/FindUAS/Probe；报告含本地诊断信息，请作为私有材料保管。没有网络权限，不连接任何本机端口，不发送 DUML，不 attach，不执行 DJI 协议 Binder 应用事务，也不反射或枚举 DJI/ART 私有类。</string>
     <string name="socket_warning">40007/40009 已硬禁用：相邻 RC331 官方框架显示它们是单活动连接槽，第二个只读连接也可能挤掉 DJI Fly。</string>
     <string name="scope_warning">France EID 不是 FAA Remote ID 或全局 RID 总开关；本工具目前不执行任何开关写入。</string>
     <string name="check_protocol_binder">执行只读能力检查</string>
@@ -10,4 +10,5 @@
     <string name="open_device_info_settings">1. 打开 Android 设备信息（关于手机）</string>
     <string name="report_copied">完整报告已复制</string>
     <string name="retry_report_export">重新保存报告到 SD 卡（不重新检查）</string>
+    <string name="export_fly_samples">导出 DJI Fly 1.19.4 分析样本到 SD 卡</string>
 </resources>

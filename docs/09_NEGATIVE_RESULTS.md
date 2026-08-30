@@ -612,3 +612,17 @@ stronger conclusion that cannot be drawn.
   evidence. Source remains as a reproducible packaging/staging negative.
 - Does not establish: that the RC 2 system app cannot use any mediated loader or that a committed
   package/other label would have the same policy.
+
+## N-56 — v0.11 ELF64-only reader on the actual ARM32 process
+
+- `OBSERVED`: the received v0.11 report ended at `ELF_BUILD_ID_FAILED` (C-235).
+- Cause: the reader only accepted ELF64. v0.12 read the same ART file's build ID and completed
+  the inspection (C-236/C-237). This was a probe implementation defect.
+
+## N-57 — local MTP progress callback canceled the final block
+
+- `OBSERVED`: the sample reader returned an error after writing the complete-sized payload.
+- Cause: libmtp's callback total includes 16 protocol bytes. The local guard compared it against
+  payload length and canceled the last callback. The received snapshot passed ZIP/manifest,
+  per-file hash and APK-signature checks; the corrected guard passed 13 offline vectors (C-238).
+- Keep transport status and validated-content receipt separate. No operator re-export was needed.

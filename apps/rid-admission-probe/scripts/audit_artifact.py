@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed probe audit: v0.11 report-only storage and retained v0.10 profile."""
+"""Fail-closed v0.12 probe audit, retaining historical v0.10/v0.11 profiles."""
 
 from __future__ import annotations
 
@@ -15,7 +15,8 @@ import zipfile
 
 
 PROJECT = Path(__file__).resolve().parent.parent
-DEFAULT_APK = PROJECT / "dist" / "FindUAS-RID-Bridge-Probe-0.11.0-report-export.apk"
+CURRENT_PROFILE = "v12"
+DEFAULT_APK = PROJECT / "dist" / "FindUAS-RID-Bridge-Probe-0.12.0-live32-samples.apk"
 SEALED_PROFILE = os.environ.get("FINDUAS_SEALED_AUDIT") == "1"
 EXPECTED_CURRENT_SIZE = 2_570_983
 EXPECTED_CURRENT_SHA256 = "fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c"
@@ -59,6 +60,17 @@ PROFILES = {
         "sealed_size": None,
         "sealed_sha256": None,
     },
+    "v12": {
+        "version_code": 12,
+        "version_name": "0.12.0-live32-samples",
+        "schema": "finduas-rid-probe/v0.10-schema-1",
+        # Reviewed clean APK 46eb6ef1...: ELF32 reads, fixed PM/property reads,
+        # fixed sample ZIP export and UI only; no new ART/DUML/network execution.
+        "external_count": 3067,
+        "external_sha256": "0e6b11a5891d2d7ac0cb84153f1c4e21ed277a24c2f1a6280418235ec421820e",
+        "sealed_size": None,
+        "sealed_sha256": None,
+    },
 }
 REPORT_SOURCE = "app/src/safe/java/com/finduas/ridobserver/ProbeReportStore.kt"
 REPORT_DESCRIPTOR = "Lcom/finduas/ridobserver/ProbeReportStore"
@@ -75,6 +87,45 @@ EXPECTED_REPORT_DESCRIPTORS = (
     "Lcom/finduas/ridobserver/ProbeReportStore$Volume;",
     "Lcom/finduas/ridobserver/ProbeReportStore;",
 )
+PROFILES["v11"].update({
+    "report_source_sha256": EXPECTED_REPORT_SOURCE_SHA256,
+    "report_dex_sha256": EXPECTED_REPORT_DEX_SHA256,
+    "report_descriptors": EXPECTED_REPORT_DESCRIPTORS,
+    "report_prefix": "FindUAS_Probe_v011_",
+})
+PROFILES["v12"].update({
+    "report_source_sha256": "11fa59c20d9e8b1f4df4d0985880cf7f8729af529b78c84cad0b34eb17888a4d",
+    "report_dex_sha256": "4b349108bfbf7525f3b3b7842d2f6d5c6fc3be8a71ee63f559e89d442f67273e",
+    "report_descriptors": EXPECTED_REPORT_DESCRIPTORS,
+    "report_prefix": "FindUAS_Probe_v012_",
+    # Source-reviewed: fixed PM package/version and four enum entries only;
+    # identity/path+metadata rechecks; bounded streaming; own pending SD row.
+    "sample_source_sha256": "c9bda403ac697255eca7df02f38202c1a4a9c778e6f91235fa7db52ced243f90",
+    "sample_dex_sha256": "5edf3cfb76d670ce6afd03b1f226f52c227eee211a39af81cfe087541bfba011",
+    "sample_descriptors": (
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$$ExternalSyntheticLambda0;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$$ExternalSyntheticLambda1;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$$ExternalSyntheticLambda2;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$$ExternalSyntheticLambda3;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$$ExternalSyntheticLambda4;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$AndroidPendingZip;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$AndroidSource;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$AndroidStore;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Copied;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Entry;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Failure;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Identity;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Metadata;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$PendingZip;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Planned;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Source;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Store;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter$Volume;",
+        "Lcom/finduas/ridobserver/InstalledFlySampleExporter;",
+    ),
+})
+SAMPLE_SOURCE = "app/src/safe/java/com/finduas/ridobserver/InstalledFlySampleExporter.kt"
+SAMPLE_DESCRIPTOR = "Lcom/finduas/ridobserver/InstalledFlySampleExporter"
 EXPECTED_QUERIES = {
     "dji.go.v5",
     "com.dpad.fuli",
@@ -201,7 +252,7 @@ def audit_known_profile_source() -> None:
             )
 
 
-def audit_sources(profile: str = "v11") -> None:
+def audit_sources(profile: str = CURRENT_PROFILE) -> None:
     selected = PROFILES[profile]
     build = (PROJECT / "app/build.gradle.kts").read_text()
     manifest = (PROJECT / "app/src/safe/AndroidManifest.xml").read_text()
@@ -214,9 +265,10 @@ def audit_sources(profile: str = "v11") -> None:
     ).read_text()
     source_paths = sorted((PROJECT / "app/src/safe/java").rglob("*.kt"))
     safe_sources = "\n".join(path.read_text() for path in source_paths)
-    non_report_sources = "\n".join(
+    non_output_sources = "\n".join(
         path.read_text() for path in source_paths
-        if path != PROJECT / REPORT_SOURCE
+        if path not in ({PROJECT / REPORT_SOURCE, PROJECT / SAMPLE_SOURCE}
+                        if profile == "v12" else {PROJECT / REPORT_SOURCE})
     )
 
     require(f'versionCode = {selected["version_code"]}' in build, "versionCode/profile mismatch")
@@ -256,6 +308,21 @@ def audit_sources(profile: str = "v11") -> None:
         require(required in art_source, f"ART source misses required guard: {required}")
     for forbidden in ("KNOWN_ATTACH_RANGE", "KNOWN_LOADER_RANGE"):
         require(forbidden not in art_source, f"ART source retains misnamed range: {forbidden}")
+    if profile == "v12":
+        for guard in (
+            "ELF_CLASS_32 = 1", "ELF32_HEADER_SIZE = 52",
+            "ELF64_HEADER_SIZE = 64", "ELF32_PROGRAM_HEADER_MIN_SIZE = 32",
+            "ELF64_PROGRAM_HEADER_MIN_SIZE = 56",
+            "view.getInt(28).toLong() and 0xffffffffL",
+            "view.getShort(if (is32Bit) 42 else 54)",
+            "view.getShort(if (is32Bit) 44 else 56)",
+            "program.getInt(4).toLong() and 0xffffffffL",
+            "program.getInt(16).toLong() and 0xffffffffL",
+            "rangeWithinFile(programOffset, programEntrySize.toLong() * programCount, fileSize)",
+            "rangeWithinFile(noteOffset, noteSize, fileSize)",
+            "matches.singleOrNull()",
+        ):
+            require(guard in art_source, f"ELF32/64 source guard changed: {guard}")
     proc_paths = {
         value.rstrip(".,")
         for value in re.findall(r"/proc/[A-Za-z0-9_{}$./-]+", art_source)
@@ -304,29 +371,37 @@ def audit_sources(profile: str = "v11") -> None:
         "Os.sendto(", "Os.sendmsg(", "Os.bind(", "Os.listen(",
         "Os.accept(",
     ):
-        # The only source-level exception is the reviewed report store's
-        # ContentResolver stream opener. Files, syscalls and all old execution /
-        # network bans still apply to the report source itself.
-        inspected = (
-            non_report_sources
-            if profile == "v11" and forbidden == "openOutputStream("
-            else safe_sources
-        )
+        # Exceptions are only the reviewed output classes' resolver opener and
+        # v12's fixed sample ZIP constructor. File writers, syscalls and all old
+        # execution/network bans still apply to those sources themselves.
+        inspected = safe_sources
+        if profile in ("v11", "v12") and forbidden == "openOutputStream(":
+            inspected = non_output_sources
+        elif profile == "v12" and forbidden == "ZipOutputStream(":
+            inspected = "\n".join(path.read_text() for path in source_paths
+                                    if path != PROJECT / SAMPLE_SOURCE)
         require(forbidden not in inspected, f"packaged source contains {forbidden}")
     # MessageDigest.update() is an existing read-only ART hashing operation.
     # Resolver.update overloads are checked by owning DEX class below instead of
     # banning every unrelated method with the same source-level name.
     for forbidden in (".insert(", ".delete(", ".write("):
-        require(forbidden not in non_report_sources,
-                f"source outside ProbeReportStore contains {forbidden}")
-    if profile == "v11":
+        require(forbidden not in non_output_sources,
+                f"source outside the reviewed output classes contains {forbidden}")
+    if profile in ("v11", "v12"):
         report_path = PROJECT / REPORT_SOURCE
-        require(report_path.is_file(), "v0.11 report store source missing")
-        require(EXPECTED_REPORT_SOURCE_SHA256 is not None,
-                "v0.11 report source has not completed manual safety review")
-        require(sha256(report_path) == EXPECTED_REPORT_SOURCE_SHA256,
+        require(report_path.is_file(), f"{profile} report store source missing")
+        require(selected["report_source_sha256"] is not None,
+                f"{profile} report source has not completed manual safety review")
+        require(sha256(report_path) == selected["report_source_sha256"],
                 "reviewed report store source changed")
-        require('0.11.0-report-export' in activity, "v0.11 report app version marker missing")
+        require(selected["version_name"] in activity, "report app version marker missing")
+    if profile == "v12":
+        sample_path = PROJECT / SAMPLE_SOURCE
+        require(sample_path.is_file(), "v12 fixed sample exporter source missing")
+        require(selected["sample_source_sha256"] is not None,
+                "v12 fixed sample exporter has not completed manual safety review")
+        require(sha256(sample_path) == selected["sample_source_sha256"],
+                "reviewed fixed sample exporter source changed")
     for required in (
         "Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS",
         "Settings.ACTION_DEVICE_INFO_SETTINGS",
@@ -954,7 +1029,7 @@ def app_class_blocks(app_dump: str) -> list[tuple[str, str]]:
     return result
 
 
-def report_dex_fingerprint(app_dump: str) -> tuple[tuple[str, ...], str]:
+def owned_family_fingerprint(app_dump: str, prefix: str) -> tuple[tuple[str, ...], str]:
     """Pin the reviewed writer's fields, literals, instructions and control flow.
 
     This is deliberately stronger than an invoke-table hash: changing a URI,
@@ -964,13 +1039,17 @@ def report_dex_fingerprint(app_dump: str) -> tuple[tuple[str, ...], str]:
     family = sorted(
         (descriptor, block)
         for descriptor, block in app_class_blocks(app_dump)
-        if descriptor == REPORT_DESCRIPTOR + ";" or descriptor.startswith(REPORT_DESCRIPTOR + "$")
+        if descriptor == prefix + ";" or descriptor.startswith(prefix + "$")
     )
-    require(bool(family), "v0.11 report store DEX class family missing")
+    require(bool(family), f"reviewed DEX class family missing: {prefix}")
     canonical = "\n".join(
         descriptor + "\n" + block.strip() for descriptor, block in family
     ).encode("utf-8")
     return tuple(descriptor for descriptor, _ in family), hashlib.sha256(canonical).hexdigest()
+
+
+def report_dex_fingerprint(app_dump: str) -> tuple[tuple[str, ...], str]:
+    return owned_family_fingerprint(app_dump, REPORT_DESCRIPTOR)
 
 
 def external_invoke_fingerprint(app_dump: str) -> tuple[int, str]:
@@ -991,17 +1070,32 @@ REPORT_WRITE_CALLS = frozenset({
     "Ljava/io/OutputStream;.write:([B)V",
     "Ljava/io/OutputStream;.flush:()V",
 })
+# Source-reviewed fixed writer. The separate final-DEX family freeze below must
+# also match before any v12 artifact can pass; no general ZIP/file API is opened.
+SAMPLE_WRITE_CALLS = {
+    SAMPLE_DESCRIPTOR + "$AndroidStore;": frozenset(
+        call for call in REPORT_WRITE_CALLS if call.startswith("Landroid/content/ContentResolver;")
+    ),
+    SAMPLE_DESCRIPTOR + ";": frozenset({
+        "Ljava/util/zip/ZipOutputStream;.<init>:(Ljava/io/OutputStream;)V",
+        "Ljava/util/zip/ZipOutputStream;.setLevel:(I)V",
+        "Ljava/util/zip/ZipOutputStream;.putNextEntry:(Ljava/util/zip/ZipEntry;)V",
+        "Ljava/util/zip/ZipOutputStream;.write:([BII)V",
+        "Ljava/util/zip/ZipOutputStream;.write:([B)V",
+        "Ljava/util/zip/ZipOutputStream;.closeEntry:()V",
+    }),
+}
 
 
 def audit_app_dex_safety(
-    app_dump: str, *, enforce_frozen_surface: bool = True, profile: str = "v11"
+    app_dump: str, *, enforce_frozen_surface: bool = True, profile: str = CURRENT_PROFILE
 ) -> None:
-    """No execution/transmission; v11 permits only the sealed report-only writer."""
+    """No execution/transmission; only the version's exact reviewed output owners."""
     forbidden_exact = (
         "Ljava/io/FileOutputStream;", "Ljava/io/FileWriter;",
         "Ljava/io/OutputStreamWriter;", "Ljava/io/BufferedWriter;",
         "Ljava/io/PrintWriter;", "Ljava/io/DataOutputStream;",
-        "Ljava/io/ObjectOutputStream;", "Ljava/util/zip/ZipOutputStream;",
+        "Ljava/io/ObjectOutputStream;",
         "Ljava/net/Socket;", "Ljava/net/ServerSocket;", "Ljava/net/DatagramSocket;",
         "Landroid/os/Parcel;", "Ldalvik/system/DexFile;", "Ldalvik/system/VMDebug;",
         "attachJvmtiAgent", "Ljava/lang/System;.load:",
@@ -1011,6 +1105,10 @@ def audit_app_dex_safety(
     for forbidden in forbidden_exact:
         require(forbidden not in app_dump,
                 f"application DEX invokes forbidden surface: {forbidden}")
+    for owner, block in app_class_blocks(app_dump):
+        if "Ljava/util/zip/ZipOutputStream;" in block:
+            require(profile == "v12" and owner == SAMPLE_DESCRIPTOR + ";",
+                    "ZIP output is outside the fixed sample exporter")
 
     forbidden_calls = (
         r"Lkotlin/io/FilesKt[^;]*;\.(?:writeText|writeBytes|appendText|appendBytes|"
@@ -1028,23 +1126,35 @@ def audit_app_dex_safety(
 
     scoped_writes = re.compile(
         r"(?:Landroid/content/ContentResolver;\.(?:openOutputStream|insert|update|delete)|"
-        r"Ljava/io/[^;]*(?:OutputStream|Writer);\.(?:write|append|flush|close)):"
+        r"Ljava/io/[^;]*(?:OutputStream|Writer);\.(?:write|append|flush|close)|"
+        r"Ljava/util/zip/ZipOutputStream;\.[^:]+):"
     )
     for owner, block in app_class_blocks(app_dump):
         for _, operation in dex_instructions(block):
             if not scoped_writes.search(operation):
                 continue
             target = operation.split(", ", 1)[-1] if "}, " not in operation else operation.split("}, ", 1)[1]
-            require(profile == "v11" and owner == REPORT_WRITE_OWNER and target in REPORT_WRITE_CALLS,
-                    f"write call is outside the exact report-store exception: {owner}: {target}")
-    if profile == "v11":
+            report_allowed = (profile in ("v11", "v12") and owner == REPORT_WRITE_OWNER
+                              and target in REPORT_WRITE_CALLS)
+            sample_allowed = (profile == "v12" and target in SAMPLE_WRITE_CALLS.get(owner, ()))
+            require(report_allowed or sample_allowed,
+                    f"write call is outside the exact output exceptions: {owner}: {target}")
+    selected = PROFILES[profile]
+    if profile in ("v11", "v12"):
         descriptors, digest = report_dex_fingerprint(app_dump)
-        require(EXPECTED_REPORT_DESCRIPTORS is not None and EXPECTED_REPORT_DEX_SHA256 is not None,
-                "v0.11 report DEX has not completed manual safety review")
-        require(descriptors == EXPECTED_REPORT_DESCRIPTORS,
+        require(selected["report_descriptors"] is not None and selected["report_dex_sha256"] is not None,
+                f"{profile} report DEX has not completed manual safety review")
+        require(descriptors == selected["report_descriptors"],
                 "report writer class family changed")
-        require(digest == EXPECTED_REPORT_DEX_SHA256,
+        require(digest == selected["report_dex_sha256"],
                 "reviewed report writer DEX/literals/control flow changed")
+    if profile == "v12":
+        descriptors, digest = owned_family_fingerprint(app_dump, SAMPLE_DESCRIPTOR)
+        require(selected["sample_descriptors"] is not None and selected["sample_dex_sha256"] is not None,
+                "v12 sample DEX has not completed manual safety review")
+        require(descriptors == selected["sample_descriptors"], "sample exporter class family changed")
+        require(digest == selected["sample_dex_sha256"],
+                "reviewed fixed sample exporter DEX/literals/control flow changed")
     if enforce_frozen_surface:
         count, digest = external_invoke_fingerprint(app_dump)
         selected = PROFILES[profile]
@@ -1240,7 +1350,7 @@ def audit_completion_gate_dex_dump(dex_dump: str) -> None:
     audit_completion_result_storage(caller, completion_call_pc)
 
 
-def audit_apk(apk: Path, profile: str = "v11") -> tuple[int, str]:
+def audit_apk(apk: Path, profile: str = CURRENT_PROFILE) -> tuple[int, str]:
     selected = PROFILES[profile]
     require(apk.is_file(), f"APK missing: {apk}")
     apk_size = apk.stat().st_size
@@ -1288,8 +1398,8 @@ def audit_apk(apk: Path, profile: str = "v11") -> tuple[int, str]:
         b"art.runtime_attach_agent_range.offset",
     ):
         require(required in dex, f"DEX misses required probe marker: {required!r}")
-    if profile == "v11":
-        require(b"0.11.0-report-export" in dex, "DEX misses v0.11 app version marker")
+    if profile in ("v11", "v12"):
+        require(selected["version_name"].encode("utf-8") in dex, "DEX misses app version marker")
     for forbidden_schema in (b"art.attach_range.", b"art.loader_range."):
         require(forbidden_schema not in dex,
                 f"DEX retains a misnamed range field: {forbidden_schema!r}")
@@ -1344,7 +1454,7 @@ def audit_apk(apk: Path, profile: str = "v11") -> tuple[int, str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=tuple(PROFILES), default="v11")
+    parser.add_argument("--profile", choices=tuple(PROFILES), default=CURRENT_PROFILE)
     parser.add_argument("apk", type=Path, nargs="?")
     args = parser.parse_args()
     profile = args.profile
@@ -1355,8 +1465,8 @@ def main() -> int:
             audit_prior_artifacts()
             audit_known_profile_source()
         # A historical artifact is checked against its own immutable final-DEX
-        # profile. The current v11 checkout is not claimed to be its source.
-        if profile == "v11":
+        # profile. The current checkout is not claimed to be its source.
+        if profile == CURRENT_PROFILE:
             audit_sources(profile=profile)
         size, digest = audit_apk(apk, profile=profile)
     except AuditFailure as error:
@@ -1366,14 +1476,17 @@ def main() -> int:
     print(f"artifact={apk}")
     print(f"bytes={size}")
     print(f"sha256={digest}")
-    mode = "sealed" if SEALED_PROFILE else ("source-only" if profile == "v11" else "artifact-only")
+    mode = "sealed" if SEALED_PROFILE else ("source-only" if profile == CURRENT_PROFILE else "artifact-only")
     print(f"audit_profile={profile}:{mode}")
     print(f"external_invoke_count={PROFILES[profile]['external_count']}")
     print(f"external_invoke_sha256={PROFILES[profile]['external_sha256']}")
-    if profile == "v11":
-        print(f"report_source_sha256={EXPECTED_REPORT_SOURCE_SHA256}")
-        print(f"report_dex_sha256={EXPECTED_REPORT_DEX_SHA256}")
-    if profile == "v10":
+    if profile in ("v11", "v12"):
+        print(f"report_source_sha256={PROFILES[profile]['report_source_sha256']}")
+        print(f"report_dex_sha256={PROFILES[profile]['report_dex_sha256']}")
+    if profile == "v12":
+        print(f"sample_source_sha256={PROFILES[profile]['sample_source_sha256']}")
+        print(f"sample_dex_sha256={PROFILES[profile]['sample_dex_sha256']}")
+    if profile != CURRENT_PROFILE:
         print("source_review=historical_artifact_only_not_current_checkout")
     if SEALED_PROFILE:
         for prior_apk, _, prior_sha256 in SEALED_PRIOR_APKS:

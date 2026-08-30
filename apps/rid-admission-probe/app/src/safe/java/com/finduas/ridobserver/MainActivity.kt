@@ -218,6 +218,8 @@ class MainActivity : Activity() {
     private lateinit var copyButton: Button
     private lateinit var exportStatusText: TextView
     private lateinit var retryExportButton: Button
+    private lateinit var sampleExportButton: Button
+    private lateinit var sampleStatusText: TextView
     private lateinit var developmentSettingsButton: Button
     private lateinit var deviceInfoSettingsButton: Button
     private var currentReport = ""
@@ -286,6 +288,7 @@ class MainActivity : Activity() {
         retryExportButton = Button(this).apply {
             text = getString(R.string.retry_report_export)
             setOnClickListener {
+                if (InstalledFlySampleSession.snapshot().running) return@setOnClickListener
                 ProbeSessionCoordinator.retryReportExport(applicationContext)
                 render()
                 if (resumed) {
@@ -295,6 +298,24 @@ class MainActivity : Activity() {
             }
         }
         content.addView(retryExportButton)
+        sampleStatusText = TextView(this).apply {
+            textSize = 16f
+            setPadding(0, padding / 2, 0, padding / 2)
+        }
+        content.addView(sampleStatusText)
+        sampleExportButton = Button(this).apply {
+            text = getString(R.string.export_fly_samples)
+            setOnClickListener {
+                if (ProbeSessionCoordinator.isBusy()) return@setOnClickListener
+                InstalledFlySampleSession.start(applicationContext)
+                render()
+                if (resumed) {
+                    handler.removeCallbacks(refreshRunnable)
+                    handler.postDelayed(refreshRunnable, REFRESH_INTERVAL_MS)
+                }
+            }
+        }
+        content.addView(sampleExportButton)
         deviceInfoSettingsButton = Button(this).apply {
             text = getString(R.string.open_device_info_settings)
             setOnClickListener { openSystemSettings(Settings.ACTION_DEVICE_INFO_SETTINGS) }
@@ -333,6 +354,7 @@ class MainActivity : Activity() {
     }
 
     private fun checkProtocolBinder() {
+        if (InstalledFlySampleSession.snapshot().running) return
         ProbeSessionCoordinator.start(applicationContext)
         render()
         if (resumed) {
@@ -343,6 +365,7 @@ class MainActivity : Activity() {
 
     private fun render(): Boolean {
         val (snapshot, export) = ProbeSessionCoordinator.displaySnapshot()
+        val samples = InstalledFlySampleSession.snapshot()
         currentReport = ProbeReportFormatter.buildReport(snapshot)
         stateText.text = currentReport
         exportStatusText.text = when (export.state) {
@@ -357,11 +380,27 @@ class MainActivity : Activity() {
                 "\n清理状态：" + (export.result?.cleanupStatus?.name ?: "NOT_REQUIRED") +
                 "\n请检查 SD 卡后点击重试，无需重新执行检查。"
         }
+        sampleStatusText.text = when {
+            samples.running -> "正在导出分析样本：已复制 ${samples.bytesCopied / (1024 * 1024)} MiB，请保持应用打开。"
+            samples.failed -> buildString {
+                append("样本导出失败：${samples.result?.status?.name ?: "EXPORT_FAILED"}")
+                samples.result?.failedEntry?.let { append("\n文件：$it") }
+                samples.result?.let { append("\n清理状态：${it.cleanupStatus.name}") }
+            }
+            samples.result != null -> buildString {
+                append("分析样本已保存到 SD 卡：\nDownload/FindUAS/Samples/${samples.result.displayName}")
+                if (samples.result.missingOptional.isNotEmpty()) {
+                    append("\n未找到的可选库：${samples.result.missingOptional.joinToString(", ")}")
+                }
+            }
+            else -> "分析样本：实机 DJI Fly 1.19.4 APK 和 SDK 原生库。"
+        }
         val probeInFlight = snapshot.runState == ProbeRunState.RUNNING ||
-            ProbeReportExportPolicy.isBusy(export.state)
+            ProbeReportExportPolicy.isBusy(export.state) || samples.running
         probeButton.isEnabled = !probeInFlight
         retryExportButton.isEnabled =
-            ProbeReportExportPolicy.mayRetry(snapshot.runId, snapshot.runState, export)
+            !samples.running && ProbeReportExportPolicy.mayRetry(snapshot.runId, snapshot.runState, export)
+        sampleExportButton.isEnabled = !probeInFlight
         copyButton.isEnabled = !probeInFlight &&
             (snapshot.runState == ProbeRunState.COMPLETE ||
                 snapshot.runState == ProbeRunState.INCOMPLETE)
@@ -379,7 +418,7 @@ class MainActivity : Activity() {
     }
 
     private fun openSystemSettings(primaryAction: String) {
-        if (ProbeSessionCoordinator.isBusy()) return
+        if (ProbeSessionCoordinator.isBusy() || InstalledFlySampleSession.snapshot().running) return
         var navigationState: SettingsNavigationState
         var launchedAction: String? = null
         when (launchSettingsAction(primaryAction)) {
@@ -434,7 +473,7 @@ class MainActivity : Activity() {
 
 /** Pure report formatting shared by the screen and the background SD export. */
 internal object ProbeReportFormatter {
-    const val APP_VERSION = "0.11.0-report-export"
+    const val APP_VERSION = "0.12.0-live32-samples"
     fun buildReport(snapshot: ProbeSessionSnapshot): String = with(snapshot) {
         buildString {
         appendMachineReport(snapshot)
@@ -469,6 +508,8 @@ internal object ProbeReportFormatter {
             appendLine("Observer UID: ${localBridge.observerUid ?: "未知"}")
             appendLine("Observer 64-bit: ${booleanText(localBridge.observerIs64Bit)}")
             appendLine("ro.debuggable: ${valueText(localBridge.roDebuggable)}")
+            appendLine("ro.boot.mp_state: ${valueText(localBridge.bootMpState)}")
+            appendLine("ro.boot.dbg_cnt: ${valueText(localBridge.bootDebugCount)}")
             appendLine("SELinux enforcing: ${valueText(localBridge.selinuxEnforcing)}")
             appendLine(
                 "Observer SELinux context: ${valueText(localBridge.observerSelinuxContext)}"
@@ -567,7 +608,7 @@ internal object ProbeReportFormatter {
         appendLine()
         appendLine("路径权限均为 Observer 自身 UID/SELinux 视角。")
         appendLine("它们不证明 UID1000 可写，也不证明 DJI Fly linker 可加载或执行。")
-        appendLine("本版本只读取上述设备状态，不启动开发助手或协议页；仅将本报告保存到 SD 卡。")
+        appendLine("报告保存于 SD 卡；实机分析样本可用上方按钮导出。")
         appendLine("report_file_end=true")
         }
     }
@@ -581,6 +622,8 @@ internal object ProbeReportFormatter {
             }
             field("schema", "finduas-rid-probe/v0.10-schema-1")
             field("app_version", APP_VERSION)
+            field("adb.mp_state", valueText(localBridge.bootMpState))
+            field("adb.dbg_cnt", valueText(localBridge.bootDebugCount))
             field("run_state", runState.name)
             field("run_id", runId)
             field("started_epoch_ms", runStartedAtMs)

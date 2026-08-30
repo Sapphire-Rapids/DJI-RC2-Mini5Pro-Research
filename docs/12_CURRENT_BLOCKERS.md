@@ -3,8 +3,10 @@
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-Current device priority is exact read-only RC 2 identity -> legitimate loader/descriptor -> one
-official inventory query. C-227--C-230 have already answered the two tested FLYC parameter
+Current device priority is the post-install A-039 report -> actual Shell identity and executable
+path -> pure ARMv7 ART TI canary -> independent RID-state observation. The first live identities
+and samples are recorded in C-235--C-238 and [the runtime topic](23_RC2_LIVE_RUNTIME.md).
+C-227--C-230 have already answered the two tested FLYC parameter
 candidates on `01.00.0600`; they are not pending probes. Basic/UAS ID, aircraft position,
 operator position and the separate Operator ID plane require their own evidence chains (B-22).
 
@@ -16,46 +18,38 @@ Closed for the signed target package:
 - exact APEX `adbd` whole-file identity, init path, and CNXN gate;
 - exact packaged `dpad_fuli.apk` identity and byte equality to the audited sample.
 
+Closed by the first live reports and samples (C-235--C-238): installed Fly 1.19.4/ARMv7 and its
+signer/APK/SDK library identities; pre-reinstall Fuli and framework/services hashes; the probe's
+32-bit ART identity; `ro.debuggable=1`, `mp_state=production` and SELinux enforcing=false.
+
 Still missing:
 
 - full signed module/package set beyond the verified system/`0205` lane;
-- current mounted `/apex/com.android.adbd/bin/adbd` readback hash and live boot properties;
-- current installed `com.dpad.fuli` path/hash, process UID, and SELinux context;
-- exact live DJI Fly APK/version/signer/splits;
-- exact live `framework.jar`, `services.jar`, broker configuration/library, and ART identities;
-- live process ABI, UID relation, `ro.debuggable`, SELinux, native-library extraction/path, and
-  linker namespace.
+- current mounted adbd hash/branch result; the reported `dbg_cnt` was an empty string;
+- post-reinstall Fuli metadata, actual Shell execution identity and directory permissions;
+- target Fly process mapping/loader behavior and the relevant executable path/namespace.
 
-Effect: ADB and Fuli statements explicitly tied to C-174--C-176 may be promoted to exact
-target-package `STATIC`; they are not live execution facts. Other adjacent Binder, Parcelable,
-policy, ART, and installed-file conclusions remain unpromoted.
+The installed-file matches support the specific framework/service and package comparisons in
+C-237/C-241; target process execution remains a separate next step.
 
 ## B-02 — runtime report and SD export
 
-Exact A-038 v0.11 is staged as removable-SD `Download/FindUAS_A038_V011.apk`; full MTP readback
-matched its registered size/hash (C-233/C-234). Installation/run and report receipt are pending.
-The explicit report-output exception adds no attach, ADB-daemon or aircraft request.
+Initial report/export work is closed: v0.11's INCOMPLETE report and v0.12's COMPLETE report were
+received, followed by the verified fixed sample ZIP. A-039 is current; A-038 is archived.
 
-Missing: the inspected device's complete `finduas-rid-probe/v0.10-schema-1` report, with v0.11
-app-version and final file marker. Fetch the published final-name file in `Download/FindUAS/Probe/`
-through fresh MTP enumeration/readback; incomplete diagnostics must remain labelled incomplete.
+Next input: a new A-039 report after the operator-confirmed Fuli installation. The operator should
+open FindUAS RID Bridge Probe, select the capability check and wait for the SD save result.
+Fetch it from `Download/FindUAS/Probe/` before selecting the internal loading path (C-242).
 
-Effect: unobserved live environment/package/ART gates stay unknown. Saving a report and receiving
-it on the host are separate from its diagnostic result and from any later loader admission.
+## B-03 — actual Shell caller and loading path
 
-## B-03 — side-effect-free privileged caller
+The original Fuli package is reinstalled and DevActivity opens (C-242). Its Shell page has not yet
+been opened. The stock page's startup checks and Runtime.exec(String) behavior are documented in
+[the Android topic](08_ANDROID_ADB.md); it is a manual interface, not an automatic command RPC.
 
-Missing: an independently audited live caller that:
-
-- actually runs as an identity accepted by the required Android permission path;
-- uses fixed argv;
-- preserves stdout, stderr, and exit status;
-- does not probe root, start ADB, enter update/recovery, change settings, or invoke arbitrary input.
-
-Effect: neither a no-op attach canary nor even the fixed Binder liveness checker has an admitted
-launcher. Exact-v07 stock `dpad_fuli` supplies an operator-visible arbitrary command page for the
-bounded ADB baseline, but it still does not supply fixed argv, stderr, exit status, or an automatic
-side-effect-free RPC for the general attach path.
+Next obtain actual UID/domain, target PID and path permissions with fixed read-only commands and
+explicit result codes. Then test A-040's loading marker and stable Fly PID. The historical root
+check's Boolean is not used as the caller identity.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -429,16 +423,16 @@ boot chain, flash startup partitions, or treat physical EDL as an authorized fal
 
 ## Dependency order
 
-The evidence dependencies are:
+The current evidence dependencies are:
 
 ```text
-exact current RC 2 installed/mounted identity and caller/target policy baseline
-  -> legitimate loader/descriptor admission
-  -> one official query-only callback with unchanged DJI Fly PID
-  -> canonical privacy-reduced inventory, if available
+verified Fly 1.19.4 samples and first A-039 COMPLETE report
+  -> post-install Fuli report and actual Shell/path baseline
+  -> A-040 pure ARMv7 ART TI canary and unchanged Fly PID
+  -> verified independent RID-state observer and callback provenance
 ```
 
-The emulator and historical transport evidence supporting that sequence is:
+The earlier FlySafe inventory branch retains this emulator and transport history:
 
 ```text
 exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
@@ -455,9 +449,9 @@ exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
 ```
 
 The F7 route matrix is closed at the generic attach level, and the tested Binder status listener is
-closed as a truth source. Continue with exact type-6 inventory/state and verified WA150
-plaintext/firmware analysis. Do not repeat the old generic attach or listener chains merely to
-answer the same fixed questions.
+closed as a truth source. Current work follows C-240/C-242/C-243; FlySafe inventory remains a
+separate branch. The older resolver sequence below is historical context, not the current operator
+procedure:
 
 ```text
 exact live identity

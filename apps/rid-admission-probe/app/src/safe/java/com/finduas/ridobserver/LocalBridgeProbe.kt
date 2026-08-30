@@ -29,6 +29,41 @@ internal enum class ActivityProbeState {
     INTERNAL_ERROR
 }
 
+internal object ActivityQueryPolicy {
+    const val FLAGS = PackageManager.MATCH_DISABLED_COMPONENTS or
+        PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS or
+        PackageManager.MATCH_DIRECT_BOOT_AWARE or PackageManager.MATCH_DIRECT_BOOT_UNAWARE
+
+    fun classify(
+        exported: Boolean,
+        componentEnabled: Boolean,
+        applicationEnabled: Boolean,
+        componentSetting: Int,
+        applicationSetting: Int
+    ): ActivityProbeState {
+        val component = effectiveEnabled(componentEnabled, componentSetting)
+            ?: return ActivityProbeState.INTERNAL_ERROR
+        val application = effectiveEnabled(applicationEnabled, applicationSetting)
+            ?: return ActivityProbeState.INTERNAL_ERROR
+        val enabled = component && application
+        return when {
+            exported && enabled -> ActivityProbeState.EXPORTED_ENABLED
+            exported -> ActivityProbeState.EXPORTED_DISABLED
+            enabled -> ActivityProbeState.PRIVATE_ENABLED
+            else -> ActivityProbeState.PRIVATE_DISABLED
+        }
+    }
+
+    private fun effectiveEnabled(manifestEnabled: Boolean, setting: Int): Boolean? = when (setting) {
+        PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> manifestEnabled
+        PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+        PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER,
+        PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
+        else -> null
+    }
+}
+
 internal enum class UpgradeRecoveryMarkerState {
     CLEAR,
     SET,
@@ -139,6 +174,8 @@ internal data class LocalBridgeProbeResult(
     val observerIs64Bit: Boolean? = null,
     val observerSelinuxContext: ReadOnlyValue = ReadOnlyValue(),
     val roDebuggable: ReadOnlyValue = ReadOnlyValue(),
+    val bootMpState: ReadOnlyValue = ReadOnlyValue(),
+    val bootDebugCount: ReadOnlyValue = ReadOnlyValue(),
     val selinuxEnforcing: ReadOnlyValue = ReadOnlyValue(),
     val djiFly: PackageCapability = PackageCapability(),
     val djiFlyProcess: RunningProcessCapability = RunningProcessCapability(),
@@ -256,6 +293,8 @@ internal object LocalBridgeProbe {
     private const val JVMTI_EID_RESOLVER_NATIVE_LIBRARY = "libfinduas_eid_resolver_v1.so"
     private const val UPGRADE_RECOVERY_PROPERTY = "persist.dji.upgrade.fuli"
     private const val DEBUGGABLE_PROPERTY = "ro.debuggable"
+    private const val BOOT_MP_STATE_PROPERTY = "ro.boot.mp_state"
+    private const val BOOT_DEBUG_COUNT_PROPERTY = "ro.boot.dbg_cnt"
     private const val FRAMEWORK_JAR_PATH = "/system/framework/framework.jar"
     private const val SERVICES_JAR_PATH = "/system/framework/services.jar"
     private const val DJI_JSON_PATH = "/vendor/etc/dji.json"
@@ -344,6 +383,8 @@ internal object LocalBridgeProbe {
             observerUid = context.applicationInfo.uid,
             observerIs64Bit = android.os.Process.is64Bit(),
             roDebuggable = readFixedSystemProperty(DEBUGGABLE_PROPERTY, ""),
+            bootMpState = readFixedSystemProperty(BOOT_MP_STATE_PROPERTY, ""),
+            bootDebugCount = readFixedSystemProperty(BOOT_DEBUG_COUNT_PROPERTY, ""),
             selinuxEnforcing = readSelinuxBoolean("isSELinuxEnforced"),
             observerSelinuxContext = readSelinuxString("getContext"),
             djiFly = djiCapability,
@@ -655,7 +696,11 @@ internal object LocalBridgeProbe {
         manager: PackageManager,
         component: ComponentName
     ): ActivityProbeState = try {
-        classifyActivity(manager.getActivityInfo(component, 0))
+        classifyActivity(
+            manager.getActivityInfo(component, ActivityQueryPolicy.FLAGS),
+            manager.getComponentEnabledSetting(component),
+            manager.getApplicationEnabledSetting(component.packageName)
+        )
     } catch (_: PackageManager.NameNotFoundException) {
         ActivityProbeState.ABSENT
     } catch (_: SecurityException) {
@@ -664,11 +709,15 @@ internal object LocalBridgeProbe {
         ActivityProbeState.INTERNAL_ERROR
     }
 
-    private fun classifyActivity(info: ActivityInfo): ActivityProbeState = when {
-        info.exported && info.enabled -> ActivityProbeState.EXPORTED_ENABLED
-        info.exported -> ActivityProbeState.EXPORTED_DISABLED
-        info.enabled -> ActivityProbeState.PRIVATE_ENABLED
-        else -> ActivityProbeState.PRIVATE_DISABLED
+    private fun classifyActivity(
+        info: ActivityInfo,
+        componentSetting: Int,
+        applicationSetting: Int
+    ): ActivityProbeState {
+        val application = info.applicationInfo ?: return ActivityProbeState.INTERNAL_ERROR
+        return ActivityQueryPolicy.classify(
+            info.exported, info.enabled, application.enabled, componentSetting, applicationSetting
+        )
     }
 
     private fun readUpgradeRecoveryMarker(): UpgradeRecoveryMarkerState {

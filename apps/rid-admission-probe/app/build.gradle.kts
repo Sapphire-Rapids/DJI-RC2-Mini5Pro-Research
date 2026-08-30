@@ -11,11 +11,11 @@ android {
         applicationId = "com.finduas.ridobserver"
         minSdk = 29
         targetSdk = 35
-        versionCode = 11
-        versionName = "0.11.0-report-export"
+        versionCode = 12
+        versionName = "0.12.0-live32-samples"
     }
 
-    // v0.11 is intentionally built from a separate, minimal source set. The withdrawn
+    // v0.12 is intentionally built from a separate, minimal source set. The withdrawn
     // localhost observer is not distributed in this repository. A connection to DJI's
     // single-client broker can evict DJI Fly even when the socket is input-only.
     sourceSets {

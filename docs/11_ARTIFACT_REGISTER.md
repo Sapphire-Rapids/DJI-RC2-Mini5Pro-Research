@@ -12,7 +12,7 @@
 
 | ID | 工件 / 类型 / 版本 | 大小 | SHA-256 | 状态 |
 | --- | --- | ---: | --- | --- |
-| A-001 | RC 2 admission probe；self-developed；v0.10 | `2,570,983` | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` | `NOT ADMITTED`；MTP staging 与完整读回 hash 已匹配；安装/运行待操作者确认；历史 v0.10 已 staged；报告导出由 A-038 接续；只公开 hash |
+| A-001 | RC 2 admission probe；self-developed；v0.10 | `2,570,983` | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` | `NOT ADMITTED`；MTP staging/完整读回匹配；本版本安装/运行未确认；历史 APK 已移入 SD Archive，报告探针由 A-039 接续；只公开 hash |
 | A-002 | Route-only resolver；self-developed；V2.2 | `29,019` | `7aa794ff8611582fd7cf27808a9d9eb11c44e307889d615d0511c100522845fb` | `RETRACTED`；从未复制、安装或运行；**REJECTED / DO NOT USE**；只公开 hash |
 | A-003 | Corrected route-only resolver；self-developed；V2.3 | `29,019` | `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` | `NOT ADMITTED`；从未复制、安装、附加或运行；只作索引、不分发；只公开 hash |
 | A-004 | RC 2 adjacent Android OTA；input-sample；RC331 `10.00.0700/0205` | `985,959,104` | `f707cf3dc0be2894b111ce4973d0206e896a2c7e9c4ebe43de1040b528cf49ce` | `STATIC`；相邻样本；排除且不分发；只公开 metadata |
@@ -42,18 +42,22 @@
 | A-028 | FindUAS RC 2 RID Admin；self-developed；`0.7.1-flysafe-direct-diagnostic` / code 11 | `197,061` | `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540` | `OBSERVED`；exact audit/MTP/install/run；current direct-readonly transport diagnostic result；group transport callback failed，`11/12 count=0`；无 protobuf/page/terminator/write；不进入本 documentation repo |
 | A-029 | RC331 v07 system aggregate；input-sample；`07.00.0100` | `1,446,604,800` | `296cfa63e3c6b011fd1ee8dd911c11f64dac9d34a8424a6fbb95b0c237ab1ae3` | `STATIC`；signed-chain verification 与离线提取；排除且不分发；只公开 metadata/hash |
 | A-030 | RC331 v07 APEX `adbd`；input-sample；`07.00.0100` | `1,497,232` | `b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422` | `STATIC`；从 exact signed package 离线提取并审计；排除且不分发；只公开 hash |
-| A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `STATIC`；exact package 离线提取并审计；当前实机安装文件 hash 未读回；排除且不分发 |
+| A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `OBSERVED`；原实机 APK/hash 匹配；原包 MTP/readback 匹配，用户已安装并打开 DevActivity；Shell/复测待完成；排除且不分发；只公开 hash |
 | A-032 | RC331 v07 APEX `adbd` CNXN-gate derivative；input-sample；userspace copy | `1,497,232` | `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` | `NOT ADMITTED`；MTP staging/readback 闭合；未复制到内部存储、未 chmod、未执行；vendor derivative 排除且不分发 |
 | A-033 | FindUAS RC 2 RID Admin；self-developed；`0.8.0-flysafe-diagnostic-export` / code 12 | `204,449` | `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177` | `STATIC`；exact audit；MTP staged/readback matched；未安装或运行；sealed APK 排除，源码公开 |
 | A-034 | DJI Fly runtime private mapping；runtime-derived input；`1.21.10` disposable emulator | `205,443,072` | `2926709cc6896c7315d003c4e61208d5a9fa53ae73cda897d820a581c5c8325c` | `OBSERVED`；authorized read-only emulator process-memory copy；仅本地分析；排除且不分发；只公开 hash |
 | A-035 | FindUAS FlySafe agent carrier；self-developed；`0.1.0-emulator-observed` | `23,032` | `16a59c1996e817891dfb84208202cb942456095d4ee98dfa7d8eb17c4c10f289` | `NEGATIVE`；disposable emulator normal installed path 在首个 `=` 被截断；未在 RC 2 使用；generated APK 排除、源码公开 |
 | A-036 | FindUAS FlySafe ART TI staging payload；self-developed；`0.1.0-emulator-observed` | `38,998` | `20a96fdd834e921b546105fd0b2314393a33d242690f731a776c867f70e47069` | `NEGATIVE`；disposable emulator uncommitted `apk_tmp_file` search denied，session 已 abandon；未在 RC 2 使用；generated APK 排除、源码公开 |
 | A-037 | FindUAS RC 2 RID Admin identity safety lock；self-developed；`0.8.1-identity-safety-locked` / code 14 | `225,937` | `8ee7a4edd36c7f97c631fabf3186ac3df79e6611869ebf05b11e83ccba4e84ba` | `NOT ADMITTED`；仅离线构建/测试，未 staged、安装或运行；generated APK 排除、源码公开 |
-| A-038 | RC 2 probe with SD report export；self-developed；`0.11.0-report-export` / code 11 | `2,601,935` | `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed4ec0f8771d6eb8044aa` | `NOT ADMITTED`；MTP staged/完整读回匹配，安装及运行待确认；当前报告导出候选；只公开 hash |
+| A-038 | RC 2 probe with SD report export；self-developed；`0.11.0-report-export` / code 11 | `2,601,935` | `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed4ec0f8771d6eb8044aa` | `OBSERVED`；已安装运行并收到报告，ART build-ID 检查 INCOMPLETE；历史 APK 已移入 SD Archive，由 A-039 接续；generated APK 排除、源码公开；只公开 artifact hash |
+| A-039 | RC 2 ARM32 probe and installed Fly sample exporter；self-developed；`0.12.0-live32-samples` / code 12 | `2,651,903` | `46eb6ef19971256a02514fc51a94b21522c488d82294c8853a7beb52fbab3ce4` | `OBSERVED`；MTP/readback 匹配、已安装运行；COMPLETE 报告与样本收到；当前版本，generated APK 排除、源码公开；只公开 hash/source |
+| A-040 | FindUAS pure ARMv7 ART TI canary；self-developed；`art-ti-canary-v1-armeabi-v7a` | `4,340` | `9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a` | `NOT ADMITTED`；MTP staged/完整读回匹配；未复制到内部、未 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
+| A-041 | DJI Fly exact live ARM32 application sample；input-sample；`1.19.4` / code `3113157` / armeabi-v7a | `426,180,752` | `fb695817a885bd9d4084643d8cae07285a8ac560b6e94edd5c87af4a70b8528c` | `OBSERVED`；从既有实机安装导出，收到后独立完整验证；排除且不分发；只公开 hash |
+| A-042 | FindUAS ARMv7 FlySafe read-only query agent；self-developed；`device-id-minus-one-guard-armeabi-v7a` | `15,464` | `88d88ba10396a790d5d6675e70b44a21c01a71bbb92b4c80978998837ae75e25` | `NOT ADMITTED`；离线构建与 host 检查通过；未 staged、未在 RC 2 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
 
-## 3. A-001：当前 v0.10 admission probe
+## 3. A-001：历史 v0.10 admission probe
 
-`STATIC`：A-001 是当前 zero-permission admission-probe 候选，覆盖旧 v0.8 状态。其 schema 为 `finduas-rid-probe/v0.10-schema-1`。离线 final-artifact audit 记录：
+`STATIC`：A-001 是历史 zero-permission admission-probe 候选，曾覆盖旧 v0.8 状态；当前版本为 A-039。其 schema 为 `finduas-rid-probe/v0.10-schema-1`。离线 final-artifact audit 记录：
 
 - 43 tests 通过；
 - 21/21 adversarial audit mutations 被拒绝；
@@ -65,6 +69,8 @@
 `OBSERVED`（C-231，2026-08-30）：保存的精确 APK 再次通过源码/final-DEX 审计及 21/21 mutation 检查；已作为单个新文件 `Download/FindUAS_A001_V010.apk` 放入 RC 2 removable SD。fresh 唯一文件名/大小检查及同会话完整读回 SHA-256 均匹配，没有重传或覆盖旧文件。
 
 `NOT ADMITTED`：安装与运行仍待操作者确认。即使将来得到 `COMPLETE` report，也只建立报告声明的环境/身份事实，不建立 RID 状态、Binder transaction authorization、attach permission 或 setter admission。
+
+C-244：A-001 的 SD APK 已移入 `Download/FindUAS/Archive`，没有删除；这不补充本版本的安装/运行记录。
 
 旧 v0.8/v0.9 只作为本地 provenance 保留，不是当前 staging instruction。v0.1–v0.4 统一登记在 A-012，因 localhost second-client 架构而 `RETRACTED`。
 
@@ -299,8 +305,7 @@ backing path，exact target image 没有 `/system/bin/adbd`。A-030 与此前审
 `cmp` 相等，因此 target-version gate 结论不再只是 adjacent inference。
 
 A-031 是 exact package 中的 `dpad_fuli.apk`。它与已审计样本逐字节相等，所以 manifest、
-`ShellCommandActivity` 和 `Runtime.exec` 行为是 target-package `STATIC` 事实。其 installed-live
-hash、实际进程 UID/SELinux context 和任何 command output 均尚未由实机读回。
+`ShellCommandActivity` 和 `Runtime.exec` 行为是 target-package `STATIC` 事实。C-235/C-237 的实机报告后来核对了原安装 APK/hash、平台 signer 和 system-shared-UID 身份。C-242 又记录原包 MTP staging/readback 匹配及用户安装后打开 DevActivity；未进入 Shell 页。当前尚无安装后 probe、Shell output 或 loader 执行结果。
 
 A-032 是 vendor-derived、不可分发的 userspace-copy 实验工件。语义 patcher 只将 exact A-030
 的 `handle_packet(CNXN)` gate-value instruction 从 `cset w21, lt` 改为 `mov w21, wzr`，保持
@@ -386,4 +391,25 @@ C-233 固定新版本 `0.11.0-report-export` / code 11。69 JVM tests、8 audito
 
 唯一新增写入为用户要求的 SD 报告：固定 `Download/FindUAS/Probe/`，每次一个新文件，完整 UTF-8/close 后 publish，失败仅清理本次 pending URI。报告写入不能改变检查结果，也不授予 DJI 控制或 attach 能力。审阅边界见 [v0.11 说明](../apps/rid-admission-probe/REPORT_EXPORT_V11.md)。
 
-C-234：`Download/FindUAS_A038_V011.apk` 已在 target-locked RC 2 会话中 staged 并完整读回核对 hash，未覆盖旧文件。安装、运行和实际报告文件读回仍待操作者完成，不把 APK 传输当作导出成功。
+C-234 记录 `Download/FindUAS_A038_V011.apk` staging/完整读回匹配且无覆盖。C-235 随后收到 10,698-byte 实机报告，确认本版本已安装运行；报告中的 Fly 1.19.4 / code 3113157、ARM32 和 JNI 身份可用，但其 ELF build-ID 检查为 INCOMPLETE。C-244 已把这一历史 APK 移入 SD Archive；当前探针为 A-039。
+
+
+## A-039：ARM32 实机探针与固定样本导出
+
+C-236 固定版本 `0.12.0-live32-samples` / code 12：94 JVM tests、8 auditor regressions、37/37 拒绝 mutation，lint 无问题；两次 clean build 完全一致，零权限、v2 签名与 zipalign 通过。新增 ELF32 ART build-ID 读取、禁用组件可见性，以及固定 DJI Fly 1.19.4 APK/库的 SD ZIP 导出；报告导出不改变原 COMPLETE 判定。详见 [v12 审计说明](../apps/rid-admission-probe/REPORT_EXPORT_V12.md)。
+
+C-237 记录 APK staging/readback 匹配、安装运行和 10,794-byte COMPLETE 报告收到。C-238 记录随后导出的完整 APK 与三个 SDK 库收到并通过独立内容验证。A-039 留在当前 SD 入口，八个旧 APK 仅移入 Archive（C-244）。
+
+## A-040 与 A-042：ARMv7 canary 和独立查询 agent
+
+A-040 是只检查 ART TI 接口的纯 canary：请求 `0x70010200`、检查接口版本并记录结果，不枚举类或发起查询。10 host tests 与 4 拒绝 mutation 通过；C-243 的 SD staging/完整读回 hash 匹配。没有内部复制、attach 或执行记录，不能把 SD 文件存在写成 loader 成功。
+
+A-042 是另一工件：它保留既有只读 FlySafe 查询机制，新增 `-1` 初始化 sentinel 拒绝和显式 ARMv7 构建选择，原 ARM64 默认不变。C-239 将其 Java descriptor、成功 envelope、JNI 注册和 core bridge 对到 exact 1.19.4；host checks 通过，但 A-042 仅离线构建，未 staged 或在 RC 2 运行。两者独立源码及构建边界见 [实验 README](../experiments/jvmti/jvmti_flysafe_inprocess_query/README.md)，生成 SO 均不入库。
+
+## A-041：实机 DJI Fly 1.19.4 输入样本
+
+A-041 来自原已安装的 DJI Fly，不是把旧 1.21.10 样本重新标记版本。固定样本 ZIP 内的 APK、`libsdk_jni.so`、`libsdk_key_value.so` 和 `libsdk_base.so` 全部通过 manifest、entry、大小和流式 SHA-256 独立验证；APK 的版本、ARMv7 ABI、signer 与报告相符，SDK JNI hash 也匹配（C-238）。
+
+首次本地主机读取因进度检查漏算 libmtp 的 16-byte 请求开销而返回 error；原 payload 已完整落盘，只有独立验证全部通过后才作为分析样本接受。修正 reader 的进度范围并用 13 个本地向量验证，不将原 error 返回改写为传输成功。APK、库、反编译结果和原始报告均留在本地；此表只登记原 APK 的身份，不分发任何厂商材料。
+
+C-235–C-244 的实机步骤及后续状态统一见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。

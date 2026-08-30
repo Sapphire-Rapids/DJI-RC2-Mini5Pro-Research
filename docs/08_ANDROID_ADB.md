@@ -6,12 +6,17 @@
 - `OBSERVED`：限定握手中，主机成功发送 ADB `CNXN`，控制器在约 15 秒的 bulk-IN 窗口内没有返回 `AUTH TOKEN`、`CNXN` 或其他 ADB packet。
 - `NEGATIVE`：没有 shell、`OPEN`、APK 安装命令、Android 命令、重启、fastboot、root、remount、agent attach 或 DJI 协议请求经 ADB 执行。
 - `STATIC`：已取得并验证 RC331 `07.00.0100` signed system chain。其 APEX `adbd` 与先前审计样本逐字节相同，target-version `handle_packet(CNXN)` 确含 DJI production/debug-count 的 pre-AUTH return。
-- `UNKNOWN`：当前实机的 `ro.boot.mp_state`、`ro.boot.dbg_cnt`、mounted `adbd` hash 与分支 log 尚未读取；signed target package 静态事实不能改写成 live branch trace。
+- `OBSERVED`：v0.12 已读到 `ro.boot.mp_state=production`、`ro.debuggable=1`、SELinux enforcing=false；`ro.boot.dbg_cnt` 返回空字符串。mounted `adbd` hash 与分支 log 仍待获取（C-237）。
 - `STATIC`：exact v07 `dpad_fuli.apk` 与已审计开发助手逐字节相同，因而“shell命令测试”页的 `Runtime.exec` 与 stdout-only 边界是 target-version 静态事实。
 - `STATIC/NOT ADMITTED`：只改一条 gate-value instruction 的 userspace copy 已生成并审计；MTP staging/readback 已闭合，但它尚未复制到内部存储、chmod 或执行。
 - `HYPOTHESIS`：第一包直接 public-key 可能进入 exact daemon 的独立 AUTH branch；该动作未执行，会触发授权提示或持久授权状态，因而不是只读结果，也不是默认下一步。
 
 本文不包含设备序列、USB location、主机 transport ID、ADB key、授权记录、绝对路径、原始 USB packet dump 或厂商代码正文。
+
+2026-08-31 更新：C-235--C-243 已取得实机 Fly 1.19.4/ARMv7 与系统文件基线，并通过同版本
+原包重装恢复开发助手入口。操作者确认 DevActivity 可打开，尚未点击 Shell 按钮。
+当前先读取安装后的 A-039 报告，再确定 Shell 身份及加载位置；A-032 仍未内部复制或执行。
+详见 [实机环境与加载进展](23_RC2_LIVE_RUNTIME.md)。下文保留此前 ADB 实验和历史工件记录。
 
 ## 2. Live USB descriptor
 
@@ -269,7 +274,10 @@ authorization key、未显示 prompt、未改变 authorization database。
 只有 normal patched path 失败并形成一个新的精确 discriminator 后才重新评估；key 与原始 packet
 不进入本仓库。
 
-## 11. 操作者回来后的同一 session
+## 11. 历史 A-032 备选流程（未执行）
+
+当前不执行本节。当前操作是 A-039 能力检查，随后取得实际 Shell/路径基线并验证 A-040，
+见 [当前实机步骤](23_RC2_LIVE_RUNTIME.md#下一步)。以下保留此前 A-032 的两段式设计。
 
 本 session 分成两个短段；第二段必须根据第一段的 live UID、SELinux 与 filesystem 结果即时生成，
 不得预写一个未经验证的 internal executable path。

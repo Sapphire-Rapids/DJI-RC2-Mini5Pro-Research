@@ -3,6 +3,9 @@
 Times are Asia/Shanghai unless explicitly stated. File modification times were used only to order
 work when a report did not contain a more precise timestamp.
 
+[Latest progress: 2026-08-31](#2026-08-31) ·
+[Current device step](23_RC2_LIVE_RUNTIME.md#下一步)
+
 ## 2026-08-27
 
 ### 02:33–05:12 — USB routes and fixed read-only state
@@ -752,3 +755,60 @@ work when a report did not contain a more precise timestamp.
 - Completed 69 JVM tests, 8 auditor tests, final-DEX review, 30 adversarial mutations and two byte-identical clean builds (C-233). Retested the historical v0.10 artifact/21 mutations separately.
 - Staged exact A-038 as `Download/FindUAS_A038_V011.apk` through the RC 2-only MTP target and verified full same-session readback (C-234). No existing file was overwritten.
 - Requested operator installation and one check, followed by a simple saved-state confirmation so the host can fetch the report directly. Installation, run and report receipt remain unconfirmed; no ADB/attach/aircraft command/motor/RF operation occurred.
+
+### v0.11 — first SD report received
+
+- `OBSERVED`: retrieved the complete A-038 v0.11 report through RC 2 removable-SD MTP (C-235).
+  It identified installed Fly `1.19.4` / code `3113157`, ARMv7. The report was `INCOMPLETE` because
+  the old ELF64-only parser could not read the actual 32-bit ART build ID.
+- The two original inspection sections completed. The full report remains private.
+
+### v0.12 — complete report and sample-export revision
+
+- `STATIC`: built A-039 v0.12 with ELF32 support, runtime component-enabled checks, fixed boot
+  properties and an explicit APK/SDK sample-export button. 94 JVM tests, 8 auditor tests,
+  37 rejected mutations and two identical clean builds passed (C-236).
+- `OBSERVED`: staged `Download/FindUAS_A039_V012.apk` with matching readback; the operator ran it
+  and the returned report was `COMPLETE`. The same ART file now supplied its GNU build ID;
+  Fuli's three queried components were identified as disabled (C-237).
+- Report completion times on the device clocks, converted to Asia/Shanghai: v0.11 at 23:08:57
+  and v0.12 at 23:49:02.
+
+## 2026-08-31
+
+### 实机样本到达并完成校验
+
+- `OBSERVED`：读取约 510 MB 的导出包，APK 与三份 SDK 库齐全；ZIP、manifest、逐文件
+  SHA-256、APK 版本/ABI/签名及 APK 内库一致性检查通过（C-238，A-041）。
+- 修复本地读取器对 libmtp 末次进度中 16 字节开销的误判；已落盘的完整内容独立验证通过，
+  操作者无需重导。13 个离线边界向量通过，原始日志与样本保留在本地。
+
+### 实机版本接口定位与 ARMv7 适配
+
+- `STATIC`：定位 1.19.4 的 Java → JNI → FlySafe core 查询链，确认旧查询程序的接口和
+  返回 envelope 可复用；增加未初始化设备 ID `-1` 的拒绝条件与 ARMv7 构建，解析器测试
+  和两种 ABI 构建通过（C-239，A-042）。
+- `STATIC`：另外定位独立 RID 状态链 `11/1C → RidImportModule → KeyRidWorkingStatusPush`
+  及 Java 模型/监听入口，记录初值和缓存重放行为（C-240）。
+- 操作者说明未办理解禁且暂时无法提供证书页截图；人工页面查看暂缓，后续优先独立 RID
+  状态观测。该说明未被写成已读取的许可证清单。
+
+### 开发助手入口恢复
+
+- `STATIC`：确认生产模式启动策略会禁用 Fuli 整包，普通设置主按钮受平台签名限制；
+  标准同版本、原签名替换在成功收尾恢复 DEFAULT，卸载更新与重启有对应恢复路径（C-241）。
+- `OBSERVED`：USB 重连后，原始 A-031 包 staged 为 `Download/RC2_FULI_ORIG.apk`，完整
+  MTP 回读匹配。操作者安装后确认开发助手可正常打开，内部按钮未点击（C-242）。
+
+### 加载测试与 SD 文件整理
+
+- `STATIC`：新增纯 ARMv7 ART TI canary，10 项 fake-VM 测试通过，4 个故障变体被拒绝；
+  ARMv7/ARM64 构建成功。ARMv7 A-040 已放入 SD 卡并完整回读，尚未内部复制或执行（C-243）。
+- `OBSERVED`：8 个旧研究 APK 移至 `Download/FindUAS/Archive/`，前后文件名/大小清单一致，
+  没有删除文件；当前 A-039、Fuli 原包与其他当前工具留在 Download（C-244）。
+- 已明确下一次操作者动作：打开 A-039，执行能力检查并保存开发助手安装后的新报告。
+
+### 持续同步到 GitHub
+
+- 按操作者要求补齐本轮源码、脱敏进度和证据/工件索引，并在首页加入本时间线入口。
+- 协作规则已加入每次新结果后的 timeline、校验、提交及 GitHub 同步步骤。

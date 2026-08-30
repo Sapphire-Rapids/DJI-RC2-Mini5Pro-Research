@@ -1,17 +1,17 @@
 # FindUAS RID Observer — research-only APK
 
-Status: **source-only v0.11 report-export revision**; device installation/run remain unconfirmed. This
-directory contains only independently written `src/safe` and `src/safeTest` code. It is covered by
-the repository-root [MIT license](../../LICENSE). Generated APKs, vendor files, and the withdrawn
-localhost/socket source are intentionally excluded.
+Status: **OBSERVED — v0.12 installed and run on RC 2; COMPLETE report and fixed Fly samples
+received and validated on the host** (C-236–C-238). This directory contains independently written
+`src/safe` and `src/safeTest` code under the repository-root [MIT license](../../LICENSE).
+Generated APKs, collected vendor samples, private reports and withdrawn socket source are excluded.
 
-2026-08-30 checkpoint (C-231): the preserved exact v0.10 APK passed the current source/final-DEX
-audit and 21/21 mutation checks again. It is now staged as one new removable-SD
-`Download/FindUAS_A001_V010.apk`; fresh unique listing and full readback match the registered
-size/hash. Installation and execution remain unconfirmed. This does not admit any attach, DJI
-protocol transaction or control operation. The historical audit below is unchanged.
+Current artifact A-039 is `0.12.0-live32-samples` / code `12`, `2,651,903` bytes, SHA-256
+`46eb6ef19971256a02514fc51a94b21522c488d82294c8853a7beb52fbab3ce4`.
+See [v0.12 report/sample export](REPORT_EXPORT_V12.md) and the
+[RC 2 live runtime record](../../docs/23_RC2_LIVE_RUNTIME.md). Historical v0.10/v0.11 artifacts and
+audits remain separate; their earlier pending states are not the current v0.12 state.
 
-Build and source-only audit with Gradle 8.10.2, JDK 21, and Android SDK 35:
+Build and offline source/final-DEX audit with Gradle 8.10.2, JDK 21, and Android SDK 35:
 
 ```sh
 export JAVA_HOME=/path/to/jdk-21
@@ -28,40 +28,58 @@ export GRADLE_BIN=/path/to/gradle-8.10.2/bin/gradle
 > client fd rather than a fan-out tap. A new connection may replace the fd already used by DJI
 > Fly even when the new client never writes a byte. Do not start their observer service, do not
 > use them for passive capture, and do not treat “input-only” as non-disruptive. If one is
-> installed, leave it stopped and update in place to v0.10.
+> installed, leave it stopped and update in place to the current v0.12 probe.
 
-## Current v0.11: save the report on SD for host retrieval
+## Current v0.12: live ARM32 checks and two fixed SD exports
 
-The user explicitly requested SD report output. Version `0.11.0-report-export` / code `11`
-keeps the same package/signing identity and the existing read-only device checks. It adds no
-permission, device command, target-code write, socket, attach, service or automatic network upload.
-Only the generated diagnostic report is written.
+The user authorized diagnostic report export and collection of the installed DJI Fly 1.19.4 APK
+and three named SDK libraries. Version `0.12.0-live32-samples` keeps package
+`com.finduas.ridobserver`, requires Android 10/API 29 or later, and was run on RC 2 Android 11/API 30.
+It supports ELF32 and ELF64 GNU build-id parsing; this fixes the earlier probe's ELF64-only failure
+in the observed 32-bit process. Component checks include disabled components and runtime enabled
+settings. Fixed reads now also report `ro.boot.mp_state` and `ro.boot.dbg_cnt`.
 
-After tapping **执行只读能力检查**, both `COMPLETE` and `INCOMPLETE` results automatically save
-one new UTF-8 file on the unique mounted removable SD volume:
+After tapping **执行只读能力检查**, a terminal `COMPLETE` or `INCOMPLETE` result saves one new
+UTF-8 report, at most 256 KiB, under:
 
 ```text
-Download/FindUAS/Probe/FindUAS_Probe_v011_<completed-time>_<run-id>_<attempt-id>.txt
+Download/FindUAS/Probe/FindUAS_Probe_v012_<completed-time>_<run-id>_<attempt-id>.txt
 ```
 
-Keep the app open until the save result. No file picker or clipboard transfer is required. A failed
-save offers **重新保存报告到 SD 卡（不重新检查）**. Each attempt has a new name; existing files
-are never replaced. No/multiple SD volumes, unavailable MediaStore, oversized/truncated output,
-write/close/publish failure and failed pending-row cleanup are separate results. There is no
-internal-storage fallback and no broad storage permission.
+The separate **导出 DJI Fly 1.19.4 分析样本到 SD 卡** button copies only PackageManager's fixed
+`dji.go.v5` package/version paths: `DJI_FLY.apk`, `libsdk_jni.so`, `libsdk_key_value.so` and
+`libsdk_base.so`. The APK and JNI library are required; the other two libraries are optional and
+reported as missing when absent. One new ZIP with per-file sizes/SHA-256 and `manifest.json` goes to:
 
-The report is at most 256 KiB and must end with `report_file_end=true`. Its core machine schema
-remains `finduas-rid-probe/v0.10-schema-1`, with `app_version=0.11.0-report-export` added. Export
-success never changes the inspection's completion verdict. Report files contain local diagnostic
-paths and run metadata; keep them private and do not commit them.
+```text
+Download/FindUAS/Samples/FindUAS_Fly1194_<attempt-id>.zip
+```
 
-The host must obtain a fresh final-name MTP listing and full readback. `IS_PENDING=0`/the UI's saved
-state proves only local publication, not host receipt. Rotation/resume cannot duplicate an export;
-process death can lose an unfinished report. See [v0.11 export and audit](REPORT_EXPORT_V11.md).
+Both outputs require exactly one mounted, removable, non-primary, non-emulated SD volume and use
+new pending MediaStore Downloads rows. Neither overwrites existing files or falls back to internal
+storage. Only the two reviewed stores may write; no permission, native library, network/socket,
+DJI protocol transaction, attach or external process is added. Source package/library files remain
+read-only. Keep the app open until completion; other operations are disabled during copying.
 
-The following v0.10 design and audit notes describe the preserved historical artifact. Their
-blanket file-output ban is unchanged for v0.10; the current source has only the reviewed v0.11
-report sink exception above.
+Report-save failure offers **重新保存报告到 SD 卡（不重新检查）**, retaining the same inspection
+snapshot with a fresh output name. Report and sample export results never change the inspection
+verdict. The report retains `finduas-rid-probe/v0.10-schema-1`, adds the current `app_version`, and
+ends with `report_file_end=true`. Both report bodies and vendor ZIPs stay private.
+
+C-237 records the received v0.12 `COMPLETE` report; C-238 records all four sample files received
+and independently validated. Local MediaStore success alone is still not host receipt: every new
+output needs a fresh MTP listing and complete readback. The developer assistant can now be opened
+according to the operator, but a new probe report after that installation is pending. The next
+operator action is to reopen the installed probe and tap **执行只读能力检查**.
+
+C-236 records 94 JVM tests, 8 auditor tests, 37/37 rejected audit mutations, lint with no issues,
+v2 signature and zip alignment, manual source/final-DEX review, and two byte-identical clean builds.
+The default audit profile is `v12`; `--profile v10` and `--profile v11` retain their own historical
+final-DEX audits. See [v0.12 details](REPORT_EXPORT_V12.md) and
+[historical v0.11 report export](REPORT_EXPORT_V11.md).
+
+The following v0.10 design/audit notes describe that historical artifact. Its blanket file-output
+ban remains unchanged for v0.10; current source has the two reviewed v0.12 output exceptions above.
 
 ## Safe replacement design: v0.10
 
