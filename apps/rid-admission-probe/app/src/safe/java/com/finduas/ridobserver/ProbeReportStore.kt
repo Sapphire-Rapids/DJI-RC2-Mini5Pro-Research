@@ -38,7 +38,7 @@ internal data class ProbeReportSaveResult(
 /** A single new report in MediaStore on the unique mounted removable volume; no file-path API. */
 internal object ProbeReportStore {
     const val RELATIVE_DIRECTORY = "Download/FindUAS/Probe/"
-    const val FILE_PREFIX = "FindUAS_Probe_v011_"
+    const val FILE_PREFIX = "FindUAS_Probe_v012_"
     const val MAX_REPORT_BYTES = 256 * 1024
     private val canonicalRunId = Regex(
         "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"

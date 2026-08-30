@@ -19,6 +19,9 @@ from audit_artifact import (
     dex_method_block,
     local_register,
     REPORT_DESCRIPTOR,
+    SAMPLE_DESCRIPTOR,
+    CURRENT_PROFILE,
+    PROFILES,
     run,
     tool,
 )
@@ -87,7 +90,7 @@ def overwrite_file_error(match: re.Match[str]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=("v10", "v11"), default="v11")
+    parser.add_argument("--profile", choices=tuple(PROFILES), default=CURRENT_PROFILE)
     parser.add_argument("apk", type=Path)
     args = parser.parse_args()
     apk = args.apk.resolve()
@@ -280,7 +283,7 @@ def main() -> int:
             "ILjava/lang/Object;)V"
         ),
     }
-    if args.profile == "v11":
+    if args.profile in ("v11", "v12"):
         store_descriptor = REPORT_DESCRIPTOR + ";"
         android_descriptor = REPORT_DESCRIPTOR + "$AndroidStore;"
         safety_mutations.update({
@@ -289,7 +292,7 @@ def main() -> int:
             "report_relative_path_becomes_data_path": replace_report_class(
                 app_dump, android_descriptor, '"relative_path"', '"_data"'),
             "report_file_prefix_becomes_arbitrary_uri": replace_report_class(
-                app_dump, store_descriptor, "FindUAS_Probe_v011_", "content://other/"),
+                app_dump, store_descriptor, PROFILES[args.profile]["report_prefix"], "content://other/"),
             "primary_volume_rejection_removed": replace_report_class(
                 app_dump, store_descriptor, '"external_primary"', '"unmatched_volume"'),
             "removable_check_replaced_by_primary_check": replace_report_class(
@@ -316,6 +319,30 @@ def main() -> int:
         safety_mutations["cleanup_uses_unowned_uri"] = app_dump.replace(
             cleanup_method, cleanup_method.replace(".ownedUri:", ".unownedUri:", 1), 1
         )
+    if args.profile == "v12":
+        sample = SAMPLE_DESCRIPTOR + ";"
+        source = SAMPLE_DESCRIPTOR + "$AndroidSource;"
+        store = SAMPLE_DESCRIPTOR + "$AndroidStore;"
+        entry = SAMPLE_DESCRIPTOR + "$Entry;"
+        safety_mutations.update({
+            "sample_targets_another_package": replace_report_class(
+                app_dump, source, '"dji.go.v5"', '"com.dpad.fuli"'),
+            "sample_uses_app_data_instead_of_apk": replace_report_class(
+                app_dump, source, ".sourceDir:Ljava/lang/String;", ".dataDir:Ljava/lang/String;"),
+            "sample_uses_app_data_instead_of_native_dir": replace_report_class(
+                app_dump, source, ".nativeLibraryDir:Ljava/lang/String;", ".dataDir:Ljava/lang/String;"),
+            "sample_archive_entry_escapes_fixed_set": replace_report_class(
+                app_dump, entry, '"libsdk_jni.so"', '"../license.db"'),
+            "sample_output_directory_widens": replace_report_class(
+                app_dump, store, "Download/FindUAS/Samples/", "Download/"),
+            "sample_target_version_changes": replace_report_class(
+                app_dump, sample, '"1.19.4"', '"1.21.10"'),
+            "another_class_constructs_zip_writer": (
+                app_dump + "\nClass #999999 -\n"
+                "  Class descriptor  : 'Lcom/finduas/ridobserver/UnreviewedZipWriter;'\n"
+                "|0000: new-instance v0, Ljava/util/zip/ZipOutputStream;"
+            ),
+        })
     for name, mutation in safety_mutations.items():
         try:
             audit_app_dex_safety(mutation, enforce_frozen_surface=False, profile=args.profile)

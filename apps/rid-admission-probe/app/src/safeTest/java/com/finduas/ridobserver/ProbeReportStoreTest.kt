@@ -20,7 +20,7 @@ class ProbeReportStoreTest {
         assertEquals(ProbeReportCleanupStatus.NOT_NEEDED, result.cleanupStatus)
         assertEquals("Download/FindUAS/Probe/", result.relativeDirectory)
         assertTrue(result.displayName!!.matches(Regex(
-            "FindUAS_Probe_v011_1234_${runId}_[0-9a-f]{8}-[0-9a-f]{4}-" +
+            "FindUAS_Probe_v012_1234_${runId}_[0-9a-f]{8}-[0-9a-f]{4}-" +
                 "[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.txt"
         )))
         assertEquals("test-sd-a", store.selectedVolume)

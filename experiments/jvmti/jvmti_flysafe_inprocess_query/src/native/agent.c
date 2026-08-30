@@ -215,7 +215,7 @@ JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM *vm, char *options, void *reserved)
         device_id = (*env)->CallIntMethod(env, event_instance, current_device_id);
     }
     exception |= clear_exception(env);
-    if (event_instance == NULL || exception != 0 || device_id == 0) {
+    if (event_instance == NULL || exception != 0 || device_id == 0 || device_id == -1) {
         stage = 11;
         goto done;
     }

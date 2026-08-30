@@ -1,4 +1,7 @@
-# v0.11 SD report export
+# v0.11 SD report export — historical
+
+Superseded by [v0.12 report/sample export](REPORT_EXPORT_V12.md). The v0.11 artifact and audit
+profile below remain unchanged; they do not certify the additional v0.12 sample sink.
 
 The user requested that the probe save its report on RC 2 removable SD so the host can read it
 through MTP. This is a narrow output exception to the historical v0.10 file-write ban. Device
@@ -62,4 +65,9 @@ A-038: `2,601,935` bytes, SHA-256 `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed
 
 The report store source (`80bec1fca211e41d86097630cae954104b617af76fbcd21106a5030f00e9265d`) and its six-class DEX family (`96fa9e54a92e65ac31d3c8f26646c049ae08ec524a3680b9384f2bfddbe6b258`) were manually reviewed. The full app-owned external-invoke multiset is 2627 calls / `4cc4ecb553f9c45689c29f09f8e6292e4dbceb92b438af82085b173e6f8c0f5c`; the 266 additions were reviewed and the original ART/framework-read surface retained.
 
-C-234 records APK staging/full readback only. The staged name is `Download/FindUAS_A038_V011.apk`; installation, execution and report-file receipt remain unconfirmed. No whole report or raw MTP log is published here.
+C-234 records staging/full readback as `Download/FindUAS_A038_V011.apk`. C-235 records the subsequent
+private v0.11 report confirming installation, execution and report receipt: it was `INCOMPLETE` with
+`art.state=ELF_BUILD_ID_FAILED` because the old reader accepted ELF64 only while the probe ran as
+32-bit. C-237 records the later v0.12 `COMPLETE` result after ELF32 support was added. See the
+[RC 2 live runtime record](../../docs/23_RC2_LIVE_RUNTIME.md). No full report or raw MTP log is
+published here.

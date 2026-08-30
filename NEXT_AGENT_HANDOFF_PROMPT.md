@@ -17,7 +17,8 @@ Read:
 - `docs/19_RID_EXPERIMENT_CONTROL_MATRIX.md`
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
-- claims C-188--C-231, especially C-207 and C-227--C-231
+- `docs/23_RC2_LIVE_RUNTIME.md`
+- claims C-235--C-244 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -32,28 +33,31 @@ Current facts:
   closed negatives. Do not repeat them or guess route variants.
 - The exact FlySafe owner/query path is emulator-observed. Ordinary installed-path,
   `trace_data_file`, and `apk_tmp_file` loader routes are closed; do not repeat them (C-208--C-211).
-- The original local research corpus has been located. Selected core DJI Fly/RC331 samples and
-  A-032/A-033 outputs were rehashed and match the registered identities; this does not establish
-  current installed or mounted RC 2 identity or change artifact admission.
+- The installed Fly is now verified as `1.19.4` / code `3113157`, ARMv7. A-039's COMPLETE
+  report and the installed APK/three SDK samples were retrieved; Fuli/framework/services hashes
+  and 32-bit ART identity are recorded. Earlier `1.21.10` results retain their original scope.
 - The latest 1558-slot/915-name enumeration files and completed C-207 RF timeline were not found
   in the bounded sandbox search. They may remain in old task outputs or application history;
   do not call them lost or replace missing provenance with a new device request by default.
 - No real-aircraft field editor is admitted. Synthetic OpenDroneID work stays offline and does
   not substitute for aircraft owner/readback/RF evidence.
-- Exact A-038 v0.11 is staged as removable-SD `Download/FindUAS_A038_V011.apk`; full MTP
-  readback matched its size/hash (C-233/C-234). After operator installation/check, retrieve its
-  final report from `Download/FindUAS/Probe/` directly through MTP. Installation/run and report
-  receipt are pending; APK delivery or export success does not admit an attach or aircraft request.
+- A-039 is the current probe: `Download/FindUAS_A039_V012.apk`. Old installers are in
+  `Download/FindUAS/Archive/`. The original Fuli package has been reinstalled and the operator
+  confirms DevActivity opens, with no internal button clicked. The next expected input is a new
+  A-039 report after that installation (C-242).
+- A-040 is the new ARMv7 ART TI-only canary, already SD-staged but unexecuted. A-042 is the
+  ARMv7 query build with the additional `-1` guard. The separate RID-state chain is mapped in
+  C-240; unlock registration and the deferred certificate-page screenshot are not prerequisites.
 
 Priority:
 
 1. Recover provenance for existing FLYC and receiver records where available; account for the
    1558 reported table slots versus 915 named rows without exposing private data.
-2. The next device objective is a bounded read-only RC 2 identity baseline, including current
-   DJI Fly and caller/target signer, ABI and SELinux facts. Do not preselect an executable path.
-3. Admit a legitimate delimiter-free loader or mediated descriptor from that evidence, then run
-   the official inventory query once with a fresh callback and unchanged DJI Fly PID. Do not
-   start with a setter, repeat the closed loaders or assume an ordinary APK can attach.
+2. Read the post-install A-039 report, then obtain Fuli's actual Shell identity and directory
+   permissions. Keep the verified Fly version fixed and select an executable path from that data.
+3. Validate A-040's explicit success marker and unchanged Fly PID, then advance the independent
+   RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to
+   be checked before creating an observer. Keep old closed loaders and sender variants retired.
 4. Independently map Basic/UAS ID, aircraft position, operator position and Operator ID owners,
    read paths and RF fields. An app location update or compliance serial is not yet RF correspondence.
 5. Complete C-207's motor-off → motor-on → motor-off standard-bearer record with the operator if
@@ -64,4 +68,5 @@ Priority:
 Keep privileged runtime actions bounded and controlled. Do not repeat the public RC 2 TEE/eFuse
 tamper/update bricking path (C-212). Do not publish vendor material, raw captures, full identifiers,
 or coordinates. Keep scripts small, record every result, run the four repository checks, commit,
-and push to `main`.
+and push to `main` after each material result. Append completed actions to the existing timeline;
+keep current operator instructions in the runtime topic and handoff, rather than creating competing logs.

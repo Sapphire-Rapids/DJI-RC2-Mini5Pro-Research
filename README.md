@@ -3,12 +3,15 @@
 [![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-30 的实机观察、
+这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-31 的实机观察、
 固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题，并逐步
 纳入可复现的自研 APK 源码、host tools、tests 和合成 fixtures。
 
 档案中的产品名称只用于说明研究对象。项目不是 DJI 官方产品，无隶属或背书关系；实验室的
 授权声明与非官方产品身份分开记录。
+
+**最新进展：[2026-08-31 时间线](docs/03_TIMELINE.md#2026-08-31)** ·
+[实机环境与当前操作](docs/23_RC2_LIVE_RUNTIME.md)。每次取得新结果后同步更新。
 
 新建或接续 Codex 任务时，请使用
 [`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md) 中的精简提示词。它把本项目准确界定为
@@ -22,9 +25,9 @@
 
 | 对象 | 记录值 | 证据边界 |
 | --- | --- | --- |
-| 遥控器 | DJI RC 2；界面固件 `07.00.0100` | exact signed system/`0205` package 已验证；mounted live files/properties 仍未读回，其他平台结论仍可能来自相邻样本 |
+| 遥控器 | DJI RC 2；界面固件 `07.00.0100` | 已读回 ART、Fuli、framework/services 与部分系统属性；mounted adbd 身份仍待核对（C-235/C-237） |
 | 飞机 | DJI Mini 5 Pro；固件 `01.00.0600`；静态候选 WA150 / product 139 | 固件为操作者确认（C-220）；product/route 仍需 live session 重新确认；`01.00.0600` 落在 CVE-2026-78306/77812 受影响窗口 |
-| DJI Fly | 重点分析样本 1.21.10 | exact APK 已在 disposable emulator 运行并作 runtime 分析；仍不自动等同于 RC 2 当前已加载 APK |
+| DJI Fly | 实机 `1.19.4` / code `3113157`，ARMv7；另保留 `1.21.10` 对照 | 实机 APK/库已回传并校验；1.21.10 的模拟器结果保留原版本标签（C-238/C-239） |
 | MSDK | 重点交叉验证 5.18.0 | schema/handler 证据不等于消费级产品支持 |
 | 主机 | macOS；飞机与 RC 2 分别枚举为 DJI USB 设备 | 序列号、端口位置和私人数据不公开 |
 
@@ -56,9 +59,11 @@
 - **接手材料已定位**：旧本地 corpus 中的核心 DJI Fly/RC331 样本及部分 A-032/A-033 输出已
   重新核验 hash，与登记一致；没有导入厂商材料。限定 sandbox 检索尚未找到最新枚举输出及
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
-- **下一实机依赖**：可信只读 RC 2 installed/mounted identity 与 caller/target policy 基线，
-  然后是合法 loader/descriptor 和一次 official inventory query。字段 owner 独立映射；
-  所有真机字段 editor 仍未准入，OpenDroneID 合成工作只做离线 encode/decode/fixtures。
+- **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
+  `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
+- **当前实机步骤（C-242/C-243）**：开发助手原包重装后已能打开。接下来运行 A-039
+  保存新报告，确认系统调用方和文件路径，再执行已准备的 ARMv7 加载测试。
+  字段 owner 与后续 RID 状态观测继续独立推进，合成 codec 保持离线。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
@@ -102,16 +107,15 @@
   单次 US 请求无匹配 ACK，随后 GET 仍为 CN。没有由此获得 Remote ID、频道或 RF 功率证据。
 - RC 2 标准 ADB 在 RSA 认证前停止：主机 `CNXN` 已发出，设备不返回 ADB 包。Exact signed-v07
   APEX `adbd` 已固定 hash 并证明含 `mp_state=production && dbg_cnt<1` 的 pre-AUTH return；运行时
-  path 是 `/apex/com.android.adbd/bin/adbd`，不是 `/system/bin/adbd`。Live properties/mounted hash
-  尚未读回，因此这是 target-package 静态解释，不是 live branch log。
+  path 是 `/apex/com.android.adbd/bin/adbd`。C-237 已读到 `mp_state=production` 与空的
+  `dbg_cnt` 字符串；mounted adbd hash 和实际分支仍待获取。
 - 只改该 gate-value instruction、保留 ordinary TLS/auth path 的 A-032 userspace copy 已生成；
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
-  没有 shell。下一次 operator session 先采集 exact Fuli UID/SELinux/properties/hashes/path labels，
-  再据实生成第二段单次启动命令，不预猜 `/data` path。
-- 当前 Android probe 为 v0.11（A-038）：在原只读检查之上，仅增加用户要求的 SD 报告导出。
-  `Download/FindUAS_A038_V011.apk` 已 staged 并完整读回核对（C-233/C-234）。运行检查后报告
-  自动进入 SD `Download/FindUAS/Probe/`，由主机读取；安装/运行及实际报告读回仍待完成，不能
-  把 APK 交付或报告保存当作 live identity、attach 或 aircraft-control 准入。
+  没有 shell。A-032 保留为备选方案；当前按 A-039 报告、实际 Shell/路径基线、A-040 canary
+  的顺序推进，操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
+- 当前 Android probe 为 v0.12（A-039），文件名 `Download/FindUAS_A039_V012.apk`。
+  首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；当前等待开发助手安装后的
+  新能力报告。v0.11/A-038 已归档。
 - 固定 clean-room 管理客户端 `0.3.0-research` 已安装并执行：live `protocol` Binder lookup、
   manager transaction 和 callback exception layer 均成功，但 target F7 在约 3.1 秒后以
   `ECode 1` 结束，没有 F7 ACK，也没有发送 F9。相邻 RC331 `ActQueue` 将该错误映射为重试耗尽；

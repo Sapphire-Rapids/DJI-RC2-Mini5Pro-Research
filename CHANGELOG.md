@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.22 - 2026-08-31
+
+- Closed SD report receipt and identified the installed Fly as `1.19.4` / code `3113157`, ARMv7.
+  Probe v0.12 (A-039) fixes ELF32 and enabled-state handling and exports fixed installed samples;
+  94 JVM tests, 8 auditor tests, 37 rejected mutations and reproducible builds passed.
+- Verified the live APK and three SDK libraries, mapped the exact FlySafe and independent RID
+  working-status chains, fixed the query's `-1` device-ID guard and added ARMv7 builds (A-042).
+- Added a pure ARMv7 ART TI canary (A-040), its build helper and 10-case fake-VM test; four fault
+  variants were rejected. Added the host test to CI. The canary is SD-staged and unexecuted.
+- Located the normal original-package reinstall path for Fuli. The operator installed the
+  verified original and can open DevActivity; the post-install probe and Shell baseline are next.
+- Archived eight superseded SD installers without deletion. Added claims C-235--C-244,
+  artifacts A-039--A-042 and the current runtime topic; linked the timeline from the home page
+  and made per-result GitHub synchronization part of the update workflow.
+
 ## 0.4.21 - 2026-08-30
 
 - Added the explicitly requested SD report export in probe v0.11/code11 (A-038): one new fixed-

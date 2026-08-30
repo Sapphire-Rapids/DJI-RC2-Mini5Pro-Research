@@ -394,9 +394,13 @@ internal fun interface PositionalReadSource {
 }
 
 internal object ElfBuildIdReader {
-    private const val ELF_HEADER_SIZE = 64
+    private const val ELF_IDENT_SIZE = 16
+    private const val ELF32_HEADER_SIZE = 52
+    private const val ELF64_HEADER_SIZE = 64
+    private const val ELF_CLASS_32 = 1
     private const val ELF_CLASS_64 = 2
     private const val ELF_DATA_LITTLE_ENDIAN = 1
+    private const val ELF32_PROGRAM_HEADER_MIN_SIZE = 32
     private const val ELF64_PROGRAM_HEADER_MIN_SIZE = 56
     private const val PT_NOTE = 4
     private const val NT_GNU_BUILD_ID = 3
@@ -417,23 +421,36 @@ internal object ElfBuildIdReader {
     )
 
     fun read(source: PositionalReadSource, fileSize: Long): String? {
-        if (fileSize < ELF_HEADER_SIZE) return null
-        val header = ByteArray(ELF_HEADER_SIZE)
-        if (!source.readFullyAt(0L, header, header.size)) return null
+        if (fileSize < ELF_IDENT_SIZE) return null
+        val ident = ByteArray(ELF_IDENT_SIZE)
+        if (!source.readFullyAt(0L, ident, ident.size)) return null
         if (
-            header[0] != 0x7f.toByte() || header[1] != 'E'.code.toByte() ||
-            header[2] != 'L'.code.toByte() || header[3] != 'F'.code.toByte() ||
-            header[4].toInt() != ELF_CLASS_64 ||
-            header[5].toInt() != ELF_DATA_LITTLE_ENDIAN
+            ident[0] != 0x7f.toByte() || ident[1] != 'E'.code.toByte() ||
+            ident[2] != 'L'.code.toByte() || ident[3] != 'F'.code.toByte() ||
+            ident[5].toInt() != ELF_DATA_LITTLE_ENDIAN
         ) {
             return null
         }
+        val is32Bit = when (ident[4].toInt()) {
+            ELF_CLASS_32 -> true
+            ELF_CLASS_64 -> false
+            else -> return null
+        }
+        val headerSize = if (is32Bit) ELF32_HEADER_SIZE else ELF64_HEADER_SIZE
+        if (fileSize < headerSize) return null
+        val header = ByteArray(headerSize)
+        if (!source.readFullyAt(0L, header, header.size)) return null
         val view = ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN)
-        val programOffset = view.getLong(32)
-        val programEntrySize = view.getShort(54).toInt() and 0xffff
-        val programCount = view.getShort(56).toInt() and 0xffff
+        val programOffset = if (is32Bit) view.getInt(28).toLong() and 0xffffffffL else view.getLong(32)
+        val programEntrySize = view.getShort(if (is32Bit) 42 else 54).toInt() and 0xffff
+        val programCount = view.getShort(if (is32Bit) 44 else 56).toInt() and 0xffff
+        val minimumEntrySize = if (is32Bit) {
+            ELF32_PROGRAM_HEADER_MIN_SIZE
+        } else {
+            ELF64_PROGRAM_HEADER_MIN_SIZE
+        }
         if (
-            programOffset < 0L || programEntrySize < ELF64_PROGRAM_HEADER_MIN_SIZE ||
+            programOffset < 0L || programEntrySize < minimumEntrySize ||
             programCount <= 0 || programCount > MAX_PROGRAM_HEADERS ||
             !rangeWithinFile(programOffset, programEntrySize.toLong() * programCount, fileSize)
         ) {
@@ -447,8 +464,8 @@ internal object ElfBuildIdReader {
             if (!source.readFullyAt(headerOffset, programHeader, programHeader.size)) return null
             val program = ByteBuffer.wrap(programHeader).order(ByteOrder.LITTLE_ENDIAN)
             if (program.getInt(0) != PT_NOTE) return@repeat
-            val noteOffset = program.getLong(8)
-            val noteSize = program.getLong(32)
+            val noteOffset = if (is32Bit) program.getInt(4).toLong() and 0xffffffffL else program.getLong(8)
+            val noteSize = if (is32Bit) program.getInt(16).toLong() and 0xffffffffL else program.getLong(32)
             if (
                 noteSize <= 0L || noteSize > MAX_NOTE_SEGMENT_BYTES ||
                 !rangeWithinFile(noteOffset, noteSize, fileSize)

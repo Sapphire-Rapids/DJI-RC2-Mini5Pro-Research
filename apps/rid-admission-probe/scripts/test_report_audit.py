@@ -19,12 +19,11 @@ class ReportAuditTests(unittest.TestCase):
             "(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;",
         ) + '|0001: const-string v0, "Download/FindUAS/Probe/"\n'
         descriptors, digest = audit.report_dex_fingerprint(self.accepted)
-        self.descriptor_patch = patch.object(audit, "EXPECTED_REPORT_DESCRIPTORS", descriptors)
-        self.digest_patch = patch.object(audit, "EXPECTED_REPORT_DEX_SHA256", digest)
-        self.descriptor_patch.start()
-        self.digest_patch.start()
-        self.addCleanup(self.descriptor_patch.stop)
-        self.addCleanup(self.digest_patch.stop)
+        self.profile_patch = patch.dict(audit.PROFILES["v11"], {
+            "report_descriptors": descriptors, "report_dex_sha256": digest,
+        })
+        self.profile_patch.start()
+        self.addCleanup(self.profile_patch.stop)
 
     def check(self, dump, profile="v11"):
         audit.audit_app_dex_safety(dump, enforce_frozen_surface=False, profile=profile)
@@ -60,7 +59,7 @@ class ReportAuditTests(unittest.TestCase):
                     self.check(self.accepted.replace("Download/FindUAS/Probe/", value))
 
     def test_unreviewed_new_writer_is_fail_closed(self):
-        with patch.object(audit, "EXPECTED_REPORT_DEX_SHA256", None):
+        with patch.dict(audit.PROFILES["v11"], {"report_dex_sha256": None}):
             with self.assertRaisesRegex(audit.AuditFailure, "manual safety review"):
                 self.check(self.accepted)
 
@@ -69,6 +68,7 @@ class ReportAuditTests(unittest.TestCase):
             "invoke-static {v0}, Ljava/lang/System;.load:(Ljava/lang/String;)V",
             "invoke-static {v0, v1, v2, v3}, Landroid/system/Os;.write:(Ljava/io/FileDescriptor;[BII)I",
             "new-instance v0, Ljava/io/FileOutputStream;",
+            "new-instance v0, Ljava/util/zip/ZipOutputStream;",
         ):
             with self.subTest(operation=operation):
                 with self.assertRaises(audit.AuditFailure):

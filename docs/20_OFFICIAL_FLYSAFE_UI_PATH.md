@@ -2,17 +2,37 @@
 
 ## Scope
 
-This note records the exact DJI Fly `1.21.10` aircraft-license inventory and enable-state path. It
-separates three facts that must not be collapsed:
+This note preserves the DJI Fly `1.21.10` disposable-emulator results and records the separately
+verified installed DJI Fly `1.19.4` ARMv7 owner chain. It separates three facts:
 
 1. the official same-process UI and native calls exist;
-2. the current Java model cannot semantically represent FlySafe type 6 `RID_UNLOCK`;
+2. the inspected Java models have no typed field-7 FlySafe `RID_UNLOCK` representation;
 3. neither fact proves that Mini 5 Pro accepts type 6 or that a license transition changes
    Broadcast Remote ID RF.
 
 No vendor APK, process dump, extracted DEX or decompiled source is published.
 
-## Exact-version runtime recovery
+## Installed DJI Fly 1.19.4: static owner and ARMv7 build
+
+`STATIC`, exact installed-app export, DJI Fly `1.19.4` / code `3113157`, RC 2 `07.00.0100`
+(C-239): the verified APK contains only `armeabi-v7a` native libraries. Targeted Java and native
+inspection independently closes `FlightRestrictImpl` → `JNIFSUnlockManager.queryFCLicensesJni`
+→ `native_queryFCLicense`, registered in `libuavfs_jni.so` and delegated to `libflysafecore.so`.
+The owner methods and erased callback signatures match the clean-room query agent. The parsed
+inventory envelope also matches, while typed `LicenseData` remains limited to fields 1--5.
+
+`JNIFSEventManager` initializes the current device ID to `-1`; its JNI query bridge forwards the
+signed value without a sentinel check. The independent agent now rejects `-1` alongside its
+existing zero guard before its sole query call. The corrected ARMv7 query is A-042, `15,464`
+bytes, SHA-256 `88d88ba10396a790d5d6675e70b44a21c01a71bbb92b4c80978998837ae75e25`.
+It has only been built offline; ARM64 build support is retained. No loaded owner, current device
+ID or query callback has yet been observed in the RC 2 DJI Fly process.
+
+The independent [experiment source and build instructions](../experiments/jvmti/jvmti_flysafe_inprocess_query/README.md)
+and [artifact register](11_ARTIFACT_REGISTER.md) publish the reproducible code and hashes.
+The verified vendor inputs and derived Java/native analysis remain local and excluded.
+
+## DJI Fly 1.21.10 runtime recovery
 
 `OBSERVED`, disposable ARM64 Android 11 emulator, exact official DJI Fly `1.21.10`:
 
@@ -30,9 +50,9 @@ No vendor APK, process dump, extracted DEX or decompiled source is published.
 This observation proves the exact Activity can render in a disposable emulator. It says nothing
 about RC 2 package identity, aircraft inventory, entitlement, enable state or RF.
 
-## Exact current owner chain
+## DJI Fly 1.21.10 owner chain
 
-`STATIC`, recovered runtime Java plus exact current native entry points, DJI Fly `1.21.10`:
+`STATIC`, recovered runtime Java plus exact native entry points, DJI Fly `1.21.10`:
 
 1. `LicenseManageComponent` implements the component action that starts
    `UnlockLicenseManagerActivity` and another action that supplies its management view.
@@ -46,9 +66,9 @@ This closes the same-process owner path that A-026 could not observe and A-027/A
 through a third-party Binder proxy. It also explains why another guessed external sender/receiver
 tuple is lower information than observing the official aircraft tab.
 
-## Exact current generic switch path
+## DJI Fly 1.21.10 generic switch path
 
-`STATIC`, never executed in this research:
+`STATIC`, DJI Fly `1.21.10`, never executed in this research:
 
 1. the aircraft-license adapter reads `WhiteListLicense.isEnabled()`;
 2. enabling shows an ordinary confirmation dialog while disabling proceeds directly;
@@ -60,7 +80,7 @@ tuple is lower information than observing the official aircraft tab.
 This is an existing-license state action, not a license generator. No write was executed, and a
 generic switch does not identify its row as type 6 or prove an aircraft/RF effect.
 
-## Exact type-6 incompatibility in current Java
+## DJI Fly 1.21.10 type-6 incompatibility in Java
 
 `STATIC`, DJI Fly `1.21.10`:
 
@@ -124,28 +144,46 @@ both creatable by the actual privileged caller and searchable/readable/mappable/
 actual DJI Fly domain, without `=` in the agent specification (C-211)? Until signer/domain and
 matching policy answer that question, neither source-only APK is an RC 2 candidate.
 
-## Prepared operator observation
+## DJI Fly 1.19.4 official UI: deferred observation
 
-Keep motors stopped and do not toggle a license in this pass.
+`STATIC`, the verified `1.19.4` APK (C-239): the navigation is **我的 → 设置 → 飞行解禁 →
+飞机内证书**. `证书列表` is the destination title, not the Settings entry. The destination
+`UnlockLicenseManagerActivity` is non-exported. The reviewed entry requires account login and
+the aircraft list requires a normal aircraft connection. The aircraft view queries when attached;
+selecting its tab changes the displayed page, with no automatic import or enable action found in
+that reviewed path. Avoid an immediate extra refresh if the first query is still completing.
 
-1. Link RC 2 and Mini 5 Pro normally and open DJI Fly.
-2. Open Profile/Me, Settings, then `证书列表` / `Unlocking License List`.
-3. Select `飞机内证书` / `Aircraft Unlocking Licenses` and refresh once if offered.
-4. Record whether the page completes, asks for login/link/update, reports empty, or shows rows.
-5. If rows exist, record only visible generic type/status/validity/switch state. Do not infer type 6
-   from an unlabeled row and do not open identity details.
-6. Close the page normally without changing any switch.
-7. Keep A-033 available only as the historical external-Binder comparison. The next higher-value
-   assisted run is the source-only same-process query after an RC 2 loader is admitted.
+`OBSERVED` by operator report: the page cannot currently be opened, and the operator has not
+applied for unlocking.
+This UI shortcut is deferred and is **not a prerequisite** for the continuing runtime and RID
+status research. It does not establish empty inventory or lack of entitlement.
 
-Interpretation:
+If the UI is revisited, keep motors stopped and leave import, delete and row switches untouched.
+Record the title/tab, completion or error message, row count and visible generic status; redact
+account, aircraft and license identifiers. Positive rows can establish what the UI displayed, but
+an empty list is not a canonical inventory result: this exact Java wrapper catches a protobuf
+decode error and can return an empty or partial list as success. Neither a generic row nor its
+switch proves type 6 or an RF effect.
 
-- a completed official aircraft list is same-process inventory evidence for that session;
-- an empty result is valid only if login, link, support and version errors are excluded;
-- a malformed-looking polygon/unknown row is a type-classification lead, not proof of type 6;
-- A-033 remains an external diagnostic and may still fail before a canonical inventory;
-- any later state experiment requires exact existing-item identity, baseline, immediate readback,
-  restore, final readback and operator-started motor-on independent RF A-B-A closure.
+## RC 2 loader preparation and independent RID status
+
+`STATIC`, independent pure ART TI canary source/build audit (C-243): the canary requests the
+`0x70010200` environment, reads its interface version and logs one result. It performs no class
+enumeration or DJI query. Ten host tests pass and four deliberately incorrect variants were
+detected. A-040 is the default ARMv7 build, `4,340` bytes, SHA-256
+`9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a`.
+`OBSERVED`: its removable-SD copy was read back with a matching hash, but it has not been copied internally
+or executed; A-042 remains offline only. Both are `NOT ADMITTED` for RC 2 execution.
+
+`OBSERVED` by operator report: the original Fuli development assistant can now open, with no button
+pressed. The subsequent report and actual execution UID/domain/path baseline remain pending
+(C-242); opening an Activity does not prove a privileged shell or an admissible loader path.
+The next evidence is that baseline, then a separately admitted pure-canary load before any query.
+
+The independent RID working-status owner route is tracked under C-240 in
+[the live-runtime note](23_RC2_LIVE_RUNTIME.md). It does not depend on applying for an unlock
+license or obtaining a UI row, and it does not supply an admitted RID setter. No RID transition
+has occurred in this work.
 
 ## Official type-6 enable surface
 
@@ -164,11 +202,8 @@ detector A-B-A on that bearer needs no DJI-licensed decoder (C-203, C-206).
 
 ## Current disposition
 
-The exact current owner and generic existing-ID action are closed statically, current Java type-6
-semantics are closed negatively, and the exact private query plus callback is now observed in the
-disposable emulator through ART TI. The success-side raw inventory parser is implemented and
-synthetically tested, but the emulator cannot produce an aircraft callback. RC 2 still lacks an
-admitted same-process loader; three path shortcuts are now explicitly retired. The official
-per-license enable/disable surface is pinned at the Cloud API and MSDK 5.8 levels, but no genuine
-type-6 row has been observed on Mini 5 Pro. No license toggle, `0x11/0x12` action, motor start or RF
-experiment has been performed as part of this path.
+The `1.21.10` emulator query/callback observation remains intact; the installed `1.19.4` Java/JNI
+chain and ARMv7 build are separately closed statically. RC 2 still has no admitted same-process
+loader or successful inventory callback. The UI shortcut is deferred, the independent RID status
+route continues, and the staged pure canary remains unexecuted. No genuine Mini 5 Pro type-6 row,
+license toggle, `0x11/0x12` action or RF effect has been established through this path.

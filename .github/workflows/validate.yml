@@ -75,3 +75,8 @@ jobs:
         env:
           FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
         run: sh scripts/run_host_tests.sh
+      - name: Test ART TI canary with a fake VM
+        working-directory: experiments/jvmti/jvmti_flysafe_inprocess_query
+        env:
+          FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
+        run: sh scripts/run_canary_host_tests.sh

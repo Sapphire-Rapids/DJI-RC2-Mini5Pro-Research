@@ -2,9 +2,14 @@
 
 Every hypothesis below is testable and remains separate from factual findings.
 
+2026-08-31 version checkpoint: the installed Fly is A-041, `1.19.4` / ARMv7. C-239/C-240 map its
+read interfaces; the next open dependency is Fuli's post-install Shell/path baseline and A-040's
+first load. Use [the runtime record](23_RC2_LIVE_RUNTIME.md) when revisiting older version-specific
+hypotheses. No new listener or aircraft-control execution has occurred.
+
 ## H-01 — product-139 live ownership
 
-- Known facts: current DJI Fly 1.21.10 maps WA150/product candidate 139 to UAV139 handlers;
+- Known facts: the earlier DJI Fly 1.21.10 sample maps WA150/product candidate 139 to UAV139 handlers;
   product-139 static EID receiver is `0x92`.
 - Hypothesis: the connected Mini 5 Pro live DJI Fly session uses the same product owner and no
   runtime HostID override replaces `0x92`.

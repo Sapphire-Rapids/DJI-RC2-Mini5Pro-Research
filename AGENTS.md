@@ -92,12 +92,13 @@ Later retractions override earlier progress summaries.
    Boolean. Never publish or synthesize license IDs, tokens, signatures, or blobs.
 6. Historical localhost observer v0.1-v0.4 is `RETRACTED`. A second connection to RC-local
    `40007`/`40009` can replace DJI Fly's single active fd even if no payload is written.
-7. v0.11 (A-038) is the current zero-permission probe with the user-requested SD report sink.
-   Its exact APK SHA-256 is `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed4ec0f8771d6eb8044aa`.
-   `Download/FindUAS_A038_V011.apk` is staged with full MTP readback verified (C-233/C-234).
-   Installation/run and actual report receipt are pending. Only generated reports may be written
-   under fixed removable-SD `Download/FindUAS/Probe/`; no target-code or aircraft write is added.
-   A-001 v0.10 remains historical; its unchanged audit does not certify the new report sink.
+7. v0.12 (A-039) is the current zero-permission probe, staged as
+   `Download/FindUAS_A039_V012.apk`, SHA-256
+   `46eb6ef19971256a02514fc51a94b21522c488d82294c8853a7beb52fbab3ce4`.
+   Its COMPLETE report and fixed Fly 1.19.4 APK/SDK samples were received and verified
+   (C-236--C-238). Output is limited to generated reports under `Download/FindUAS/Probe/`
+   and the user-requested fixed sample ZIP under `Download/FindUAS/Samples/`.
+   A-001/v0.10 and A-038/v0.11 are historical; their installers are now archived (C-244).
 8. V2.2 SHA-256 `7aa794ff8611582fd7cf27808a9d9eb11c44e307889d615d0511c100522845fb`
    is permanently rejected. V2.3 SHA-256
    `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` fixes the documented
@@ -110,8 +111,9 @@ Later retractions override earlier progress summaries.
     and Stopper membership, in-flight zero, lifecycle stability, and a worker-tail fence remain open.
 11. Standard ADB is silent before RSA. Exact signed-v07 APEX `adbd` contains the
     `mp_state=production && dbg_cnt<1` pre-AUTH return and runs at
-    `/apex/com.android.adbd/bin/adbd`; `/system/bin/adbd` is not the target path. Live boot values,
-    mounted hash and branch log remain unobserved. A-032 changes only gate materialization, has
+    `/apex/com.android.adbd/bin/adbd`; `/system/bin/adbd` is not the target path. v0.12 read
+    `mp_state=production` and an empty `dbg_cnt` string; mounted adbd hash and branch log remain
+    unobserved. A-032 changes only gate materialization, has
     matching removable-SD MTP readback, but has not been copied internally, chmodded or executed.
     Do not preselect an internal path before the live UID/SELinux/path-label baseline. First-packet
     public key remains an unexecuted, state-changing, non-default hypothesis.
@@ -303,8 +305,15 @@ Later retractions override earlier progress summaries.
     relative to the public table and its sampled flags have min/max 0. Do not repeat old parameter
     or route variants, treat index 1306 as authoritative, or unlock a neighbour as a substitute.
     This does not establish absence in DJI Fly, another firmware surface or encrypted `0802`.
-    The next device objective is trusted read-only RC 2 identity, a legitimate loader/descriptor,
-    then one official inventory query; field-owner mapping proceeds independently.
+    C-235--C-238 now supply the first RC 2 identity reports and installed Fly samples;
+    the next dependency is the post-install Fuli baseline and a legitimate loader.
+41. The installed Fly is `1.19.4` / code `3113157`, ARMv7. Earlier `1.21.10` results keep their
+    emulator/static version labels. C-239/C-240 map the actual FlySafe and independent RID-state
+    owners. Fuli's original same-version reinstall has been operator-confirmed to open DevActivity
+    (C-241/C-242); its new probe report and Shell identity/path baseline are pending. A-040 is the
+    ARMv7 ART TI-only canary, built/tested and SD-staged but not executed (C-243). Obtain that
+    baseline before any same-process observation. Unlock registration is not a prerequisite for
+    investigating the independent RID-state route.
 
 ## Privacy and redaction
 
@@ -343,6 +352,9 @@ license to redistribute the artifact.
    `docs/10_HYPOTHESES_AND_UNKNOWNS.md`, or `docs/12_CURRENT_BLOCKERS.md` as applicable.
 5. Update `CHANGELOG.md`.
 6. Run link, CSV, whitespace, and sensitive-pattern checks before publishing.
+7. After each material new result, append the completed action to `docs/03_TIMELINE.md`, commit the
+   synchronized source/evidence records, and push validated changes to GitHub `main`. Report the
+   commit and any pending CI status; keep raw/private material excluded.
 
 ## Live-experiment record minimum
 

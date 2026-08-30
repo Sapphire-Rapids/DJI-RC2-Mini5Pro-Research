@@ -2,8 +2,10 @@
 
 ## Start here
 
-The next device objective is trusted read-only RC 2 identity, then a legitimate loader/descriptor,
-then one official query-only inventory callback. The two current FLYC candidates are closed by
+The next device objective is the post-install A-039 report, Fuli's actual Shell/path baseline,
+and the pure ARMv7 ART TI canary, followed by independent RID-state observation. The installed
+Fly 1.19.4/ARMv7 reports, samples and current steps are in
+[23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
 Basic/UAS ID, aircraft position and operator position; keep Operator ID separate and map each
 field's owner/readback/RF correspondence independently. Synthetic codecs remain offline.
@@ -26,13 +28,18 @@ field's owner/readback/RF correspondence independently. Synthetic codecs remain 
 4. Exact local audit reports for v0.10 and V2.3, if legally available to the researcher.
 5. Older progress indexes only for history; they contain superseded v0.8/V2.1 wording.
 
-The current corrections are v0.10, rejected V2.2, and sealed-but-unadmitted V2.3. Do not copy an
-older “install v0.8” or “V2.3 in progress” instruction into a current procedure.
+The current probe is A-039 v0.12. A-001/v0.10 and A-038/v0.11 are historical and their installers
+are archived; V2.2 remains rejected and V2.3 remains unexecuted.
 
-Exact A-038 v0.11 is now staged as removable-SD `Download/FindUAS_A038_V011.apk`, with complete
-MTP readback matching size/hash (C-233/C-234). It adds only the user-requested report sink; preserve
-all device-control boundaries. After the operator runs the check, read its final report directly
-from SD `Download/FindUAS/Probe/`. Installation/run and report receipt remain pending.
+A-039's COMPLETE report and its fixed sample export have been received (C-236--C-238). The
+operator then installed original Fuli and confirmed DevActivity opens without clicking its
+internal buttons. Ask only for the next capability check in the already-installed A-039 and read
+the resulting report from `Download/FindUAS/Probe/` (C-242). Unlock registration and the deferred
+certificate-page screenshot are not prerequisites for the independent RID-state route.
+
+After each material result, append the completed action to the existing timeline, synchronize
+the evidence/source records, run repository checks, commit and push to GitHub main. Keep the
+current operator step in the runtime topic and this handoff.
 
 ## Topic entry points
 
@@ -54,7 +61,8 @@ Exact target-package facts:
   AUTH. This closes target-package code, not the live property values or taken branch.
 - Exact packaged `dpad_fuli.apk`: `8,849,471` bytes, SHA-256
   `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f`; its operator Shell page is
-  exact-v07 static evidence but installed-live hash/UID/SELinux are still unknown.
+  exact-v07 static evidence, and the pre-reinstall installed hash matches (C-237).
+  Post-install metadata and actual Shell identity remain pending (C-242).
 
 A-032 changes only `cset w21, lt -> mov w21, wzr` at the exact gate-value instruction and preserves
 the normal TLS/auth target. Its `1,497,232`-byte SHA-256 is
@@ -62,13 +70,11 @@ the normal TLS/auth target. Its `1,497,232`-byte SHA-256 is
 matching fresh size/full readback as removable-SD `Download/RC2_ADBD_CNXN.bin`; no binary is in this
 repository.
 
-Current state is `NOT ADMITTED`: no internal copy, chmod, execution, daemon stop, new ADB response,
-or shell has occurred. When the operator returns, run only the three first-segment read-only commands
-in section 11.1 of the ADB document and preserve their complete output. Do not guess an internal
-path. Use the observed UID, SELinux, owner/mode/label and hashes to prepare the second segment in the
-same assisted session. The second segment may stop only init-managed `adbd`, launch only the verified
-A-032 copy, and send one host `CNXN`; if it reaches `device`, record `adb shell id` before describing
-privilege.
+This historical contingency remains `NOT ADMITTED`: no internal copy, chmod, execution, daemon
+stop, new ADB response or shell has occurred. Section 11 of the ADB topic preserves its proposed
+baseline-dependent sequence. It is not the current operator instruction. The immediate step is
+only A-039's capability check and SD report; follow [the current runtime steps](23_RC2_LIVE_RUNTIME.md#下一步)
+before selecting any later action.
 
 Do not return to first-packet public key, WebADB, banner/MAXDATA/checksum variants, USB-debugging
 toggle, wireless ADB, or `tcpip 5555` before that discriminator. Never use bootloader/fastboot/OEM
