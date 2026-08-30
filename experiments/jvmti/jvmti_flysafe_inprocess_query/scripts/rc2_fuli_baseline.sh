@@ -7,11 +7,11 @@ LC_ALL=C
 export LC_ALL
 set -f
 
-fail_start() { printf 'F1_ERROR code=%s\n' "$1"; exit 64; }
+fail_start() { printf 'F2_ERROR code=%s\n' "$1"; exit 64; }
 [ "$#" -eq 0 ] || fail_start ARGUMENTS_REJECTED
-case "$0" in /storage/*/Download/F1.sh) ;; *) fail_start INVALID_START_PATH ;; esac
+case "$0" in /storage/*/Download/F2.sh) ;; *) fail_start INVALID_START_PATH ;; esac
 FINDUAS_VOLUME=${0#/storage/}
-FINDUAS_VOLUME=${FINDUAS_VOLUME%/Download/F1.sh}
+FINDUAS_VOLUME=${FINDUAS_VOLUME%/Download/F2.sh}
 case "$FINDUAS_VOLUME" in
     [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) ;;
     *) fail_start INVALID_VOLUME_NAME ;;
@@ -23,19 +23,9 @@ for FINDUAS_DIRECTORY in "$FINDUAS_SD" "$FINDUAS_SD/Download" \
     [ -d "$FINDUAS_DIRECTORY" ] && [ ! -L "$FINDUAS_DIRECTORY" ] ||
         fail_start REPORT_DIRECTORY_UNAVAILABLE
 done
-set +f
-FINDUAS_MATCHES=0
-for FINDUAS_ENTRY in /storage/????-????/Download/F1.sh; do
-    if [ -e "$FINDUAS_ENTRY" ] || [ -L "$FINDUAS_ENTRY" ]; then
-        FINDUAS_MATCHES=$((FINDUAS_MATCHES + 1))
-        [ "$FINDUAS_ENTRY" = "$0" ] || fail_start AMBIGUOUS_START_PATH
-    fi
-done
-set -f
-[ "$FINDUAS_MATCHES" -eq 1 ] || fail_start AMBIGUOUS_START_PATH
 FINDUAS_DATE=$(date -u +%Y%m%dT%H%M%SZ) || fail_start DATE_UNAVAILABLE
 case "$FINDUAS_DATE" in ''|*[!0-9TZ]*) fail_start INVALID_DATE ;; esac
-FINDUAS_REPORT=$FINDUAS_SD/Download/FindUAS/Probe/FindUAS_F1_${FINDUAS_DATE}_$$.txt
+FINDUAS_REPORT=$FINDUAS_SD/Download/FindUAS/Probe/FindUAS_F2_${FINDUAS_DATE}_$$.txt
 FINDUAS_SOURCE=$FINDUAS_SD/Download/FindUAS_ARTTI_V1.so
 FINDUAS_EXPECTED_SHA=9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a
 FINDUAS_CANDIDATE=/data/app/finduas_A040_canary.so
@@ -82,7 +72,7 @@ starttime() {
 
 collect_report() {
     FINDUAS_PARTIAL=0
-    printf 'schema=finduas-rc2-fuli-baseline/v1\nreport_begin=true\n'
+    printf 'schema=finduas-rc2-fuli-baseline/v2\nreport_begin=true\n'
     printf 'utc=%s\nprotocol_request_count=0\nattach_count=0\ninternal_copy_count=0\n' "$FINDUAS_DATE"
     printf 'automatic_update_control=NOT_ESTABLISHED\n'
     run_read identity id
@@ -170,8 +160,8 @@ collect_report() {
 )
 FINDUAS_RESULT=$?
 case "$FINDUAS_RESULT" in
-    0) printf 'F1_SAVED state=COMPLETE\nreport=%s\nF1_END\n' "$FINDUAS_REPORT" ;;
-    10) printf 'F1_SAVED state=INCOMPLETE\nreport=%s\nF1_END\n' "$FINDUAS_REPORT" ;;
-    *) printf 'F1_ERROR code=REPORT_CREATE_OR_WRITE_FAILED rc=%s\nF1_END\n' "$FINDUAS_RESULT" ;;
+    0) printf 'F2_SAVED state=COMPLETE\nreport=%s\nF2_END\n' "$FINDUAS_REPORT" ;;
+    10) printf 'F2_SAVED state=INCOMPLETE\nreport=%s\nF2_END\n' "$FINDUAS_REPORT" ;;
+    *) printf 'F2_ERROR code=REPORT_CREATE_OR_WRITE_FAILED rc=%s\nF2_END\n' "$FINDUAS_RESULT" ;;
 esac
 exit "$FINDUAS_RESULT"

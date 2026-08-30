@@ -1,13 +1,16 @@
 # Handoff for researchers and coding agents
 
+Current update (C-259): the direct target context path returned No such file or directory. Prepare F3 to collect AMS PID before/after and proc metadata in one report; no further manual command is currently requested.
+
+
 ## Start here
 
-The post-install A-039 COMPLETE report, actual Shell identity and parent-directory observations
-are received (C-245--C-247); C-249 adds the complete contents/basename check. F1/A-043 is now
-SD-staged as `Download/F1.sh` with matching full readback (C-251). C-252 records a wrapper
-path-open error before F1 started; C-253 confirms `/storage` enumeration is denied. The current
-step collects directory metadata and public-volume API results before selecting an entry.
-F1 execution/report receipt and internal canary copy/attach remain pending.
+C-257 closes F2/A-044 execution, SD report saving and complete host receipt. The report is
+INCOMPLETE only for `pidof dji.go.v5` returning rc=1 with empty output; the other checks,
+including the A-040 source hash, passed. C-258 now supplies an AMS HOME main-process entry
+for DJI Fly, with its nonzero PID/UID kept privately. The current step reads target domain and
+live proc mount options; hidepid is not yet observed. Do not reopen Fly or rerun F2/installers.
+No internal canary copy or attach has occurred.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -50,9 +53,19 @@ DJI_FLY at 0777 and six randomized installation roots at 0775, all system:system
 three Java Runtime.exec launch cases and seven shell-body cases with mocked Android commands
 (C-250). C-251 records one new SD file and matching full readback. C-252 shows the correctly
 entered wrapper failing to open the literal wildcard path; it did not enter F1. C-253 then
-records `ls: /storage: Permission denied`; this does not test a known child file. Await the
-directory metadata and public-volume API results using [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步),
-without changing F1 or the SD file yet.
+records `ls: /storage: Permission denied`; this does not test a known child file. C-254
+shows `/storage` mode 0710, shell:everybody and `mnt_user_file`, giving Fuli search but no
+directory-read permission; the API identifies one mounted public volume. F2/A-044 uses that
+private exact entry without global enumeration. Independent diff review, `sh -n` and eight
+host fixtures passed, including an actual search-only mode-0111 parent (C-255). C-256 records
+one new `Download/F2.sh`, 6,845-byte matching full readback, and F1 moved to
+`Download/FindUAS/Archive/F1.sh` with matching readbacks and no deletion. C-257 now records
+F2 execution and a fully received 2,553-byte report passing schema/end/parser validation. It is
+INCOMPLETE only because `pidof dji.go.v5` returned rc=1 and empty output. System/system_app,
+SELinux Permissive, ro.debuggable=1, wifi_on=0 and A-040 source size/hash passed. C-258 then
+records Fly's HOME main-process entry in AMS. Use its privately recorded PID for target-domain
+and live proc mount-option reads; hidepid remains unobserved. The current step is in
+[the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步).
 Unlock registration and the deferred certificate-page screenshot are not prerequisites for
 the independent RID-state route.
 
@@ -95,8 +108,10 @@ repository.
 This historical contingency remains `NOT ADMITTED`: no internal copy, chmod, execution, daemon
 stop or new ADB response has occurred through A-032; C-246 records the separate Fuli Shell.
 Section 11 of the ADB topic preserves its proposed baseline-dependent sequence. It is not the
-current operator instruction. The `/data/app` listing is complete (C-249); after C-253,
-directory metadata and public-volume API results must precede a new F1 launch instruction. Follow
+current operator instruction. Directory contents and storage metadata are complete
+(C-249/C-254), F2 report receipt is closed (C-257), and AMS process identity is recorded
+(C-258). Pending target-domain/mount reads do not require reopening Fly, rerunning F2 or
+installing a package. Follow
 [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步) before selecting a later device action.
 
 Do not return to first-packet public key, WebADB, banner/MAXDATA/checksum variants, USB-debugging
@@ -552,8 +567,10 @@ collection; absence from that search is not proof that the records are lost.
 Installed-package identity, actual Fuli Shell identity and parent-directory observations are now
 recorded in C-245--C-247. C-248 narrows the candidate to a regular `.so` directly in
 `/data/app`, with no new subdirectory; C-249 found no matching candidate basename. F1/A-043
-staging/readback is closed by C-251. C-252 did not enter the script and C-253 refused directory
-enumeration; await metadata/public-volume API results before selecting the entry. Admit a legitimate
+staging/readback is closed by C-251. C-252 did not enter the script; C-254 now supplies the
+private storage entry and parent permissions. F2 execution/report receipt are closed by C-257;
+C-258 supplies an AMS main-process entry despite the earlier empty pidof result. Target
+domain and live proc mount options remain pending, without a confirmed hidepid value. Admit a legitimate
 delimiter-free path or mediated descriptor before the first
 query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.

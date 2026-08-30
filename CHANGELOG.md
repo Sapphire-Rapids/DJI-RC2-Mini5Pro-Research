@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.25 - 2026-08-31
+
+- Read `/storage` mode 0710 and one mounted public volume through the system API, establishing
+  search permission without directory enumeration for the Fuli caller (C-254).
+- F2 removes the global storage glob while preserving the fixed read/report operations. Eight
+  host fixtures passed, including a parent permitting search but denying listing (C-255).
+- Staged A-044 with full matching readback and archived F1 with matching before/after readbacks;
+  the exact-path F2 launch and report are next (C-256). GitHub synchronization remains paused.
+- Received F2's complete SD report: only pidof returned rc1/empty; the other eleven commands and
+  A-040 source checks passed. The next read uses AMS's package-filtered process record (C-257).
+- AMS returned the exact Fly main-process name and a nonzero PID. The next read uses that private
+  PID for target context and proc mount diagnostics, without restarting Fly (C-258).
+- The separate target-context read returned a missing path; a combined AMS/proc report is being
+  prepared to pair process identity and file reads in one run (C-259).
+
 ## 0.4.24 - 2026-08-31
 
 - Received the full two-photo `/data/app` listing; the proposed standalone canary basename is
