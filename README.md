@@ -7,12 +7,14 @@
 固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题，并逐步
 纳入可复现的自研 APK 源码、host tools、tests 和合成 fixtures。
 
-档案中的产品名称只用于说明研究对象。项目与 DJI 无隶属、授权或背书关系。
+档案中的产品名称只用于说明研究对象。项目不是 DJI 官方产品，无隶属或背书关系；实验室的
+授权声明与非官方产品身份分开记录。
 
 新建或接续 Codex 任务时，请使用
 [`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md) 中的精简提示词。它把本项目准确界定为
-用户自有实验设备上的 Remote ID 互操作性/合规验证，并一次写清允许动作、硬性禁区和实证完成
-标准，避免把合法的本地实验误写成未授权访问或泛化的安全绕过任务。
+用户自有实验设备上的 Remote ID 控制研究，并一次写清允许动作、硬性禁区和实证完成标准。
+当前目标包括真机 RID 开关、Basic/UAS ID、飞机位置和操作者位置；Operator ID 单独记录。
+各字段须分别闭合 owner、基线、读回、恢复及独立 RF 证据，不能用合成 codec 代替真机结果。
 已有研究的快速接手请直接复制
 [`NEXT_AGENT_HANDOFF_PROMPT.md`](NEXT_AGENT_HANDOFF_PROMPT.md)。
 
@@ -42,14 +44,26 @@
 
 ## 当前结论摘要
 
-- **RF bearer 已确认（C-207）**：操作者用已验证的标准 Remote ID 检测装置 + FindUAS 上位机确认，
-  Mini 5 Pro 起桨时广播的是**明文标准 Remote ID**（ASTM F3411 / EN 4709，BLE/Wi-Fi），Basic ID 可读。
-  当前开关研究聚焦这条标准 bearer；DJI 私有 OcuSync DroneID（含 O4 加密边界）**暂缓、不作为目标**。
+- **标准 RID 已观察（C-207）**：操作者用已验证的标准 Remote ID 检测装置 + FindUAS 上位机确认，
+  Mini 5 Pro 起桨时广播明文标准 Remote ID，Basic ID 可读。确切 BLE/Wi-Fi bearer 与电机
+  off/on/off 时序仍需一份完整书面记录；Mac 到接收机的 BLE 连接不证明飞机的 air bearer。
+  DJI 私有 OcuSync DroneID（含 O4 加密边界）暂缓，不作为当前控制目标。
+
+- **两项 FLYC 候选已否定（C-227--C-230）**：`01.00.0600` aircraft-direct 路由正对照成功，
+  table count 为 1558、报告具名项 915；`EU_CE_enable_c0_rid(_0)` 和 `rid_ctrl_enable_0`
+  在该表面为 positive-controlled absence。邻接 EU C0 块比公开表后移一位，采样行 min/max
+  均为 0。不得重复旧参数/地址变体或把邻接标志当开关；结论不覆盖 App、其他表面或加密 `0802`。
+- **接手材料已定位**：旧本地 corpus 中的核心 DJI Fly/RC331 样本及部分 A-032/A-033 输出已
+  重新核验 hash，与登记一致；没有导入厂商材料。限定 sandbox 检索尚未找到最新枚举输出及
+  C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
+- **下一实机依赖**：可信只读 RC 2 installed/mounted identity 与 caller/target policy 基线，
+  然后是合法 loader/descriptor 和一次 official inventory query。字段 owner 独立映射；
+  所有真机字段 editor 仍未准入，OpenDroneID 合成工作只做离线 encode/decode/fixtures。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
   EID、OPID、DIPS 和 China OID 分开。DJI Fly `1.21.10` 没有同名 wrapper，因此 Mini 5 Pro
-  是否支持仍由当前实机 F7/F8 决定，不能仅凭静态同族 SDK 宣称已实现。
+  该 wrapper 不能静态迁移到 Mini 5 Pro；该型号当前 FLYC 表面的后续否定见 C-230。
 - 同族 RID key/native-handler 全量盘点没有发现第二个可直接落地的 global Boolean；公开固定
   revision 与 exact-string 检索也没有独立 Mini 5 Pro 实现。FreeFCC 仅交叉支持 modern route
   和 F9 framing，其参数与功能不同。
@@ -94,7 +108,10 @@
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
   没有 shell。下一次 operator session 先采集 exact Fuli UID/SELinux/properties/hashes/path labels，
   再据实生成第二段单次启动命令，不预猜 `/data` path。
-- 当前 Android admission probe v0.10 通过离线工件审计，但尚未复制、安装或运行于 RC 2。
+- 当前 Android admission probe v0.10（A-001）已重新通过 source/final-DEX audit，并 staged 为
+  removable-SD `Download/FindUAS_A001_V010.apk`；fresh 唯一文件 listing 与同 session 全量
+  MTP readback 的 size/hash 匹配（C-231）。安装/运行及实机环境报告仍待完成，不能把交付当作
+  live identity、attach 或 aircraft-control 准入。
 - 固定 clean-room 管理客户端 `0.3.0-research` 已安装并执行：live `protocol` Binder lookup、
   manager transaction 和 callback exception layer 均成功，但 target F7 在约 3.1 秒后以
   `ECode 1` 结束，没有 F7 ACK，也没有发送 F9。相邻 RC331 `ActQueue` 将该错误映射为重试耗尽；
@@ -130,7 +147,7 @@
   empty inventory、RID off 或无 RF。external Binder route/window 仍只是 token 代理；
   external Developer Assistant 也不受内部 allow-list，且 APK 保留 gated F9/EID/OPID writes，因此是
   Admin 而非全局 read-only。
-- A-027 `0.7.0-flysafe-direct-readonly` / code 10 现在把下一步收敛为一次主动只读 `11/11`：固定
+- 历史 A-027 `0.7.0-flysafe-direct-readonly` / code 10 将当时的诊断收敛为一次主动只读 `11/11`：固定
   system-Binder `02:04 -> 12:04`，只使用 V3/V4 group/page selectors，不扫描 route，也不做应用层
   retry。`196,569`-byte APK 的 SHA-256 为
   `aa4bcd9c8aa96870cfbae1ba326d366cb8854a50ef4aff223f7bce4290ddcd81`；127 tests 全通过、
@@ -189,9 +206,9 @@
   attach 路线已关闭；target 从未发送，未发送 F9。Exact A-026 的首次 passive gate 运行也已闭合为
   `GATE_UNOBSERVED`/zero-query，不能重复解释为设备能力阴性。A-027 主动只读候选随后也已运行，
   但只收敛到 `ProtocolException` 级 ambiguous failure，尚未形成 canonical inventory。A-028 又把它
-  定位为 group transport callback failure。下一步显示现有 Reply 的 failure/ecode/callback diagnostic，
-  不重复相同黑盒请求；或继续 official
-  in-process/current-state owner；同时确认网站 RID card/Mini 5 Pro selector 两个 yes/no。只有 canonical genuine type 6 才继续追
+  定位为 group transport callback failure。A-033 的 Reply diagnostic 只保留历史对照用途；当前
+  优先读取可信 RC 2 identity 并准入 official in-process owner 的合法 loader，不重复相同黑盒
+  请求。网站 RID card/Mini 5 Pro selector 仍是独立 entitlement 问题。只有 canonical genuine type 6 才继续追
   enable state 到 `NO_BROADCAST`/真实 RF；并行继续 WA150 `0802` broadcaster/policy owner。
 - Route-only V2.2 已因两个 P1 与一个 P2 缺陷撤销。V2.3 修复三项缺陷，但仍固定零 exception
   gate、zero-send、未上机，且尚无新的独立 post-fix audit 结论。
@@ -213,7 +230,8 @@
 - NDSS 2023 所述旧式 DroneID 多字段控制已高置信对应到 FlyC `0x03/0xDA` 的
   `0x05`/`0x06` mask。论文的 RF 实测并未停发包，只把选中字段替换成 `fake`；它针对私有
   OcuSync/AeroScope DroneID，不是 Mini 5 Pro 的 ASTM/FAA/EU Broadcast RID。
-- 可调目标已扩展为 RID 实验控制面。current exact 路径新增闭合 EASA OPID `0x03/0x78`、
+- 可调目标已扩展为真机开关、Basic/UAS ID、飞机位置和操作者位置；Operator ID 单列。
+  current exact 路径闭合 EASA OPID `0x03/0x78`、
   Japan DIPS `0x11/0x4B`、China UOM tag `0x11/0xD6`、app location `0x11/0x43` 和只读
   compliance serial；它们是不同身份/地区数据面，当前均未达到 Mini 5 Pro 可写 UI 的完整门禁。
 - China UOM tag 的 product-139 receiver、timeout/retry 与 reply value parser 已进一步闭合；其
@@ -230,7 +248,7 @@
 - [docs/00_SCOPE_AND_REDACTION.md](docs/00_SCOPE_AND_REDACTION.md)：范围、证据类型和脱敏边界。
 - [docs/01_RESEARCH_PROCESS.md](docs/01_RESEARCH_PROCESS.md)：实际研究过程与方法。
 - [docs/02_EVIDENCE_REGISTER.md](docs/02_EVIDENCE_REGISTER.md)：核心 claim 登记册。
-- [docs/03_TIMELINE.md](docs/03_TIMELINE.md)：2026-08-27 至 2026-08-29 时间线。
+- [docs/03_TIMELINE.md](docs/03_TIMELINE.md)：研究动作时间线。
 - [docs/04_STATE_ACCOUNT_LIMITS.md](docs/04_STATE_ACCOUNT_LIMITS.md)：RID 状态、账号登录和限飞层。
 - [docs/05_RID_CONTROL_SURFACES.md](docs/05_RID_CONTROL_SURFACES.md)：各 RID/EID/OPID/许可控制面。
 - [docs/06_REGION_RF_POLICY.md](docs/06_REGION_RF_POLICY.md)：地区码、FCC/CE、SDR 与 RF 证据。
@@ -295,8 +313,10 @@
 可审阅的自研 APK/host-tool 源码和测试。源码公开不代表相应路线已通过实机验证；每个项目必须
 保留 `OBSERVED`、`NOT ADMITTED`、`RETRACTED` 或 `UNKNOWN` 状态边界。
 
-本项目的唯一目标是实现并验证可控的 Mini 5 Pro Remote ID 开关。实验室声明已获得 DJI
-及低空经济相关部门授权；因保密要求，授权材料不进入仓库，也不在实机上注册。
+本项目目标是实现并验证可控的 Mini 5 Pro Remote ID 开关，以及具有独立证据链的 Basic/UAS ID、
+飞机位置、操作者位置实验控制；Operator ID 保持独立。合成 codec 仅供离线验证，不添加 RF
+发射后端。实验室声明已获得 DJI 及低空经济相关部门授权；因保密要求，授权材料不进入仓库，
+也不在实机上注册。
 
 不发布 DJI APK、固件、提取分区、厂商共享库、厂商反编译源码、原始私人抓包、
 ADB/signing key、已打包 APK/JAR/SO、patched vendor binary、设备序列号、UAS ID、电话或坐标。

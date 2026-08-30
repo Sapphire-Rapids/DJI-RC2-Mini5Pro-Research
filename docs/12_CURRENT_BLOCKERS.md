@@ -3,6 +3,11 @@
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
+Current device priority is exact read-only RC 2 identity -> legitimate loader/descriptor -> one
+official inventory query. C-227--C-230 have already answered the two tested FLYC parameter
+candidates on `01.00.0600`; they are not pending probes. Basic/UAS ID, aircraft position,
+operator position and the separate Operator ID plane require their own evidence chains (B-22).
+
 ## B-01 — exact live RC 2 package identity
 
 Closed for the signed target package:
@@ -26,6 +31,10 @@ target-package `STATIC`; they are not live execution facts. Other adjacent Binde
 policy, ART, and installed-file conclusions remain unpromoted.
 
 ## B-02 — v0.10 runtime result
+
+Exact A-001 is staged as removable-SD `Download/FindUAS_A001_V010.apk`; fresh unique listing and
+same-session full MTP readback matched its registered size/hash (C-231). Installation and run
+remain pending. No attach, ADB-daemon or aircraft request follows from that delivery.
 
 Missing: a complete redacted `finduas-rid-probe/v0.10-schema-1` report from the exact reviewed APK.
 
@@ -285,7 +294,17 @@ OPID, UOM identifiers, full serials, coordinates, telephone data, signed license
 must not enter public logs or editable fixtures. No current static schema is admitted as a Mini 5
 Pro free-form RID editor.
 
-## B-20 — live `rid_ctrl_enable_0` admission and RF closure
+## B-20 — closed FLYC candidates and official inventory dependency
+
+C-227--C-230 close the later `01.00.0600` aircraft-direct FLYC session: the known-height F7/F8
+positive control succeeded, table 0 reported CRC `0x5F8B2AE1`/count 1558, and enumeration reported
+915 named parameters. `EU_CE_enable_c0_rid(_0)` and `rid_ctrl_enable_0` were absent on that
+surface with same-session positive controls. The EU C0 registration block was shifted +1 from
+the public table and the sampled flags had min/max 0. There is no target baseline to promote to
+a write; the neighbouring registration flags are not substitute RID switches. These results do
+not establish absence in DJI Fly, another firmware surface or encrypted WA150 `0802`.
+
+The earlier route and inventory sequence below is retained as history, not a list of retries.
 
 Current same-family static evidence closes `RIDCtrlEnable -> rid_ctrl_enable_0 -> 0x3CBD864F ->
 03/F7-F9`, but every known generic access route is now bounded by live evidence.
@@ -411,6 +430,15 @@ boot chain, flash startup partitions, or treat physical EDL as an authorized fal
 The evidence dependencies are:
 
 ```text
+exact current RC 2 installed/mounted identity and caller/target policy baseline
+  -> legitimate loader/descriptor admission
+  -> one official query-only callback with unchanged DJI Fly PID
+  -> canonical privacy-reduced inventory, if available
+```
+
+The emulator and historical transport evidence supporting that sequence is:
+
+```text
 exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
   -> A-027 fixed active read-only 11/11 = ProtocolException / ambiguous (C-169)
   -> A-028 = group transport callback failed before protobuf/page/terminator (C-173)
@@ -458,7 +486,7 @@ official RID application card + Mini 5 Pro Rid product selector yes/no
 
 Failure or `UNKNOWN` at a gate does not authorize trial-and-error at the next gate.
 
-The ADB path is independent and currently shortest:
+The userspace ADB path is an independent loader contingency, not a pre-admitted shortcut:
 
 ```text
 exact signed-v07 adbd + gate (C-174/C-175)
@@ -482,9 +510,44 @@ deployment shortcuts are now retired on emulator evidence:
 3. uncommitted PackageInstaller staging: target search denied on `apk_tmp_file`, session abandoned
    (C-210).
 
-Within the same-process lane, the next smallest blocker is C-211: identify the actual RC 2 DJI Fly
+Within the same-process lane, the next blocker is C-211: identify the actual RC 2 DJI Fly
 signer/SELinux domain and Fuli caller domain, then find a legitimate delimiter-free path/descriptor
 at their policy intersection. If no intersection exists, prioritize the already separate
-userspace-ADB route or an existing system-mediated loader. The overall project sequence still begins
-with C-207's written standard-RID bearer/timing A-B-A and read-only admission of the C-192--C-199
-WA150 parameter candidates. A-035 and A-036 should not be installed on RC 2 as currently written.
+userspace-ADB route or an existing system-mediated loader only after its own baseline and recovery
+gates close. C-207's written standard-RID bearer/timing record remains open, independently of the
+FLYC result. Do not repeat the C-192--C-199 candidates to rediscover C-227--C-230. A-035 and A-036
+should not be installed on RC 2 as currently written.
+
+## B-22 — requested fields: owner, readback and RF correspondence
+
+The expanded target covers Basic/UAS ID, aircraft position and operator position in addition to
+the RID switch. Operator ID remains a separate identity plane. Missing for each field:
+
+- an exact current authoritative owner and admitted privacy-reduced read path;
+- correspondence between that owner's value and the intended standard-RID RF field;
+- a bounded control with baseline, strict readback, exact restore and final readback;
+- automatic writer precedence and reconnect/reboot persistence classification;
+- independent receiver confirmation of the field transition and restoration.
+
+Compliance serial derivation does not establish RF Basic ID, and app-location delivery does not
+establish the System/operator-location field. Aircraft GNSS, operator position, Operator ID,
+OPID/DIPS/UOM identity and cloud policy must not substitute for one another. See the field matrix
+in [19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md). Synthetic codecs
+remain offline and cannot close a real-aircraft gate.
+
+## Handoff evidence availability
+
+The original local corpus has been located and selected fixed DJI Fly/RC331 samples and A-032/
+A-033 outputs were rehashed against their registered identities. This restores access to static
+inputs, not live RC 2 identity or execution evidence. No private material is imported here.
+
+The bounded sandbox search did not locate the latest 1558-slot/915-name enumeration output or a
+completed C-207 RF timeline. Recover old task output or an existing local record before planning
+another device action; in particular, account for unnamed/status/error entries in the enumeration.
+This is a search limitation, not evidence that the records were lost or that the recorded live
+results did not occur.
+
+The existing FindUASMac persisted history was located separately through its source-configured
+Application Support location. A bounded read found no explicit motor-transition or aircraft-air-
+bearer fields. The writer rate-limits persistence per UAS to one row per two seconds, so rows are
+not RF packet counts and do not close C-207. Identifiers, coordinates and raw records stay private.

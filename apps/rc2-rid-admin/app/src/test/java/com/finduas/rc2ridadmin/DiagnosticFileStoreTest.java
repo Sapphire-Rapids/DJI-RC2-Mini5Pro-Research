@@ -8,7 +8,7 @@ public final class DiagnosticFileStoreTest {
     @Test
     public void publicDiagnosticUsesOneStableDedicatedDownloadPath() {
         assertEquals(
-                "Download/FindUAS/FindUAS_RID_A033_latest.txt",
+                "Download/FindUAS/FindUAS_RID_latest.txt",
                 DiagnosticFileStore.publicRelativeLocation());
     }
 }

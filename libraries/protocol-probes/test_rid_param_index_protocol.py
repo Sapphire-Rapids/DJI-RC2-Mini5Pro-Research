@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import unittest
+from dataclasses import replace
 
 import rid_param_index_protocol as p
 
@@ -135,6 +136,17 @@ class WriteTests(unittest.TestCase):
     def test_boolean_encoding(self):
         self.assertEqual(p.encode_boolean_value(True, info=info_u8()), b"\x01")
         self.assertEqual(p.encode_boolean_value(False, info=info_u8()), b"\x00")
+
+    def test_unestablished_numeric_boolean_writes_are_rejected(self):
+        for type_id, width in ((1, 2), (2, 4), (3, 8), (5, 2), (8, 4), (9, 8)):
+            with self.subTest(type_id=type_id), self.assertRaises(p.ParamIndexError):
+                p.encode_boolean_value(True, info=replace(info_u8(), type_id=type_id, size=width))
+
+    def test_malformed_width_and_truthy_nonboolean_are_rejected(self):
+        with self.assertRaises(p.ParamIndexError):
+            p.encode_boolean_value(True, info=replace(info_u8(), type_id=11, size=4))
+        with self.assertRaises(p.ParamIndexError):
+            p.encode_boolean_value(2, info=info_u8())
 
     def test_write_status_ok(self):
         self.assertEqual(p.parse_write_status(b"\x00\x00\x00\x00"), 0)

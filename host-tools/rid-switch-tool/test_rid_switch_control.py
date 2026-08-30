@@ -49,9 +49,12 @@ class BuildTargetRawTests(unittest.TestCase):
     def test_preserves_width_for_off(self):
         self.assertEqual(control.build_target_raw(b"\x01", False), b"\x00")
 
-    def test_multi_byte_width_fills_all_bytes(self):
-        self.assertEqual(control.build_target_raw(b"\x01\x00\x00\x00", False), b"\x00\x00\x00\x00")
-        self.assertEqual(control.build_target_raw(b"\x00\x00\x00\x00", True), b"\x01\x01\x01\x01")
+    def test_multi_byte_write_encoding_is_not_admitted(self):
+        for baseline in (b"\x01\x00\x00\x00", b"\x00\x00", b"\x00\x00\x80\x3f"):
+            for target in (False, True):
+                with self.subTest(baseline=baseline, target=target):
+                    with self.assertRaises(ValueError):
+                        control.build_target_raw(baseline, target)
 
     def test_empty_baseline_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -63,10 +66,9 @@ class GateTests(unittest.TestCase):
 
     def test_exchange_refuses_unlisted_command(self):
         session = object.__new__(control.FCSession)
-        session.protocol = None
-        with self.assertRaises(AttributeError):
-            # A session with no protocol attribute cannot dispatch anything.
-            control.FCSession.exchange(session, 0xF9, b"")
+        session.protocol = control.load_protocol_module()
+        with self.assertRaises(AssertionError):
+            control.FCSession.exchange(session, 0xFA, b"")
 
     def test_transport_config_is_fixed_allowlist(self):
         self.assertEqual(control.transport_config("aircraft")["pid"], 0x0020)

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -83,14 +84,14 @@ public final class DjiProtocolClientAllowlistTest {
     }
 
     @Test
-    public void preexistingFlycCommandsRemainExplicitlyAllowListed() {
+    public void identityReadsAndExistingParameterCommandsRemainAllowListed() {
         DjiProtocolClient.validateAllowedRequest(
                 DjiProtocolClient.MODERN_FC4, 0x03,
                 DjiProtocolClient.CMD_EID_SWITCH, new byte[] {2}, 500);
         DjiProtocolClient.validateAllowedRequest(
                 DjiProtocolClient.MODERN_FC4, 0x03,
                 DjiProtocolClient.CMD_OPERATOR_ID,
-                new byte[] {0, 0x10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new byte[] {2},
                 500);
         DjiProtocolClient.validateAllowedRequest(
                 DjiProtocolClient.MODERN_FC4, 0x03,
@@ -113,6 +114,45 @@ public final class DjiProtocolClientAllowlistTest {
                 () -> DjiProtocolClient.validateAllowedRequest(
                         DjiProtocolClient.RC2_LEGACY_FC, 0x03,
                         DjiProtocolClient.CMD_OPERATOR_ID, new byte[] {2}, 500));
+    }
+
+    @Test
+    public void identityWritesCannotBypassTheDisabledUi() {
+        for (DjiProtocolClient.Route route : new DjiProtocolClient.Route[] {
+                DjiProtocolClient.MODERN_FC4, DjiProtocolClient.RC2_LEGACY_FC
+        }) {
+            for (byte[] payload : new byte[][] {{0}, {1}}) {
+                assertThrows(IllegalArgumentException.class,
+                        () -> DjiProtocolClient.validateAllowedRequest(
+                                route, 3, DjiProtocolClient.CMD_EID_SWITCH, payload, 500));
+            }
+            for (byte[] payload : new byte[][] {
+                    {1}, // DELETE also restores an originally empty OPID.
+                    OperatorIdCodec.encodeSetPayload("FRA0000000000000-000")
+            }) {
+                assertThrows(IllegalArgumentException.class,
+                        () -> DjiProtocolClient.validateAllowedRequest(
+                                route, 3, DjiProtocolClient.CMD_OPERATOR_ID, payload, 500));
+            }
+        }
+    }
+
+    @Test
+    public void identityTransportDiagnosticsRedactPayloadAndVendorErrorText() throws Exception {
+        byte[] payload = OperatorIdCodec.encodeSetPayload("FRA0000000000000-000");
+        Method summary = DjiProtocolClient.class.getDeclaredMethod(
+                "commandSummary", DjiProtocolClient.Route.class, int.class, int.class, byte[].class);
+        summary.setAccessible(true);
+        String report = (String) summary.invoke(null, DjiProtocolClient.MODERN_FC4, 3, 0x78, payload);
+        assertTrue(report.contains("<redacted-operator-id>"));
+        assertFalse(report.contains("FRA"));
+        assertFalse(report.contains("465241"));
+
+        Method failureSummary = DjiProtocolClient.class.getDeclaredMethod(
+                "commandThrowableSummary", Throwable.class, int.class, int.class);
+        failureSummary.setAccessible(true);
+        assertEquals("IllegalStateException", failureSummary.invoke(
+                null, new IllegalStateException("vendor echoed TEST-OPID-000001"), 3, 0x78));
     }
 
     @Test

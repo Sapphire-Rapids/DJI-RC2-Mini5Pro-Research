@@ -28,7 +28,7 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 | RID-002 | onboard working status | `STATIC` | product-139 RID module 监听 `0x11/0x1C`；无 GET/SET/action |
 | RID-002A | dynamic RID characteristic bundle | `STATIC` | function-discovery ID `0x37` 准入九项 mixed-access inventory；live admission 未知 |
 | RID-002B | AirSense/ADS-B lookalikes | `STATIC/NEGATIVE` | `0x11/0x0C`、`0x11/0x37`、`0x11/0x39` 均为非 RID 表面 |
-| RID-002C | independent `RIDCtrlEnable` | `STATIC/HYPOTHESIS` | same-family current SDK maps a dynamic Boolean to fixed FC hash; Mini 5 Pro F7/F8 result pending |
+| RID-002C | independent `RIDCtrlEnable` | `STATIC/NEGATIVE` | same-family mapping exists; C-230 closes positive-controlled absence on the tested Mini 5 Pro FLYC surface |
 | RID-003 | France EID | `STATIC` | `0x03/0x77` 是法国专用 GET/SET schema |
 | RID-004 | France EID live artificial routes | `NEGATIVE` | 两个固定 GET 路由均为 unavailable |
 | RID-005 | EASA OPID | `STATIC` | `0x03/0x78` 是身份数据 GET/SET/DELETE |
@@ -137,7 +137,7 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ### RID-002C：独立 `RIDCtrlEnable` 已闭合到固定 FC 参数
 
-- **证据状态：STATIC/HYPOTHESIS/OBSERVED**（C-136--C-145）
+- **证据状态：STATIC/OBSERVED/NEGATIVE**（C-136--C-145、C-227/C-230）
 - **对象/版本：** 官网当前 SKYROVER `1.2.0`，package `com.sky.dronemaster`。输入 APK
   SHA-256 为 `8f5590f5f61194b186ac8e4a670e5b2182551a653eda2bb0c0ce23b696c554b8`；
   只在排除工作区静态分析，不在本仓库分发。
@@ -154,8 +154,8 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   `0x11/0x1C` listen-only RID health push。它是目前找到的第一个名称、Boolean 高层语义、底层
   固定参数、GET/SET 和应用 UI 行为能够连成一条链的独立 RID control candidate。
 - **Mini 5 Pro 当前边界：** 精确 DJI Fly `1.21.10` native 未出现同名 KeyValue/FC parameter；
-  这只说明 DJI Fly 没有内置该 wrapper，不说明 WA150 飞控一定没有参数。最短判别实验固定为
-  hash `0x3CBD864F` 的一次 F7，成功后一次 F8；F7 返回一字节错误时，不再发送 F8/F9。
+  单凭静态缺名不能证明飞控无参数。后续 C-230 已在正对照成功的 `01.00.0600` direct-USB
+  FLYC 表面闭合 absence，不再把相同 F7/F8 当作待执行判别；其他 owner/表面仍须新证据。
 - **live positive-controlled absence（2026-08-30，C-230）：** 本次 aircraft-direct `0x0A -> 0x03`
   同 session 正对照 `max_height_0` 成功；`rid_ctrl_enable_0`(`0x3CBD864F`) F7 返回单字节
   `0x03`，且 by-index 全表 915 个具名参数无 `rid_ctrl_enable` 行。因此该参数在实机 FC 上
@@ -190,8 +190,9 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   modern USB route 与两条第三方 Binder route 均无法通过 known-height positive control。因此
   不再重复 generic F7/F8 attach 或仅改变 sender/receiver 的盲试。只有发现 official in-process
   owner、已验证的新 route，或取得 WA150 plaintext handler 后才重开该 exact parameter。
-- **下一步：** 直接查询真实 type-6 inventory，并追踪其 official enable state 到
-  `NO_BROADCAST`/0802 policy owner 的因果链；并行追 WA150 `0802` broadcaster。不要重复
+- **下一步：** 先闭合可信只读 RC 2 identity、caller/target policy 和合法 loader/descriptor，
+  再作一次 official query-only inventory；只有真实 canonical type-6 基线才可追踪其 enable
+  state 到 `NO_BROADCAST`/0802 policy owner 的因果链。不要重复
   protocol-Binder `0x11/0x1C` listener。任何未来控制点仍须 baseline/readback/restore 和独立
   RF A-B-A。
 - **隐私/分发：** 只公开固定参数事实、self-developed APK hash 和脱敏结果；不提交 SKYROVER
@@ -730,7 +731,7 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ## FC policy 参数与 cloud policy
 
-### RID-009：EU C0 policy 映射存在，但 live metadata 不可用
+### RID-009：EU C0 policy 映射存在，当前 FLYC 表面已正对照否定
 
 - **证据状态：NEGATIVE**
 - **对象/版本：** DJI Fly 1.21.10 UAV139 registration；当前 Mini 5 Pro live FLYC route。
@@ -739,8 +740,10 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   同 route 的 height/distance 参数为 positive controls。
 - **事实：** 两条 live route 都只返回单字节 F7 status `0x03`，未达到 metadata 最小布局；因此未发送
   F8 value GET、F9 write 或 FA reset。
-- **边界/不证明：** 不证明 key 不存在于 DJI Fly，也不确定 `0x03` 是 endpoint absence、product/runtime
-  gate 或其他 refusal。该字段的 business owner 是 cloud-country + C0 certification policy，不是用户开关。
+- **早期结果边界：** 单独的一字节 `0x03` 不能区分 endpoint absence、product/runtime gate 或
+  其他 refusal。后续 C-227--C-229 结合具名枚举和邻接正对照收窄为本次 FLYC 表面的 absence，
+  不证明 DJI Fly、其他固件表面或加密 `0802` 无该机制。静态 business owner 是 cloud-country +
+  C0 certification policy，不是已验证用户开关。
 - **公开依据：** 先前公开
   [firmware research](https://github.com/Sapphire-Rapids/FindUAS/blob/15f331cf68ce93ae444a8e6aff4c5dc1ed90b5cc/docs/DJI_RID_FIRMWARE_RESEARCH.md#current-official-dji-fly-native-boundary)。
 - **隐私/分发：** 可记录公开参数名/hash；不发布 raw responses 或 vendor library。
@@ -775,7 +778,8 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   `eu_ce_support_remote_set_level` 在公开表中声明 min 0 / max 0（非可写 Boolean 范围），
   且 public GlassFalcon SDK 记载 by-index `0xE0`-`0xE3` 仅在 PC/assistant 源身份 `0x0a` 下
   被接受（C-213/C-214/C-215）。这进一步把该行族标为 EU C0 class/registration 标志，而非
-  单一发射机总开关；仍须 live by-index/by-hash 基线与独立接收机 RF 证据，不能以参数名外推。
+  单一发射机总开关。C-227--C-229 已给出当前固件的 live 结果，不能继续按公开索引重复准入，
+  也不能以邻接参数名外推 RID 控制或 RF 行为。
 
 ### RID-010：broadcast-effect policy 映射存在，但 bit 语义和 live metadata 未闭合
 
@@ -876,7 +880,7 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ### RID-012A：v0.10 只是一项环境准入探针
 
-- **证据状态：STATIC**
+- **证据状态：STATIC/OBSERVED**（C-231 的 `OBSERVED` 仅覆盖交付/readback，不覆盖运行）
 - **对象/版本：** `com.finduas.ridobserver` v0.10，SHA-256
   `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c`；完整 identity/disposition
   见[工件登记册](11_ARTIFACT_REGISTER.md)。
@@ -884,8 +888,10 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 - **事实：** v0.10 请求零权限，无 service/receiver/provider/socket/DUML/应用 Binder transaction、
   process execution、persistence、network send、packaged native library 或 attach/load 路径；它只采集
   环境 inventory 和自身进程映射的 ART identity。
-- **边界/不证明：** 尚未复制、安装或运行于 RC 2；即使环境 match 也不证明 RID state、EID route、
-  transaction authorization 或 RF behavior。
+- **当前交付：** A-001 已 staged 为 removable-SD `Download/FindUAS_A001_V010.apk`；fresh 唯一
+  listing 与同 session 全量 MTP readback 的 size/hash 匹配（C-231）。安装/运行仍待完成。
+- **边界/不证明：** 交付不等于 live environment report；即使环境 match 也不证明 RID state、
+  EID route、transaction authorization 或 RF behavior。
 - **公开依据：** 本仓库 AGENTS correction、前述 compatibility research。
 - **隐私/分发：** 仓库只登记 hash/size/audit/disposition，不分发 APK，不记录 live inode/path/maps。
 

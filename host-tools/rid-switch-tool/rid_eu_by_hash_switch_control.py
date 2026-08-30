@@ -3,7 +3,7 @@
 This tool addresses only the flight-controller parameter
 ``EU_CE_enable_c0_rid_0`` (hash ``0xF80992FE``) over verified USB DUML paths.
 It never sends a write unless a same-session F7/F8 baseline exists, and it
-always restores that baseline immediately after a forward write. It has no
+attempts to restore that baseline immediately after any possible forward write. It has no
 generic payload, route, command, or parameter interface.
 
 Commands reachable here are FLYC 0x03/0xF7 (metadata), 0x03/0xF8 (value), and
@@ -25,6 +25,8 @@ from pathlib import Path
 import time
 
 import usb1
+
+from switch_safety import close_usb, run_transition, validate_boolean_write_range
 
 
 VID = 0x2CA3
@@ -53,16 +55,10 @@ RID_CTRL_BRIDGE_KIND = "bool"
 
 
 def build_target_raw(baseline_raw: bytes, target: bool) -> bytes:
-    """Return the F9 value bytes for ``target`` with the baseline width.
-
-    The strict Boolean decoder accepts a raw value of exactly the F7 width
-    filled with all-zero or all-one bytes. This helper keeps that width and
-    never changes it.
-    """
-
-    if not baseline_raw:
-        raise ValueError("baseline raw value is empty")
-    return bytes([1 if target else 0]) * len(baseline_raw)
+    """Only one-byte 0/1 baselines have an admitted local write encoding."""
+    if baseline_raw not in (b"\x00", b"\x01") or type(target) is not bool:
+        raise ValueError("write encoding requires one-byte Boolean baseline and target")
+    return bytes((int(target),))
 
 
 def load_protocol_module():
@@ -253,7 +249,7 @@ def probe_parameter(session: FCSession, *, name: str, hash_value: int, kind: str
     return metadata, value, f7_payload, f8_payload
 
 
-def main() -> None:
+def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description="Bounded USB DUML by-hash switch for EU_CE_enable_c0_rid_0."
     )
@@ -292,7 +288,7 @@ def main() -> None:
         default=2.0,
         help="per-reply receive window in seconds (default: 2.0)",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if not 0.25 <= args.reply_seconds <= 5.0:
         raise SystemExit("--reply-seconds must be between 0.25 and 5.0")
 
@@ -313,33 +309,17 @@ def main() -> None:
         route_source = config["source"]
         route_target = LEGACY_TARGET_FC
 
-    context = usb1.USBContext()
-    device = context.getByVendorIDAndProductID(VID, config["pid"])
-    if device is None:
-        context.close()
-        raise SystemExit(f"DJI {args.transport} USB device not found")
-
-    handle = device.open()
-    handle.claimInterface(config["interface"])
-    session = FCSession(
-        handle=handle,
-        duml=duml,
-        protocol_module=protocol_module,
-        source=route_source,
-        target=route_target,
-        endpoint_out=config["endpoint_out"],
-        endpoint_in=config["endpoint_in"],
-        wire_mode=args.wire_mode,
-        reply_seconds=args.reply_seconds,
-    )
+    context = None
+    handle = None
+    claimed = False
 
     report = {
         "transport": args.transport,
         "route": args.route,
         "source": f"0x{route_source:02X}",
-        "target": f"0x{route_target:02X}",
+        "route_target": f"0x{route_target:02X}",
         "wire_mode": args.wire_mode,
-        "target": args.target,
+        "requested_target": args.target,
         "parameter": RID_PARAM_NAME,
         "hash": f"0x{RID_PARAM_HASH:08X}",
         "state": "unavailable",
@@ -353,7 +333,28 @@ def main() -> None:
     def record(step: str, outcome: str, detail: dict[str, object]) -> None:
         report["steps"].append({"step": step, "outcome": outcome, **detail})
 
-    try:
+    def run():
+        nonlocal context, handle, claimed
+        context = usb1.USBContext()
+        device = context.getByVendorIDAndProductID(VID, config["pid"])
+        if device is None:
+            raise RuntimeError("USB device not found")
+
+        handle = device.open()
+        handle.claimInterface(config["interface"])
+        claimed = True
+        session = FCSession(
+            handle=handle,
+            duml=duml,
+            protocol_module=protocol_module,
+            source=route_source,
+            target=route_target,
+            endpoint_out=config["endpoint_out"],
+            endpoint_in=config["endpoint_in"],
+            wire_mode=args.wire_mode,
+            reply_seconds=args.reply_seconds,
+        )
+
         # Positive control: a known-good parameter must round-trip first.
         try:
             _, _, pc_f7, pc_f8 = probe_parameter(
@@ -373,6 +374,7 @@ def main() -> None:
             raise RuntimeError("positive control failed; refusing to touch the RID parameter") from exc
 
         # Optional read-only bridge: the other by-hash RID candidate.
+        bridge_verified = True
         if args.rid_ctrl_bridge:
             try:
                 _, _, bridge_f7, bridge_f8 = probe_parameter(
@@ -389,6 +391,7 @@ def main() -> None:
                 })
             except (TimeoutError, RuntimeError, protocol_module.ParamProtocolError, usb1.USBError) as exc:
                 record("rid_ctrl_bridge", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
+                bridge_verified = False
 
         # Baseline: F7 metadata then F8 value for the RID parameter.
         try:
@@ -411,86 +414,58 @@ def main() -> None:
             report["state"] = "baseline_unavailable"
             raise RuntimeError("no same-session baseline; no write was attempted") from exc
 
+        if not bridge_verified:
+            report["state"] = "partial_bridge_unverified"
+            return 1
         report["state"] = "baseline"
         if args.target is None:
             report["state"] = "probe_only"
-            return
+            return 0
 
+        report["state"] = "write_encoding_not_admitted"
+        validate_boolean_write_range(
+            type_id=metadata.data_type, size=metadata.size,
+            minimum_raw=metadata.minimum_raw, maximum_raw=metadata.maximum_raw,
+        )
         target_value = args.target == "on"
         if baseline == target_value:
             record("forward_write", "no_op", {"reason": "baseline already equals target"})
             report["state"] = "already_target"
-            return
+            return 0
 
-        # Forward write with the same wire protection as reads. The encoded
-        # Boolean target keeps the baseline value width and fills the whole raw
-        # value with 0 or 1, matching the strict Boolean decoder.
+        # Both metadata bounds and encodings pass before any possible mutation.
         target_raw = build_target_raw(original_raw, target_value)
-        write_payload = protocol_module.build_write_request_body(
-            target_raw, parameter_hash=RID_PARAM_HASH
-        )
-        try:
-            ack_payload = session.exchange(protocol_module.CMD_WRITE_PARAM_BY_HASH, write_payload)
-            status = protocol_module.parse_f9_write_ack(ack_payload)
-            record("forward_write", "ack", {"status": status, "payload_length": len(ack_payload)})
-        except (TimeoutError, RuntimeError, protocol_module.ParamProtocolError, usb1.USBError) as exc:
-            record("forward_write", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
-            report["state"] = "write_failed_restoring"
-            raise
+        protocol_module.build_write_request_body(original_raw, parameter_hash=RID_PARAM_HASH)
+        protocol_module.build_write_request_body(target_raw, parameter_hash=RID_PARAM_HASH)
 
-        # Readback of the forward value.
-        forward_ok = False
-        try:
-            _, fwd_value, _, _ = probe_parameter(
-                session,
-                name=RID_PARAM_NAME,
-                hash_value=RID_PARAM_HASH,
-                kind=RID_SEMANTIC_KIND,
+        def write(raw):
+            payload = protocol_module.build_write_request_body(raw, parameter_hash=RID_PARAM_HASH)
+            ack = session.exchange(protocol_module.CMD_WRITE_PARAM_BY_HASH, payload)
+            protocol_module.parse_f9_write_ack(ack)
+
+        def read():
+            observed_metadata, observed, _, _ = probe_parameter(
+                session, name=RID_PARAM_NAME, hash_value=RID_PARAM_HASH, kind=RID_SEMANTIC_KIND
             )
-            forward_ok = bool(fwd_value.decoded) == target_value
-            record("forward_readback", "match" if forward_ok else "mismatch", {
-                "value": fwd_value.decoded,
-                "raw_hex": fwd_value.raw.hex(),
-            })
-        except (TimeoutError, RuntimeError, protocol_module.ParamProtocolError, usb1.USBError) as exc:
-            record("forward_readback", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
+            if observed_metadata != metadata:
+                raise RuntimeError("parameter metadata changed during transition")
+            return bytes(observed.raw)
 
-        # Always restore the baseline.
-        restore_payload = protocol_module.build_write_request_body(
-            original_raw, parameter_hash=RID_PARAM_HASH
-        )
-        restore_ok = False
-        try:
-            restore_ack = session.exchange(protocol_module.CMD_WRITE_PARAM_BY_HASH, restore_payload)
-            protocol_module.parse_f9_write_ack(restore_ack)
-            record("restore_write", "ack", {"payload_length": len(restore_ack)})
-            _, restore_value, _, _ = probe_parameter(
-                session,
-                name=RID_PARAM_NAME,
-                hash_value=RID_PARAM_HASH,
-                kind=RID_SEMANTIC_KIND,
-            )
-            restore_ok = bool(restore_value.decoded) == baseline
-            record("restore_readback", "match" if restore_ok else "mismatch", {
-                "value": restore_value.decoded,
-                "raw_hex": restore_value.raw.hex(),
-            })
-        except (TimeoutError, RuntimeError, protocol_module.ParamProtocolError, usb1.USBError) as exc:
-            record("restore", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
-
-        if restore_ok and forward_ok:
-            report["state"] = "A_B_A_complete"
-        elif restore_ok:
-            report["state"] = "restored_forward_unverified"
-        else:
-            report["state"] = "restore_unverified"
+        return 0 if run_transition(
+            report=report, record=record, write=write, read=read,
+            target_raw=target_raw, baseline_raw=original_raw,
+        ) else 1
+    try:
+        exit_code = run()
+    except (Exception, KeyboardInterrupt) as exc:
+        report["error_type"] = type(exc).__name__
+        exit_code = 1
     finally:
-        handle.releaseInterface(config["interface"])
-        handle.close()
-        context.close()
-
-    print(json.dumps(report, indent=2, ensure_ascii=False))
+        close_usb(context=context, handle=handle, claimed=claimed,
+                  interface=config["interface"], report=report)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+    return 1 if report.get("cleanup_errors") else exit_code
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

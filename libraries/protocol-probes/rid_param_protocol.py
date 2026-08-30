@@ -140,15 +140,13 @@ def build_write_request_body(value_raw: bytes, *, parameter_hash: int) -> bytes:
     """Build the exact F9 application payload ``[hash:u32le][value]``.
 
     This helper only composes bytes. It validates the hash and the encoded
-    Boolean raw value range but performs no I/O and cannot transmit a packet.
+    one-byte Boolean representation but performs no I/O and cannot transmit a packet.
     """
 
     if not 0 <= parameter_hash <= 0xFFFFFFFF:
         raise ParamProtocolError("write parameter hash is outside u32")
-    if not value_raw:
-        raise ParamProtocolError("write value is empty")
-    if any(byte not in (0, 1) for byte in value_raw):
-        raise ParamProtocolError("write value is not a Boolean 0/1 payload")
+    if value_raw not in (b"\x00", b"\x01"):
+        raise ParamProtocolError("only one-byte Boolean writes are established")
     return parameter_hash.to_bytes(4, "little") + bytes(value_raw)
 
 

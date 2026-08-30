@@ -235,12 +235,17 @@ def build_write_value_request(
 
 
 def encode_boolean_value(value: bool, *, info: ParamInfo) -> bytes:
-    """Encode one Boolean value in the get_info-declared width."""
+    """Encode only the established one-byte Boolean representation.
+
+    Numeric read support does not establish a multi-byte control encoding.
+    """
 
     _check_boolean_capable(info)
-    if info.type_id == _BOOL_TYPE:
-        return bytes([1 if value else 0])
-    return bytes([1 if value else 0]) * info.size
+    if type(value) is not bool:
+        raise ParamIndexError("Boolean encoder requires a bool value")
+    if info.size != 1 or info.type_id not in (0, 4, _BOOL_TYPE):
+        raise ParamIndexError("only one-byte Boolean writes are established")
+    return bytes([int(value)])
 
 
 def parse_write_status(payload: bytes) -> int:

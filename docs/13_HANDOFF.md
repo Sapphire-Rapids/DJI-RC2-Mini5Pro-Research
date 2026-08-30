@@ -2,6 +2,12 @@
 
 ## Start here
 
+The next device objective is trusted read-only RC 2 identity, then a legitimate loader/descriptor,
+then one official query-only inventory callback. The two current FLYC candidates are closed by
+C-227--C-230, not awaiting another parameter probe. The requested control target also includes
+Basic/UAS ID, aircraft position and operator position; keep Operator ID separate and map each
+field's owner/readback/RF correspondence independently. Synthetic codecs remain offline.
+
 1. Read [AGENTS.md](../AGENTS.md) completely.
 2. Read [02_EVIDENCE_REGISTER.md](02_EVIDENCE_REGISTER.md) and
    [evidence/claims.csv](../evidence/claims.csv).
@@ -23,9 +29,14 @@
 The current corrections are v0.10, rejected V2.2, and sealed-but-unadmitted V2.3. Do not copy an
 older “install v0.8” or “V2.3 in progress” instruction into a current procedure.
 
+Exact A-001 v0.10 is now staged as removable-SD `Download/FindUAS_A001_V010.apk`; the fresh
+unique listing and same-session full MTP readback matched the registered size/hash (C-231).
+Installation and run remain pending. The next artifact result is its redacted environment report,
+not an attach, shell launch or aircraft request.
+
 ## Topic entry points
 
-### Current ADB task: exact v07 gate and pending userspace-copy session
+### ADB loader contingency: exact v07 gate and pending identity baseline
 
 Read C-174--C-179/A-029--A-032 in the two registers, then read
 [08_ANDROID_ADB.md](08_ANDROID_ADB.md), H-30, and B-21 before touching the device.
@@ -89,13 +100,15 @@ or a verified WA150 handler. A-024's passive timeline is also complete: it produ
 while an independent detector confirmed real motor-on RID, so that third-party listener is a
 false-negative truth source and must not be repeated.
 
-The independent USB DUML path is now separately instrumented in
+The independent USB DUML path was separately instrumented in
 [`host-tools/rid-switch-tool/rid_switch_control.py`](../host-tools/rid-switch-tool/rid_switch_control.py).
-It reaches FC `03/F7-F9` for `rid_ctrl_enable_0` only, behind a same-session maximum-height positive
-control, a strict F7/F8 Boolean baseline, one forward F9 write, readback, and an immediate restore.
-This is `STATIC`/`NOT ADMITTED` source; it is not live evidence, it does not retry the closed Binder
-attach routes, and its F8 readback is not RF proof. Run it only with the operator present and the
-external receiver ready for the motor-on A-B-A check.
+Its source-level gates do not constitute a live switch. C-227--C-230 now record a successful
+direct-USB FLYC positive control on `01.00.0600` and positive-controlled absence of both
+`rid_ctrl_enable_0` and `EU_CE_enable_c0_rid(_0)`. No target baseline or write followed. The public
+index mapping is not authoritative: the live C0 block shifts +1, and its sampled zero-range
+registration flags cannot substitute for the absent target. Keep these tools as historical
+source; do not repeat the same target/route variants without new owner, handler or version
+evidence. The conclusion is limited to the tested surface, not DJI Fly or encrypted `0802`.
 
 ### Closed passive branch: A-026 gated FlySafe inventory
 
@@ -480,15 +493,16 @@ ruby scripts/check_evidence_csv.rb
 sh scripts/check_sensitive_patterns.sh
 ```
 
-Then inspect the staged file list. Only Markdown, CSV, scripts, license, and repository metadata are
-expected. APK, SO, firmware, images, captures, key files, build directories, or host-local paths are
+Then inspect the staged file list. Independently written source/tests, Markdown, CSV, scripts,
+license and repository metadata are expected. APK, SO, firmware, captures, key files, build
+directories or host-local paths are
 release blockers.
 
 ## 2026-08-30 takeover checkpoint
 
 Start with [`../NEXT_AGENT_HANDOFF_PROMPT.md`](../NEXT_AGENT_HANDOFF_PROMPT.md), then read this file,
 [`12_CURRENT_BLOCKERS.md`](12_CURRENT_BLOCKERS.md),
-[`20_OFFICIAL_FLYSAFE_UI_PATH.md`](20_OFFICIAL_FLYSAFE_UI_PATH.md), and claims C-188--C-211.
+[`20_OFFICIAL_FLYSAFE_UI_PATH.md`](20_OFFICIAL_FLYSAFE_UI_PATH.md), and claims C-188--C-231.
 
 Do not repeat these emulator-closed routes on RC 2:
 
@@ -498,11 +512,26 @@ Do not repeat these emulator-closed routes on RC 2:
 - an uncommitted PackageInstaller `apk_tmp_file` staging directory;
 - the old external Binder F7/F8 route variants or passive `0x11/0x1C` listener.
 
-First close C-207's written standard-RID bearer/motor-timing A-B-A using
-[`21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md`](21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md), then use
-read-only positive controls to decide whether the C-192--C-199 WA150 by-index/by-hash candidate
-route is live. In the same-process lane, exact domain/path admission for the already-working ART TI
-query remains next, or the independent userspace-ADB path if policy has no shared executable label.
-The first RC 2 ART TI execution is query-only and succeeds only with a fresh callback plus unchanged
-DJI Fly PID. Do not add a state-changing path until a real baseline, route, readback and exact
-restore are closed.
+The original local corpus has been located. Rehashed core DJI Fly/RC331 inputs and selected
+A-032/A-033 outputs match their registered identities; no vendor file or private log is imported.
+This does not promote the inputs to installed/mounted RC 2 facts or change artifact admission.
+The bounded sandbox search did not find the latest 1558-slot/915-name enumeration output or a
+completed C-207 timeline. Check old task outputs and existing local history before repeating any
+collection; absence from that search is not proof that the records are lost.
+
+The next device session begins with exact read-only installed/mounted identity and caller/target
+policy facts. Admit a legitimate delimiter-free path or mediated descriptor before the first
+query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
+independent userspace-ADB contingency retains its own baseline and recovery gates.
+
+In parallel, map Basic/UAS ID, aircraft position, operator position and Operator ID independently
+using [19_RID_EXPERIMENT_CONTROL_MATRIX.md](19_RID_EXPERIMENT_CONTROL_MATRIX.md). Recover or
+complete C-207's written standard-bearer/motor-timing record using
+[`21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md`](21_C207_MOTOR_RID_ABA_OBSERVATION_FORM.md).
+No state-changing path follows until its own baseline, route, readback, restore, persistence and
+RF design is closed. Synthetic fixtures remain offline.
+
+The existing FindUASMac persisted history was located separately through its source-configured
+Application Support location. A bounded read found no explicit motor-transition or aircraft-air-
+bearer fields. The writer rate-limits persistence per UAS to one row per two seconds, so rows are
+not RF packet counts and do not close C-207. Identifiers, coordinates and raw records stay private.

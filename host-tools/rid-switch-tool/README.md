@@ -1,10 +1,17 @@
 # RID switch control and by-index probe (bounded USB DUML)
 
-This directory contains two operator-run USB tools for the RID candidate parameters.
+This directory contains fixed USB tools for historical RID candidate parameters.
 They are independently written research source, not DJI software, and neither is
-**admitted** as a stable aircraft Remote ID switch: a write is only attempted after a
-same-session baseline exists, the baseline is always restored immediately, and no
-radio state is measured.
+**admitted** as a stable aircraft Remote ID switch. Offline repair and passing tests
+do not reopen a closed device route. In particular, `rid_ctrl_enable_0` and
+`EU_CE_enable_c0_rid_0` / `EU_CE_enable_c0_rid` remain `NOT ADMITTED` for the recorded
+Mini 5 Pro `01.00.0600` state. Do not repeat their closed routes merely because these
+source defects have been repaired; consult the current evidence and handoff first.
+
+A write path requires a same-session baseline, attempts one immediate restore after
+any possible forward write, and checks the final value even if a restore ACK is lost.
+This is bounded best-effort recovery: disconnection, process termination, power loss,
+or a failed final read can leave restoration unverified. No radio state is measured.
 
 ## Why this exists
 
@@ -46,18 +53,24 @@ name the same wa150 row, and both tools can read-only report that bridge.
 Neither tool has a generic payload, route, command, or parameter interface. Neither
 starts motors nor measures RF.
 
-## One-shot read-only baseline session
+## Read-only baseline batch
 
-For a same-session, write-free baseline capture, run:
+The historical wrapper sequences two write-free probes:
 
 ```sh
-# by-index + by-hash read-only baseline in one batch (no --target is ever passed)
+# Two separate USB connections in one batch (no --target is ever passed)
 ./readonly_baseline_session.sh aircraft legacy
 ```
 
-It writes two redacted JSON reports (`by_index.json`, `by_hash.json`) into a
-timestamped directory and never reaches a write or restore path. Review the
-reports for unexpected identifiers before sharing them.
+Each completed invocation emits a JSON report, including a read-only result or an
+operational failure. The batch stops at the first failure and may therefore create
+only the first report. Each Python process opens and closes its own USB connection;
+the batch does not establish a shared connection or same-session baseline across
+the two reports. The default output is the repository's ignored
+`private/readonly_baseline_<timestamp>/` directory; `READONLY_BASELINE_OUT_DIR` may
+select another private local directory. It never reaches a write or restore path.
+These are historical interfaces, not instructions to repeat the current closed
+routes. Review reports for unexpected identifiers before sharing them.
 
 ## Usage
 
@@ -102,13 +115,27 @@ Dependencies: Python 3.10+ and `libusb1`
 1. Positive control `g_config.flying_limit.max_height_0` (`0x0371238A`) must round-trip
    F7/F8 on the chosen route. A failed positive control aborts before any RID request.
 2. `rid_ctrl_enable_0` F7 metadata must match the fixed name, and F8 must return a
-   strict Boolean baseline.
+   strict Boolean baseline. Writes are restricted to a one-byte integer/Boolean
+   type with raw value `00` or `01`; wider integer and floating-point values remain
+   read-only. Canonical metadata bounds must permit both 0 and 1 within that type's
+   domain; zero-range or malformed bounds stop before any forward or restore write.
 3. Only then may a single F9 write be sent; the F9 request and its acknowledgement use
    the same SIMPLE-keystream protection as reads.
-4. Forward value is read back, then the baseline is written back and read back again.
+4. Forward value is read back, then the exact captured baseline bytes are written
+   back and read back again. A forward ACK failure or interruption also enters the
+   restore attempt. A failed restore ACK does not skip the final readback.
 
-The by-index probe never writes. It verifies the table identity through `0xE0`, then
-re-checks each candidate's on-board name through `0xE1` before interpreting `0xE2`.
+The by-index probe never writes. Both by-index tools compare the `0xE0` CRC/count
+with the pinned table before any `0xE1`/`0xE2` request, and validate frame CRCs,
+response type, reverse route, sequence and command before parsing. A table mismatch
+stops the operation. The switch also requires a one-byte Boolean baseline.
+Its metadata range must permit both Boolean states before a requested write or
+no-op can be admitted. Read-only reports may still show a zero-range flag.
+
+An explicitly requested bridge is required to complete successfully. Bridge failure
+retains any successful baseline reads, reports `partial_bridge_unverified`, exits
+nonzero and sends no write. The by-index tool also rejects disagreement between its
+baseline and the same parameter's by-hash value. Unrequested bridges add no gate.
 
 The EU C0 by-hash switch tool uses the same gate order as `rid_switch_control.py`,
 applied to `EU_CE_enable_c0_rid_0` (`0xF80992FE`). The by-index switch tool uses the
@@ -123,11 +150,23 @@ wa150 table, not a global RID master switch.
 
 ```sh
 python3 -m unittest -v test_rid_switch_control.py test_rid_eu_by_hash_switch_control.py test_rid_index_switch_control.py test_rid_param_index_readonly.py
+python3 -m unittest -v test_switch_session_failures.py
 ```
 
 Offline tests load the modules with a fake `usb1` and verify the value-width helpers,
 the fixed single-parameter target and table identity, the fixed candidate list, and the
-fail-closed dispatch gates without opening a device.
+fail-closed dispatch gates without opening a device. In-memory USB sessions exercise
+the actual CLI and packet paths for read-only output, positive-control failure,
+table mismatch, damaged replies, lost ACKs, interruption, exact restoration and
+unverified restoration. Tests also cover zero-range and malformed metadata, the
+live 1558 count against the pinned 1557 table, and requested bridge failure or value
+disagreement before writes. The fixed hash bridge permits F7/F8 only for its pinned
+hash; it does not add an F9 route.
+
+Reports distinguish `route_target` from `requested_target`. Operational failure and
+unverified transition/restore exit nonzero; successful read-only/no-op paths emit
+JSON and exit zero. `A_B_A_complete` describes exact onboard byte readbacks only,
+including a separately recorded missing ACK when a later read confirms the state.
 The EU C0 by-hash codec is mirrored in the Android panel at
 `apps/rc2-rid-admin/.../RidEuC0Parameter.java` with its own name/hash identity test.
 The by-hash F9 codec tests live in `../device-read-probes/test_rid_param_protocol.py`,

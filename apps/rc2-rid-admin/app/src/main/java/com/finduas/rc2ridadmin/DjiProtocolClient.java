@@ -1302,7 +1302,7 @@ final class DjiProtocolClient {
                             + commandSummary(route, cmdSet, cmdId, payload) + "; elapsedMs="
                             + elapsedSince(started) + "; cause="
                             + commandThrowableSummary(exception, cmdSet, cmdId);
-                    if (isSensitiveFlysafeCommand(cmdSet, cmdId)) {
+                    if (isSensitiveCommand(cmdSet, cmdId)) {
                         throw new SecurityException(message);
                     }
                     throw new SecurityException(message, exception);
@@ -1312,7 +1312,7 @@ final class DjiProtocolClient {
                             + commandSummary(route, cmdSet, cmdId, payload) + "; elapsedMs="
                             + elapsedSince(started) + "; cause="
                             + commandThrowableSummary(exception, cmdSet, cmdId);
-                    if (isSensitiveFlysafeCommand(cmdSet, cmdId)) {
+                    if (isSensitiveCommand(cmdSet, cmdId)) {
                         throw new IllegalStateException(message);
                     }
                     throw new IllegalStateException(message, exception);
@@ -1336,7 +1336,7 @@ final class DjiProtocolClient {
                         + commandSummary(route, cmdSet, cmdId, payload) + "; elapsedMs="
                         + elapsedSince(started) + "; cause="
                         + commandThrowableSummary(exception, cmdSet, cmdId);
-                if (isSensitiveFlysafeCommand(cmdSet, cmdId)) {
+                if (isSensitiveCommand(cmdSet, cmdId)) {
                     throw new IllegalStateException(message);
                 }
                 throw new IllegalStateException(message, exception);
@@ -1505,12 +1505,11 @@ final class DjiProtocolClient {
             return false;
         }
         if (cmdId == CMD_EID_SWITCH) {
-            return payload.length == 1
-                    && (payload[0] == 0 || payload[0] == 1 || payload[0] == 2);
+            // STATIC LOCKED: even a direct caller cannot bypass the disabled Activity controls.
+            return payload.length == 1 && payload[0] == 2;
         }
         if (cmdId == CMD_OPERATOR_ID) {
-            return (payload.length == 1 && (payload[0] == 1 || payload[0] == 2))
-                    || (payload.length == 18 && payload[0] == 0 && payload[1] == 0x10);
+            return payload.length == 1 && payload[0] == 2;
         }
         if (cmdId == CMD_PARAM_INFO_BY_HASH) {
             return isRidControlHash(payload)
@@ -1844,16 +1843,18 @@ final class DjiProtocolClient {
             int cmdSet,
             int cmdId,
             byte[] payload) {
-        String payloadSummary = isSensitiveFlysafeCommand(cmdSet, cmdId)
-                ? "<redacted-license-action>" : hex(payload);
+        String payloadSummary = cmdSet == CMD_SET_FLYC && cmdId == CMD_OPERATOR_ID
+                ? "<redacted-operator-id>"
+                : isSensitiveCommand(cmdSet, cmdId) ? "<redacted-license-action>" : hex(payload);
         return String.format(Locale.US, "%s cmd=%02X/%02X payload=%s",
                 route.summary(), cmdSet & 0xff, cmdId & 0xff, payloadSummary);
     }
 
-    private static boolean isSensitiveFlysafeCommand(int cmdSet, int cmdId) {
-        return cmdSet == CMD_SET_ADSB
+    private static boolean isSensitiveCommand(int cmdSet, int cmdId) {
+        return (cmdSet == CMD_SET_FLYC && cmdId == CMD_OPERATOR_ID)
+                || (cmdSet == CMD_SET_ADSB
                 && (cmdId == CMD_FLYSAFE_LICENSE_LIST
-                || cmdId == CMD_FLYSAFE_SET_LICENSE_ENABLED);
+                || cmdId == CMD_FLYSAFE_SET_LICENSE_ENABLED));
     }
 
     private static String hex(byte[] value) {
@@ -1917,7 +1918,7 @@ final class DjiProtocolClient {
             Throwable throwable,
             int cmdSet,
             int cmdId) {
-        if (!isSensitiveFlysafeCommand(cmdSet, cmdId)) {
+        if (!isSensitiveCommand(cmdSet, cmdId)) {
             return throwableSummary(throwable);
         }
         Throwable current = unwrapInvocationTarget(throwable);
@@ -2049,7 +2050,7 @@ final class DjiProtocolClient {
                                     expectedCmdId,
                                     callbackSummary("SUCCESS", afterTokenAvail, data));
                         } finally {
-                            if (isSensitiveFlysafeCommand(expectedCmdSet, expectedCmdId)
+                            if (isSensitiveCommand(expectedCmdSet, expectedCmdId)
                                     && pack.data != null) {
                                 Arrays.fill(pack.data, (byte) 0);
                             }
@@ -2089,7 +2090,7 @@ final class DjiProtocolClient {
                             data.readByteArray(description);
                         }
                         final String ecodeDiagnostic;
-                        if (isSensitiveFlysafeCommand(expectedCmdSet, expectedCmdId)) {
+                        if (isSensitiveCommand(expectedCmdSet, expectedCmdId)) {
                             ecodeDiagnostic = String.format(Locale.US,
                                     "ecode{id=%d descLen=%d desc=<redacted> trailing=%d}",
                                     error,

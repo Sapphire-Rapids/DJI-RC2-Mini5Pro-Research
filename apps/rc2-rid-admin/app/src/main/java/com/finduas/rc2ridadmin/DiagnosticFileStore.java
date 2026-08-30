@@ -20,7 +20,7 @@ import java.nio.file.StandardCopyOption;
 /** Atomic latest-result replacement inside the app-specific external files directory. */
 final class DiagnosticFileStore {
     private static final String PUBLIC_DIRECTORY = "Download/FindUAS/";
-    private static final String PUBLIC_FILE_NAME = "FindUAS_RID_A033_latest.txt";
+    private static final String PUBLIC_FILE_NAME = "FindUAS_RID_latest.txt";
 
     private DiagnosticFileStore() {
     }

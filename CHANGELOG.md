@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.4.20 - 2026-08-30
+
+### Fixed
+
+- Reconciled current handoff entrypoints with C-227--C-230; the two rejected FC candidates are no
+  longer the next live task. The research scope now includes the aircraft's actual Basic/UAS ID,
+  aircraft position and operator position, with Operator ID kept separate and synthetic work offline.
+- Fixed bounded host recovery after uncertain write ACKs, JSON reporting on early/error exits,
+  one-byte Boolean encoding, by-index response/table checks, bridge handling, and extended RID
+  status parsing. Added fake-transport failure coverage rather than reopening a device route.
+- Added the distinct A-037 Admin identity safety lock: EID/OPID writes locked at UI and sender,
+  OPID diagnostics masked, recoverable baselines checked and stale-session restoration rejected.
+- Added missing device-read, control-flow, synthetic-codec and Android Admin checks to CI.
+- Local validation: 270 Python tests and 170 Admin JVM tests passed; the same-process inventory
+  parser/build also passed. These are offline results; the new remote CI workflow has not run yet.
+
+### Evidence
+
+- Recovered the old local corpus without importing private/vendor material or uncommitted drafts.
+- Re-audited exact A-001 and staged one APK on RC 2 removable SD; fresh listing and full readback
+  matched its identity (C-231). Operator installation/run and the environment report remain pending.
+- Registered A-037's 170 passing JVM tests, lint 0 errors/15 warnings and identical clean builds
+  (C-232); the APK was not staged, installed or run. No aircraft write, attach, motor or RF action.
+
 ## 0.4.19 - 2026-08-30
 
 ### Added
@@ -9,14 +33,6 @@
   firmware 01.00.0600, plus the +1 index shift of the EU C0 block (C-227--C-230).
 - Fixed the F7 metadata name check to accept the canonical on-board name without the `_0` instance
   suffix (the FC answers with the plain name).
-
-## 0.4.19 - 2026-08-30
-
-### Added
-
-- Recorded the first live Mini 5 Pro FLYC positive control (`max_height_0` value 500) and the
-  positive-controlled absence of both `EU_CE_enable_c0_rid_0` and `rid_ctrl_enable_0` on the
-  `01.00.0600` flight controller, plus the +1 index shift of the EU C0 block (C-227--C-230).
 
 ## 0.4.18 - 2026-08-30
 

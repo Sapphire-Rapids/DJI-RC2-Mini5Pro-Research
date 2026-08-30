@@ -1,9 +1,9 @@
 #!/bin/sh
-# Read-only WA150 baseline session — NO writes, NO motors, NO RF measurement.
+# Read-only WA150 baseline batch — NO writes, NO motors, NO RF measurement.
 #
 # Sequences the two fixed read-only probes for the Mini 5 Pro (wa150) Remote ID
-# parameter candidates so an operator can capture a same-session baseline in one
-# command batch and hand the redacted reports back:
+# parameter candidates in one command batch. Each Python process opens and closes
+# its own USB connection; the reports are not a single same-session baseline:
 #
 #   1. by-index FLYC 0xE0/0xE1/0xE2 probe — table CRC/count positive control,
 #      then the three wa150 RID rows (EU_CE_enable_c0_rid 1306,
@@ -29,8 +29,9 @@ case "$transport" in aircraft|rc2) ;; *) echo "transport must be aircraft or rc2
 case "$route" in legacy|modern) ;; *) echo "route must be legacy or modern" >&2; exit 2;; esac
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_root=$(CDPATH= cd -- "$here/../.." && pwd)
 stamp=$(date +%Y%m%dT%H%M%S)
-out_dir="${READONLY_BASELINE_OUT_DIR:-$here/readonly_baseline_$stamp}"
+out_dir="${READONLY_BASELINE_OUT_DIR:-$repo_root/private/readonly_baseline_$stamp}"
 mkdir -p "$out_dir"
 
 echo "[1/2] by-index read-only probe -> $out_dir/by_index.json"

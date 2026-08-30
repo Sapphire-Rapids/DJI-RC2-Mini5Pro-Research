@@ -5,6 +5,41 @@ laboratory source with both read-only diagnostics and explicitly labelled experi
 It is covered by the repository-root [MIT license](../../LICENSE). Generated APKs, signing material,
 vendor code, and live/private captures are intentionally not committed.
 
+## Current source: identity safety lock
+
+Version `0.8.1-identity-safety-locked` / code `14` is a new source revision, not the A-033 artifact
+identified below. It has not been staged, installed, or run on RC 2. EID and OPID SET/DELETE/restore
+controls are disabled, their handlers reject entry, and the shared protocol sender admits only the
+existing GET selectors for these two commands. A successful GET cannot unlock them. The other
+experimental F9/FlySafe paths retain their existing boundaries; this is not a globally read-only APK.
+
+OPID output contains only unknown/empty/present and length. Full values do not enter the selectable
+result pane or clipboard; transport payloads, callback descriptions and vendor exception text for
+OPID are redacted. OPID input is disabled and excluded from Android view-state saving.
+
+The retained EID/OPID transaction code validates the current value and original session baseline
+before a write; OPID restoration requires exactly zero or 16 bytes. Once dispatch may have occurred,
+an uncertain ACK, readback failure, mismatch, interruption or failed restore reports
+`RESTORE_REQUIRED`, retains the baseline only in process memory, and blocks further transitions.
+Even a successfully read-back forward change remains locked until the original baseline is read
+back. A fresh value that conflicts with the captured baseline or last attempted value invalidates
+the session and blocks stale restoration instead of overwriting an unrelated external change.
+There is no automatic retry or recovery on an unadmitted route. Any future separately admitted
+recovery write must obtain both a canonical ACK and matching final readback; closing/restarting the
+app is not restoration. Host tests exercise this logic with fake device state, not with a device
+transport.
+
+The existing direct-query report now uses `Download/FindUAS/FindUAS_RID_latest.txt`; its embedded app
+version distinguishes this revision without overwriting the historical A-033-named report. No new
+query, field setter, broadcaster or RF backend was added.
+
+Local validation on 2026-08-30: 170 JVM tests passed; lint reported zero errors and 15 warnings.
+Two clean APK builds have size `225937` bytes and identical SHA-256
+`8ee7a4edd36c7f97c631fabf3186ac3df79e6611869ebf05b11e83ccba4e84ba`.
+APK Signature Scheme v2, zip alignment, zero declared permissions and absence of packaged native
+libraries were verified. These are local source/artifact checks only; the new revision remains
+`NOT ADMITTED`, with no device delivery or execution.
+
 RC 2 laboratory APK for the stock DJI `protocol` Binder service found in RC331 firmware.
 
 Implemented runtime operations:
@@ -33,17 +68,16 @@ Implemented runtime operations:
   fail-closed name/hash identity; it mirrors the host-tool codec and is now wired to a
   separate EU C0 read-only probe/off/on/restore surface whose write buttons stay disabled
   until an F7/F8 baseline and live route pass;
-- France EID GET / SET off / SET on (`0x03/0x77`), with automatic GET readback;
-- session-baseline restore;
-- EU operator-registration-number GET / SET / DELETE (`0x03/0x78`), with automatic GET readback
-  and session-baseline restore;
+- candidate France EID GET (`0x03/0x77`); retained SET/restore transaction code is locked;
+- candidate masked EU operator-registration-number GET (`0x03/0x78`); retained SET/DELETE/restore
+  transaction code is locked;
 - launcher for the stock DJI Developer Assistant protocol page.
 
 The passive-gated and direct-read-only query entry points admit only `0x11/0x11`; their query proof
 cannot authorize `0x11/0x12`. The shared sender also contains a separate, gated validation-pulse
 SET path that is not wired to the direct-read-only button. The Developer Assistant launcher opens
 an external DJI UI and is not governed by this APK's internal allow-list. The APK also contains
-the explicitly labelled experimental F9/EID/operator write controls listed above, so the artifact
+the explicitly labelled experimental F9 controls listed above, so the artifact
 as a whole is an **Admin** build, not a globally read-only build.
 
 The Activity uses process label `com.dpad.fuli` because RC331
@@ -191,6 +225,6 @@ Exact A-033 artifact:
 - staged through MTP as removable-SD `Download/FindUAS_A033_DIAG_EXPORT.apk`; a fresh readback
   matched the expected size and SHA-256.
 
-The APK binary remains excluded; this directory is its independently written source. Staging is
-not installation or execution. A-033 has not produced a live Binder result and does not establish
+The A-033 APK binary remains excluded; the hashes above identify that historical build, not the
+current source revision. Staging is not installation or execution. A-033 has not produced a live Binder result and does not establish
 inventory, entitlement, RID state, aircraft control, or RF behavior.

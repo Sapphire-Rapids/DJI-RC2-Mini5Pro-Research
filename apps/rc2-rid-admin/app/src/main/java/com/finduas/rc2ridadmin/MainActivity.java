@@ -34,6 +34,7 @@ public final class MainActivity extends Activity {
     private TextView status;
     private EditText operatorInput;
     private final List<Button> operationButtons = new ArrayList<>();
+    private final List<Button> identityWriteButtons = new ArrayList<>();
     private final AtomicBoolean operationRunning = new AtomicBoolean(false);
     private final AtomicBoolean flysafeStopRequested = new AtomicBoolean(false);
     private volatile boolean flysafeOneShotRunning;
@@ -42,9 +43,10 @@ public final class MainActivity extends Activity {
     private Button ridDisableButton;
     private Button ridEnableButton;
     private Button ridRestoreButton;
-    private Boolean sessionBaseline;
-    private boolean operatorBaselineCaptured;
-    private byte[] operatorBaseline;
+    private final IdentityControlTransaction eidTransaction =
+            new IdentityControlTransaction(IdentityControlTransaction.Field.EID);
+    private final IdentityControlTransaction operatorTransaction =
+            new IdentityControlTransaction(IdentityControlTransaction.Field.OPERATOR_ID);
     private RidControlParameter.Metadata ridControlMetadata;
     private Boolean ridControlBaseline;
     private DjiProtocolClient.Route ridControlRoute;
@@ -167,25 +169,33 @@ public final class MainActivity extends Activity {
         ridEuC0RestoreButton = button("恢复 EU C0 候选参数基线", () ->
                 runOperation("正在恢复 EU C0 候选参数…", this::restoreRidEuC0));
         content.addView(ridEuC0RestoreButton);
-        content.addView(button("刷新 EID 状态", () -> runOperation("正在读取 EID…", this::readEid)));
-        content.addView(button("关闭法国 EID 并读回", () ->
+        content.addView(text(
+                "STATIC LOCKED：法国 EID / EASA OPID 写入、删除和恢复均未准入。"
+                        + "当前缺少已验证的设备 owner/route、恢复和 RF 证据；读取成功也不会解锁。"
+                        + "OPID 仅显示已设置/未设置/未知，不显示或复制编号。",
+                14,
+                Color.DKGRAY));
+        content.addView(button("刷新 EID 状态（候选只读）", () -> runOperation("正在读取 EID…", this::readEid)));
+        content.addView(identityWriteButton("关闭法国 EID（未准入）", () ->
                 runOperation("正在关闭并读回…", () -> setAndReadEid(false))));
-        content.addView(button("开启法国 EID 并读回", () ->
+        content.addView(identityWriteButton("开启法国 EID（未准入）", () ->
                 runOperation("正在开启并读回…", () -> setAndReadEid(true))));
-        content.addView(button("恢复本次打开时的 EID 状态", () ->
+        content.addView(identityWriteButton("恢复 EID 基线（未准入）", () ->
                 runOperation("正在恢复并读回…", this::restoreBaseline)));
         content.addView(button("读取 EU 运营人编号", () ->
                 runOperation("正在读取运营人编号…", this::readOperatorId)));
         operatorInput = new EditText(this);
         operatorInput.setSingleLine(true);
         operatorInput.setTextSize(16);
-        operatorInput.setHint("完整 20 字符 EASA 运营人编号");
+        operatorInput.setHint("OPID 编辑未准入，不接受编号输入");
+        operatorInput.setEnabled(false);
+        operatorInput.setSaveEnabled(false);
         content.addView(operatorInput);
-        content.addView(button("设置 EU 运营人编号并读回", () ->
+        content.addView(identityWriteButton("设置 EU 运营人编号（未准入）", () ->
                 runOperation("正在设置运营人编号并读回…", this::setOperatorId)));
-        content.addView(button("删除 EU 运营人编号并读回", () ->
+        content.addView(identityWriteButton("删除 EU 运营人编号（未准入）", () ->
                 runOperation("正在删除运营人编号并读回…", this::deleteOperatorId)));
-        content.addView(button("恢复本次读取到的 EU 运营人编号", () ->
+        content.addView(identityWriteButton("恢复 EU 运营人编号（未准入）", () ->
                 runOperation("正在恢复运营人编号并读回…", this::restoreOperatorId)));
         content.addView(button("打开 DJI 开发助手（人工协议页）", this::openDeveloperAssistant));
 
@@ -212,6 +222,13 @@ public final class MainActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         operationButtons.add(button);
+        return button;
+    }
+
+    private Button identityWriteButton(String label, Runnable action) {
+        Button button = button(label, action);
+        identityWriteButtons.add(button);
+        button.setEnabled(false);
         return button;
     }
 
@@ -255,6 +272,9 @@ public final class MainActivity extends Activity {
         boolean idle = !operationRunning.get();
         for (Button button : operationButtons) {
             button.setEnabled(idle);
+        }
+        for (Button button : identityWriteButtons) {
+            button.setEnabled(idle && IdentityControlTransaction.writesAdmitted());
         }
         boolean candidateReady = idle
                 && ridControlMetadata != null
@@ -549,11 +569,10 @@ public final class MainActivity extends Activity {
         DjiProtocolClient.Reply reply = client().request(
                 DjiProtocolClient.CMD_EID_SWITCH, new byte[]{0x02});
         Boolean value = parseEid(reply);
-        if (sessionBaseline == null) {
-            sessionBaseline = value;
-        }
+        eidTransaction.captureBaseline(new byte[] {(byte) (value ? 1 : 0)});
         return "法国 EID：" + (value ? "开启" : "关闭")
-                + "；本次基线：" + (sessionBaseline ? "开启" : "关闭")
+                + "；本次基线：" + (eidTransaction.baseline()[0] == 1 ? "开启" : "关闭")
+                + "；写入仍未准入；不证明 RF 状态"
                 + diagnosticBlock("EID GET", reply);
     }
 
@@ -1096,157 +1115,113 @@ public final class MainActivity extends Activity {
     }
 
     private String setAndReadEid(boolean enabled) throws Exception {
-        DjiProtocolClient client = client();
-        if (sessionBaseline == null) {
-            sessionBaseline = parseEid(client.request(
-                    DjiProtocolClient.CMD_EID_SWITCH, new byte[]{0x02}));
-        }
-        DjiProtocolClient.Reply setReply = client.request(
-                DjiProtocolClient.CMD_EID_SWITCH,
-                new byte[]{(byte) (enabled ? 1 : 0)});
-        requireSuccess(setReply, "EID SET");
-        Thread.sleep(200);
-        DjiProtocolClient.Reply getReply = client.request(
-                DjiProtocolClient.CMD_EID_SWITCH, new byte[]{0x02});
-        boolean readback = parseEid(getReply);
-        if (readback != enabled) {
-            throw new IllegalStateException("SET 后读回不一致"
-                    + diagnosticBlock("EID SET", setReply)
-                    + diagnosticBlock("EID GET", getReply));
-        }
-        return "写入并读回成功：法国 EID 已" + (readback ? "开启" : "关闭")
-                + "；可用恢复按钮回到本次基线"
-                + diagnosticBlock("EID SET", setReply)
-                + diagnosticBlock("EID GET", getReply);
+        IdentityControlTransaction.requireWriteAdmission();
+        return eidTransaction.transition(
+                new byte[] {(byte) (enabled ? 1 : 0)}, eidDeviceState(client()));
     }
 
     private String restoreBaseline() throws Exception {
-        if (sessionBaseline == null) {
-            return "尚未取得本次基线，请先刷新 EID 状态";
-        }
-        return setAndReadEid(sessionBaseline);
+        IdentityControlTransaction.requireWriteAdmission();
+        return eidTransaction.restore(eidDeviceState(client()));
+    }
+
+    private IdentityControlTransaction.DeviceState eidDeviceState(DjiProtocolClient client) {
+        return new IdentityControlTransaction.DeviceState() {
+            @Override
+            public byte[] read() throws Exception {
+                boolean value = parseEid(client.request(
+                        DjiProtocolClient.CMD_EID_SWITCH, new byte[] {0x02}));
+                return new byte[] {(byte) (value ? 1 : 0)};
+            }
+
+            @Override
+            public void write(byte[] state) throws Exception {
+                requireIdentityWriteAck(client.request(DjiProtocolClient.CMD_EID_SWITCH, state));
+            }
+        };
     }
 
     private String readOperatorId() throws Exception {
         DjiProtocolClient.Reply reply = client().request(
-                DjiProtocolClient.CMD_OPERATOR_ID, new byte[]{0x02});
+                DjiProtocolClient.CMD_OPERATOR_ID, new byte[] {0x02});
         byte[] value = parseOperatorId(reply);
-        captureOperatorBaseline(value);
-        return operatorIdDisplay("EU 运营人编号", value)
-                + diagnosticBlock("OPID GET", reply);
+        try {
+            operatorTransaction.captureBaseline(value);
+            return "EU 运营人编号：" + OperatorIdCodec.maskedSummary(value)
+                    + "；写入仍未准入；不证明 RF 字段。";
+        } finally {
+            Arrays.fill(value, (byte) 0);
+        }
     }
 
     private String setOperatorId() throws Exception {
+        IdentityControlTransaction.requireWriteAdmission();
         byte[] payload = OperatorIdCodec.encodeSetPayload(
                 operatorInput.getText().toString().trim());
-        DjiProtocolClient client = client();
-        captureOperatorBaseline(readOperatorIdBytes(client));
-        DjiProtocolClient.Reply setReply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, payload);
-        requireSuccess(setReply, "Operator ID SET");
-        Thread.sleep(200);
-        DjiProtocolClient.Reply getReply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, new byte[]{0x02});
-        byte[] readback = parseOperatorId(getReply);
-        byte[] expected = Arrays.copyOfRange(payload, 2, 18);
-        if (!Arrays.equals(expected, readback)) {
-            throw new IllegalStateException("SET 后运营人编号读回不一致"
-                    + diagnosticBlock("OPID SET", setReply)
-                    + diagnosticBlock("OPID GET", getReply));
+        byte[] desired = Arrays.copyOfRange(payload, 2, 18);
+        try {
+            return operatorTransaction.transition(desired, operatorDeviceState(client()));
+        } finally {
+            Arrays.fill(payload, (byte) 0);
+            Arrays.fill(desired, (byte) 0);
         }
-        return operatorIdDisplay("设置并读回成功", readback)
-                + diagnosticBlock("OPID SET", setReply)
-                + diagnosticBlock("OPID GET", getReply);
     }
 
     private String deleteOperatorId() throws Exception {
-        DjiProtocolClient client = client();
-        captureOperatorBaseline(readOperatorIdBytes(client));
-        DjiProtocolClient.Reply deleteReply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, new byte[]{0x01});
-        requireSuccess(deleteReply, "Operator ID DELETE");
-        Thread.sleep(200);
-        DjiProtocolClient.Reply getReply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, new byte[]{0x02});
-        byte[] readback = parseOperatorId(getReply);
-        if (readback.length != 0) {
-            throw new IllegalStateException("DELETE 后运营人编号仍非空"
-                    + diagnosticBlock("OPID DELETE", deleteReply)
-                    + diagnosticBlock("OPID GET", getReply));
-        }
-        return "删除并读回成功：EU 运营人编号未设置"
-                + diagnosticBlock("OPID DELETE", deleteReply)
-                + diagnosticBlock("OPID GET", getReply);
+        IdentityControlTransaction.requireWriteAdmission();
+        return operatorTransaction.transition(new byte[0], operatorDeviceState(client()));
     }
 
     private String restoreOperatorId() throws Exception {
-        if (!operatorBaselineCaptured) {
-            return "尚未取得本次运营人编号基线，请先读取";
-        }
-        DjiProtocolClient client = client();
-        byte[] payload;
-        if (operatorBaseline.length == 0) {
-            payload = new byte[]{0x01};
-        } else if (operatorBaseline.length == 16) {
-            payload = OperatorIdCodec.encodeRawPublic16(operatorBaseline);
-        } else {
-            throw new IllegalStateException(
-                    "基线长度为 " + operatorBaseline.length + "，当前协议无法无损恢复");
-        }
-        DjiProtocolClient.Reply restoreReply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, payload);
-        requireSuccess(restoreReply, "Operator ID RESTORE");
-        Thread.sleep(200);
-        DjiProtocolClient.Reply getReply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, new byte[]{0x02});
-        byte[] readback = parseOperatorId(getReply);
-        if (!Arrays.equals(operatorBaseline, readback)) {
-            throw new IllegalStateException("恢复后运营人编号读回不一致"
-                    + diagnosticBlock("OPID RESTORE", restoreReply)
-                    + diagnosticBlock("OPID GET", getReply));
-        }
-        return operatorIdDisplay("已恢复本次基线", readback)
-                + diagnosticBlock("OPID RESTORE", restoreReply)
-                + diagnosticBlock("OPID GET", getReply);
+        IdentityControlTransaction.requireWriteAdmission();
+        return operatorTransaction.restore(operatorDeviceState(client()));
     }
 
-    private byte[] readOperatorIdBytes(DjiProtocolClient client) throws Exception {
-        DjiProtocolClient.Reply reply = client.request(
-                DjiProtocolClient.CMD_OPERATOR_ID, new byte[]{0x02});
-        return parseOperatorId(reply);
+    private IdentityControlTransaction.DeviceState operatorDeviceState(DjiProtocolClient client) {
+        return new IdentityControlTransaction.DeviceState() {
+            @Override
+            public byte[] read() throws Exception {
+                return parseOperatorId(client.request(
+                        DjiProtocolClient.CMD_OPERATOR_ID, new byte[] {0x02}));
+            }
+
+            @Override
+            public void write(byte[] state) throws Exception {
+                OperatorIdCodec.requireRestorableBaseline(state);
+                byte[] payload = state.length == 0
+                        ? new byte[] {0x01} : OperatorIdCodec.encodeRawPublic16(state);
+                try {
+                    requireIdentityWriteAck(client.request(DjiProtocolClient.CMD_OPERATOR_ID, payload));
+                } finally {
+                    Arrays.fill(payload, (byte) 0);
+                }
+            }
+        };
     }
 
     private static byte[] parseOperatorId(DjiProtocolClient.Reply reply) {
-        requireSuccess(reply, "Operator ID GET");
-        if (reply.data == null || reply.data.length < 1) {
-            throw new IllegalStateException("运营人编号回包为空"
-                    + diagnosticBlock("OPID GET", reply));
-        }
-        int length = reply.data[0] & 0xff;
-        if (length >= 101) {
-            throw new IllegalStateException("运营人编号长度超过官方上限"
-                    + diagnosticBlock("OPID GET", reply));
-        }
-        if (length > reply.data.length - 1) {
-            throw new IllegalStateException("运营人编号长度字段不合法"
-                    + diagnosticBlock("OPID GET", reply));
-        }
-        return Arrays.copyOfRange(reply.data, 1, 1 + length);
-    }
-
-    private void captureOperatorBaseline(byte[] value) {
-        if (!operatorBaselineCaptured) {
-            operatorBaseline = Arrays.copyOf(value, value.length);
-            operatorBaselineCaptured = true;
+        try {
+            requireIdentityReplySuccess(reply);
+            return OperatorIdCodec.decodeGetData(reply.data);
+        } finally {
+            if (reply != null && reply.data != null) {
+                Arrays.fill(reply.data, (byte) 0);
+            }
         }
     }
 
-    private static String operatorIdDisplay(String prefix, byte[] value) {
-        if (value.length == 0) {
-            return prefix + "：未设置";
+    private static void requireIdentityReplySuccess(DjiProtocolClient.Reply reply) {
+        if (reply == null || !reply.callbackSuccess || reply.ccode != 0) {
+            throw new IllegalStateException("IDENTITY_REPLY_UNAVAILABLE：未取得规范成功回包；值未知。");
         }
-        return prefix + "：" + new String(value, StandardCharsets.US_ASCII)
-                + "（设备保存的 16 字节公开部分）";
+    }
+
+    private static void requireIdentityWriteAck(DjiProtocolClient.Reply reply) {
+        requireIdentityReplySuccess(reply);
+        // Parsed Reply separates the result byte into ccode; SET/DELETE have no data bytes.
+        if (reply.data != null && reply.data.length != 0) {
+            throw new IllegalStateException("IDENTITY_WRITE_ACK_NONCANONICAL");
+        }
     }
 
     private static Boolean parseEid(DjiProtocolClient.Reply reply) {

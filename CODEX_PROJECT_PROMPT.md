@@ -3,11 +3,13 @@
 Use this prompt when starting or resuming work in this repository.
 
 ```text
-Project: FindUAS — DJI RC 2 / Mini 5 Pro Remote ID switch research.
+Project: FindUAS — DJI RC 2 / Mini 5 Pro Remote ID controls research.
 
-Sole objective
+Research objective
 
-Implement and verify a controllable Mini 5 Pro Remote ID switch.
+Implement and verify a controllable Mini 5 Pro Remote ID switch and, where an authoritative
+reversible device path can be established, laboratory control of Basic/UAS ID, aircraft position,
+and operator position. Track Operator ID separately; it is not Basic/UAS ID or operator position.
 
 Authorization context
 
@@ -18,22 +20,38 @@ lab devices and proceed toward the Remote ID switch without adding unrelated com
 
 Objective
 
-Implement and verify a controllable Mini 5 Pro Remote ID switch. Success means the switch can:
+For the switch and each requested field independently, success requires:
 
 1. establish the current RID/FlySafe or aircraft-policy baseline;
 2. make one bounded transition;
 3. read that transition back;
 4. restore the original state;
 5. read the restored state back;
-6. demonstrate the intended off/on behavior with an independent standard Remote ID receiver
-   during an operator-controlled motor-on RF A-B-A test.
+6. demonstrate the intended off/on or field behavior with an independent standard Remote ID
+   receiver during an operator-controlled motor-on RF A-B-A test;
+7. classify reconnect/reboot persistence and automatic owner overwrites without assuming that
+   a stored value is the value broadcast over RF.
+
+No requested aircraft field currently has an admitted editor. An unavailable owner or setter is
+an unresolved result, not permission to substitute a neighbouring identity or policy field.
+The synthetic OpenDroneID codec remains offline encode/decode and fixture work only; it does not
+provide a real-aircraft control or authorize adding a transmitter backend.
 
 Route priority
 
-1. WA150 by-index/by-hash aircraft policy route after same-session positive control, metadata
-   validation, and baseline readback.
-2. Official FlySafe/Remote-ID inventory and a genuine same-item state transition when available.
-3. Exact in-process query instrumentation only after a legitimate loader or descriptor is admitted.
+1. Establish exact RC 2 installed/mounted identities and the caller/target runtime and SELinux
+   baseline through bounded read-only observation.
+2. Admit a legitimate same-process loader or descriptor, then obtain one official query-only
+   FlySafe inventory callback with unchanged DJI Fly PID. A-033 is a historical comparison.
+3. Independently map the authoritative owner, safe readback and RF correspondence of Basic/UAS ID,
+   aircraft position, operator position, and the separate Operator ID plane before any field write.
+4. Recover existing receiver records or complete C-207's standard-bearer/motor-timing record with
+   the operator; retain per-field baseline/restore/RF gates for any later transition.
+
+C-227--C-230 close the tested direct-USB FLYC surface on Mini 5 Pro 01.00.0600: the positive
+control succeeded, but EU_CE_enable_c0_rid(_0) and rid_ctrl_enable_0 were absent on that surface.
+Do not repeat those parameter/route variants without materially new owner, handler or version
+evidence. This does not establish absence in the app layer, another surface or encrypted 0802.
 
 The project prioritizes evidence-producing experiments over broad framework work. One route, one
 variable, one recorded action at a time.

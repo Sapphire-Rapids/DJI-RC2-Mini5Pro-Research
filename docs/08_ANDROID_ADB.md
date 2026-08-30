@@ -195,7 +195,9 @@ v0.10 取代 v0.8/v0.9，保留同一 package/signer 只用于覆盖历史 obser
 | SHA-256 | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` |
 | schema | `finduas-rid-probe/v0.10-schema-1` |
 | 审计 | 43 tests；21/21 adversarial audit mutations rejected；两次 clean build byte-identical |
-| 状态 | `NOT ADMITTED`：已离线独立审计，未复制、安装或运行于 RC 2 |
+| 状态 | `NOT ADMITTED`：已离线独立审计；C-231 MTP staging/完整读回匹配，安装与运行待确认 |
+
+2026-08-30 接手复核（C-231）：原始精确 APK 再次通过源码/final-DEX 审计和 21/21 mutation 检查，已放到 removable SD 的 `Download/FindUAS_A001_V010.apk`。fresh listing 的唯一文件名与大小、随后同一只读会话的完整文件读回 hash 均匹配。独立 `mtp-getfile` 跨会话尝试失败，没有重传；同会话精确枚举后读回成功。该动作没有安装/启动 probe、启动 ADB、attach、DUML、飞机设置或电机操作。
 
 v0.10 请求零 Android permission，只有一个 launcher Activity，没有 service/receiver/provider/native library。应用自身无 socket、localhost port、DUML、Parcel、DJI application transaction、process execution、file persistence、network send、agent attach 或 library load。
 
