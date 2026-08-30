@@ -869,3 +869,19 @@ work when a report did not contain a more precise timestamp.
   proc 挂载包含 gid=3009/hidepid=2。AMS 解析处的 heredoc 在 mksh 上尝试写内部临时文件，
   被拒绝两次，导致目标分支未进入及严格格式校验失败（C-262）。原始报告保留不改。
 - 操作者请求省去逐条手工输入；开始实现有限会话的 SD 检查任务接收器与主机客户端。
+
+### F4 兼容性修复与 SD 任务收发
+
+- `STATIC`：F4 用 printf 管道替代 heredoc；Android mksh 的 18 个完整场景及 12 个临时
+  目录权限对照通过，固定读取范围不变（C-263）。
+- `STATIC`：B1 的 Java 页面启动快速返回、任务提交/输出校验、非法或不完整输入、结果
+  冲突、内存中已验 helper 执行、TTL 与 64 项上限测试通过；主机 C 传输器编译、自测、
+  sanitizer 与独立复核完成（C-264）。
+- `OBSERVED`：F4/B1 已经 SD 完整读回核对。两次快速连续 MTP 准备在只读查询时报错；
+  保留同一会话标识、加入调用间隔后准备成功，active 文件最后发布。状态为等待启动，
+  已向操作者提供一次性启动命令（C-265）。进度仍仅保留本地。
+- `OBSERVED`：操作者启动 B1 一次后，主机取得 READY，顺序发送 PING → SNAPSHOT → PING，
+  三项 accepted/report/done 的身份、长度和摘要全部核验，返回码 0/10/0（C-266）。
+- `OBSERVED`：F4 的 4,036-byte 报告严格解析成功，heredoc 问题已修复。前后 AMS 解析
+  成功且 PID 相同；八项 pidof/proc 读取失败、其余十五项成功，`hidepid=2` 和 A-040
+  源校验均读回（C-267）。未新增内部复制、attach 或飞机操作。

@@ -57,6 +57,8 @@
 | A-043 | FindUAS F1 Fuli baseline report script；self-developed；`fuli-baseline-v1` | `7,196` | `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` | `STATIC`；源码审查及 host 检查通过；启动路径未匹配，未进入脚本；已归档到 SD Archive，由 F2 接续；历史源码保留，报告排除；只公开 hash/source |
 | A-044 | FindUAS F2 exact-path Fuli baseline report script；self-developed；`fuli-baseline-v2` | `6,845` | `808998e211f6af204f42df7fdce4257532dcccefd3f61420c8cfbccba08be02c` | `OBSERVED`；已执行并收到完整 SD 报告，INCOMPLETE 仅因 pidof 失败；已移入 SD Archive，由 F3 接续；历史源码保留，报告排除；只公开 hash/source |
 | A-045 | FindUAS F3 paired AMS and proc diagnostic report script；self-developed；`fuli-baseline-v3` | `10,611` | `1e87258dd013c00e720f20b4bc6981463197cef0d49a503a1bc1a577c6b1b5c0` | `OBSERVED`；已运行并收到报告；mksh heredoc 临时创建被拒，出现两条框架外错误、PID 解析未完成；源码保留，报告排除；只公开 hash/source |
+| A-046 | FindUAS F4 mksh-compatible Fuli baseline report script；self-developed；`fuli-baseline-v4` | `10,607` | `91c77ffcfcae83f062dd43425ea350cf161c4ea67a429cd527f0a01f410a817e` | `OBSERVED`；已由 B1 执行并收到 4,036-byte 严格格式有效报告；INCOMPLETE 为目标 proc 读取失败；source/hash 公开，运行报告排除 |
+| A-047 | FindUAS B1 finite SD diagnostic receiver；self-developed；`sd-bridge-v1` | `9,417` | `866ecb21d7c3129acbfe7bad0670d86853dee1e58e38e3faf262365e907a4951` | `OBSERVED`；11 项 mksh/Java 场景通过；人工启动后 PING/SNAPSHOT/PING 三项自动往返核验成功；最后 PING 仍响应，会话限时；source/hash 公开，会话及报告排除 |
 
 ## 3. A-001：历史 v0.10 admission probe
 

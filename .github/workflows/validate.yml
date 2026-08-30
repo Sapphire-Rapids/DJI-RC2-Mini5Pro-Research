@@ -48,6 +48,8 @@ jobs:
         run: python -m unittest discover -s host-tools/firmware-acquisition -p 'test_*.py'
       - name: Test runtime DEX boundary scanner
         run: python -m unittest discover -s host-tools/runtime-dex-scan -p 'test_*.py'
+      - name: Test SD mailbox host protocol without a device
+        run: python -m unittest discover -s host-tools/rc2-sd-bridge -p 'test_bridge.py'
       - name: Test restricted report-audit rules
         run: python -m unittest discover -s apps/rid-admission-probe/scripts -p 'test_report_audit.py'
 

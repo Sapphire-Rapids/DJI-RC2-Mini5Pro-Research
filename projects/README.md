@@ -38,6 +38,7 @@ change Remote ID behavior on a device.
 | `host-tools/elf-analysis/` | AArch64 ELF inspection helpers and one fixed runtime-route manifest | Static analysis only; vendor ELF inputs and output are excluded |
 | `host-tools/ghidra-scripts/` | Targeted Ghidra symbol/xref/decompiler helpers | Source only; no program database, vendor binary, or decompiler output |
 | `host-tools/runtime-dex-scan/` | Small bounded DEX-image scanner for an already authorized raw-memory file | Host-tested source and synthetic tests only; no process dumper, vendor memory, DEX or decompiled output |
+| `host-tools/rc2-sd-bridge/` | Finite diagnostic-session host client and exact-path MTP transport | Source and host fixtures; operator-started PING/F4/PING round trip observed, no aircraft or attach operation |
 | `experiments/device-write/` | Historical bounded country/area round-trip scripts | FC/Sky `CN -> US -> CN` observed; Ground write unacknowledged; no RID/RF conclusion |
 | `experiments/jvmti/` | Seven source-only Android/JVMTI/ART TI research stages | V2.2 is `RETRACTED`; the exact-owner query is emulator-`OBSERVED` but RC 2-`NOT ADMITTED`; all other active stages retain their recorded status |
 

@@ -1,16 +1,13 @@
 # Handoff for researchers and coding agents
 
-Current update (C-262): F3 was received; Android mksh heredoc temporary-file creation failed. Work now fixes the helper and builds the operator-requested finite SD task session. No repeat F3 command is requested.
-
-
 ## Start here
 
-Current F3/A-045 has passed 18 full shell fixtures and 14 independent parser/capture vectors
-and is SD-staged as `Download/F3.sh` with complete matching readback (C-260/C-261). It puts
-AMS before/after and proc reads into one report following C-257--C-259's differing observations.
-F2 is archived with matching readbacks and no deletion. The next step is the privately issued
-exact-path F3 launch; await `F3_SAVED` or error. It has not run, and no internal canary copy or
-attach has occurred. Do not repeat F2 or the manual proc commands.
+F3/A-045 ran and its raw report was received (C-262). It records matching main-process PIDs
+in the two raw AMS blocks and live proc options gid=3009,hidepid=2. The caller lacks group 3009.
+Android mksh could not create the heredoc temporary file, so strict report parsing fails.
+F4 replaces that heredoc with a pipe. B1 was operator-started once;
+PING/SNAPSHOT/PING and strict F4 receipt are now verified (C-266/C-267). Preserve the active
+host session state; no new manual command is requested. Do not repeat F3 or the manual proc commands. No internal canary copy or attach occurred.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -66,8 +63,8 @@ SELinux Permissive, ro.debuggable=1, wifi_on=0 and A-040 source size/hash passed
 records Fly's HOME main-process entry in AMS. C-259's separate proc read then returned a path
 error without a mount-options line. F3/A-045 now combines these observations in one window:
 C-260 records the 18/14 passing test sets, and C-261 records 10,611-byte matching staging/readback
-and F2 moved to Archive with matching readbacks and no deletion. F3 execution/report receipt
-remain pending; the current private exact-path step is in
+and F2 moved to Archive with matching readbacks and no deletion. C-262 then records the live
+F3 report and heredoc compatibility failure; the current step is in
 [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步).
 Unlock registration and the deferred certificate-page screenshot are not prerequisites for
 the independent RID-state route.
@@ -572,8 +569,9 @@ recorded in C-245--C-247. C-248 narrows the candidate to a regular `.so` directl
 `/data/app`, with no new subdirectory; C-249 found no matching candidate basename. F1/A-043
 staging/readback is closed by C-251. C-252 did not enter the script; C-254 now supplies the
 private storage entry and parent permissions. F2 execution/report receipt are closed by C-257;
-C-258/C-259 leave process/view continuity unresolved. F3 staging/readback is now closed by
-C-261; its same-window report remains pending, without a confirmed hidepid value. Admit a legitimate
+C-262 establishes live hidepid=2 and the F3 heredoc defect. The B1 round trip and corrected F4
+report are now received: AMS PID is stable and target-proc reads remain unavailable (C-266/C-267).
+Admit a legitimate
 delimiter-free path or mediated descriptor before the first
 query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.

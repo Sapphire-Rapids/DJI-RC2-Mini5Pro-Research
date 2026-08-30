@@ -7,11 +7,11 @@ LC_ALL=C
 export LC_ALL
 set -f
 
-fail_start() { printf 'F3_ERROR code=%s\n' "$1"; exit 64; }
+fail_start() { printf 'F4_ERROR code=%s\n' "$1"; exit 64; }
 [ "$#" -eq 0 ] || fail_start ARGUMENTS_REJECTED
-case "$0" in /storage/*/Download/F3.sh) ;; *) fail_start INVALID_START_PATH ;; esac
+case "$0" in /storage/*/Download/F4.sh) ;; *) fail_start INVALID_START_PATH ;; esac
 FINDUAS_VOLUME=${0#/storage/}
-FINDUAS_VOLUME=${FINDUAS_VOLUME%/Download/F3.sh}
+FINDUAS_VOLUME=${FINDUAS_VOLUME%/Download/F4.sh}
 case "$FINDUAS_VOLUME" in
     [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]-[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]) ;;
     *) fail_start INVALID_VOLUME_NAME ;;
@@ -25,7 +25,7 @@ for FINDUAS_DIRECTORY in "$FINDUAS_SD" "$FINDUAS_SD/Download" \
 done
 FINDUAS_DATE=$(date -u +%Y%m%dT%H%M%SZ) || fail_start DATE_UNAVAILABLE
 case "$FINDUAS_DATE" in ''|*[!0-9TZ]*) fail_start INVALID_DATE ;; esac
-FINDUAS_REPORT=$FINDUAS_SD/Download/FindUAS/Probe/FindUAS_F3_${FINDUAS_DATE}_$$.txt
+FINDUAS_REPORT=$FINDUAS_SD/Download/FindUAS/Probe/FindUAS_F4_${FINDUAS_DATE}_$$.txt
 FINDUAS_SOURCE=$FINDUAS_SD/Download/FindUAS_ARTTI_V1.so
 FINDUAS_EXPECTED_SHA=9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a
 FINDUAS_CANDIDATE=/data/app/finduas_A040_canary.so
@@ -79,11 +79,9 @@ valid_pid() {
     case "$1" in ''|0*|*[!0-9]*) return 1 ;; esac
 }
 
-# Only complete, successful fixed AMS output can supply a PID. This parser is run
-# in command substitution, so its temporary variables do not alter the collector.
-ams_pid() {
-    [ "$FINDUAS_RC" -eq 0 ] && [ "$FINDUAS_TRUNCATED" -eq 0 ] || return 1
-    [ "${#FINDUAS_OUTPUT}" -le 4096 ] || return 1
+# Parse a pipe instead of a heredoc: Android mksh must not create a temp file.
+# Pipeline-local variables do not alter the collector.
+ams_pid_stream() {
     FINDUAS_AMS_HEADER=0
     FINDUAS_AMS_MATCHES=0
     FINDUAS_AMS_PID=
@@ -117,12 +115,16 @@ ams_pid() {
         if [ "$FINDUAS_AMS_LINE_MATCHES" -eq 1 ]; then
             FINDUAS_AMS_MATCHES=$((FINDUAS_AMS_MATCHES + 1))
         fi
-    done <<FINDUAS_AMS_DUMP
-$FINDUAS_OUTPUT
-FINDUAS_AMS_DUMP
+    done
     [ "$FINDUAS_AMS_HEADER" -eq 1 ] && [ "$FINDUAS_AMS_MATCHES" -eq 1 ] || return 1
     valid_pid "$FINDUAS_AMS_PID" || return 1
     printf '%s' "$FINDUAS_AMS_PID"
+}
+
+ams_pid() {
+    [ "$FINDUAS_RC" -eq 0 ] && [ "$FINDUAS_TRUNCATED" -eq 0 ] || return 1
+    [ "$FINDUAS_OUTPUT_BYTES" -le 4096 ] || return 1
+    printf '%s\n' "$FINDUAS_OUTPUT" | ams_pid_stream
 }
 
 # /proc/PID/stat field 22; comm may contain spaces or parentheses.
@@ -138,7 +140,7 @@ starttime() {
 
 collect_report() {
     FINDUAS_PARTIAL=0
-    printf 'schema=finduas-rc2-fuli-baseline/v3\nreport_begin=true\n'
+    printf 'schema=finduas-rc2-fuli-baseline/v4\nreport_begin=true\n'
     printf 'utc=%s\nprotocol_request_count=0\nattach_count=0\ninternal_copy_count=0\n' "$FINDUAS_DATE"
     printf 'automatic_update_control=NOT_ESTABLISHED\n'
     run_read identity id
@@ -246,8 +248,8 @@ collect_report() {
 )
 FINDUAS_RESULT=$?
 case "$FINDUAS_RESULT" in
-    0) printf 'F3_SAVED state=COMPLETE\nreport=%s\nF3_END\n' "$FINDUAS_REPORT" ;;
-    10) printf 'F3_SAVED state=INCOMPLETE\nreport=%s\nF3_END\n' "$FINDUAS_REPORT" ;;
-    *) printf 'F3_ERROR code=REPORT_CREATE_OR_WRITE_FAILED rc=%s\nF3_END\n' "$FINDUAS_RESULT" ;;
+    0) printf 'F4_SAVED state=COMPLETE\nreport=%s\nF4_END\n' "$FINDUAS_REPORT" ;;
+    10) printf 'F4_SAVED state=INCOMPLETE\nreport=%s\nF4_END\n' "$FINDUAS_REPORT" ;;
+    *) printf 'F4_ERROR code=REPORT_CREATE_OR_WRITE_FAILED rc=%s\nF4_END\n' "$FINDUAS_RESULT" ;;
 esac
 exit "$FINDUAS_RESULT"

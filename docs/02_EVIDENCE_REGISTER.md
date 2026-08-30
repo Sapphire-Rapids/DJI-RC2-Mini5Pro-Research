@@ -349,11 +349,16 @@ The two source-only deployment experiments are retained as explicit negatives:
 | C-257 | `OBSERVED` | F2 ran and its 2553-byte SD report was fully received; only pidof failed (rc1/empty), other eleven commands and A-040 source checks passed | Target PID/domain branch not entered; filtered AMS process read is next |
 | C-258 | `OBSERVED` | Official package-filtered AMS LRU read returns a HOME main-process record named exactly dji.go.v5 with nonzero PID | Direct target context and live proc mount options are next; identifiers stay private |
 | C-259 | `OBSERVED` | Direct attr/current read under the earlier AMS PID returns No such file or directory; no mount-option line is visible | Combined AMS-before/after and proc report is next; no target-domain or hidepid conclusion |
-| C-260 | `STATIC` | F3 pairs strict single-main-process AMS reads with proc metadata, separate stability fields and full proc mount line; 14 parser/capture vectors and 18 host body fixtures passed | Same SD-only report write, zero internal copy/attach/aircraft requests; live report pending |
-| C-261 | `OBSERVED` | F3 SD staging/full readback matches 10611 bytes and registered SHA; F2 archived with matching full before/after readbacks | No deletion; F3 execution/report pending |
+| C-260 | `STATIC` | F3 pairs strict single-main-process AMS reads with proc metadata, separate stability fields and full proc mount line; 14 parser/capture vectors and 18 host body fixtures passed | Host-shell checks; C-262 later identifies the Android mksh heredoc failure |
+| C-261 | `OBSERVED` | F3 SD staging/full readback matches 10611 bytes and registered SHA; F2 archived with matching full before/after readbacks | No deletion; subsequent F3 execution/report in C-262 |
 | C-262 | `OBSERVED` | F3 raw report received: AMS samples share a main PID; proc has gid=3009/hidepid=2; mksh heredoc temp creation denied twice, preventing PID parsing | Raw strict schema rejected two unframed errors; target context still absent; original report retained |
+| C-263 | `STATIC` | F4 replaces the heredoc with a printf pipe; 18 Android mksh body fixtures and 12 temp-policy comparisons pass | Fixed reads and SD report boundary unchanged; live F4 follows in C-267 |
+| C-264 | `STATIC` | B1 finite fixed diagnostic jobs, immutable input/result records and pinned RAM-executed F4; 11 real mksh/Java cases, 19 client tests and C transport checks pass | Live startup/round trip follows in C-266; session records stay private |
+| C-265 | `OBSERVED` | F4/B1 full SD readbacks match A-046/A-047; same-SID preparation succeeds with spaced MTP calls, active marker published last | Current status awaits receiver start; no job or internal/aircraft action ran |
+| C-266 | `OBSERVED` | One B1 startup followed by three host-submitted jobs: PING → SNAPSHOT → PING; every accepted/report/done binding verified, return codes 0/10/0 | Finite diagnostic session; no live STOP, internal copy, attach or aircraft request |
+| C-267 | `OBSERVED` | F4 4036-byte report passes strict parsing; both AMS parsers succeed and PID is stable, target proc reads fail under observed hidepid=2 | Heredoc defect fixed; target context/starttime remain unavailable, source checks pass |
 
-C-235–C-262 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
+C-235–C-267 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
 
 ## Promotion rules
 

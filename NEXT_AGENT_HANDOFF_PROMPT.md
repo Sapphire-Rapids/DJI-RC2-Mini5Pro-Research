@@ -1,8 +1,5 @@
 # Next-agent prompt
 
-Current update (C-262): F3 was received; Android mksh heredoc temporary-file creation failed. Work now fixes the helper and builds the operator-requested finite SD task session. No repeat F3 command is requested.
-
-
 Continue from the current reviewed checkout on the DJI RC 2 `07.00.0100` / Mini 5 Pro `01.00.0600`
 lab setup. The objective covers a controllable Remote ID switch plus Basic/UAS ID, aircraft-position
 and operator-position controls, each requiring its own authoritative owner, readback, restoration
@@ -21,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-261 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-267 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -100,10 +97,12 @@ in one report. It passed 18 full shell fixtures and 14 independent parser/captur
 `1e87258dd013c00e720f20b4bc6981463197cef0d49a503a1bc1a577c6b1b5c0` (C-261). F2 was moved
 to `Download/FindUAS/Archive/F2.sh`, with matching full readbacks before/after and no deletion.
 
-Current operator step: use the F3 exact-path launch command already supplied privately for the
-volume observed in C-254. Do not copy its volume identifier into public text or replace it with
-a wildcard. Await `F3_SAVED` or error; execution/report receipt remain pending. Do not rerun
-F2, repeat the manual proc commands, reopen Fly or reinstall packages.
+C-262 closes F3 execution/report receipt. Both raw AMS entries use the same main PID; proc
+mount options include gid=3009,hidepid=2, while the caller lacks group 3009. Android mksh
+failed to create the heredoc temporary file twice, so the strict parser rejects the raw report.
+The original file is preserved unchanged. F4 replaces that heredoc with a pipe. F4/B1 passed host checks and SD readback. One operator startup then enabled the
+verified PING/SNAPSHOT/PING round trip (C-266/C-267). The F4 report is strictly valid, with
+stable AMS PID and target-proc reads still hidden; preserve the active host session state. Do not repeat F3 or the manual proc commands.
 
 Priority:
 
@@ -112,9 +111,11 @@ Priority:
 2. The post-install report, actual Shell identity and parent-directory observations are closed by
    C-245--C-247; the complete `/data/app` contents/basename check is received in C-249. C-254
    supplies the storage entry privately. C-257 closes F2 execution/report receipt and C-258
-   supplies the AMS main-process identity privately. F3 validation/staging are closed by
-   C-260/C-261; await its single-window report to resolve C-259. Neither process absence nor
-   a live hidepid option has been established by the earlier results.
+   supplies the AMS main-process identity privately. F3 validation/staging and execution are recorded in
+   C-260--C-262. Its raw report supplies the live hidepid option and a shell compatibility defect;
+   F4 then passed strict parsing with stable AMS PID and unavailable target proc reads (C-267).
+   The B1 diagnostic round trip works (C-266); preserve its current host state rather than
+   repeating F4 or the individual proc reads.
 3. After the regular-file path checks and the target-process baseline are complete, validate A-040's
    explicit success marker and unchanged Fly PID, then advance the independent
    RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to
