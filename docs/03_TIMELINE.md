@@ -708,3 +708,31 @@ work when a report did not contain a more precise timestamp.
   files so the by-index/by-hash read-only probes (which load `@dataclass` protocol modules) no longer
   crash on Python 3.13+; added a one-shot `readonly_baseline_session.sh` wrapper for a write-free
   same-session baseline capture.
+### 2026-08-30 — live Mini 5 Pro FLYC route: positive-controlled absence of both candidates
+
+- `OBSERVED`: aircraft-direct USB FLYC route live — table 0 CRC `0x5F8B2AE1` count 1558; positive
+  control `max_height_0` (0x0371238A) F7/F8 canonical (type 1/size 2/value 500) (C-227).
+- `NEGATIVE`: `EU_CE_enable_c0_rid` absent — by-index 915-name enumeration has no such row (1306
+  returns 0x0E) and by-hash `EU_CE_enable_c0_rid_0` (0xF80992FE) returns 0x03, positive-controlled
+  by `max_height_0` and the neighbouring EU C0 rows (C-228).
+- `OBSERVED`: EU C0 block index-shifted +1 vs the public wa150 table; sampled values Level 0,
+  RID_Enable 0, fscap_EU_CE_Support 1, remote_set_level 0, all min 0 / max 0 (C-229).
+- `NEGATIVE`: `rid_ctrl_enable_0` absent — by-hash F7 (0x3CBD864F) returns 0x03 and the by-index
+  enumeration has no `rid_ctrl_enable` name, positive-controlled (C-230).
+- No F9/E3/0x11/0x12 write, no license change, no motor or RF action was performed.
+### 2026-08-30 — live Mini 5 Pro FLYC positive control and candidate absence
+
+- `OBSERVED`: aircraft-direct USB FLYC route (0x0A→0x03) is live: table 0 CRC `0x5F8B2AE1`,
+  count 1558; by-hash positive control `max_height_0` (0x0371238A) F7 metadata canonical
+  (type 1, size 2, min 20, max 500, def 120) and F8 value 500.
+- `NEGATIVE`: `EU_CE_enable_c0_rid` is absent on this FC — by-index enumeration of 915 named
+  parameters has no such row (index 1306 returns status-only 0x0E) and by-hash F7 for
+  `EU_CE_enable_c0_rid_0` (0xF80992FE) returns status 0x03, positive-controlled by the
+  neighbouring EU C0 rows `EU_CE_Reg_RID_Enable_0` (0xA2C325CE) and
+  `eu_ce_support_remote_set_level_0` (0xA8E96A09) returning canonical metadata (C-228).
+- `OBSERVED`: the EU C0 block is index-shifted +1 vs the public wa150 table — EU_CE_Reg_Level 1308,
+  EU_CE_Reg_RID_Enable 1309, … eu_ce_support_remote_set_level 1316 (C-229); public index 1306/1308
+  are no longer authoritative for 01.00.0600.
+- `NEGATIVE`: `rid_ctrl_enable_0` is absent on this FC — by-hash F7 (0x3CBD864F) returns status 0x03
+  and the by-index enumeration has no `rid_ctrl_enable` row, positive-controlled (C-230).
+- No F9/E3/0x11/0x12 write, no license change, no motor action, no RF experiment was performed.

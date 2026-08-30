@@ -82,6 +82,15 @@ class MetadataTests(unittest.TestCase):
                 semantic_kind="int",
             )
 
+    def test_name_suffix_zero_is_accepted(self):
+        # The FC returns the canonical name without the "_0" instance suffix.
+        result = protocol.parse_f7_metadata(
+            f7_payload("g_config.flying_limit.max_height", data_type=1, size=2),
+            expected_name="g_config.flying_limit.max_height_0",
+            semantic_kind="int",
+        )
+        self.assertEqual(result.name, "g_config.flying_limit.max_height")
+
     def test_nonzero_status_is_not_metadata(self):
         with self.assertRaises(protocol.ParamStatusError):
             protocol.parse_f7_metadata(

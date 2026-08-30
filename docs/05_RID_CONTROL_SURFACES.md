@@ -156,6 +156,10 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 - **Mini 5 Pro 当前边界：** 精确 DJI Fly `1.21.10` native 未出现同名 KeyValue/FC parameter；
   这只说明 DJI Fly 没有内置该 wrapper，不说明 WA150 飞控一定没有参数。最短判别实验固定为
   hash `0x3CBD864F` 的一次 F7，成功后一次 F8；F7 返回一字节错误时，不再发送 F8/F9。
+- **live positive-controlled absence（2026-08-30，C-230）：** 本次 aircraft-direct `0x0A -> 0x03`
+  同 session 正对照 `max_height_0` 成功；`rid_ctrl_enable_0`(`0x3CBD864F`) F7 返回单字节
+  `0x03`，且 by-index 全表 915 个具名参数无 `rid_ctrl_enable` 行。因此该参数在实机 FC 上
+  为 positive-controlled absence（direct-USB FLYC route），不是 route 失败。
 - **direct live result：** 2026-08-28，同一当前会话中，RC 2 routed `0xAA -> 0x03` 与
   aircraft-direct `0x0A -> 0x03` 对该 hash 的 F7 都返回 canonical one-byte `03`；RC 2
   height/distance/distance-enable 与 aircraft height 正对照均成功返回 F7 metadata 和 F8
@@ -749,6 +753,18 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
   分离的只读探测/关闭/开启/恢复按钮；写按钮仅在 EU C0 F7/F8 基线与 live route 通过后解锁，
   每次 F9 前重新探测 F7/F8，读回两次，任何未确认状态立即恢复基线（C-199）。UI 文案明确
   单次 F8 读回不代表重连后保持。
+- **live positive-controlled absence（2026-08-30，C-227--C-229）：** 本次 direct-USB FLYC route
+  正对照成功：table 0 CRC `0x5F8B2AE1`、count 1558；by-hash `max_height_0`
+  (`0x0371238A`) F7/F8 canonical（type 1/size 2/值 500）。但 `EU_CE_enable_c0_rid`
+  在实机 FC 上不存在：by-index 全表枚举 915 个具名参数无此名（1306 返回 status-only
+  `0x0E`），by-hash `EU_CE_enable_c0_rid_0`(`0xF80992FE`) F7 返回单字节 `0x03`。同 session
+  邻接 EU C0 行 `EU_CE_Reg_RID_Enable_0`(`0xA2C325CE`) 与
+  `eu_ce_support_remote_set_level_0`(`0xA8E96A09`) 均返回 canonical metadata。故这是
+  正对照下的 absence，不是 timeout/route 失败。
+- **实机索引 +1 漂移（C-229）：** 实机 `01.00.0600` 的 EU C0 注册块整体比公开 wa150 表
+  后移一位（`EU_CE_Reg_Level`=1308 … `eu_ce_support_remote_set_level`=1316），采样值
+  Level=0 / RID_Enable=0 / fscap_EU_CE_Support=1 / remote_set_level=0，全部 min 0 / max 0。
+  公开表索引对当前固件不再权威，by-index 探针必须依赖 onboard 名字校验，不能按公开表硬编码。
 - **重连覆盖边界：** pinned FreeFCC 公开文本记载 DJI Fly 以 C0 class runtime flag 在每次连接时
   覆盖飞控参数，`cmd_set=3`/`cmd_id=0xF9` 的 DUML 写入会在每次 reconnect 被覆盖（C-198）。该
   文本未指名 `EU_CE_enable_c0_rid_0` 的 owner，也未证明 RID 相关 C0 flag 与高度 C0 cap 同层；

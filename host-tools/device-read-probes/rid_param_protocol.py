@@ -220,7 +220,10 @@ def parse_f7_metadata(
         name = name_raw.decode("ascii")
     except UnicodeDecodeError as exc:
         raise ParamProtocolError("F7 parameter name is not ASCII") from exc
-    if name != expected_name:
+    # The FC returns the canonical parameter name without the trailing instance
+    # suffix ``_0`` that the by-hash request was computed over. Accept the exact
+    # expected name or the expected name with one trailing ``_0`` stripped.
+    if name != expected_name and name + "_0" != expected_name:
         raise ParamProtocolError(
             f"F7 parameter identity mismatch: expected {expected_name!r}, got {name!r}"
         )
