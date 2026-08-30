@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.19 - 2026-08-30
+
+### Added
+
+- Recorded the first live Mini 5 Pro FLYC positive control (route CRC/count + max_height_0 value
+  500) and the positive-controlled absence of `EU_CE_enable_c0_rid_0` and `rid_ctrl_enable_0` on
+  firmware 01.00.0600, plus the +1 index shift of the EU C0 block (C-227--C-230).
+- Fixed the F7 metadata name check to accept the canonical on-board name without the `_0` instance
+  suffix (the FC answers with the plain name).
+
+## 0.4.19 - 2026-08-30
+
+### Added
+
+- Recorded the first live Mini 5 Pro FLYC positive control (`max_height_0` value 500) and the
+  positive-controlled absence of both `EU_CE_enable_c0_rid_0` and `rid_ctrl_enable_0` on the
+  `01.00.0600` flight controller, plus the +1 index shift of the EU C0 block (C-227--C-230).
+
 ## 0.4.18 - 2026-08-30
 
 ### Fixed

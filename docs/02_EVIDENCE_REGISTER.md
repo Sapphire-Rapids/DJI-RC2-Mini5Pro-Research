@@ -323,6 +323,12 @@ The two source-only deployment experiments are retained as explicit negatives:
 
 | C-226 | `CORROBORATED` | An independent by-hash bridge of the full wa150 RID/EU C0/China family matches `o-gs` `flyc_parameter_compute_hash` across 15 names (`EU_CE_enable_c0_rid_0` 0xF80992FE, `EU_CE_Reg_RID_Enable_0` 0xA2C325CE, `eu_ce_support_remote_set_level_0` 0xA8E96A09, and the remaining EU C0/China rows) | Offline hash-function corroboration only; not a live read/write or RF result |
 
+
+| C-227 | `OBSERVED` | Live Mini 5 Pro `01.00.0600` FLYC table 0 CRC `0x5F8B2AE1`, count 1558; by-hash positive control `max_height_0` (0x0371238A) returned canonical metadata and value 500 | Proves the direct-USB FLYC route/positive control were live this session only; no RID/RF conclusion |
+| C-228 | `NEGATIVE` | Live Mini 5 Pro `01.00.0600` has no `EU_CE_enable_c0_rid`: by-index enumeration of 915 names has no such row (1306 returns 0x0E) and by-hash F7 `EU_CE_enable_c0_rid_0` (0xF80992FE) returns 0x03, positive-controlled by `max_height_0` and the neighbouring EU C0 rows | Direct-USB FLYC route only; not absence in 0802/app-layer/other firmware |
+| C-229 | `OBSERVED` | Live `01.00.0600` EU C0 block is present but index-shifted +1 vs the public wa150 table (EU_CE_Reg_Level 1308 … eu_ce_support_remote_set_level 1316); sampled values Level 0, RID_Enable 0, fscap_EU_CE_Support 1, remote_set_level 0, all min 0 / max 0 | Read-only EU C0 flags, not a writable RID switch; public index map is not authoritative for this firmware |
+| C-230 | `NEGATIVE` | Live Mini 5 Pro `01.00.0600` has no `rid_ctrl_enable_0`: by-hash F7 (0x3CBD864F) returns 0x03 and the by-index enumeration has no `rid_ctrl_enable` name, positive-controlled by `max_height_0` | Direct-USB FLYC route only; does not rule out app-layer/other-surface/0802 |
+
 ## Promotion rules
 
 A claim changes status only when new evidence directly satisfies the missing boundary. Examples:
