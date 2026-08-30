@@ -7,8 +7,11 @@ succeeded in the existing Fly process, with matching native identity, successful
 disposal, unchanged AMS PID/UID and unchanged APK. The verified ordinary file was removed,
 independent cleanup found it absent, and B2 STOP/CLOSED STOP completed. A-040 remains unchanged
 and unexecuted. Preserve the global A-048 attempt record and do not repeat the successful canary.
-Next inspect the exact native_get_sync/cache path identified in C-276 before reading RID state;
-Lazy getters, factories, mutable interceptors and default DTOs are not a current-state sample.
+C-277--C-282 subsequently close the exact synchronous cache path and A-051 live read. One
+cache call returned RID1/1, EID0/0 and failReason0; parse/disposal, file recovery and independent
+absence readback succeeded with unchanged Fly PID/UID/APK. B3 STOP/CLOSED STOP is complete.
+Preserve both A-048/A-051 permanent receipts. Next align SDK status with independent receiver/
+motor timing and resolve a reversible control owner; no further operator command is pending.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -573,8 +576,8 @@ private storage entry and parent permissions. F2 execution/report receipt are cl
 C-262 establishes live hidepid=2 and the F3 heredoc defect. The corrected F4 report supplied
 a stable AMS baseline (C-267), and A-048 subsequently loaded through the verified ordinary-file
 path, returned native identity/API success, and had its file removed (C-273--C-275). Advance
-the exact RID owner/cache work in C-276; further query execution keeps its own callback and
-process-identity checks. The
+the follow-on cache result in C-277--C-282: the first actual state has been received and the
+probe/session recovered. Further timed sampling keeps its own process and record identity. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.
 
 In parallel, map Basic/UAS ID, aircraft position, operator position and Operator ID independently

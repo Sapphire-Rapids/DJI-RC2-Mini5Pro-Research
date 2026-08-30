@@ -220,3 +220,13 @@ output，以及 ART TI canary/owner/query 的本地 emulator 日志。
   支持 C-273--C-275；PID/UID、MLS 类别、boot/starttime、目录元数据和日志仅存私有。
 - 1.19.4 的现存 Lazy 字段、默认 DTO、可变拦截器和同步原生入口定向笔记支持 C-276；
   输入哈希和全限定描述符保留在私有交接记录，厂商方法体不发布。
+
+## RID synchronous cache and B3 preparation
+
+C-277--C-279 use excluded exact SDK/system analysis, a small independent seccomp interpreter,
+A-051 build manifests, sanitizer output, L2/B3 fixture logs and private MTP session/staging records.
+The native analysis retains symbols/offsets and serializer evidence locally. Raw library slices,
+volume/session identifiers and transport errors are not copied into this repository.
+- C-280--C-282 add the four B3 job reports, strict native parsing, exact copy/attempt receipts
+  and CLOSED STOP. The single RID cache snapshot is retained privately with its process binding;
+  only the four status booleans and numeric failure value are recorded publicly.

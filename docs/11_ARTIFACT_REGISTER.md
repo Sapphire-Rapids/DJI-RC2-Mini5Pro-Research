@@ -62,6 +62,9 @@
 | A-048 | FindUAS ARMv7 ART TI self-identity canary；self-developed；`art-ti-identity-v1-armeabi-v7a` | `8,372` | `28b96744bef7f4cf3e64911134683ee71a6c950c44a88193fae2fdc7b60b4f4b` | `OBSERVED`；已在原 Fly 进程加载一次，native ready/identity/artti/dispose 均成功；PID/UID/APK 保持，测试文件回收；映射未卸载；SO 排除、source/hash 公开 |
 | A-049 | FindUAS L1 fixed ART TI canary loader；self-developed；`rc2-canary-loader-v1` | `21,080` | `1d889e7389c5561acbfca576dac9d9d60cf494c0d6fa5001e09a63cf153f7cc4` | `OBSERVED`；BASELINE、LOAD、独立 CLEANUP 报告均收齐且 rc0；一次派发、文件回收和复读闭合；source/hash 公开，运行记录排除 |
 | A-050 | FindUAS B2 fixed canary diagnostic session；self-developed；`sd-canary-bridge-v1` | `10,545` | `d3cd2b6bbf26bf86ec3b2899d85067278c05b057432aeb183c4f1c4edf113503` | `OBSERVED`；一次人工启动后完成 BASELINE/LOAD/CLEANUP/STOP，CLOSED STOP 已核验；source/hash 公开，会话记录排除 |
+| A-051 | FindUAS ARMv7 official RID cache probe；self-developed；`rid-cache-v1-armeabi-v7a` | `14,376` | `3dea20698eee556706189fd9910705fa60a1d80d0d18ba31a496fa443b38837b` | `OBSERVED`；一次实机 cache call 成功，RID1/1、EID0/0、failReason0；环境释放、文件回收、PID/APK 稳定；SO 排除、source/hash 公开 |
+| A-052 | FindUAS L2 fixed RID cache loader；self-developed；`rc2-rid-cache-loader-v1` | `22,121` | `78ba8c4b2e7176048b16d582cd6c688f207131f4c246f0de45804ed47f478b52` | `OBSERVED`；BASELINE/READ/独立 CLEANUP 完整报告均 rc0，文件回收并独立确认不存在；source/hash 公开，原始报告排除 |
+| A-053 | FindUAS B3 fixed RID cache session；self-developed；`sd-rid-cache-bridge-v1` | `10,513` | `82e781c1e0b5a5e06849499e8d76076f8831b8fee1cf12dd866273089e7475ea` | `OBSERVED`；操作者启动后完成 BASELINE/READ/CLEANUP/STOP，均 rc0，CLOSED STOP 已确认；source/hash 公开，会话记录排除 |
 
 ## 3. A-001：历史 v0.10 admission probe
 

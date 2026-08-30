@@ -241,3 +241,34 @@ Preserve the permanent attempted marker and do not replay this successful canary
 RID state reads must follow the exact initialized-owner and native_get_sync review in C-276;
 no current RID value or transition was read by A-048. See
 [the live-runtime record](../../../docs/23_RC2_LIVE_RUNTIME.md).
+
+## A-051: one official RID cache read
+
+Status: **OBSERVED** in the existing RC 2 Fly 1.19.4 process (C-281/C-282). One call returned
+RID support/normal1/1, EID0/0 and failReason0; JNI/parse/disposal succeeded, PID/APK stayed stable,
+and file removal plus independent cleanup and B3 STOP were verified. Preserve the global attempt
+record; this completed probe is not a recurring sampler.
+
+The independent ARMv7 cache probe uses exact Fly 1.19.4 initialized JNI/key metadata and the
+existing native SDK owner. It bypasses model factories, default DTOs and Rx interceptors,
+then invokes `JNIKeyValue.native_get_sync` once for the original working-status key.
+C-277 records the synchronous cache chain and serializer. The probe checks the already-loaded
+SDK build ID and owner before/after the read, parses the strict `16+L` byte structure, and emits
+only four status booleans plus numeric RID failure. It does not copy the area string.
+
+A null cache returns a completed `ready=1/value_present=0` result with unavailable boolean
+sentinels. JNI, metadata, owner, parsing and disposal errors keep separate numeric stages.
+Every valid entry returns JNI_OK; an atomic once guard prevents repeated execution by the same
+loaded DSO. New ART TI environments are disposed and JNI references are released.
+The returned cached value has no recovered receive timestamp.
+
+```sh
+FINDUAS_ANDROID_NDK_ROOT=/path/to/android-ndk sh scripts/build_rid_cache_probe.sh
+FINDUAS_JDK_ROOT=/path/to/jdk sh scripts/run_rid_cache_probe_host_tests.sh
+```
+
+The host suite covers 25 synthetic JNI/metadata/parser/cleanup cases with ASan and UBSan;
+Android linker and owner reads use a test double there. The real ARMv7 build and version-specific
+system checks are recorded separately. L2/B3 add fixed baseline/read/cleanup SD jobs using a
+new internal test filename and A-051 receipts. See [the host transport](../../../host-tools/rc2-sd-bridge/README.md)
+and [the runtime record](../../../docs/23_RC2_LIVE_RUNTIME.md) for staging and execution state.

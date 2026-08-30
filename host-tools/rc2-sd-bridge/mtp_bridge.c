@@ -72,7 +72,9 @@ static unsigned allowed_path(const struct path *p) {
     if (p->count == 1) return CAN_MKDIR;
     if (p->count == 2 && (!strcmp(p->part[1], "B1.sh") || !strcmp(p->part[1], "F4.sh") ||
                          !strcmp(p->part[1], "B2.sh") || !strcmp(p->part[1], "L1.sh") ||
-                         !strcmp(p->part[1], "FindUAS_ARTTI_V2.so")))
+                         !strcmp(p->part[1], "FindUAS_ARTTI_V2.so") ||
+                         !strcmp(p->part[1], "B3.sh") || !strcmp(p->part[1], "L2.sh") ||
+                         !strcmp(p->part[1], "FindUAS_RID_CACHE.so")))
         return CAN_GET | CAN_PUT;
     if (strcmp(p->part[1], "FindUAS")) return 0;
     if (p->count == 2) return CAN_MKDIR;
@@ -81,6 +83,7 @@ static unsigned allowed_path(const struct path *p) {
         if (p->count != 4) return 0;
         const char *name = p->part[3], *prefix = "FindUAS_F4_";
         if (!strcmp(name, "A048_copy.receipt") || !strcmp(name, "A048_attach.attempted")) return CAN_GET;
+        if (!strcmp(name, "A051_copy.receipt") || !strcmp(name, "A051_attach.attempted")) return CAN_GET;
         size_t n = strlen(name), prefix_length = strlen(prefix);
         return n > prefix_length + 4 && !strncmp(name, prefix, prefix_length) &&
             !strcmp(name + n - 4, ".txt") ? CAN_GET : 0;
@@ -398,6 +401,8 @@ static int self_test(void) {
         {"Download/F4.sh", CAN_GET | CAN_PUT}, {"Download/F1.sh", 0},
         {"Download/B2.sh", CAN_GET | CAN_PUT}, {"Download/L1.sh", CAN_GET | CAN_PUT},
         {"Download/FindUAS_ARTTI_V2.so", CAN_GET | CAN_PUT},
+        {"Download/B3.sh", CAN_GET | CAN_PUT}, {"Download/L2.sh", CAN_GET | CAN_PUT},
+        {"Download/FindUAS_RID_CACHE.so", CAN_GET | CAN_PUT},
         {"Download/FindUAS_ARTTI_V1.so", 0},
         {"Download/FindUAS/Bridge/active.session", CAN_GET | CAN_PUT},
         {"Download/FindUAS/Bridge/0123456789abcdef/inbox", CAN_MKDIR},
@@ -413,6 +418,8 @@ static int self_test(void) {
         {"Download/FindUAS/Probe/FindUAS_F4_TEST.txt", CAN_GET},
         {"Download/FindUAS/Probe/FindUAS_F3_TEST.txt", 0},
         {"Download/FindUAS/Probe/A048_copy.receipt", CAN_GET},
+        {"Download/FindUAS/Probe/A051_copy.receipt", CAN_GET},
+        {"Download/FindUAS/Probe/A051_attach.attempted", CAN_GET},
         {"Download/FindUAS/Probe/A048_attach.attempted", CAN_GET},
         {"Download/FindUAS/Probe/A048_copy.receipt.extra", 0},
         {"Download/FindUAS/Samples/TEST.zip", 0}, {"Download/user.txt", 0},

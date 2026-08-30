@@ -3,14 +3,13 @@
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-The exact A-048 loader is now observed on RC 2 (C-273--C-275): normal system-mediated attach,
-native self-identity/API/disposal success, stable Fly PID/UID/APK, verified file removal and
-independent absence readback. B2 closed normally. The next missing piece is the actual RID
-value path: C-276 maps the initialized-owner fields and separates lazy/default/interceptor
-behavior from the still-unclosed native_get_sync implementation. No new manual command or
-repeat canary is currently requested. See [the runtime topic](23_RC2_LIVE_RUNTIME.md).
-Per the latest user instruction, continue local updates, validation and commits, but do not
-resume GitHub pushes without renewed user authorization. Historical pushes remain recorded.
+A-048 closed the basic loader and A-051 now closes the first official RID cache read
+(C-277--C-282). One synchronous call returned RID support/normal1/1, EID0/0 and failReason0,
+with successful parse/disposal, stable Fly PID/UID/APK, verified file removal and independent
+cleanup. B3 closed normally. Current cache acquisition is no longer a blocker; receive-time/RF
+correlation and an authoritative reversible control owner remain separate work.
+See [the runtime topic](23_RC2_LIVE_RUNTIME.md). Prior commits through `2f31394` were pushed on
+one explicit request; new results remain local unless another push is requested.
 C-227--C-230 have already answered the two tested FLYC parameter
 candidates on `01.00.0600`; they are not pending probes. Basic/UAS ID, aircraft position,
 operator position and the separate Operator ID plane require their own evidence chains (B-22).
@@ -95,8 +94,8 @@ The remaining target-proc visibility failure is recorded; do not repeat that sam
 
 C-274 resolves the loader objective through a self-reading canary without changing proc permissions.
 Its target base domain is untrusted_app; identity/API/disposal checks succeeded, the ordinary SO
-was removed and independently confirmed absent (C-275). Next close native_get_sync/cache semantics
-before invoking the current RID getter (C-276).
+was removed and independently confirmed absent (C-275). C-277 subsequently closed native_get_sync;
+A-051 returned a real cached RID status in C-281 and its independent recovery closed in C-282.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -491,7 +490,9 @@ verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
   -> A-048/L1/B2 build, tests, exact staging and live baseline (C-268--C-273)
   -> A-048 native identity/API success; stable Fly PID/UID/APK (C-274)
   -> test-file removal, independent absence readback and CLOSED STOP (C-275)
-  -> exact RID native_get_sync/cache semantics and initialized owner metadata (C-276)
+  -> exact RID synchronous cache path closed (C-277)
+  -> one real cached status and verified cleanup/session closure (C-280--C-282)
+  -> receive-time / independent-RF correlation and authoritative reversible control owner
   -> verified independent RID-state observation and callback provenance
 ```
 
