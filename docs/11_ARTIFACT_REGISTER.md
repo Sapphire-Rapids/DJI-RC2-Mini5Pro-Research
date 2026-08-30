@@ -55,7 +55,8 @@
 | A-041 | DJI Fly exact live ARM32 application sample；input-sample；`1.19.4` / code `3113157` / armeabi-v7a | `426,180,752` | `fb695817a885bd9d4084643d8cae07285a8ac560b6e94edd5c87af4a70b8528c` | `OBSERVED`；从既有实机安装导出，收到后独立完整验证；排除且不分发；只公开 hash |
 | A-042 | FindUAS ARMv7 FlySafe read-only query agent；self-developed；`device-id-minus-one-guard-armeabi-v7a` | `15,464` | `88d88ba10396a790d5d6675e70b44a21c01a71bbb92b4c80978998837ae75e25` | `NOT ADMITTED`；离线构建与 host 检查通过；未 staged、未在 RC 2 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
 | A-043 | FindUAS F1 Fuli baseline report script；self-developed；`fuli-baseline-v1` | `7,196` | `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` | `STATIC`；源码审查及 host 检查通过；启动路径未匹配，未进入脚本；已归档到 SD Archive，由 F2 接续；历史源码保留，报告排除；只公开 hash/source |
-| A-044 | FindUAS F2 exact-path Fuli baseline report script；self-developed；`fuli-baseline-v2` | `6,845` | `808998e211f6af204f42df7fdce4257532dcccefd3f61420c8cfbccba08be02c` | `OBSERVED`；独立 diff/host 检查、MTP/readback 通过；已执行并收到完整 SD 报告，INCOMPLETE 仅因 pidof 失败；脚本源码公开，报告排除；只公开 hash/source |
+| A-044 | FindUAS F2 exact-path Fuli baseline report script；self-developed；`fuli-baseline-v2` | `6,845` | `808998e211f6af204f42df7fdce4257532dcccefd3f61420c8cfbccba08be02c` | `OBSERVED`；已执行并收到完整 SD 报告，INCOMPLETE 仅因 pidof 失败；已移入 SD Archive，由 F3 接续；历史源码保留，报告排除；只公开 hash/source |
+| A-045 | FindUAS F3 paired AMS and proc diagnostic report script；self-developed；`fuli-baseline-v3` | `10,611` | `1e87258dd013c00e720f20b4bc6981463197cef0d49a503a1bc1a577c6b1b5c0` | `OBSERVED`；已运行并收到报告；mksh heredoc 临时创建被拒，出现两条框架外错误、PID 解析未完成；源码保留，报告排除；只公开 hash/source |
 
 ## 3. A-001：历史 v0.10 admission probe
 

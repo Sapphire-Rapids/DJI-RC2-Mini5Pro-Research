@@ -1,6 +1,6 @@
 # Next-agent prompt
 
-Current update (C-259): the direct target context path returned No such file or directory. Prepare F3 to collect AMS PID before/after and proc metadata in one report; no further manual command is currently requested.
+Current update (C-262): F3 was received; Android mksh heredoc temporary-file creation failed. Work now fixes the helper and builds the operator-requested finite SD task session. No repeat F3 command is requested.
 
 
 Continue from the current reviewed checkout on the DJI RC 2 `07.00.0100` / Mini 5 Pro `01.00.0600`
@@ -21,7 +21,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-258 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-261 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -76,10 +76,10 @@ C-254 closes the metadata/API check: `/storage` is mode 0710, shell:everybody, w
 permission. The API returned exactly one mounted public volume. Its identifier is retained
 privately and must not be copied into public instructions.
 
-Current F2/A-044 removes global `/storage` traversal and uses that private exact entry. It
+Historical F2/A-044 removes global `/storage` traversal and uses that private exact entry. It
 passed independent diff review, `sh -n` and eight host fixtures, including an actual mode-0111
 parent that cannot be enumerated but permits an exact-path launch (C-255). `Download/F2.sh`
-is now created on SD and fully read back: 6,845 bytes, SHA-256
+was created on SD and fully read back: 6,845 bytes, SHA-256
 `808998e211f6af204f42df7fdce4257532dcccefd3f61420c8cfbccba08be02c` (C-256). The old F1 was
 moved to `Download/FindUAS/Archive/F1.sh`, with matching full readbacks before/after and no deletion.
 
@@ -93,11 +93,17 @@ C-258 now records the AMS LRU result: a `dji.go.v5` HOME main-process entry with
 PID. Its PID/UID are retained privately. This differs from the earlier empty pidof observation
 and does not call for reopening Fly.
 
-Current operator step: use the read-only command already sent privately for the PID recorded
-in C-258. It reads `/proc/<PID>/attr/current` and searches `/proc/self/mountinfo` for hidepid.
-Here `<PID>` denotes the private observed value, not a literal path to execute. Await the target
-domain and live mount-option output; hidepid is not yet observed. Do not rerun F2, reopen Fly
-or reinstall packages.
+C-259 records a separate target-context path error without a mount-options line; it does not
+resolve the process/view difference. Current F3/A-045 collects AMS before/after and proc data
+in one report. It passed 18 full shell fixtures and 14 independent parser/capture vectors
+(C-260). `Download/F3.sh` is now staged with complete matching readback: 10,611 bytes, SHA-256
+`1e87258dd013c00e720f20b4bc6981463197cef0d49a503a1bc1a577c6b1b5c0` (C-261). F2 was moved
+to `Download/FindUAS/Archive/F2.sh`, with matching full readbacks before/after and no deletion.
+
+Current operator step: use the F3 exact-path launch command already supplied privately for the
+volume observed in C-254. Do not copy its volume identifier into public text or replace it with
+a wildcard. Await `F3_SAVED` or error; execution/report receipt remain pending. Do not rerun
+F2, repeat the manual proc commands, reopen Fly or reinstall packages.
 
 Priority:
 
@@ -106,8 +112,9 @@ Priority:
 2. The post-install report, actual Shell identity and parent-directory observations are closed by
    C-245--C-247; the complete `/data/app` contents/basename check is received in C-249. C-254
    supplies the storage entry privately. C-257 closes F2 execution/report receipt and C-258
-   supplies the AMS main-process identity privately. Obtain its target domain and the live
-   proc mount options; do not treat the earlier pidof result as process absence or confirmed hidepid.
+   supplies the AMS main-process identity privately. F3 validation/staging are closed by
+   C-260/C-261; await its single-window report to resolve C-259. Neither process absence nor
+   a live hidepid option has been established by the earlier results.
 3. After the regular-file path checks and the target-process baseline are complete, validate A-040's
    explicit success marker and unchanged Fly PID, then advance the independent
    RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to
