@@ -180,3 +180,20 @@ claimed). A green readback only records an onboard parameter value; it does not 
 Remote ID RF behaviour. Do not run a write path until the operator confirms the
 physical route, motor-off state, and the external receiver for a motor-on A-B-A check
 is ready.
+
+## Offline RID cloud-policy audit
+
+`rid_cloud_policy_audit.py` reads a private JSON input and prints only sanitized selection or
+possible-candidate statistics. It reproduces the exact1.19.4 first-row, product-block, DEFAULT,
+empty-string and per-subscription distinct rules in C-286/C-287. An input `area` selects exact-area
+mode; omitting it uses candidate comparison without assuming actual area. `A054_LIMITS` matches
+the native probe's bounded UTF8 subset. Inputs include a decoded shared cache object with
+`receiver_type`, `receiver_index` and `data`; payload strings, areas and hashes are never output.
+
+```sh
+python3 rid_cloud_policy_audit.py /path/to/private-input.json
+python3 -m unittest test_rid_cloud_policy_audit
+```
+
+This tool has no device transport or write operation. Matching a candidate and receiver does not
+identify the shared cache's writer. See [the runtime record](../../docs/23_RC2_LIVE_RUNTIME.md).

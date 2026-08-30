@@ -419,3 +419,11 @@ hypotheses. No new listener or aircraft-control execution has occurred.
   tested A-048 path OBSERVED; other payloads and broader loader policies keep their own scope.
   C-277 later closed that synchronous path; C-281 received the first actual SDK cache value
   and C-282 closed recovery. Timestamp/RF correlation remains separate from that observed read.
+
+## Matched RID cloud payload — next unresolved structure
+
+C-286 resolves the source selector and successful last-SET cache mechanism; C-291 observes
+candidate content membership with ProductType139 and DEFAULT-match0. The encoded payload's
+internal schema and receiving aircraft owner remain unresolved. A054 records no raw payload,
+actual App area, DEFAULT-presence flag or matching-country-row count. The next bounded data
+request should target those structural gaps before any control transition is designed.

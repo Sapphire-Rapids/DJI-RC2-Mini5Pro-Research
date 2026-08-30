@@ -989,3 +989,16 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
    和独立 RF 验证；本文没有给出任何已准入 SET。
 6. 新假设先进入[假设与未知](10_HYPOTHESES_AND_UNKNOWNS.md)，新失败进入
    [否定结果](09_NEGATIVE_RESULTS.md)，完成门禁状态同步到[交接](13_HANDOFF.md)。
+
+## Exact Fly1.19.4 follow-up after the live cache read
+
+C-281 closes one real SDK cache value. C-283 now resolves its age semantics: the RID entry has
+1000ms expiry, synchronous reads retain expired values, and equal pushes refresh cache time without
+change-listener notification. This augments RID-002's versioned evidence without adding a GET builder.
+
+C-284/C-285 close the examined settings/BLE naming branches and the fixed-name inventory on the
+three installed-version SDK inputs. C-286 follows the active cloud-selector source: ProductType
+membership, first country/default selection and legacy MMKV persistence feed a hex-decoding00/DD
+writer. Its original successful SET value is cached, but three app writers share the same key.
+The next probe compares existing RID candidates and that cached content, with no actual-area
+selection or policy write. See [the runtime record](23_RC2_LIVE_RUNTIME.md).

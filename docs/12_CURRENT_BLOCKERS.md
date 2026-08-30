@@ -3,11 +3,13 @@
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-A-048 closed the basic loader and A-051 now closes the first official RID cache read
-(C-277--C-282). One synchronous call returned RID support/normal1/1, EID0/0 and failReason0,
-with successful parse/disposal, stable Fly PID/UID/APK, verified file removal and independent
-cleanup. B3 closed normally. Current cache acquisition is no longer a blocker; receive-time/RF
-correlation and an authoritative reversible control owner remain separate work.
+A-048/A-051 close the basic loader and one RID cache value. C-283 explains retained-value
+expiry and notification deduplication. A054 now closes the guarded existing-MMKV/two-SDK-cache
+comparison (C-286--C-292): ProductType139,41 policy rows,36 distinct nonempty candidates,
+receiver18/4 and a candidate match with DEFAULT-match0. Parsing/disposal, stable PID/APK,
+file removal, independent cleanup/receipts and B4 closure all passed.
+The next gap is the matched payload's structure and aircraft consumer, together with applied
+readback/restore; candidate matching does not choose an actual area or identify a writer.
 See [the runtime topic](23_RC2_LIVE_RUNTIME.md). Prior commits through `2f31394` were pushed on
 one explicit request; new results remain local unless another push is requested.
 C-227--C-230 have already answered the two tested FLYC parameter
@@ -492,7 +494,9 @@ verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
   -> test-file removal, independent absence readback and CLOSED STOP (C-275)
   -> exact RID synchronous cache path closed (C-277)
   -> one real cached status and verified cleanup/session closure (C-280--C-282)
-  -> receive-time / independent-RF correlation and authoritative reversible control owner
+  -> retained-cache freshness and exact cloud source closed (C-283--C-288)
+  -> existing RID candidate / shared-cache content match and recovery (C-289--C-292)
+  -> matched payload schema/aircraft consumer; receive-time/RF correlation and reversible control owner
   -> verified independent RID-state observation and callback provenance
 ```
 

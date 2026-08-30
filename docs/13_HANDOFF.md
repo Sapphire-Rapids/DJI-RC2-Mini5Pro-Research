@@ -10,8 +10,12 @@ and unexecuted. Preserve the global A-048 attempt record and do not repeat the s
 C-277--C-282 subsequently close the exact synchronous cache path and A-051 live read. One
 cache call returned RID1/1, EID0/0 and failReason0; parse/disposal, file recovery and independent
 absence readback succeeded with unchanged Fly PID/UID/APK. B3 STOP/CLOSED STOP is complete.
-Preserve both A-048/A-051 permanent receipts. Next align SDK status with independent receiver/
-motor timing and resolve a reversible control owner; no further operator command is pending.
+Preserve both A-048/A-051 permanent receipts. C-283--C-292 add the exact expiry/notification and
+cloud-source chain plus A054 live comparison: ProductType139,41 rows,36 distinct candidates,
+receiver18/4, candidate match1 and DEFAULT-match0. Its environment/file recovery, independent
+receipts and B4 STOP are complete. Preserve A054's permanent receipt too. Next inspect matched
+payload structure and its aircraft consumer; actual-area selection and applied readback/restore
+remain separate. No further operator command is pending.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes

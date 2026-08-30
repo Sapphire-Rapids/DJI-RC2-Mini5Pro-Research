@@ -634,3 +634,10 @@ stronger conclusion that cannot be drawn.
   two unframed shell errors (C-262).
 - F4 uses a `printf` pipe. Eighteen Android mksh host scenarios and twelve temporary-directory
   comparisons pass (C-263). Preserve F3 as historical; use F4 for the next diagnostic.
+
+## Exact Fly1.19.4 named control inventory — C-285
+
+The validated ARMv7 SDK JNI/key-value/base inputs lack the old CCC/global-RID/C0 fixed names
+listed in the runtime record. Examined EID/registration/BLE names resolve to those individual
+planes. This inventory supplies no new ordinary Broadcast RID switch; encrypted firmware and
+other versions remain separate inputs. No F7/Binder route or device write was repeated.

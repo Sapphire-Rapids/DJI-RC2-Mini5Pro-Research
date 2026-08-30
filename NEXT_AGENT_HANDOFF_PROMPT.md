@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-282 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-292 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -48,15 +48,14 @@ Current facts:
   and all three component entries are enabled. Earlier directory ABSENT results remain only the
   Observer app's view. C-246 now records the actual Shell `id` output: UID/GID 1000/system and
   domain `system_app:s0`. C-247 records `/data` and `/data/app` as mode 0771, system:system,
-  with `system_data_root_file` and `apk_data_file` labels respectively. No internal canary copy
-  or attach has occurred.
+  with `system_data_root_file` and `apk_data_file` labels respectively. That early baseline preceded
+  the later successful A048/A051/A054 experiments below.
 - C-248 statically identifies package scanning/reconciliation that can delete unregistered
-  subdirectories; both examined rules skip ordinary non-APK files. The candidate is a separate
-  regular `.so` directly under `/data/app`, with no new subdirectory. This is not yet a tested
-  file location or loader. C-249 now records the complete listing: seven subdirectories
+  subdirectories; both examined rules skip ordinary non-APK files. The resulting ordinary `.so`
+  path directly under `/data/app` was later exercised by A048/A051/A054. C-249 now records the complete listing: seven subdirectories
   (DJI_FLY at 0777, six randomized installation roots at 0775), all system:system with
   apk_data_file labels; `finduas_A040_canary.so` was absent.
-- A-040 is the new ARMv7 ART TI-only canary, already SD-staged but unexecuted. A-042 is the
+- A-040 is the historical ARMv7 ART TI-only canary, already SD-staged but unexecuted. A-042 is the
   ARMv7 query build with the additional `-1` guard. The separate RID-state chain is mapped in
   C-240; unlock registration and the deferred certificate-page screenshot are not prerequisites.
 
@@ -91,7 +90,7 @@ PID. Its PID/UID are retained privately. This differs from the earlier empty pid
 and does not call for reopening Fly.
 
 C-259 records a separate target-context path error without a mount-options line; it does not
-resolve the process/view difference. Current F3/A-045 collects AMS before/after and proc data
+resolve the process/view difference. Historical F3/A-045 collects AMS before/after and proc data
 in one report. It passed 18 full shell fixtures and 14 independent parser/capture vectors
 (C-260). `Download/F3.sh` is now staged with complete matching readback: 10,611 bytes, SHA-256
 `1e87258dd013c00e720f20b4bc6981463197cef0d49a503a1bc1a577c6b1b5c0` (C-261). F2 was moved
@@ -104,15 +103,18 @@ The original file is preserved unchanged. F4 replaces that heredoc with a pipe. 
 verified PING/SNAPSHOT/PING round trip (C-266/C-267). The F4 report is strictly valid, with
 stable AMS PID and target-proc reads still hidden; preserve the active host session state. Do not repeat F3 or the manual proc commands.
 
-Current result (C-273--C-276): A-048 loaded successfully in the existing Fly process after the
+Loading result (C-273--C-276): A-048 loaded successfully in the existing Fly process after the
 live baseline passed. Canonical native identity, ART TI and disposal results all succeeded;
 PID/UID/APK remained stable. The verified ordinary file was removed, independent cleanup found
 it absent and B2 closed by STOP. A-040 remains untouched. Preserve the permanent A-048 attempt
 marker and do not replay the canary. C-277--C-282 subsequently close the synchronous cache route
 and A-051 live read: RID1/1, EID0/0, failReason0, one cache call, successful parse/disposal, stable
 PID/UID/APK, file removed and independently absent; B3 STOP/CLOSED STOP completed. Preserve the
-A-051 receipt too. Next align SDK status with independent RID receiver/motor timing and resolve
-authoritative reversible control owners.
+A-051 receipt too. C-283--C-292 then close the retained-cache semantics, exact cloud source and
+A054 comparison: ProductType139,41 rows/36 distinct candidates, receiver18/4, match1/default0.
+One MMKV decode and two SDK cache reads succeeded; file recovery/receipt readbacks and B4
+STOP/CLOSED STOP are complete. Preserve A054 receipts. Next inspect the matched hex payload's
+structure and receiving owner. No payload or actual App area was exported by A054.
 
 Priority:
 
@@ -126,9 +128,11 @@ Priority:
    F4 then passed strict parsing with stable AMS PID and unavailable target proc reads (C-267).
    The B1 diagnostic round trip works (C-266); preserve its current host state rather than
    repeating F4 or the individual proc reads.
-3. A-048/A-051 loading, first RID cache read and recovery are complete. Use C-277--C-282 for
-   the exact synchronous entry and live result; do not repeat this baseline. Next align timed
-   status with independent receiver/motor observations. Listener lifecycle remains separate.
+3. A-048/A-051 and A054 are complete, recovered and stopped. Use C-283--C-292 for retained
+   cache behavior and RID policy/shared-cache content correlation. Next needs matched-row count,
+   DEFAULT presence/nonempty and matched hex payload structure/version summaries; current
+   reports lack that raw content. Do not repeat the basic cache read or add an unexplained SET.
+   Timed RF correlation and listener lifecycle remain separate.
 4. Independently map Basic/UAS ID, aircraft position, operator position and Operator ID owners,
    read paths and RF fields. An app location update or compliance serial is not yet RF correspondence.
 5. Complete C-207's motor-off → motor-on → motor-off standard-bearer record with the operator if

@@ -340,6 +340,20 @@ Later retractions override earlier progress summaries.
     snapshot without a receive timestamp or paired RF record; the next work is temporal/RF
     correlation and an authoritative reversible control owner.
 
+44. C-283 closes exact1.19.4 RID cache freshness: UpdateType1000 is a1000ms expiry; the
+    synchronous getter ignores it. Same-valued pushes refresh the CacheValue timestamp but
+    do not notify change listeners. JNI exposes no timestamp; listener cancellation queues
+    worker cleanup. Retain A051 as a cache observation, not a packet-arrival sample.
+45. C-286--C-292 close RID cloud-source selection and A054's live comparison. ProductType
+    cache is139; one fixed MMKV decode and one read of each ProductType/CloudControlData cache
+    succeeded.41 rows and36 distinct nonempty candidates yield candidate match1/default match0
+    with receiver18/4; this is set membership, not unique-country or applied-state attribution.
+    PID/UID/APK were stable, file recovery and independent receipts passed, and B4 closed by
+    STOP. A054 is22336 bytes, SHA-256
+    `23c769203a26c6649c95770f50f49676965b06b30d292a302ddb2ce6eba8ea7f`.
+    Preserve its permanent attempt record. Next resolve matched payload structure/receiver
+    semantics rather than repeat the completed baseline or fabricate a cloud policy.
+
 ## Privacy and redaction
 
 Never commit:

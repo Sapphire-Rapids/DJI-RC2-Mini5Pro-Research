@@ -74,7 +74,9 @@ static unsigned allowed_path(const struct path *p) {
                          !strcmp(p->part[1], "B2.sh") || !strcmp(p->part[1], "L1.sh") ||
                          !strcmp(p->part[1], "FindUAS_ARTTI_V2.so") ||
                          !strcmp(p->part[1], "B3.sh") || !strcmp(p->part[1], "L2.sh") ||
-                         !strcmp(p->part[1], "FindUAS_RID_CACHE.so")))
+                         !strcmp(p->part[1], "FindUAS_RID_CACHE.so") ||
+                         !strcmp(p->part[1], "B4.sh") || !strcmp(p->part[1], "L3.sh") ||
+                         !strcmp(p->part[1], "FindUAS_CLOUD_POLICY.so")))
         return CAN_GET | CAN_PUT;
     if (strcmp(p->part[1], "FindUAS")) return 0;
     if (p->count == 2) return CAN_MKDIR;
@@ -84,6 +86,7 @@ static unsigned allowed_path(const struct path *p) {
         const char *name = p->part[3], *prefix = "FindUAS_F4_";
         if (!strcmp(name, "A048_copy.receipt") || !strcmp(name, "A048_attach.attempted")) return CAN_GET;
         if (!strcmp(name, "A051_copy.receipt") || !strcmp(name, "A051_attach.attempted")) return CAN_GET;
+        if (!strcmp(name, "A054_copy.receipt") || !strcmp(name, "A054_attach.attempted")) return CAN_GET;
         size_t n = strlen(name), prefix_length = strlen(prefix);
         return n > prefix_length + 4 && !strncmp(name, prefix, prefix_length) &&
             !strcmp(name + n - 4, ".txt") ? CAN_GET : 0;
@@ -403,6 +406,8 @@ static int self_test(void) {
         {"Download/FindUAS_ARTTI_V2.so", CAN_GET | CAN_PUT},
         {"Download/B3.sh", CAN_GET | CAN_PUT}, {"Download/L2.sh", CAN_GET | CAN_PUT},
         {"Download/FindUAS_RID_CACHE.so", CAN_GET | CAN_PUT},
+        {"Download/B4.sh", CAN_GET | CAN_PUT}, {"Download/L3.sh", CAN_GET | CAN_PUT},
+        {"Download/FindUAS_CLOUD_POLICY.so", CAN_GET | CAN_PUT},
         {"Download/FindUAS_ARTTI_V1.so", 0},
         {"Download/FindUAS/Bridge/active.session", CAN_GET | CAN_PUT},
         {"Download/FindUAS/Bridge/0123456789abcdef/inbox", CAN_MKDIR},
@@ -420,6 +425,8 @@ static int self_test(void) {
         {"Download/FindUAS/Probe/A048_copy.receipt", CAN_GET},
         {"Download/FindUAS/Probe/A051_copy.receipt", CAN_GET},
         {"Download/FindUAS/Probe/A051_attach.attempted", CAN_GET},
+        {"Download/FindUAS/Probe/A054_copy.receipt", CAN_GET},
+        {"Download/FindUAS/Probe/A054_attach.attempted", CAN_GET},
         {"Download/FindUAS/Probe/A048_attach.attempted", CAN_GET},
         {"Download/FindUAS/Probe/A048_copy.receipt.extra", 0},
         {"Download/FindUAS/Samples/TEST.zip", 0}, {"Download/user.txt", 0},

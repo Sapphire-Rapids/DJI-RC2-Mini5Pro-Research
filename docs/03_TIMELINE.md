@@ -191,7 +191,7 @@ work when a report did not contain a more precise timestamp.
   listen/update-only `KeyRidWorkingStatusPush` and `0x11/0x1C` observer.
 - `STATIC`: the seven-byte status bit/area/failure layout and US/Cloud/EU/Japan/France capability
   interpretations were closed; runtime link/device identity prevents a fixed request tuple inference.
-- `STATIC/NEGATIVE`: the separate `KeyCloudControlData` path was closed as value-routed SET-only
+- `STATIC`、`NEGATIVE`: the separate `KeyCloudControlData` path was closed as value-routed SET-only
   `0x00/0xDD`; success caches the request and has no applied-state echo. No status GET, stable
   disable/reset/debug handler, or correlation between the surfaces was found.
 - No active query, write, vendor-code execution, or device-state change occurred.
@@ -213,7 +213,7 @@ work when a report did not contain a more precise timestamp.
   multi-field DroneID control.
 - `STATIC`: the eight legacy field names, logical APP-to-FLYC builder route, and get/set mask layouts
   were recorded with the paper-disclosure and live-polarity boundaries intact.
-- `STATIC/NEGATIVE`: the paper's RF experiment retained packets and substituted selected fields with
+- `STATIC`、`NEGATIVE`: the paper's RF experiment retained packets and substituted selected fields with
   `fake`; no public evidence transfers the legacy OcuSync/AeroScope handler to WA150 or modern
   ASTM/FAA/EU Broadcast RID.
 - No device command was sent and no executable sender was created.
@@ -918,3 +918,18 @@ work when a report did not contain a more precise timestamp.
   原生解析及环境释放成功，Fly PID/UID/APK 稳定，测试文件回收（C-281）。
 - `OBSERVED`：独立清理确认文件不存在，copy/attempt 回读匹配，STOP/CLOSED STOP 完成；
   没有第二次读取或 Fly 重启（C-282）。代码、结果和时间线继续同步本地。
+
+### RID控制入口收敛与云缓存比对准备
+
+- `STATIC`：闭合状态缓存1000ms期限、同步读取与同值监听去重行为（C-283）。
+- `STATIC`、`NEGATIVE`：设置页和BLE命名分别归到EID/注册/本机适配层，旧固定控制名字在三份
+  exact SDK输入中未见；没有重复F7/Binder实验（C-284/C-285）。
+- `STATIC`：闭合产品类型选择、RID旧namespace存储家族、服务区域门与最后成功SET的共享
+  缓存；取得现存MMKV单键读取路线（C-286）。
+- `STATIC`：独立选择器/UTF8解析器、A054与L3/B4构建和测试完成（C-287/C-288）。
+- `OBSERVED`：三份新文件SD完整回读匹配，会话已准备，并提供一次B4启动命令（C-289）。
+  更新保持本地，等待实际缓存比对报告。
+- `OBSERVED`：B4启动后基线23项通过（C-290）；A054完成一次MMKV解码及两项SDK缓存读取，
+  得到产品139、41项/36份候选内容、集合匹配1/DEFAULT匹配0，PID/APK稳定，文件回收（C-291）。
+- `OBSERVED`：独立清理确认文件不存在、copy/attempt回读匹配、STOP/CLOSED STOP完成；
+  本轮没有第二次加载或重启Fly（C-292）。

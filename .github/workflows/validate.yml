@@ -92,3 +92,11 @@ jobs:
         env:
           FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
         run: sh scripts/run_rid_cache_probe_host_tests.sh
+      - name: Test cloud policy parser and offline candidate comparison
+        working-directory: experiments/jvmti/jvmti_flysafe_inprocess_query
+        run: sh scripts/run_cloud_policy_parser_host_tests.sh
+      - name: Test cloud cache probe with synthetic JNI and MMKV ownership
+        working-directory: experiments/jvmti/jvmti_flysafe_inprocess_query
+        env:
+          FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
+        run: sh scripts/run_cloud_cache_probe_host_tests.sh
