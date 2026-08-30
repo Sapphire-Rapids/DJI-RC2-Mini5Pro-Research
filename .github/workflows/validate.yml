@@ -48,6 +48,8 @@ jobs:
         run: python -m unittest discover -s host-tools/firmware-acquisition -p 'test_*.py'
       - name: Test runtime DEX boundary scanner
         run: python -m unittest discover -s host-tools/runtime-dex-scan -p 'test_*.py'
+      - name: Test restricted report-audit rules
+        run: python -m unittest discover -s apps/rid-admission-probe/scripts -p 'test_report_audit.py'
 
   android-admin-tests:
     runs-on: ubuntu-latest
@@ -64,6 +66,9 @@ jobs:
         run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'platforms;android-35' 'build-tools;35.0.0'"
       - name: Test, lint and build Admin without a device
         working-directory: apps/rc2-rid-admin
+        run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug
+      - name: Test, lint and build the SD report probe without a device
+        working-directory: apps/rid-admission-probe
         run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug
       - name: Test same-process inventory parser without Android runtime
         working-directory: experiments/jvmti/jvmti_flysafe_inprocess_query

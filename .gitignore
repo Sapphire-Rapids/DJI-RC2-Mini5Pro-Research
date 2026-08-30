@@ -6,6 +6,7 @@
 
 # Nested Android/Gradle/CMake/Python build state
 **/.gradle/
+**/.kotlin/
 **/.cxx/
 **/.externalNativeBuild/
 **/__pycache__/

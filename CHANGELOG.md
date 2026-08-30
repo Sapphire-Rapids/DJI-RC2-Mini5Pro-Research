@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.21 - 2026-08-30
+
+- Added the explicitly requested SD report export in probe v0.11/code11 (A-038): one new fixed-
+  directory MediaStore report per terminal inspection; failure-only save retry; no new permissions,
+  device-control, network or attach behavior.
+- Preserved the v0.10 core schema and completion proof, added app-version/final-file markers, and
+  fixed the UI completion race by rendering/scheduling from one atomic display snapshot.
+- Reviewed the new narrow write boundary; 69 JVM tests, 8 audit tests and 30 rejected mutations
+  passed. Two clean builds matched the reviewed APK; the historical v0.10 profile still passes.
+- Staged the new APK and verified full RC 2 SD readback (C-233/C-234). Installation/run and actual
+  report receipt remain pending. Raw reports and MTP logs stay private.
+
 ## 0.4.20 - 2026-08-30
 
 ### Fixed

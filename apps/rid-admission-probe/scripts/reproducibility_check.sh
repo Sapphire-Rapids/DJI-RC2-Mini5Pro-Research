@@ -6,12 +6,12 @@ gradle_bin="${GRADLE_BIN:-$(command -v gradle || true)}"
 java_runtime="${JAVA_HOME:-}"
 android_sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 built_apk="$project_dir/app/build/outputs/apk/debug/app-debug.apk"
-published_apk="$project_dir/dist/FindUAS-RID-Bridge-Probe-0.10.0-research.apk"
-task_tmp="$(mktemp -d "${TMPDIR:-/tmp}/finduas-rid-v010-repro.XXXXXX")"
+published_apk="$project_dir/dist/FindUAS-RID-Bridge-Probe-0.11.0-report-export.apk"
+task_tmp="$(mktemp -d "${TMPDIR:-/tmp}/finduas-rid-v011-repro.XXXXXX")"
 
 cleanup() {
     case "$task_tmp" in
-        "${TMPDIR:-/tmp}"/finduas-rid-v010-repro.*) rm -rf -- "$task_tmp" ;;
+        "${TMPDIR:-/tmp}"/finduas-rid-v011-repro.*) rm -rf -- "$task_tmp" ;;
         *) printf '%s\n' "refusing to remove unexpected temporary path: $task_tmp" >&2 ;;
     esac
 }

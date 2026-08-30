@@ -745,3 +745,10 @@ work when a report did not contain a more precise timestamp.
 - Asked the operator to install/open the probe and run its read-only capability check. Installation, execution and report remain unconfirmed. No ADB start, attach, DJI command, aircraft write, motor or RF action occurred.
 
 - Built the distinct A-037 identity-safety revision offline: 170 JVM tests and two matching clean builds, with v2/zipalign/permission/native-entry checks (C-232). No Admin APK was staged or executed. Host fault tests now cover ACK uncertainty, recovery, frame/table validation and report failures; these fixes do not reopen the rejected FLYC candidates.
+
+### 2026-08-30 — requested SD report export
+
+- Implemented v0.11 report export in the same probe package, preserving read-only device checks and adding only the explicitly requested new SD report file. Both terminal results export; failures retry without rerunning the inspection.
+- Completed 69 JVM tests, 8 auditor tests, final-DEX review, 30 adversarial mutations and two byte-identical clean builds (C-233). Retested the historical v0.10 artifact/21 mutations separately.
+- Staged exact A-038 as `Download/FindUAS_A038_V011.apk` through the RC 2-only MTP target and verified full same-session readback (C-234). No existing file was overwritten.
+- Requested operator installation and one check, followed by a simple saved-state confirmation so the host can fetch the report directly. Installation, run and report receipt remain unconfirmed; no ADB/attach/aircraft command/motor/RF operation occurred.

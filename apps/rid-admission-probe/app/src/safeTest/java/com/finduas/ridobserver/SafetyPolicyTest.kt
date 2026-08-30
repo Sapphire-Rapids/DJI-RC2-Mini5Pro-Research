@@ -93,8 +93,8 @@ class SafetyPolicyTest {
     fun versionAndApplicationIdRemainUpgradeCompatible() {
         val build = source("build.gradle.kts")
         assertTrue(build.contains("applicationId = \"com.finduas.ridobserver\""))
-        assertTrue(build.contains("versionCode = 10"))
-        assertTrue(build.contains("versionName = \"0.10.0-research\""))
+        assertTrue(build.contains("versionCode = 11"))
+        assertTrue(build.contains("versionName = \"0.11.0-report-export\""))
     }
 
     @Test

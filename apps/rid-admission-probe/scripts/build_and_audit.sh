@@ -6,7 +6,7 @@ gradle_bin="${GRADLE_BIN:-$(command -v gradle || true)}"
 java_runtime="${JAVA_HOME:-}"
 android_sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 artifact_source="$project_dir/app/build/outputs/apk/debug/app-debug.apk"
-artifact_final="$project_dir/dist/FindUAS-RID-Bridge-Probe-0.10.0-research.apk"
+artifact_final="$project_dir/dist/FindUAS-RID-Bridge-Probe-0.11.0-report-export.apk"
 
 test -n "$gradle_bin" && test -x "$gradle_bin" || {
     printf '%s\n' "Set GRADLE_BIN or put Gradle 8.10.2 on PATH." >&2

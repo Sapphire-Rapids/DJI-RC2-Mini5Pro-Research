@@ -213,6 +213,18 @@ v0.10 请求零 Android permission，只有一个 launcher Activity，没有 ser
 
 v0.8 是历史封存工件，不再是当前 staging instruction。v0.9 的独立审计发现 mapping geometry、timestamp/maps drift 和 auditor coverage 缺陷；这些已在 v0.10 修复并重新测试。
 
+### 8.1 v0.11：SD 报告导出
+
+当前候选是 A-038 `0.11.0-report-export` / code 11，上述 v0.10 是前一封存版本。用户明确要求
+把报告写入 SD 卡供主机读取；新版本只增加固定 `Download/FindUAS/Probe/` 的新报告文件，不加
+权限、DJI 命令、目标代码写入或 attach。检查终态不论 COMPLETE/INCOMPLETE 都保存，导出状态
+独立；失败可重试保存而不重新检查。完整规则和审核见
+[v0.11 报告导出](../apps/rid-admission-probe/REPORT_EXPORT_V11.md)。
+
+C-233/C-234：69 JVM tests、30 mutations、两次一致构建及签名/对齐检查已完成；精确 APK 已作为
+`Download/FindUAS_A038_V011.apk` staged，完整 MTP 读回匹配。安装、运行及报告文件读回仍未确认。
+旧 A-001 文件未覆盖；原始报告和 MTP 日志保留于私有排除区。
+
 ## 9. Exact-v07 userspace-copy patch
 
 ### 9.1 Design

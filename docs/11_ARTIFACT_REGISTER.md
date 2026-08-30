@@ -12,7 +12,7 @@
 
 | ID | 工件 / 类型 / 版本 | 大小 | SHA-256 | 状态 |
 | --- | --- | ---: | --- | --- |
-| A-001 | RC 2 admission probe；self-developed；v0.10 | `2,570,983` | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` | `NOT ADMITTED`；MTP staging 与完整读回 hash 已匹配；安装/运行待操作者确认；当前候选已 staged；只公开 hash |
+| A-001 | RC 2 admission probe；self-developed；v0.10 | `2,570,983` | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` | `NOT ADMITTED`；MTP staging 与完整读回 hash 已匹配；安装/运行待操作者确认；历史 v0.10 已 staged；报告导出由 A-038 接续；只公开 hash |
 | A-002 | Route-only resolver；self-developed；V2.2 | `29,019` | `7aa794ff8611582fd7cf27808a9d9eb11c44e307889d615d0511c100522845fb` | `RETRACTED`；从未复制、安装或运行；**REJECTED / DO NOT USE**；只公开 hash |
 | A-003 | Corrected route-only resolver；self-developed；V2.3 | `29,019` | `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` | `NOT ADMITTED`；从未复制、安装、附加或运行；只作索引、不分发；只公开 hash |
 | A-004 | RC 2 adjacent Android OTA；input-sample；RC331 `10.00.0700/0205` | `985,959,104` | `f707cf3dc0be2894b111ce4973d0206e896a2c7e9c4ebe43de1040b528cf49ce` | `STATIC`；相邻样本；排除且不分发；只公开 metadata |
@@ -49,6 +49,7 @@
 | A-035 | FindUAS FlySafe agent carrier；self-developed；`0.1.0-emulator-observed` | `23,032` | `16a59c1996e817891dfb84208202cb942456095d4ee98dfa7d8eb17c4c10f289` | `NEGATIVE`；disposable emulator normal installed path 在首个 `=` 被截断；未在 RC 2 使用；generated APK 排除、源码公开 |
 | A-036 | FindUAS FlySafe ART TI staging payload；self-developed；`0.1.0-emulator-observed` | `38,998` | `20a96fdd834e921b546105fd0b2314393a33d242690f731a776c867f70e47069` | `NEGATIVE`；disposable emulator uncommitted `apk_tmp_file` search denied，session 已 abandon；未在 RC 2 使用；generated APK 排除、源码公开 |
 | A-037 | FindUAS RC 2 RID Admin identity safety lock；self-developed；`0.8.1-identity-safety-locked` / code 14 | `225,937` | `8ee7a4edd36c7f97c631fabf3186ac3df79e6611869ebf05b11e83ccba4e84ba` | `NOT ADMITTED`；仅离线构建/测试，未 staged、安装或运行；generated APK 排除、源码公开 |
+| A-038 | RC 2 probe with SD report export；self-developed；`0.11.0-report-export` / code 11 | `2,601,935` | `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed4ec0f8771d6eb8044aa` | `NOT ADMITTED`；MTP staged/完整读回匹配，安装及运行待确认；当前报告导出候选；只公开 hash |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -378,3 +379,11 @@ sh scripts/check_sensitive_patterns.sh
 C-232 固定的是新版本 `0.8.1-identity-safety-locked` / code 14，不能冒用 A-033 的 hash 或运行状态。170 JVM tests 通过；lint 0 errors / 15 warnings；两次 clean 构建相同；v2 签名和 zipalign 通过；零权限、无 packaged native library。
 
 EID/OPID 写入由 UI/入口/sender 共同锁定，完整 OPID 不进入可复制诊断。保留事务逻辑只以 fake device 验证可恢复基线、ACK/读回不确定、成功变更后仍需恢复、会话漂移时拒绝覆盖旧基线。其他实验写入面仍保留自身边界，所以整个 APK 不是全局只读。新安装包没有 staged、安装或运行，也不证明任何 RID/RF 控制能力。
+
+## A-038：SD 卡报告导出探针
+
+C-233 固定新版本 `0.11.0-report-export` / code 11。69 JVM tests、8 auditor tests 通过，lint 无问题；30/30 v11 mutation 被拒绝；两次 clean build 与登记 APK 完全一致。零权限、v2 签名、zipalign 通过；signer 与旧 v0.10 相同。旧 v0.10 artifact-only profile 与 21 mutations 另行重跑通过。
+
+唯一新增写入为用户要求的 SD 报告：固定 `Download/FindUAS/Probe/`，每次一个新文件，完整 UTF-8/close 后 publish，失败仅清理本次 pending URI。报告写入不能改变检查结果，也不授予 DJI 控制或 attach 能力。审阅边界见 [v0.11 说明](../apps/rid-admission-probe/REPORT_EXPORT_V11.md)。
+
+C-234：`Download/FindUAS_A038_V011.apk` 已在 target-locked RC 2 会话中 staged 并完整读回核对 hash，未覆盖旧文件。安装、运行和实际报告文件读回仍待操作者完成，不把 APK 传输当作导出成功。

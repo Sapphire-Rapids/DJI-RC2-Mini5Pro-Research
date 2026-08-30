@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Fail-closed static and DEX-semantic audit for the v0.10 ART identity probe."""
+"""Fail-closed probe audit: v0.11 report-only storage and retained v0.10 profile."""
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import os
 from pathlib import Path
@@ -14,7 +15,7 @@ import zipfile
 
 
 PROJECT = Path(__file__).resolve().parent.parent
-DEFAULT_APK = PROJECT / "dist" / "FindUAS-RID-Bridge-Probe-0.10.0-research.apk"
+DEFAULT_APK = PROJECT / "dist" / "FindUAS-RID-Bridge-Probe-0.11.0-report-export.apk"
 SEALED_PROFILE = os.environ.get("FINDUAS_SEALED_AUDIT") == "1"
 EXPECTED_CURRENT_SIZE = 2_570_983
 EXPECTED_CURRENT_SHA256 = "fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c"
@@ -34,6 +35,45 @@ EXPECTED_SIGNER = "37896e5a80772e39edad4bdf3ce7f19d2b6e1352a701c48c70edc10c97b2b
 EXPECTED_EXTERNAL_INVOKE_COUNT = 2_361
 EXPECTED_EXTERNAL_INVOKE_SHA256 = (
     "c3b4ed26b563e2be2e4806b57ba0d21b8ea15ee3e6fa276d4223e0749d32ed29"
+)
+# These legacy values are intentionally immutable. A new writer is not admitted
+# merely by replacing the old invoke hash with whatever a build happens to emit.
+PROFILES = {
+    "v10": {
+        "version_code": 10,
+        "version_name": "0.10.0-research",
+        "schema": "finduas-rid-probe/v0.10-schema-1",
+        "external_count": EXPECTED_EXTERNAL_INVOKE_COUNT,
+        "external_sha256": EXPECTED_EXTERNAL_INVOKE_SHA256,
+        "sealed_size": EXPECTED_CURRENT_SIZE,
+        "sealed_sha256": EXPECTED_CURRENT_SHA256,
+    },
+    "v11": {
+        "version_code": 11,
+        "version_name": "0.11.0-report-export",
+        "schema": "finduas-rid-probe/v0.10-schema-1",  # Retained core schema.
+        # Reviewed on APK aaa6f8bf...: only report storage, formatter/coordinator
+        # and UI additions; the original ART/framework-read surfaces are retained.
+        "external_count": 2627,
+        "external_sha256": "4cc4ecb553f9c45689c29f09f8e6292e4dbceb92b438af82085b173e6f8c0f5c",
+        "sealed_size": None,
+        "sealed_sha256": None,
+    },
+}
+REPORT_SOURCE = "app/src/safe/java/com/finduas/ridobserver/ProbeReportStore.kt"
+REPORT_DESCRIPTOR = "Lcom/finduas/ridobserver/ProbeReportStore"
+# Reviewed: unique mounted non-primary removable volume; fixed directory/name;
+# non-emulated; <=256 KiB UTF-8; unique UUID attempt suffix; newly inserted URI
+# ownership; pending -> UTF-8 close -> publish; own-row cleanup.
+EXPECTED_REPORT_SOURCE_SHA256 = "80bec1fca211e41d86097630cae954104b617af76fbcd21106a5030f00e9265d"
+EXPECTED_REPORT_DEX_SHA256 = "96fa9e54a92e65ac31d3c8f26646c049ae08ec524a3680b9384f2bfddbe6b258"
+EXPECTED_REPORT_DESCRIPTORS = (
+    "Lcom/finduas/ridobserver/ProbeReportStore$AndroidPendingReport;",
+    "Lcom/finduas/ridobserver/ProbeReportStore$AndroidStore;",
+    "Lcom/finduas/ridobserver/ProbeReportStore$PendingReport;",
+    "Lcom/finduas/ridobserver/ProbeReportStore$Store;",
+    "Lcom/finduas/ridobserver/ProbeReportStore$Volume;",
+    "Lcom/finduas/ridobserver/ProbeReportStore;",
 )
 EXPECTED_QUERIES = {
     "dji.go.v5",
@@ -161,7 +201,8 @@ def audit_known_profile_source() -> None:
             )
 
 
-def audit_sources() -> None:
+def audit_sources(profile: str = "v11") -> None:
+    selected = PROFILES[profile]
     build = (PROJECT / "app/build.gradle.kts").read_text()
     manifest = (PROJECT / "app/src/safe/AndroidManifest.xml").read_text()
     art_source = (
@@ -171,13 +212,15 @@ def audit_sources() -> None:
     activity = (
         PROJECT / "app/src/safe/java/com/finduas/ridobserver/MainActivity.kt"
     ).read_text()
-    safe_sources = "\n".join(
-        path.read_text()
-        for path in sorted((PROJECT / "app/src/safe/java").rglob("*.kt"))
+    source_paths = sorted((PROJECT / "app/src/safe/java").rglob("*.kt"))
+    safe_sources = "\n".join(path.read_text() for path in source_paths)
+    non_report_sources = "\n".join(
+        path.read_text() for path in source_paths
+        if path != PROJECT / REPORT_SOURCE
     )
 
-    require('versionCode = 10' in build, "versionCode is not 10")
-    require('versionName = "0.10.0-research"' in build, "versionName is not v0.10")
+    require(f'versionCode = {selected["version_code"]}' in build, "versionCode/profile mismatch")
+    require(f'versionName = "{selected["version_name"]}"' in build, "versionName/profile mismatch")
     require('java.setSrcDirs(listOf("src/safe/java"))' in build, "safe Java source set not pinned")
     require('manifest.srcFile("src/safe/AndroidManifest.xml")' in build, "safe manifest not pinned")
     for forbidden in ("<uses-permission", "<service", "<receiver", "<provider"):
@@ -226,7 +269,7 @@ def audit_sources() -> None:
     ):
         require(forbidden not in art_source, f"new ART section contains {forbidden}")
 
-    require("finduas-rid-probe/v0.10-schema-1" in activity, "v0.10 schema missing")
+    require(selected["schema"] in activity, "profile schema missing")
     require("machine_section_end=true" in activity, "machine section terminator missing")
     require("ProbeCompletionPolicy.terminalState" in activity, "completion gate missing")
     require("nextArtIdentity.state" in activity, "completion call is not fed by ART result state")
@@ -261,7 +304,29 @@ def audit_sources() -> None:
         "Os.sendto(", "Os.sendmsg(", "Os.bind(", "Os.listen(",
         "Os.accept(",
     ):
-        require(forbidden not in safe_sources, f"packaged source contains {forbidden}")
+        # The only source-level exception is the reviewed report store's
+        # ContentResolver stream opener. Files, syscalls and all old execution /
+        # network bans still apply to the report source itself.
+        inspected = (
+            non_report_sources
+            if profile == "v11" and forbidden == "openOutputStream("
+            else safe_sources
+        )
+        require(forbidden not in inspected, f"packaged source contains {forbidden}")
+    # MessageDigest.update() is an existing read-only ART hashing operation.
+    # Resolver.update overloads are checked by owning DEX class below instead of
+    # banning every unrelated method with the same source-level name.
+    for forbidden in (".insert(", ".delete(", ".write("):
+        require(forbidden not in non_report_sources,
+                f"source outside ProbeReportStore contains {forbidden}")
+    if profile == "v11":
+        report_path = PROJECT / REPORT_SOURCE
+        require(report_path.is_file(), "v0.11 report store source missing")
+        require(EXPECTED_REPORT_SOURCE_SHA256 is not None,
+                "v0.11 report source has not completed manual safety review")
+        require(sha256(report_path) == EXPECTED_REPORT_SOURCE_SHA256,
+                "reviewed report store source changed")
+        require('0.11.0-report-export' in activity, "v0.11 report app version marker missing")
     for required in (
         "Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS",
         "Settings.ACTION_DEVICE_INFO_SETTINGS",
@@ -878,8 +943,60 @@ def application_dex_dump(dex_dump: str) -> str:
     return "\n".join(blocks)
 
 
-def audit_app_dex_safety(app_dump: str, *, enforce_frozen_surface: bool = True) -> None:
-    """Rejects app-owned calls that can transmit, persist, execute, or load code."""
+def app_class_blocks(app_dump: str) -> list[tuple[str, str]]:
+    result = []
+    for block in re.split(r"\n(?=Class #\d+\s+-)", app_dump):
+        descriptor = re.search(r"Class descriptor  : '(L[^']+;)'", block)
+        require(descriptor is not None, "application DEX class boundary is missing")
+        result.append((descriptor.group(1), block))
+    require(len({descriptor for descriptor, _ in result}) == len(result),
+            "application DEX repeats a class descriptor")
+    return result
+
+
+def report_dex_fingerprint(app_dump: str) -> tuple[tuple[str, ...], str]:
+    """Pin the reviewed writer's fields, literals, instructions and control flow.
+
+    This is deliberately stronger than an invoke-table hash: changing a URI,
+    primary-volume fallback, branch or buffer source must require fresh review.
+    The existing general semantic completion proofs remain independent.
+    """
+    family = sorted(
+        (descriptor, block)
+        for descriptor, block in app_class_blocks(app_dump)
+        if descriptor == REPORT_DESCRIPTOR + ";" or descriptor.startswith(REPORT_DESCRIPTOR + "$")
+    )
+    require(bool(family), "v0.11 report store DEX class family missing")
+    canonical = "\n".join(
+        descriptor + "\n" + block.strip() for descriptor, block in family
+    ).encode("utf-8")
+    return tuple(descriptor for descriptor, _ in family), hashlib.sha256(canonical).hexdigest()
+
+
+def external_invoke_fingerprint(app_dump: str) -> tuple[int, str]:
+    targets = re.findall(
+        r"\|[0-9a-f]{4}:\s+invoke-[^\n]+?, "
+        r"(L[^ \n]+?;\.[^:\s]+:[^ \n]+)", app_dump,
+    )
+    targets = [target for target in targets if not target.startswith("Lcom/finduas/ridobserver/")]
+    return len(targets), hashlib.sha256("\n".join(sorted(targets)).encode("utf-8")).hexdigest()
+
+
+REPORT_WRITE_OWNER = REPORT_DESCRIPTOR + "$AndroidStore;"
+REPORT_WRITE_CALLS = frozenset({
+    "Landroid/content/ContentResolver;.insert:(Landroid/net/Uri;Landroid/content/ContentValues;)Landroid/net/Uri;",
+    "Landroid/content/ContentResolver;.openOutputStream:(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;",
+    "Landroid/content/ContentResolver;.update:(Landroid/net/Uri;Landroid/content/ContentValues;Ljava/lang/String;[Ljava/lang/String;)I",
+    "Landroid/content/ContentResolver;.delete:(Landroid/net/Uri;Ljava/lang/String;[Ljava/lang/String;)I",
+    "Ljava/io/OutputStream;.write:([B)V",
+    "Ljava/io/OutputStream;.flush:()V",
+})
+
+
+def audit_app_dex_safety(
+    app_dump: str, *, enforce_frozen_surface: bool = True, profile: str = "v11"
+) -> None:
+    """No execution/transmission; v11 permits only the sealed report-only writer."""
     forbidden_exact = (
         "Ljava/io/FileOutputStream;", "Ljava/io/FileWriter;",
         "Ljava/io/OutputStreamWriter;", "Ljava/io/BufferedWriter;",
@@ -903,30 +1020,42 @@ def audit_app_dex_safety(app_dump: str, *, enforce_frozen_surface: bool = True) 
         r"Landroid/system/Os;\.(?:write|pwrite|writev|socket|connect|sendto|sendmsg|"
         r"bind|listen|accept):",
         r"Landroid/content/Context;\.openFileOutput:",
-        r"Landroid/content/ContentResolver;\.(?:openOutputStream|insert|update|delete):",
         r"Ljava/io/File;\.(?:delete|renameTo|mkdir|mkdirs|createNewFile):",
     )
     for pattern in forbidden_calls:
         require(re.search(pattern, app_dump) is None,
                 f"application DEX invokes forbidden write/send call: {pattern}")
 
-    external_targets = re.findall(
-        r"\|[0-9a-f]{4}:\s+invoke-[^\n]+?, "
-        r"(L[^ \n]+?;\.[^:\s]+:[^ \n]+)",
-        app_dump,
+    scoped_writes = re.compile(
+        r"(?:Landroid/content/ContentResolver;\.(?:openOutputStream|insert|update|delete)|"
+        r"Ljava/io/[^;]*(?:OutputStream|Writer);\.(?:write|append|flush|close)):"
     )
-    external_targets = [
-        target for target in external_targets
-        if not target.startswith("Lcom/finduas/ridobserver/")
-    ]
+    for owner, block in app_class_blocks(app_dump):
+        for _, operation in dex_instructions(block):
+            if not scoped_writes.search(operation):
+                continue
+            target = operation.split(", ", 1)[-1] if "}, " not in operation else operation.split("}, ", 1)[1]
+            require(profile == "v11" and owner == REPORT_WRITE_OWNER and target in REPORT_WRITE_CALLS,
+                    f"write call is outside the exact report-store exception: {owner}: {target}")
+    if profile == "v11":
+        descriptors, digest = report_dex_fingerprint(app_dump)
+        require(EXPECTED_REPORT_DESCRIPTORS is not None and EXPECTED_REPORT_DEX_SHA256 is not None,
+                "v0.11 report DEX has not completed manual safety review")
+        require(descriptors == EXPECTED_REPORT_DESCRIPTORS,
+                "report writer class family changed")
+        require(digest == EXPECTED_REPORT_DEX_SHA256,
+                "reviewed report writer DEX/literals/control flow changed")
     if enforce_frozen_surface:
-        canonical = "\n".join(sorted(external_targets)).encode("utf-8")
+        count, digest = external_invoke_fingerprint(app_dump)
+        selected = PROFILES[profile]
+        require(selected["external_count"] is not None and selected["external_sha256"] is not None,
+                f"{profile} external invoke surface has not completed manual safety review")
         require(
-            len(external_targets) == EXPECTED_EXTERNAL_INVOKE_COUNT,
+            count == selected["external_count"],
             "application external invoke count changed",
         )
         require(
-            hashlib.sha256(canonical).hexdigest() == EXPECTED_EXTERNAL_INVOKE_SHA256,
+            digest == selected["external_sha256"],
             "application external invoke surface changed",
         )
 
@@ -1111,18 +1240,21 @@ def audit_completion_gate_dex_dump(dex_dump: str) -> None:
     audit_completion_result_storage(caller, completion_call_pc)
 
 
-def audit_apk(apk: Path) -> tuple[int, str]:
+def audit_apk(apk: Path, profile: str = "v11") -> tuple[int, str]:
+    selected = PROFILES[profile]
     require(apk.is_file(), f"APK missing: {apk}")
     apk_size = apk.stat().st_size
     apk_sha = sha256(apk)
     if SEALED_PROFILE:
-        require(apk_size == EXPECTED_CURRENT_SIZE, "v0.10 artifact size changed")
-        require(apk_sha == EXPECTED_CURRENT_SHA256, "v0.10 artifact hash changed")
+        require(selected["sealed_size"] is not None and selected["sealed_sha256"] is not None,
+                f"{profile} does not have a sealed artifact profile")
+        require(apk_size == selected["sealed_size"], f"{profile} artifact size changed")
+        require(apk_sha == selected["sealed_sha256"], f"{profile} artifact hash changed")
 
     badging = run(tool("aapt"), "dump", "badging", apk)
     require("name='com.finduas.ridobserver'" in badging, "application ID mismatch")
-    require("versionCode='10'" in badging, "packaged versionCode mismatch")
-    require("versionName='0.10.0-research'" in badging, "packaged versionName mismatch")
+    require(f"versionCode='{selected['version_code']}'" in badging, "packaged versionCode mismatch")
+    require(f"versionName='{selected['version_name']}'" in badging, "packaged versionName mismatch")
     require("launchable-activity: name='com.finduas.ridobserver.MainActivity'" in badging,
             "launcher Activity mismatch")
     require("uses-permission:" not in badging, "packaged APK requests a permission")
@@ -1145,7 +1277,7 @@ def audit_apk(apk: Path) -> tuple[int, str]:
         b"Lcom/finduas/ridobserver/AndroidArtIdentityProbe;",
         b"Lcom/finduas/ridobserver/ElfBuildIdReader;",
         b"Lcom/finduas/ridobserver/ArtMapsParser;",
-        b"finduas-rid-probe/v0.10-schema-1",
+        selected["schema"].encode("utf-8"),
         b"/proc/self/maps",
         b"3ec3d232ad7f4099c42f014b87658be47e83d7e21a7a053fb16c4d146103745d",
         b"5f839ecc60b9ae39764305b5fee6ed37",
@@ -1155,7 +1287,9 @@ def audit_apk(apk: Path) -> tuple[int, str]:
         b"art.agent_unload_range.offset",
         b"art.runtime_attach_agent_range.offset",
     ):
-        require(required in dex, f"DEX misses required v0.10 marker: {required!r}")
+        require(required in dex, f"DEX misses required probe marker: {required!r}")
+    if profile == "v11":
+        require(b"0.11.0-report-export" in dex, "DEX misses v0.11 app version marker")
     for forbidden_schema in (b"art.attach_range.", b"art.loader_range."):
         require(forbidden_schema not in dex,
                 f"DEX retains a misnamed range field: {forbidden_schema!r}")
@@ -1177,7 +1311,7 @@ def audit_apk(apk: Path) -> tuple[int, str]:
     dex_dump = run(tool("dexdump"), "-d", apk)
     audit_completion_gate_dex_dump(dex_dump)
     app_dump = application_dex_dump(dex_dump)
-    audit_app_dex_safety(app_dump)
+    audit_app_dex_safety(app_dump, profile=profile)
     require(app_dump.count(".startActivity:(Landroid/content/Intent;)V") == 1,
             "application DEX does not have exactly one Activity launch site")
     require(app_dump.count("Landroid/content/Intent;.<init>:(Ljava/lang/String;)V") == 1,
@@ -1209,13 +1343,22 @@ def audit_apk(apk: Path) -> tuple[int, str]:
 
 
 def main() -> int:
-    apk = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else DEFAULT_APK
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=tuple(PROFILES), default="v11")
+    parser.add_argument("apk", type=Path, nargs="?")
+    args = parser.parse_args()
+    profile = args.profile
+    default_name = "FindUAS-RID-Bridge-Probe-" + PROFILES[profile]["version_name"] + ".apk"
+    apk = (args.apk or PROJECT / "dist" / default_name).resolve()
     try:
         if SEALED_PROFILE:
             audit_prior_artifacts()
             audit_known_profile_source()
-        audit_sources()
-        size, digest = audit_apk(apk)
+        # A historical artifact is checked against its own immutable final-DEX
+        # profile. The current v11 checkout is not claimed to be its source.
+        if profile == "v11":
+            audit_sources(profile=profile)
+        size, digest = audit_apk(apk, profile=profile)
     except AuditFailure as error:
         print(f"AUDIT_FAIL: {error}", file=sys.stderr)
         return 1
@@ -1223,7 +1366,15 @@ def main() -> int:
     print(f"artifact={apk}")
     print(f"bytes={size}")
     print(f"sha256={digest}")
-    print(f"audit_profile={'sealed' if SEALED_PROFILE else 'source-only'}")
+    mode = "sealed" if SEALED_PROFILE else ("source-only" if profile == "v11" else "artifact-only")
+    print(f"audit_profile={profile}:{mode}")
+    print(f"external_invoke_count={PROFILES[profile]['external_count']}")
+    print(f"external_invoke_sha256={PROFILES[profile]['external_sha256']}")
+    if profile == "v11":
+        print(f"report_source_sha256={EXPECTED_REPORT_SOURCE_SHA256}")
+        print(f"report_dex_sha256={EXPECTED_REPORT_DEX_SHA256}")
+    if profile == "v10":
+        print("source_review=historical_artifact_only_not_current_checkout")
     if SEALED_PROFILE:
         for prior_apk, _, prior_sha256 in SEALED_PRIOR_APKS:
             print(f"sealed_{prior_apk.stem}_sha256={prior_sha256}")

@@ -76,13 +76,21 @@ internal object ProbeRunAdmissionPolicy {
 internal object ProbeSessionCoordinator {
     private val lock = Any()
     private var state = ProbeSessionSnapshot()
+    private var reportExport = ProbeReportExportSnapshot()
 
     fun snapshot(): ProbeSessionSnapshot = synchronized(lock) { state }
+    fun displaySnapshot(): Pair<ProbeSessionSnapshot, ProbeReportExportSnapshot> =
+        synchronized(lock) { state to reportExport }
+    fun isBusy(): Boolean = synchronized(lock) {
+        state.runState == ProbeRunState.RUNNING || ProbeReportExportPolicy.isBusy(reportExport.state)
+    }
 
     fun start(applicationContext: Context): Boolean {
         val runId = UUID.randomUUID().toString()
         synchronized(lock) {
             if (!ProbeRunAdmissionPolicy.mayStart(state.runState)) return false
+            if (ProbeReportExportPolicy.isBusy(reportExport.state)) return false
+            reportExport = ProbeReportExportSnapshot(runId, ProbeReportExportState.AWAITING_PROBE)
             state = state.copy(
                 result = ProtocolBinderProbeResult(),
                 localBridge = LocalBridgeProbeResult(),
@@ -134,7 +142,53 @@ internal object ProbeSessionCoordinator {
                     )
                 )
             }
+            exportCompletedReport(applicationContext, runId)
         }, "protocol-binder-readonly-probe").start()
+        return true
+    }
+
+    private fun exportCompletedReport(applicationContext: Context, runId: String) {
+        val completed = synchronized(lock) {
+            if (state.runId != runId ||
+                !ProbeReportExportPolicy.maySave(runId, state.runState, reportExport)) return
+            reportExport = reportExport.copy(state = ProbeReportExportState.SAVING)
+            state
+        }
+        val saved = try {
+            ProbeReportStore.saveCompletedReport(
+                applicationContext,
+                ProbeReportFormatter.buildReport(completed),
+                requireNotNull(completed.runCompletedAtMs),
+                runId
+            )
+        } catch (_: Throwable) {
+            null
+        }
+        synchronized(lock) {
+            if (state.runId == runId && reportExport.runId == runId) {
+                reportExport = ProbeReportExportSnapshot(
+                    runId,
+                    if (saved?.status == ProbeReportSaveStatus.SAVED) {
+                        ProbeReportExportState.SAVED
+                    } else {
+                        ProbeReportExportState.FAILED
+                    },
+                    saved,
+                    preparationFailed = saved == null
+                )
+            }
+        }
+    }
+
+    fun retryReportExport(applicationContext: Context): Boolean {
+        val runId = synchronized(lock) {
+            if (!ProbeReportExportPolicy.mayRetry(state.runId, state.runState, reportExport)) {
+                return false
+            }
+            reportExport = reportExport.copy(state = ProbeReportExportState.AWAITING_PROBE)
+            requireNotNull(state.runId)
+        }
+        Thread({ exportCompletedReport(applicationContext, runId) }, "probe-report-export").start()
         return true
     }
 
@@ -162,6 +216,8 @@ class MainActivity : Activity() {
     private lateinit var stateText: TextView
     private lateinit var probeButton: Button
     private lateinit var copyButton: Button
+    private lateinit var exportStatusText: TextView
+    private lateinit var retryExportButton: Button
     private lateinit var developmentSettingsButton: Button
     private lateinit var deviceInfoSettingsButton: Button
     private var currentReport = ""
@@ -169,8 +225,7 @@ class MainActivity : Activity() {
     private val refreshRunnable = object : Runnable {
         override fun run() {
             if (!resumed) return
-            val snapshot = render()
-            if (snapshot.runState == ProbeRunState.RUNNING) {
+            ProbeReportExportPolicy.refreshFromDisplayedState(::render) {
                 handler.postDelayed(this, REFRESH_INTERVAL_MS)
             }
         }
@@ -223,6 +278,23 @@ class MainActivity : Activity() {
             textSize = 14f
             setPadding(0, 0, 0, padding)
         })
+        exportStatusText = TextView(this).apply {
+            textSize = 16f
+            setPadding(0, 0, 0, padding / 2)
+        }
+        content.addView(exportStatusText)
+        retryExportButton = Button(this).apply {
+            text = getString(R.string.retry_report_export)
+            setOnClickListener {
+                ProbeSessionCoordinator.retryReportExport(applicationContext)
+                render()
+                if (resumed) {
+                    handler.removeCallbacks(refreshRunnable)
+                    handler.postDelayed(refreshRunnable, REFRESH_INTERVAL_MS)
+                }
+            }
+        }
+        content.addView(retryExportButton)
         deviceInfoSettingsButton = Button(this).apply {
             text = getString(R.string.open_device_info_settings)
             setOnClickListener { openSystemSettings(Settings.ACTION_DEVICE_INFO_SETTINGS) }
@@ -269,26 +341,107 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun render(): ProbeSessionSnapshot {
-        val snapshot = ProbeSessionCoordinator.snapshot()
-        currentReport = buildReport(snapshot)
+    private fun render(): Boolean {
+        val (snapshot, export) = ProbeSessionCoordinator.displaySnapshot()
+        currentReport = ProbeReportFormatter.buildReport(snapshot)
         stateText.text = currentReport
-        val probeInFlight = snapshot.runState == ProbeRunState.RUNNING
+        exportStatusText.text = when (export.state) {
+            ProbeReportExportState.NOT_REQUESTED -> "检查结束后自动保存报告到 SD 卡；请保持本应用打开至保存完成。"
+            ProbeReportExportState.AWAITING_PROBE -> "等待检查完成后保存报告到 SD 卡。"
+            ProbeReportExportState.SAVING -> "正在保存报告到 SD 卡，请保持本应用打开。"
+            ProbeReportExportState.SAVED -> "报告已保存到 SD 卡：\n" +
+                export.result?.relativeDirectory + export.result?.displayName +
+                "\n电脑可通过 MTP 读取；本地保存成功不代表电脑已读回。"
+            ProbeReportExportState.FAILED -> "报告未保存：" +
+                (export.result?.status?.name ?: "REPORT_PREPARATION_FAILED") +
+                "\n清理状态：" + (export.result?.cleanupStatus?.name ?: "NOT_REQUIRED") +
+                "\n请检查 SD 卡后点击重试，无需重新执行检查。"
+        }
+        val probeInFlight = snapshot.runState == ProbeRunState.RUNNING ||
+            ProbeReportExportPolicy.isBusy(export.state)
         probeButton.isEnabled = !probeInFlight
+        retryExportButton.isEnabled =
+            ProbeReportExportPolicy.mayRetry(snapshot.runId, snapshot.runState, export)
         copyButton.isEnabled = !probeInFlight &&
             (snapshot.runState == ProbeRunState.COMPLETE ||
                 snapshot.runState == ProbeRunState.INCOMPLETE)
         developmentSettingsButton.isEnabled = !probeInFlight
         deviceInfoSettingsButton.isEnabled = !probeInFlight
-        return snapshot
+        // Schedule from what was displayed, not a second read of worker state. A worker
+        // finishing immediately after this snapshot still needs one final UI render.
+        return probeInFlight
     }
 
-    private fun buildReport(snapshot: ProbeSessionSnapshot): String = with(snapshot) {
+    private fun copyCompleteReport() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("FindUAS RID probe", currentReport))
+        Toast.makeText(this, getString(R.string.report_copied), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openSystemSettings(primaryAction: String) {
+        if (ProbeSessionCoordinator.isBusy()) return
+        var navigationState: SettingsNavigationState
+        var launchedAction: String? = null
+        when (launchSettingsAction(primaryAction)) {
+            SettingsLaunchResult.OPENED -> {
+                navigationState = SettingsNavigationState.PRIMARY_OPENED
+                launchedAction = primaryAction
+            }
+            SettingsLaunchResult.NOT_FOUND -> when (
+                launchSettingsAction(Settings.ACTION_SETTINGS)
+            ) {
+                SettingsLaunchResult.OPENED -> {
+                    navigationState = SettingsNavigationState.FALLBACK_OPENED
+                    launchedAction = Settings.ACTION_SETTINGS
+                }
+                SettingsLaunchResult.NOT_FOUND -> {
+                    navigationState = SettingsNavigationState.ACTIVITY_NOT_FOUND
+                }
+                SettingsLaunchResult.DENIED -> {
+                    navigationState = SettingsNavigationState.DENIED
+                }
+                SettingsLaunchResult.FAILED -> {
+                    navigationState = SettingsNavigationState.FAILED
+                }
+            }
+            SettingsLaunchResult.DENIED -> {
+                navigationState = SettingsNavigationState.DENIED
+            }
+            SettingsLaunchResult.FAILED -> {
+                navigationState = SettingsNavigationState.FAILED
+            }
+        }
+        ProbeSessionCoordinator.recordSettingsNavigation(
+            navigationState,
+            primaryAction,
+            launchedAction
+        )
+        render()
+    }
+
+    private fun launchSettingsAction(action: String): SettingsLaunchResult = try {
+        startActivity(Intent(action))
+        SettingsLaunchResult.OPENED
+    } catch (_: ActivityNotFoundException) {
+        SettingsLaunchResult.NOT_FOUND
+    } catch (_: SecurityException) {
+        SettingsLaunchResult.DENIED
+    } catch (_: Throwable) {
+        SettingsLaunchResult.FAILED
+    }
+
+}
+
+/** Pure report formatting shared by the screen and the background SD export. */
+internal object ProbeReportFormatter {
+    const val APP_VERSION = "0.11.0-report-export"
+    fun buildReport(snapshot: ProbeSessionSnapshot): String = with(snapshot) {
         buildString {
         appendMachineReport(snapshot)
         appendLine("machine_section_end=true")
         appendLine()
         appendLine("schema: finduas-rid-probe/v0.10-schema-1")
+        appendLine("app version: $APP_VERSION")
         appendLine("run state: $runState")
         appendLine("run id: ${runId ?: "无"}")
         appendLine("started: ${formatTime(runStartedAtMs)}")
@@ -414,7 +567,8 @@ class MainActivity : Activity() {
         appendLine()
         appendLine("路径权限均为 Observer 自身 UID/SELinux 视角。")
         appendLine("它们不证明 UID1000 可写，也不证明 DJI Fly linker 可加载或执行。")
-        appendLine("本版本只读取上述状态，不启动开发助手或协议页")
+        appendLine("本版本只读取上述设备状态，不启动开发助手或协议页；仅将本报告保存到 SD 卡。")
+        appendLine("report_file_end=true")
         }
     }
 
@@ -426,6 +580,7 @@ class MainActivity : Activity() {
                 appendLine(MachineReportValue.encode(value?.toString()))
             }
             field("schema", "finduas-rid-probe/v0.10-schema-1")
+            field("app_version", APP_VERSION)
             field("run_state", runState.name)
             field("run_id", runId)
             field("started_epoch_ms", runStartedAtMs)
@@ -510,64 +665,6 @@ class MainActivity : Activity() {
                 "size=0x${range.size.toString(16)}, state=${range.state}, " +
                 "SHA-256=${range.sha256 ?: "未知"}"
         )
-    }
-
-    private fun copyCompleteReport() {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("FindUAS RID probe", currentReport))
-        Toast.makeText(this, getString(R.string.report_copied), Toast.LENGTH_SHORT).show()
-    }
-
-    private fun openSystemSettings(primaryAction: String) {
-        if (ProbeSessionCoordinator.snapshot().runState == ProbeRunState.RUNNING) return
-        var navigationState: SettingsNavigationState
-        var launchedAction: String? = null
-        when (launchSettingsAction(primaryAction)) {
-            SettingsLaunchResult.OPENED -> {
-                navigationState = SettingsNavigationState.PRIMARY_OPENED
-                launchedAction = primaryAction
-            }
-            SettingsLaunchResult.NOT_FOUND -> when (
-                launchSettingsAction(Settings.ACTION_SETTINGS)
-            ) {
-                SettingsLaunchResult.OPENED -> {
-                    navigationState = SettingsNavigationState.FALLBACK_OPENED
-                    launchedAction = Settings.ACTION_SETTINGS
-                }
-                SettingsLaunchResult.NOT_FOUND -> {
-                    navigationState = SettingsNavigationState.ACTIVITY_NOT_FOUND
-                }
-                SettingsLaunchResult.DENIED -> {
-                    navigationState = SettingsNavigationState.DENIED
-                }
-                SettingsLaunchResult.FAILED -> {
-                    navigationState = SettingsNavigationState.FAILED
-                }
-            }
-            SettingsLaunchResult.DENIED -> {
-                navigationState = SettingsNavigationState.DENIED
-            }
-            SettingsLaunchResult.FAILED -> {
-                navigationState = SettingsNavigationState.FAILED
-            }
-        }
-        ProbeSessionCoordinator.recordSettingsNavigation(
-            navigationState,
-            primaryAction,
-            launchedAction
-        )
-        render()
-    }
-
-    private fun launchSettingsAction(action: String): SettingsLaunchResult = try {
-        startActivity(Intent(action))
-        SettingsLaunchResult.OPENED
-    } catch (_: ActivityNotFoundException) {
-        SettingsLaunchResult.NOT_FOUND
-    } catch (_: SecurityException) {
-        SettingsLaunchResult.DENIED
-    } catch (_: Throwable) {
-        SettingsLaunchResult.FAILED
     }
 
     private fun protocolBinderText(state: ProtocolBinderProbeState): String = when (state) {

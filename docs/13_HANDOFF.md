@@ -29,10 +29,10 @@ field's owner/readback/RF correspondence independently. Synthetic codecs remain 
 The current corrections are v0.10, rejected V2.2, and sealed-but-unadmitted V2.3. Do not copy an
 older “install v0.8” or “V2.3 in progress” instruction into a current procedure.
 
-Exact A-001 v0.10 is now staged as removable-SD `Download/FindUAS_A001_V010.apk`; the fresh
-unique listing and same-session full MTP readback matched the registered size/hash (C-231).
-Installation and run remain pending. The next artifact result is its redacted environment report,
-not an attach, shell launch or aircraft request.
+Exact A-038 v0.11 is now staged as removable-SD `Download/FindUAS_A038_V011.apk`, with complete
+MTP readback matching size/hash (C-233/C-234). It adds only the user-requested report sink; preserve
+all device-control boundaries. After the operator runs the check, read its final report directly
+from SD `Download/FindUAS/Probe/`. Installation/run and report receipt remain pending.
 
 ## Topic entry points
 

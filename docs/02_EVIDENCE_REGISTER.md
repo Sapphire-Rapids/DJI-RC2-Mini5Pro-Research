@@ -322,6 +322,8 @@ The two source-only deployment experiments are retained as explicit negatives:
 | C-230 | `NEGATIVE` | Live Mini 5 Pro `01.00.0600` has no `rid_ctrl_enable_0`: by-hash F7 (0x3CBD864F) returns 0x03 and the by-index enumeration has no `rid_ctrl_enable` name, positive-controlled by `max_height_0` | Direct-USB FLYC route only; does not rule out app-layer/other-surface/0802 |
 | C-231 | `OBSERVED` | Exact A-001 v0.10 audit and 21/21 mutations rechecked; one removable-SD APK staged, fresh unique listing and same-session full readback hash matched | Installation/run unconfirmed; no ADB, attach, DJI protocol, aircraft write, motors or RF experiment; raw MTP logs excluded |
 | C-232 | `STATIC` | A-037 identity safety lock: 170 JVM tests, lint 0 errors/15 warnings, two identical clean builds, v2/zipalign and zero permissions/native libraries checked | Offline only; not staged/installed/run; other experimental lanes remain; no new aircraft control/RF result |
+| C-233 | `STATIC` | A-038 adds only fixed removable-SD report export; 69 JVM tests, 8 auditor tests, 30 rejected mutations, matching clean builds and v2/signer/alignment checks | Offline; completion semantics unchanged; no aircraft/attach/network capability; local publication is not MTP receipt |
+| C-234 | `OBSERVED` | Exact A-038 APK staged in RC 2 removable-SD Download and fully read back with matching size/hash | APK transfer only; installation/run and report-file receipt pending; no aircraft write, motors or RF |
 
 ## Promotion rules
 
