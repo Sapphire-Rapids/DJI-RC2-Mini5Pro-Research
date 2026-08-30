@@ -857,3 +857,15 @@ work when a report did not contain a more precise timestamp.
   记录 PID 后改为直接读取目标标签与 `/proc` 挂载信息，未重启 Fly（C-258）。
 - `OBSERVED`：直接目标标签路径返回文件不存在，未显示挂载选项行；转为准备同次采集
   AMS 前后 PID 与 proc 信息的 F3 报告（C-259）。
+
+### F3 同次进程报告
+
+- `STATIC`：F3 加入严格 AMS 主进程解析、前后 AMS 查询、独立的 PID/starttime 稳定性
+  字段、完整 proc 挂载行和调用方状态。修复额外冒号前缀及失败输出保存边界；14 个独立
+  parser/capture 向量和 18 个完整 host 场景通过（C-260）。
+- `OBSERVED`：F3 暂存及完整回读与 10,611-byte 审阅源码匹配；F2 移入 Archive，移动前后
+  完整读回一致，无删除。已提供精确路径启动命令，等待报告（C-261）。
+- `OBSERVED`：F3 的 3,677-byte 原始报告已完整收到。两个原始 AMS 记录的主 PID 一致；
+  proc 挂载包含 gid=3009/hidepid=2。AMS 解析处的 heredoc 在 mksh 上尝试写内部临时文件，
+  被拒绝两次，导致目标分支未进入及严格格式校验失败（C-262）。原始报告保留不改。
+- 操作者请求省去逐条手工输入；开始实现有限会话的 SD 检查任务接收器与主机客户端。

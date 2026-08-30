@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.26 - 2026-08-31
+
+- Added F3's paired AMS/proc diagnostics with strict main-process parsing, before/after AMS
+  checks, separate stability fields and complete proc-mount output. Fourteen parser/capture
+  vectors and eighteen host shell fixtures passed (C-260).
+- Staged A-045 with full matching readback and archived F2 with verified before/after reads;
+  operator execution and report receipt are next (C-261). Changes remain local.
+- F3's raw report records live proc gid=3009/hidepid=2 and matching raw AMS PIDs, but Android
+  mksh rejected its heredoc temporary files, leaving two unframed errors (C-262). Fixing that
+  compatibility issue now accompanies the requested SD task automation.
+
 ## 0.4.25 - 2026-08-31
 
 - Read `/storage` mode 0710 and one mounted public volume through the system API, establishing

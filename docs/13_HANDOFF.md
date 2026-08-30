@@ -1,16 +1,16 @@
 # Handoff for researchers and coding agents
 
-Current update (C-259): the direct target context path returned No such file or directory. Prepare F3 to collect AMS PID before/after and proc metadata in one report; no further manual command is currently requested.
+Current update (C-262): F3 was received; Android mksh heredoc temporary-file creation failed. Work now fixes the helper and builds the operator-requested finite SD task session. No repeat F3 command is requested.
 
 
 ## Start here
 
-C-257 closes F2/A-044 execution, SD report saving and complete host receipt. The report is
-INCOMPLETE only for `pidof dji.go.v5` returning rc=1 with empty output; the other checks,
-including the A-040 source hash, passed. C-258 now supplies an AMS HOME main-process entry
-for DJI Fly, with its nonzero PID/UID kept privately. The current step reads target domain and
-live proc mount options; hidepid is not yet observed. Do not reopen Fly or rerun F2/installers.
-No internal canary copy or attach has occurred.
+Current F3/A-045 has passed 18 full shell fixtures and 14 independent parser/capture vectors
+and is SD-staged as `Download/F3.sh` with complete matching readback (C-260/C-261). It puts
+AMS before/after and proc reads into one report following C-257--C-259's differing observations.
+F2 is archived with matching readbacks and no deletion. The next step is the privately issued
+exact-path F3 launch; await `F3_SAVED` or error. It has not run, and no internal canary copy or
+attach has occurred. Do not repeat F2 or the manual proc commands.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -63,8 +63,11 @@ one new `Download/F2.sh`, 6,845-byte matching full readback, and F1 moved to
 F2 execution and a fully received 2,553-byte report passing schema/end/parser validation. It is
 INCOMPLETE only because `pidof dji.go.v5` returned rc=1 and empty output. System/system_app,
 SELinux Permissive, ro.debuggable=1, wifi_on=0 and A-040 source size/hash passed. C-258 then
-records Fly's HOME main-process entry in AMS. Use its privately recorded PID for target-domain
-and live proc mount-option reads; hidepid remains unobserved. The current step is in
+records Fly's HOME main-process entry in AMS. C-259's separate proc read then returned a path
+error without a mount-options line. F3/A-045 now combines these observations in one window:
+C-260 records the 18/14 passing test sets, and C-261 records 10,611-byte matching staging/readback
+and F2 moved to Archive with matching readbacks and no deletion. F3 execution/report receipt
+remain pending; the current private exact-path step is in
 [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步).
 Unlock registration and the deferred certificate-page screenshot are not prerequisites for
 the independent RID-state route.
@@ -110,8 +113,8 @@ stop or new ADB response has occurred through A-032; C-246 records the separate 
 Section 11 of the ADB topic preserves its proposed baseline-dependent sequence. It is not the
 current operator instruction. Directory contents and storage metadata are complete
 (C-249/C-254), F2 report receipt is closed (C-257), and AMS process identity is recorded
-(C-258). Pending target-domain/mount reads do not require reopening Fly, rerunning F2 or
-installing a package. Follow
+(C-258). The staged F3 report replaces further manual proc reads; no reopening Fly, rerunning
+F2 or package installation is needed. Follow
 [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步) before selecting a later device action.
 
 Do not return to first-packet public key, WebADB, banner/MAXDATA/checksum variants, USB-debugging
@@ -569,8 +572,8 @@ recorded in C-245--C-247. C-248 narrows the candidate to a regular `.so` directl
 `/data/app`, with no new subdirectory; C-249 found no matching candidate basename. F1/A-043
 staging/readback is closed by C-251. C-252 did not enter the script; C-254 now supplies the
 private storage entry and parent permissions. F2 execution/report receipt are closed by C-257;
-C-258 supplies an AMS main-process entry despite the earlier empty pidof result. Target
-domain and live proc mount options remain pending, without a confirmed hidepid value. Admit a legitimate
+C-258/C-259 leave process/view continuity unresolved. F3 staging/readback is now closed by
+C-261; its same-window report remains pending, without a confirmed hidepid value. Admit a legitimate
 delimiter-free path or mediated descriptor before the first
 query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.

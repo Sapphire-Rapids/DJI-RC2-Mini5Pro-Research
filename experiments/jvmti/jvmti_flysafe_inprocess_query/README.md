@@ -97,41 +97,59 @@ indexed in [the artifact register](../../../docs/11_ARTIFACT_REGISTER.md).
 
 ## Fixed Fuli baseline report script
 
-`scripts/rc2_fuli_baseline.sh` is the current F2 revision (A-044), staged and run with a received
-report (C-257). Its SD name is `Download/F2.sh`. It accepts no arguments, validates the hexadecimal volume name
-in its exact `$0` path and requires the existing report directory on that same SD. It exclusively
-creates `Download/FindUAS/Probe/FindUAS_F2_<UTC-date>_<pid>.txt`; no internal library copy or attach
-is performed.
+`scripts/rc2_fuli_baseline.sh` is the F3 source revision under local review. It has not been staged
+or run on RC 2. Its required SD name is `Download/F3.sh`; it accepts no arguments, validates the
+hexadecimal volume name in its exact `$0` path and requires the existing report directory on that
+same SD. It exclusively creates `Download/FindUAS/Probe/FindUAS_F3_<UTC-date>_<pid>.txt` using
+noclobber. There is no global storage enumeration, internal library copy, attach, permission/mount
+change, Fly launch request or DJI protocol action.
 
-A-043/F1 remains historical with its original identity and source at commit `463c0d5`. Its device
-launch retained the unexpanded SD wildcard (C-252). The later `/storage` directory observation
-shows why enumeration cannot be assumed. F2 removes only the global `/storage` glob/uniqueness
-check and updates its filename, schema and output markers; all other read/write bounds remain.
+The `finduas-rc2-fuli-baseline/v3` report keeps F2's identity, SELinux/Wi-Fi/debuggable reads,
+`/data/app` listing, candidate-file check and staged A-040 size/hash checks. It adds two fixed
+`dumpsys activity -p dji.go.v5 lru` reads, each limited to three seconds, around the process reads:
 
-The recorded launch used the privately observed volume ID. In this three-token Fuli
-`Runtime.exec(String)` example, replace `XXXX-XXXX` before use; the completed run is not currently
-being repeated:
+- An AMS result supplies a PID only with command rc=0, at most 4,096 raw output bytes, no
+  truncation, and the exact `ACTIVITY MANAGER LRU PROCESSES (dumpsys activity lru)` header.
+- Only records whose first token is `#` plus ASCII digits plus `:` are parsed. A complete target
+  token must be a positive ASCII PID without leading zero, followed by `:dji.go.v5/` and a
+  nonempty UID token. Prefix/suffix process names and `:aux` processes do not match.
+- Exactly one matching record is required. Duplicate lines are rejected even if their PIDs agree;
+  multiple matching tokens in one line are rejected too. The PID is revalidated immediately
+  before constructing `/proc/<PID>` paths.
+- The original pidof reads remain diagnostic. Their failure marks the report INCOMPLETE but
+  cannot suppress AMS or any target `/proc` reads admitted by the first AMS result. Each target
+  stat/context/cmdline/exe/status read records its own stderr and rc and continues after failure.
+  The second AMS read also runs when the first AMS result is unusable or all target reads fail.
+- `ams_pid_stable` compares the two independently admitted AMS PIDs. `proc_starttime_stable`
+  separately compares field 22 from the two target stat reads. Each is `true`, `false` or
+  `unknown`; unavailable stat data is not evidence that the process stopped.
 
-```text
-sh -c (sh${IFS}/storage/XXXX-XXXX/Download/F2.sh)2>&1
-```
+The same window records every `/proc` mount line from `/proc/self/mountinfo`, rather than filtering
+only for hidepid. It also records Pid/PPid/NSpid/Uid/Gid/Groups from `/proc/$$/status`, where `$$`
+is the collecting shell identity. The script does not hardcode a live PID or volume identifier.
 
-The fixed `finduas-rc2-fuli-baseline/v2` report records identity, SELinux/Wi-Fi/debuggable reads,
-the existing Fly PID/domain/executable and selected process fields, PID/starttime stability,
-`/data/app` entries and the staged A-040 size/hash. Each command retains stderr and its exit code;
-Binder reads and hashing require the available `timeout` tool with a three-second limit. Output
-is capped per command. Missing/nonunique Fly PID, read failures or source mismatch produce
-`INCOMPLETE`; `COMPLETE` means the baseline reads completed. The script reports zero protocol
-requests, attaches and internal copies. File preparation and loading remain separate steps.
+Every executed command retains its rc; AMS parser outcomes have separate before/after rc fields.
+Command output is bounded before normalization, including trailing newline bytes. Nonzero rc,
+truncation, unusable AMS data, unknown/false stability or source mismatch produces INCOMPLETE;
+none of those outcomes aborts the remaining admitted reads. `COMPLETE` describes these baseline reads only.
+The report still records zero protocol requests, attaches and internal copies.
 
-`F2_SAVED` prints the report path; retrieve it through fresh MTP enumeration/full readback and
-require `report_end=true`. Startup/storage failure prints `F2_ERROR` instead. Reports and actual
-volume identifiers remain private. No media-scan broadcast is sent. Current operator instructions
-are maintained in the [live-runtime steps](../../../docs/23_RC2_LIVE_RUNTIME.md#下一步).
+`F3_SAVED` prints the report path for either report status; startup/write failure prints `F3_ERROR`,
+with `F3_END` as the final console marker. A received report must retain its schema and
+`report_end=true`. Reports, actual volume identities and process identifiers stay private; no
+media-scan broadcast is sent. Deployment and the next operator command remain in
+[the live-runtime steps](../../../docs/23_RC2_LIVE_RUNTIME.md#下一步).
 
-C-257's 2,553-byte report passed complete MTP receipt and envelope validation. Its sole failed
-command was `pidof dji.go.v5` (rc 1, empty); the other eleven commands passed, including A-040's
-source size/hash. The current discriminator is the system service's package-filtered process record.
+F2/A-044 and its source remain recoverable at commit `238b902`; its SD script is `Download/F2.sh`.
+C-257's 2,553-byte F2 report passed full MTP/envelope validation. Its sole failed command was
+`pidof dji.go.v5` (rc 1, empty); the other eleven commands passed, including A-040 source size/hash.
+AMS later reported a HOME main-process entry (C-258), while a separate read of that earlier
+process's context returned a path error without a mount-options line (C-259). F3 puts the AMS and
+proc observations into one window; it does not infer why those earlier observations differ.
+
+F1/A-043 remains historical, with its original source at commit `463c0d5`. Its launcher retained
+the unexpanded SD wildcard (C-252). F2 removed global `/storage` enumeration and changed its
+filename/schema/markers; its earlier launch is not an instruction to repeat F1 or F2 now.
 
 ## Exact observed emulator result
 
