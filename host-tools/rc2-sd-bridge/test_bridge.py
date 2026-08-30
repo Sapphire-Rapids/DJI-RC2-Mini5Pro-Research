@@ -55,6 +55,22 @@ class ClientTest(unittest.TestCase):
         self.remote.files[f"{bridge.BASE}/{sid}/session.ready"] = f"B1 READY_SESSION {sid} 123 456 END\n".encode()
         return sid
 
+    def canary_ready(self):
+        sid = self.ready()
+        self.remote.files[f"{bridge.BASE}/{sid}/session.receiver"] = f"B1 RECEIVER {sid} B2 END\n".encode()
+        return sid
+
+    def canary_body(self, sid, operation):
+        return (f"schema=finduas-rc2-canary-loader/v1\nsid={sid}\noperation={operation}\n"
+                "report_begin=true\npreflight_ready=true\nattach_dispatch_count=0\n"
+                "test_file_created=false\ntest_file_removed=false\nnative_result_observed=false\n"
+                "report_end=true\n").encode()
+
+    def collected_baseline(self, sid, seq="0001", rc=0):
+        self.assertEqual(f"TASK_SUBMITTED seq={seq}", self.client.submit("CANARY_BASELINE"))
+        self.result(sid, seq, rc, self.canary_body(sid, "CANARY_BASELINE"))
+        self.assertEqual(f"TASK_COLLECTED seq={seq} handler_rc={rc}", self.client.collect(seq))
+
     def result(self, sid, seq="0001", rc=0, body=b"TEST diagnostic\n", op=None):
         job = self.client.task_path(sid, seq, ".job").read_bytes()
         task = bridge.record(job, "JOB")
@@ -130,6 +146,173 @@ class ClientTest(unittest.TestCase):
         self.assertEqual("TASK_COLLECTED seq=0001 handler_rc=0", self.client.collect("0001"))
         self.assertEqual("TASK_ALREADY_COLLECTED seq=0001", self.client.collect("0001"))
         self.assertEqual("TASK_SUBMITTED seq=0002", self.client.submit("SNAPSHOT"))
+
+    def test_canary_operations_require_exact_b2_receiver_before_job_creation(self):
+        sid = self.ready()
+        receiver_path = f"{bridge.BASE}/{sid}/session.receiver"
+        for marker in (None, f"B1 RECEIVER {sid} B1 END\n".encode(),
+                       b"B1 RECEIVER 0123456789abcdef B2 END\n",
+                       f"B1 RECEIVER {sid} B2 END\r\n".encode()):
+            if marker is not None:
+                self.remote.files[receiver_path] = marker
+            for operation in bridge.CANARY_OPS:
+                with self.subTest(marker=marker, operation=operation):
+                    before = len([call for call in self.remote.calls if call[0] == "put"])
+                    with self.assertRaises(bridge.BridgeError):
+                        self.client.submit(operation)
+                    self.assertFalse(self.client.task_path(sid, "0001", ".job").exists())
+                    self.assertEqual(before, len([call for call in self.remote.calls if call[0] == "put"]))
+
+    def test_load_requires_latest_baseline_successfully_collected(self):
+        sid = self.canary_ready()
+        with self.assertRaisesRegex(bridge.BridgeError, "SUCCESSFUL_CANARY_BASELINE_REQUIRED"):
+            self.client.submit("CANARY_LOAD")
+        self.client.submit("CANARY_BASELINE")
+        self.result(sid, body=self.canary_body(sid, "CANARY_BASELINE"))
+        with self.assertRaisesRegex(bridge.BridgeError, "SUCCESSFUL_CANARY_BASELINE_REQUIRED"):
+            self.client.submit("CANARY_LOAD")
+        self.client.collect("0001")
+        self.collected_baseline(sid, "0002", rc=10)
+        with self.assertRaisesRegex(bridge.BridgeError, "SUCCESSFUL_CANARY_BASELINE_REQUIRED"):
+            self.client.submit("CANARY_LOAD")
+        self.assertFalse(self.client.task_path(sid, "0003", ".job").exists())
+
+    def test_load_uncertain_puts_retry_same_sequence_and_never_second_load(self):
+        sid = self.canary_ready()
+        self.collected_baseline(sid)
+        remote_prefix = f"{bridge.BASE}/{sid}/inbox/0002"
+        saved = None
+        for suffix in (".job", ".ready"):
+            self.remote.fail_put = remote_prefix + suffix
+            with self.assertRaisesRegex(bridge.BridgeError, "TIMEOUT"):
+                self.client.submit("CANARY_LOAD")
+            current = self.client.task_path(sid, "0002", ".job").read_bytes()
+            if saved is not None:
+                self.assertEqual(saved, current)
+            saved = current
+            self.assertEqual(2, len(self.client.history(sid)))
+            with self.assertRaisesRegex(bridge.BridgeError, "PENDING_DIFFERENT_OPERATION"):
+                self.client.submit("CANARY_CLEANUP")
+        recovered = bridge.Client(bridge.State(self.state.root), self.remote)
+        self.assertEqual("TASK_SUBMITTED seq=0002", recovered.submit("CANARY_LOAD"))
+        self.result(sid, "0002", rc=10, body=self.canary_body(sid, "CANARY_LOAD"))
+        self.assertEqual("TASK_COLLECTED seq=0002 handler_rc=10", recovered.collect("0002"))
+        with self.assertRaisesRegex(bridge.BridgeError, "CANARY_LOAD_ALREADY_CREATED"):
+            recovered.submit("CANARY_LOAD")
+        self.assertEqual("TASK_SUBMITTED seq=0003", recovered.submit("CANARY_CLEANUP"))
+        self.result(sid, "0003", body=self.canary_body(sid, "CANARY_CLEANUP"))
+        recovered.collect("0003")
+        with self.assertRaisesRegex(bridge.BridgeError, "CANARY_LOAD_ALREADY_CREATED"):
+            recovered.submit("CANARY_LOAD")
+        self.assertEqual(["CANARY_BASELINE", "CANARY_LOAD", "CANARY_CLEANUP"],
+                         [task["op"] for task in recovered.history(sid)])
+        self.assertFalse(self.client.task_path(sid, "0004", ".job").exists())
+
+    def test_cleanup_can_be_requested_without_implicitly_loading(self):
+        sid = self.canary_ready()
+        self.assertEqual("TASK_SUBMITTED seq=0001", self.client.submit("CANARY_CLEANUP"))
+        self.result(sid, rc=10, body=self.canary_body(sid, "CANARY_CLEANUP"))
+        self.assertEqual("TASK_COLLECTED seq=0001 handler_rc=10", self.client.collect("0001"))
+        self.assertEqual(["CANARY_CLEANUP"], [task["op"] for task in self.client.history(sid)])
+        with self.assertRaisesRegex(bridge.BridgeError, "SUCCESSFUL_CANARY_BASELINE_REQUIRED"):
+            self.client.submit("CANARY_LOAD")
+
+    def test_canary_envelope_binds_sid_operation_and_complete_boundaries(self):
+        sid = self.canary_ready()
+        self.client.submit("CANARY_BASELINE")
+        body = self.canary_body(sid, "CANARY_BASELINE")
+        bad_bodies = (body.replace(b"loader/v1", b"loader/v2"),
+                      body.replace(sid.encode(), b"0123456789abcdef"),
+                      body.replace(b"operation=CANARY_BASELINE", b"operation=CANARY_LOAD"),
+                      body.replace(b"report_begin=true\n", b""),
+                      body[:-1], body + b"TEST trailing bytes\n")
+        for changed in bad_bodies:
+            with self.subTest(body=changed):
+                prefix = self.result(sid, rc=10, body=changed)
+                summary = bridge.validate_result(self.client.task_path(sid, "0001", ".job").read_bytes(),
+                    *[self.remote.files[prefix + suffix] for suffix in (".accepted", ".done", ".report")])
+                self.assertEqual("incomplete_envelope", summary["canary_validation"])
+                self.assertFalse(summary["canary_preflight_ready"])
+                self.assertFalse(self.client.task_path(sid, "0001", ".collected.json").exists())
+        self.result(sid, rc=10, body=body)
+        self.assertEqual("TASK_COLLECTED seq=0001 handler_rc=10", self.client.collect("0001"))
+        summary = json.loads(self.client.task_path(sid, "0001", ".collected.json").read_bytes())
+        self.assertEqual("envelope_received_only", summary["canary_validation"])
+        self.assertIsNone(summary["snapshot"])
+        self.assertFalse(any(call[0] == "get" and call[1].startswith("Download/FindUAS/Probe/")
+                             for call in self.remote.calls))
+
+    def test_timed_out_load_keeps_partial_report_and_allows_explicit_cleanup(self):
+        sid = self.canary_ready()
+        self.collected_baseline(sid)
+        self.client.submit("CANARY_LOAD")
+        body = self.canary_body(sid, "CANARY_LOAD").removesuffix(b"report_end=true\n")
+        body += b"BEGIN copy_file\ncommand.copy_file.rc=0\nEND copy_file\nattach_dispatch_count=1\n"
+        prefix = self.result(sid, "0002", rc=124, body=body)
+        self.assertEqual("TASK_COLLECTED seq=0002 handler_rc=124", self.client.collect("0002"))
+        self.assertEqual(self.remote.files[prefix + ".report"], self.client.task_path(sid, "0002", ".report").read_bytes())
+        summary = json.loads(self.client.task_path(sid, "0002", ".collected.json").read_bytes())
+        self.assertEqual("incomplete_envelope", summary["canary_validation"])
+        with self.assertRaisesRegex(bridge.BridgeError, "CANARY_LOAD_ALREADY_CREATED"):
+            self.client.submit("CANARY_LOAD")
+        self.assertEqual("TASK_SUBMITTED seq=0003", self.client.submit("CANARY_CLEANUP"))
+
+    def test_zero_rc_invalid_baseline_is_terminal_but_never_admits_load(self):
+        sid = self.canary_ready()
+        self.client.submit("CANARY_BASELINE")
+        self.result(sid, body=b"TEST unexpected helper output\n")
+        self.assertEqual("TASK_COLLECTED seq=0001 handler_rc=0", self.client.collect("0001"))
+        summary = json.loads(self.client.task_path(sid, "0001", ".collected.json").read_bytes())
+        self.assertEqual("invalid_envelope", summary["canary_validation"])
+        with self.assertRaisesRegex(bridge.BridgeError, "SUCCESSFUL_CANARY_BASELINE_REQUIRED"):
+            self.client.submit("CANARY_LOAD")
+        self.assertEqual("TASK_SUBMITTED seq=0002", self.client.submit("CANARY_CLEANUP"))
+
+    def test_baseline_gate_uses_unique_outer_preflight_not_command_output(self):
+        section = b"BEGIN test_read\npreflight_ready=true\ncommand.test_read.rc=0\nEND test_read\n"
+        for content in (section, section + b"preflight_ready=false\n",
+                        b"preflight_ready=true\npreflight_ready=true\n",
+                        b"preflight_ready=true\r\n", b"BEGIN test_read\npreflight_ready=true\n",
+                        b"preflight_ready=true\nBEGIN test_read\nEND test_read\n"):
+            with self.subTest(content=content):
+                self.assertFalse(bridge.canary_preflight_ready(content))
+        self.assertTrue(bridge.canary_preflight_ready(section + b"preflight_ready=true\n"))
+        self.assertTrue(bridge.canary_preflight_ready(
+            b"BEGIN update_sys.upgrade.app_self.path\n\ncommand.update_sys.upgrade.app_self.path.rc=0\n"
+            b"END update_sys.upgrade.app_self.path\npreflight_ready=true\n"))
+        sid = self.canary_ready()
+        self.client.submit("CANARY_BASELINE")
+        body = self.canary_body(sid, "CANARY_BASELINE").replace(b"preflight_ready=true\n", section)
+        self.result(sid, body=body)
+        self.client.collect("0001")
+        with self.assertRaisesRegex(bridge.BridgeError, "SUCCESSFUL_CANARY_BASELINE_REQUIRED"):
+            self.client.submit("CANARY_LOAD")
+        self.collected_baseline(sid, "0002")
+        self.assertEqual("TASK_SUBMITTED seq=0003", self.client.submit("CANARY_LOAD"))
+
+    def test_rejected_load_still_consumes_the_one_load_allocation(self):
+        sid = self.canary_ready()
+        self.collected_baseline(sid)
+        self.client.submit("CANARY_LOAD")
+        self.result(sid, "0002", rc=65, op="REJECTED", body=b"job_error=TEST_REJECTED\n")
+        self.client.collect("0002")
+        with self.assertRaisesRegex(bridge.BridgeError, "CANARY_LOAD_ALREADY_CREATED"):
+            self.client.submit("CANARY_LOAD")
+
+    def test_stage_canary_and_original_stage_use_only_fixed_destinations(self):
+        inputs = []
+        for index in range(5):
+            source = Path(self.temp.name) / f"TEST-input-{index}"
+            source.write_bytes(f"TEST independent fixture {index}\n".encode())
+            inputs.append(source)
+        self.assertEqual("SCRIPTS_STAGED_VERIFIED", self.client.stage_canary(*inputs[:3]))
+        self.assertEqual("SCRIPTS_STAGED_VERIFIED", self.client.stage(*inputs[3:]))
+        puts = [call for call in self.remote.calls if call[0] == "put"]
+        self.assertEqual(["Download/B2.sh", "Download/L1.sh", "Download/FindUAS_ARTTI_V2.so",
+                          "Download/B1.sh", "Download/F4.sh"], [call[1] for call in puts])
+        self.assertEqual([source.read_bytes() for source in inputs], [call[2] for call in puts])
+        self.assertIsNone(self.state.current())
+        self.assertEqual(5, len(self.remote.calls))
 
     def test_receiver_rejected_job_is_terminal_failure_not_replayed(self):
         sid = self.ready()

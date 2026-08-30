@@ -2,12 +2,13 @@
 
 ## Start here
 
-F3/A-045 ran and its raw report was received (C-262). It records matching main-process PIDs
-in the two raw AMS blocks and live proc options gid=3009,hidepid=2. The caller lacks group 3009.
-Android mksh could not create the heredoc temporary file, so strict report parsing fails.
-F4 replaces that heredoc with a pipe. B1 was operator-started once;
-PING/SNAPSHOT/PING and strict F4 receipt are now verified (C-266/C-267). Preserve the active
-host session state; no new manual command is requested. Do not repeat F3 or the manual proc commands. No internal canary copy or attach occurred.
+C-273--C-275 close the real RC 2 A-048 loader experiment. The fixed system-mediated attach
+succeeded in the existing Fly process, with matching native identity, successful ART TI/API
+disposal, unchanged AMS PID/UID and unchanged APK. The verified ordinary file was removed,
+independent cleanup found it absent, and B2 STOP/CLOSED STOP completed. A-040 remains unchanged
+and unexecuted. Preserve the global A-048 attempt record and do not repeat the successful canary.
+Next inspect the exact native_get_sync/cache path identified in C-276 before reading RID state;
+Lazy getters, factories, mutable interceptors and default DTOs are not a current-state sample.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -569,11 +570,11 @@ recorded in C-245--C-247. C-248 narrows the candidate to a regular `.so` directl
 `/data/app`, with no new subdirectory; C-249 found no matching candidate basename. F1/A-043
 staging/readback is closed by C-251. C-252 did not enter the script; C-254 now supplies the
 private storage entry and parent permissions. F2 execution/report receipt are closed by C-257;
-C-262 establishes live hidepid=2 and the F3 heredoc defect. The B1 round trip and corrected F4
-report are now received: AMS PID is stable and target-proc reads remain unavailable (C-266/C-267).
-Admit a legitimate
-delimiter-free path or mediated descriptor before the first
-query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
+C-262 establishes live hidepid=2 and the F3 heredoc defect. The corrected F4 report supplied
+a stable AMS baseline (C-267), and A-048 subsequently loaded through the verified ordinary-file
+path, returned native identity/API success, and had its file removed (C-273--C-275). Advance
+the exact RID owner/cache work in C-276; further query execution keeps its own callback and
+process-identity checks. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.
 
 In parallel, map Basic/UAS ID, aircraft position, operator position and Operator ID independently

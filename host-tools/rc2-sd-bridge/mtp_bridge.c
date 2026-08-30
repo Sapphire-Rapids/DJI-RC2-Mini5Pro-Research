@@ -70,7 +70,9 @@ static int sequence_file(const char *name, const char *extension) {
 static unsigned allowed_path(const struct path *p) {
     if (!p->count || strcmp(p->part[0], "Download")) return 0;
     if (p->count == 1) return CAN_MKDIR;
-    if (p->count == 2 && (!strcmp(p->part[1], "B1.sh") || !strcmp(p->part[1], "F4.sh")))
+    if (p->count == 2 && (!strcmp(p->part[1], "B1.sh") || !strcmp(p->part[1], "F4.sh") ||
+                         !strcmp(p->part[1], "B2.sh") || !strcmp(p->part[1], "L1.sh") ||
+                         !strcmp(p->part[1], "FindUAS_ARTTI_V2.so")))
         return CAN_GET | CAN_PUT;
     if (strcmp(p->part[1], "FindUAS")) return 0;
     if (p->count == 2) return CAN_MKDIR;
@@ -78,6 +80,7 @@ static unsigned allowed_path(const struct path *p) {
         if (p->count == 3) return CAN_MKDIR;
         if (p->count != 4) return 0;
         const char *name = p->part[3], *prefix = "FindUAS_F4_";
+        if (!strcmp(name, "A048_copy.receipt") || !strcmp(name, "A048_attach.attempted")) return CAN_GET;
         size_t n = strlen(name), prefix_length = strlen(prefix);
         return n > prefix_length + 4 && !strncmp(name, prefix, prefix_length) &&
             !strcmp(name + n - 4, ".txt") ? CAN_GET : 0;
@@ -89,7 +92,7 @@ static unsigned allowed_path(const struct path *p) {
     if (p->count == 4) return CAN_MKDIR;
     if (p->count == 5) {
         if (!strcmp(p->part[4], "inbox") || !strcmp(p->part[4], "outbox")) return CAN_MKDIR;
-        const char *files[] = { "active.session", "worker.lock", "worker.log", "session.ready", "session.closed" };
+        const char *files[] = { "active.session", "worker.lock", "worker.log", "session.ready", "session.closed", "session.receiver" };
         for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); ++i)
             if (!strcmp(p->part[4], files[i])) return CAN_GET;
         return 0;
@@ -393,6 +396,9 @@ static int self_test(void) {
     const struct { const char *name; unsigned allowed; } paths[] = {
         {"Download", CAN_MKDIR}, {"Download/B1.sh", CAN_GET | CAN_PUT},
         {"Download/F4.sh", CAN_GET | CAN_PUT}, {"Download/F1.sh", 0},
+        {"Download/B2.sh", CAN_GET | CAN_PUT}, {"Download/L1.sh", CAN_GET | CAN_PUT},
+        {"Download/FindUAS_ARTTI_V2.so", CAN_GET | CAN_PUT},
+        {"Download/FindUAS_ARTTI_V1.so", 0},
         {"Download/FindUAS/Bridge/active.session", CAN_GET | CAN_PUT},
         {"Download/FindUAS/Bridge/0123456789abcdef/inbox", CAN_MKDIR},
         {"Download/FindUAS/Bridge/0123456789abcdef/inbox/0001.job", CAN_GET | CAN_PUT},
@@ -400,11 +406,15 @@ static int self_test(void) {
         {"Download/FindUAS/Bridge/0123456789abcdef/outbox/0001.report", CAN_GET},
         {"Download/FindUAS/Bridge/0123456789abcdef/active.session", CAN_GET},
         {"Download/FindUAS/Bridge/0123456789abcdef/session.closed", CAN_GET},
+        {"Download/FindUAS/Bridge/0123456789abcdef/session.receiver", CAN_GET},
         {"Download/FindUAS/Bridge/0123456789abcdef/inbox/1.job", 0},
         {"Download/FindUAS/Bridge/0123456789abcdef/outbox/0001.sh", 0},
         {"Download/FindUAS/Bridge/0123456789abcdeg/inbox", 0},
         {"Download/FindUAS/Probe/FindUAS_F4_TEST.txt", CAN_GET},
         {"Download/FindUAS/Probe/FindUAS_F3_TEST.txt", 0},
+        {"Download/FindUAS/Probe/A048_copy.receipt", CAN_GET},
+        {"Download/FindUAS/Probe/A048_attach.attempted", CAN_GET},
+        {"Download/FindUAS/Probe/A048_copy.receipt.extra", 0},
         {"Download/FindUAS/Samples/TEST.zip", 0}, {"Download/user.txt", 0},
         {"/Download/B1.sh", 0}, {"Download//B1.sh", 0}, {"Download/./B1.sh", 0},
         {"Download/../B1.sh", 0}, {"Download\\B1.sh", 0}, {"Download/B1.sh/", 0},

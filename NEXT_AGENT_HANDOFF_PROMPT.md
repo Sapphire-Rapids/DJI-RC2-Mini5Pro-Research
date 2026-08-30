@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-267 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-276 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -104,6 +104,13 @@ The original file is preserved unchanged. F4 replaces that heredoc with a pipe. 
 verified PING/SNAPSHOT/PING round trip (C-266/C-267). The F4 report is strictly valid, with
 stable AMS PID and target-proc reads still hidden; preserve the active host session state. Do not repeat F3 or the manual proc commands.
 
+Current result (C-273--C-276): A-048 loaded successfully in the existing Fly process after the
+live baseline passed. Canonical native identity, ART TI and disposal results all succeeded;
+PID/UID/APK remained stable. The verified ordinary file was removed, independent cleanup found
+it absent and B2 closed by STOP. A-040 remains untouched. Preserve the permanent A-048 attempt
+marker and do not replay the canary. Next resolve native_get_sync/cache semantics and use only
+already initialized owner fields; do not invoke Lazy/factory/getter chains as presumed pure reads.
+
 Priority:
 
 1. Recover provenance for existing FLYC and receiver records where available; account for the
@@ -116,10 +123,9 @@ Priority:
    F4 then passed strict parsing with stable AMS PID and unavailable target proc reads (C-267).
    The B1 diagnostic round trip works (C-266); preserve its current host state rather than
    repeating F4 or the individual proc reads.
-3. After the regular-file path checks and the target-process baseline are complete, validate A-040's
-   explicit success marker and unchanged Fly PID, then advance the independent
-   RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to
-   be checked before creating an observer. Keep old closed loaders and sender variants retired.
+3. A-048 loading and file restoration are complete. Advance the independent RID-state route
+   using C-276's exact owner fields and synchronous-native stopping point. The deeper listener
+   dispatch/cancellation behavior remains separate; keep closed loaders and sender variants retired.
 4. Independently map Basic/UAS ID, aircraft position, operator position and Operator ID owners,
    read paths and RF fields. An app location update or compliance serial is not yet RF correspondence.
 5. Complete C-207's motor-off → motor-on → motor-off standard-bearer record with the operator if

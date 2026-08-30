@@ -408,3 +408,13 @@ hypotheses. No new listener or aircraft-control execution has occurred.
   actual Fly process baseline are verified. C-249 supplies the directory listing with the
   proposed basename absent; the file has not been created. Target-process checks are next.
   The two scanner checks do not describe every possible cleanup path.
+- C-267 now records stable AMS identity and hidden target proc access. For the next minimal loader
+  experiment, target SELinux identity is an output of the new self-reading A-048 canary, avoiding
+  an external-proc prerequisite loop. This remains a loader hypothesis until a matched result is
+  received; fresh file identity, update isolation and result capture are still checked before
+  dispatch. C-268 records the exact system-mediated entry and environment lifecycle.
+- C-274/C-275 close this narrow path experimentally: A-048 loaded through normal fixed-name AMS
+  in the same Fly process, reported its own identity/API success, disposed its environment and
+  had its verified ordinary file removed with independent absence readback. This makes the
+  tested A-048 path OBSERVED; other payloads and broader loader policies keep their own scope.
+  Next resolve the RID synchronous getter/cache path rather than repeat the canary.

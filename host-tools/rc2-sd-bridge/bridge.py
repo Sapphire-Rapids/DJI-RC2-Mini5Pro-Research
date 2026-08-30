@@ -23,14 +23,17 @@ SID = r"[0-9a-f]{16}"
 SEQ = r"[0-9]{4}"
 NUMBER = r"(?:0|[1-9][0-9]*)"
 SHA = r"[0-9a-f]{64}"
+CANARY_OPS = ("CANARY_BASELINE", "CANARY_LOAD", "CANARY_CLEANUP")
+OPERATIONS = ("PING", "SNAPSHOT", "STOP", *CANARY_OPS)
 PATTERNS = {
     "SESSION": rf"B1 SESSION (?P<sid>{SID}) END\n",
     "READY_SESSION": rf"B1 READY_SESSION (?P<sid>{SID}) (?P<pid>[1-9][0-9]*) (?P<uptime>{NUMBER}) END\n",
-    "JOB": rf"B1 JOB (?P<sid>{SID}) (?P<seq>{SEQ}) (?P<op>PING|SNAPSHOT|STOP) END\n",
+    "JOB": rf"B1 JOB (?P<sid>{SID}) (?P<seq>{SEQ}) (?P<op>{'|'.join(OPERATIONS)}) END\n",
     "READY": rf"B1 READY (?P<sid>{SID}) (?P<seq>{SEQ}) (?P<size>{NUMBER}) (?P<sha>{SHA}) END\n",
     "ACCEPTED": rf"B1 ACCEPTED (?P<sid>{SID}) (?P<seq>{SEQ}) (?P<size>{NUMBER}) (?P<sha>{SHA}) END\n",
     "DONE": rf"B1 DONE (?P<sid>{SID}) (?P<seq>{SEQ}) (?P<rc>{NUMBER}) (?P<size>{NUMBER}) (?P<sha>{SHA}) END\n",
     "CLOSED": rf"B1 CLOSED (?P<sid>{SID}) (?P<reason>STOP|TTL|LIMIT|ERROR) END\n",
+    "RECEIVER": rf"B1 RECEIVER (?P<sid>{SID}) B2 END\n",
 }
 SNAPSHOT_PATH = re.compile(
     r"report=/storage/[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}/Download/FindUAS/Probe/"
@@ -228,6 +231,30 @@ class Transport:
         self.call("archive-active", sid)
 
 
+def canary_preflight_ready(content: bytes) -> bool:
+    try:
+        lines = content.decode("utf-8").split("\n")
+    except UnicodeDecodeError:
+        return False
+    section, previous, fields = None, "", []
+    for line in lines:
+        if section is not None:
+            if line == "END " + section:
+                if not re.fullmatch(rf"command\.{re.escape(section)}\.rc={NUMBER}", previous):
+                    return False
+                section = None
+        elif line.startswith("BEGIN "):
+            if not re.fullmatch(r"BEGIN [a-z][a-z0-9_.]*", line):
+                return False
+            section = line[6:]
+        elif line.startswith("END "):
+            return False
+        elif line.startswith("preflight_ready="):
+            fields.append(line)
+        previous = line
+    return section is None and fields == ["preflight_ready=true"]
+
+
 def validate_result(job: bytes, accepted: bytes, done: bytes, report: bytes) -> dict:
     task = record(job, "JOB")
     sid, seq, op = task["sid"], task["seq"], task["op"]
@@ -251,6 +278,14 @@ def validate_result(job: bytes, accepted: bytes, done: bytes, report: bytes) -> 
         raise BridgeError("REPORT_DUPLICATE_BOUNDARY")
     summary = {"sid": sid, "seq": seq, "op": actual_op, "handler_rc": rc,
                "report_sha256": digest(report), "snapshot": None}
+    if actual_op in CANARY_OPS:
+        beginning = (f"schema=finduas-rc2-canary-loader/v1\nsid={sid}\n"
+                     f"operation={actual_op}\nreport_begin=true\n").encode()
+        ending = b"report_end=true\n"
+        complete = body.startswith(beginning) and body.endswith(ending)
+        summary["canary_validation"] = ("envelope_received_only" if complete else
+                                        "incomplete_envelope" if rc else "invalid_envelope")
+        summary["canary_preflight_ready"] = complete and canary_preflight_ready(body[len(beginning):-len(ending)])
     if actual_op == "SNAPSHOT" and rc in (0, 10):
         try:
             lines = body.decode("utf-8").splitlines()
@@ -315,6 +350,9 @@ class Client:
                 if json.loads(marker.read_bytes()) != summary:
                     raise BridgeError("LOCAL_COLLECTION_RECORD_INVALID")
                 task["complete"] = True
+                task["handler_rc"] = summary["handler_rc"]
+                task["canary_validation"] = summary.get("canary_validation")
+                task["canary_preflight_ready"] = summary.get("canary_preflight_ready", False)
             elif unavailable.exists():
                 closed = self.task_path(sid, seq, ".closed").read_bytes()
                 if json.loads(unavailable.read_bytes()) != unavailable_summary(task, closed):
@@ -392,7 +430,13 @@ class Client:
         return "SESSION_PREPARED"
 
     def stage(self, b1: Path, f4: Path) -> str:
-        for basename, source in (("B1.sh", b1), ("F4.sh", f4)):
+        return self.stage_files((("B1.sh", b1), ("F4.sh", f4)))
+
+    def stage_canary(self, b2: Path, l1: Path, canary: Path) -> str:
+        return self.stage_files((("B2.sh", b2), ("L1.sh", l1), ("FindUAS_ARTTI_V2.so", canary)))
+
+    def stage_files(self, files) -> str:
+        for basename, source in files:
             if source.is_symlink() or not source.is_file() or source.stat().st_size > 32768:
                 raise BridgeError("STAGE_SOURCE_INVALID")
             data = source.read_bytes()
@@ -417,6 +461,8 @@ class Client:
         return "SESSION_READY_LIVENESS_NOT_PROVEN"
 
     def submit(self, operation: str) -> str:
+        if operation not in OPERATIONS:
+            raise BridgeError("INVALID_OPERATION")
         sid = self.state.current()
         if sid is None:
             raise BridgeError("PREPARE_REQUIRED")
@@ -433,6 +479,20 @@ class Client:
         if ready is None:
             raise BridgeError("SESSION_NOT_READY")
         record(ready, "READY_SESSION", sid)
+        if operation in CANARY_OPS:
+            receiver = self.transport.get(f"{BASE}/{sid}/session.receiver")
+            if receiver is None:
+                raise BridgeError("B2_RECEIVER_REQUIRED")
+            record(receiver, "RECEIVER", sid)
+        if operation == "CANARY_LOAD":
+            previous_loads = [task for task in tasks if task["op"] == "CANARY_LOAD"]
+            if previous_loads and not (previous_loads[-1] is tasks[-1] and not tasks[-1]["complete"]):
+                raise BridgeError("CANARY_LOAD_ALREADY_CREATED_FOR_SESSION")
+            baselines = [task for task in tasks if task["op"] == "CANARY_BASELINE"]
+            if not baselines or not baselines[-1]["complete"] or baselines[-1].get("handler_rc") != 0 or \
+                    baselines[-1].get("canary_validation") != "envelope_received_only" or \
+                    not baselines[-1].get("canary_preflight_ready"):
+                raise BridgeError("SUCCESSFUL_CANARY_BASELINE_REQUIRED")
         if tasks and not tasks[-1]["complete"]:
             task = tasks[-1]
             if task["op"] != operation:
@@ -512,8 +572,12 @@ def main(argv=None) -> int:
     stage = commands.add_parser("stage")
     stage.add_argument("--b1", type=Path, required=True)
     stage.add_argument("--f4", type=Path, required=True)
+    canary = commands.add_parser("stage-canary")
+    canary.add_argument("--b2", type=Path, required=True)
+    canary.add_argument("--l1", type=Path, required=True)
+    canary.add_argument("--canary", type=Path, required=True)
     submit = commands.add_parser("submit")
-    submit.add_argument("operation", choices=("PING", "SNAPSHOT", "STOP"))
+    submit.add_argument("operation", choices=OPERATIONS)
     commands.add_parser("collect").add_argument("sequence")
     args = parser.parse_args(argv)
     os.umask(0o077)
@@ -523,6 +587,8 @@ def main(argv=None) -> int:
             client = Client(state, Transport(args.transport, state, args.transport_timeout))
             if args.command == "stage":
                 output = client.stage(args.b1, args.f4)
+            elif args.command == "stage-canary":
+                output = client.stage_canary(args.b2, args.l1, args.canary)
             elif args.command == "submit":
                 output = client.submit(args.operation)
             elif args.command == "collect":

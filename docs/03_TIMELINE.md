@@ -885,3 +885,23 @@ work when a report did not contain a more precise timestamp.
 - `OBSERVED`：F4 的 4,036-byte 报告严格解析成功，heredoc 问题已修复。前后 AMS 解析
   成功且 PID 相同；八项 pidof/proc 读取失败、其余十五项成功，`hidepid=2` 和 A-040
   源校验均读回（C-267）。未新增内部复制、attach 或飞机操作。
+
+### 最小身份加载探针准备
+
+- `STATIC`：核对 exact v07 的 system/AMS 加载入口、固定进程名选择及 ART TI 新环境的
+  申请/释放路径（C-268）。
+- `STATIC`：A-048 身份探针构建完成，32 项测试、sanitizer 及 6 个故障变体通过，两次 ARMv7
+  构建同字节；A-040 保留不变（C-269）。
+- `OBSERVED`：A-048 已在 SD 完整回读匹配。随后 B1 的第 4 项 STOP 和 CLOSED STOP
+  均读回核验，为 B2 会话准备腾出入口；未停止 Fly（C-270）。
+- `STATIC`：L1 通过 13 个真实 mksh 测试、39 场景，B2 通过 2 个 Java/mksh 分派测试，
+  host client 的 29 个测试通过。修正了 FD3 继承、原生身份日志匹配和返回版本判定（C-271）。
+- `OBSERVED`：L1/B2/身份探针在 SD 的完整回读全部匹配；旧 active 记录归档核验完成，
+  新会话准备并最后发布 active，等待一次 B2 启动。精确操作已私下发给操作者（C-272）。
+- `OBSERVED`：操作者启动 B2 后，CANARY_BASELINE 的 23 个检查全部通过，报告完整读回（C-273）。
+- `OBSERVED`：CANARY_LOAD 在同一 Fly 进程中成功执行 A-048，原生身份、ART TI 与环境释放
+  均成功，PID/UID/APK 未变；匹配的测试文件已删除（C-274）。
+- `OBSERVED`：独立 CLEANUP 再次确认文件已不存在；copy/attempt 记录回读匹配，B2 的
+  STOP 和 CLOSED STOP 均确认，无第二次 attach、未重启 Fly（C-275）。
+- `STATIC`：继续核对 RID getter，区分 Lazy/默认 DTO、可变拦截器与 native_get_sync；
+  下一步聚焦该原生同步入口的缓存语义（C-276）。

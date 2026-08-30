@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.28 - 2026-08-31
+
+- Mapped the exact system-mediated loader and ART TI environment lifecycle (C-268).
+- Added independent A-048 self-identity canary source, tests and reproducible ARMv7 builds; the
+  SD readback matches, and the preceding B1 session closed normally (C-269/C-270).
+- Added L1/B2 fixed baseline/load/cleanup tasks with 13 mksh tests (39 scenarios), two dispatch
+  tests and 29 client tests. All three SD files read back correctly and the new session was
+  prepared (C-271/C-272).
+- B2 subsequently passed its live baseline and loaded A-048 once inside the unchanged Fly
+  process; identity/API/disposal succeeded and independent cleanup confirmed file removal.
+  STOP/CLOSED STOP completed (C-273--C-275). The RID getter/cache review is recorded in C-276.
+  Changes remain local; no GitHub push.
+
 ## 0.4.27 - 2026-08-31
 
 - Fixed F3's Android mksh heredoc failure in F4 by feeding AMS text through a pipe. Eighteen

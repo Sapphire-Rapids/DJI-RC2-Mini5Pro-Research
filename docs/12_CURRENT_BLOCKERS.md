@@ -3,13 +3,12 @@
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-C-262 records F3 receipt: raw AMS entries share the same main PID and proc has
-`gid=3009,hidepid=2`, while the caller lacks group 3009. Android mksh rejected the heredoc
-temporary-file creation twice; the unmodified raw report fails strict parsing. F4 replaces
-the heredoc with a pipe. F4/B1 passed host checks and SD readback; the operator then started B1 once.
-PING/SNAPSHOT/PING and strict F4 receipt are closed by C-266/C-267. The current diagnostic
-session remains available within its lease; no further manual command is requested. Do not repeat F3 or the individual proc commands. No internal canary
-copy/attach has occurred. See [the runtime topic](23_RC2_LIVE_RUNTIME.md).
+The exact A-048 loader is now observed on RC 2 (C-273--C-275): normal system-mediated attach,
+native self-identity/API/disposal success, stable Fly PID/UID/APK, verified file removal and
+independent absence readback. B2 closed normally. The next missing piece is the actual RID
+value path: C-276 maps the initialized-owner fields and separates lazy/default/interceptor
+behavior from the still-unclosed native_get_sync implementation. No new manual command or
+repeat canary is currently requested. See [the runtime topic](23_RC2_LIVE_RUNTIME.md).
 Per the latest user instruction, continue local updates, validation and commits, but do not
 resume GitHub pushes without renewed user authorization. Historical pushes remain recorded.
 C-227--C-230 have already answered the two tested FLYC parameter
@@ -38,12 +37,15 @@ Still missing:
 
 - full signed module/package set beyond the verified system/`0205` lane;
 - current mounted adbd hash/branch result; the reported `dbg_cnt` was an empty string;
-- internal-payload access/label/hash checks; the candidate basename was absent in C-249;
-- target Fly process mapping/loader behavior and the relevant executable path/namespace.
+- mounted identities outside the tested lane, including any userspace-ADB alternative;
+- broader process mappings and other payload/namespace behavior beyond A-048.
+
+C-274/C-275 close the tested ordinary SO identity/label/hash, native target identity, load result
+and file restoration. The complete process mapping inventory was not collected.
 
 The installed-file matches support the specific framework/service and package comparisons in
 C-237/C-241/C-245. Actual Shell identity now has its own direct evidence (C-246); target-process
-loading and execution remain untested.
+loading is now observed for A-048 in C-274; other payloads retain their own scope.
 
 ## B-02 — runtime report and SD export
 
@@ -90,6 +92,11 @@ returned a target-context path error without a mount-options line. F3/A-045 then
 the live proc mount options, but its heredoc failed under Android mksh (C-262). F4 preserves
 the paired AMS/proc collection through a pipe and its report now passes strict parsing (C-267).
 The remaining target-proc visibility failure is recorded; do not repeat that same diagnostic.
+
+C-274 resolves the loader objective through a self-reading canary without changing proc permissions.
+Its target base domain is untrusted_app; identity/API/disposal checks succeeded, the ordinary SO
+was removed and independently confirmed absent (C-275). Next close native_get_sync/cache semantics
+before invoking the current RID getter (C-276).
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -481,9 +488,11 @@ verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
   -> F3 reviewed/tested and SD-staged/readback matched (C-260/C-261)
   -> F3 received: live hidepid=2; mksh heredoc temp creation failed (C-262)
   -> F4/B1 staged and started; three host jobs and strict F4 receipt verified (C-266/C-267)
-  -> internal-file and target-process baselines before loading
-  -> A-040 pure ARMv7 ART TI canary and unchanged Fly PID
-  -> verified independent RID-state observer and callback provenance
+  -> A-048/L1/B2 build, tests, exact staging and live baseline (C-268--C-273)
+  -> A-048 native identity/API success; stable Fly PID/UID/APK (C-274)
+  -> test-file removal, independent absence readback and CLOSED STOP (C-275)
+  -> exact RID native_get_sync/cache semantics and initialized owner metadata (C-276)
+  -> verified independent RID-state observation and callback provenance
 ```
 
 The earlier FlySafe inventory branch retains this emulator and transport history:
