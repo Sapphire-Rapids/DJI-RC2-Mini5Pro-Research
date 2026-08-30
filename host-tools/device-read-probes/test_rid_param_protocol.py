@@ -378,6 +378,12 @@ class WriteBodyTests(unittest.TestCase):
         with self.assertRaises(protocol.ParamProtocolError):
             protocol.build_write_request_body(b"\x01", parameter_hash=-1)
 
+    def test_write_body_rejects_multibyte_integer_and_float_booleans(self):
+        for raw in (b"\x01\x00", bytes(4), b"\x01\x01\x01\x01", b"\x00\x00\x80\x3f"):
+            with self.subTest(raw=raw):
+                with self.assertRaises(protocol.ParamProtocolError):
+                    protocol.build_write_request_body(raw, parameter_hash=0x3CBD864F)
+
 
 class WriteAckTests(unittest.TestCase):
     def test_empty_ack_is_success(self):

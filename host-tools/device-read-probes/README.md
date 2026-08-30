@@ -8,6 +8,8 @@ They are independently written research tools, not DJI software.
 - Most probes send one of a fixed set of GET/read requests and apply route, command, sequence,
   framing, and checksum checks before interpreting a response.
 - `usb_rid_passive_snapshot.py` is input-only and never obtains an output endpoint.
+  It accepts the seven-byte minimum RID status prefix and retains extension bytes
+  in memory; reports show their length, never their uninterpreted contents.
 - No file exposes a generic packet sender, flight command, motor command, firmware write, country
   setter, RID setter, bootloader action, or updater.
 - A GET reply is onboard state only. It does not by itself prove over-the-air RID, radio power, or
@@ -19,6 +21,8 @@ write-body/ACK codec shared by the RID-policy, EID, and RID-switch tools; its sy
 included. The bounded F9 write path itself lives in
 [`../rid-switch-tool/rid_switch_control.py`](../rid-switch-tool/rid_switch_control.py) and is not
 reachable from any probe in this directory.
+The write-body codec rejects anything except a single `00`/`01` byte. Wider
+integer/float Boolean read support does not establish a safe write encoding.
 
 ## Dependencies and tests
 

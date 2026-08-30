@@ -10,6 +10,11 @@ repository and evidence rules.
 For an immediate takeover of the current research state, use
 [`NEXT_AGENT_HANDOFF_PROMPT.md`](NEXT_AGENT_HANDOFF_PROMPT.md).
 
+The current research objective includes the real-aircraft RID switch, Basic/UAS ID, aircraft
+position and operator position. Keep Operator ID separate from both Basic/UAS ID and operator
+position. Each control needs an independent owner/baseline/readback/restore/RF evidence chain;
+the scope extension does not admit a field editor. Synthetic OpenDroneID codecs remain offline.
+
 ## Repository boundary
 
 This repository contains independently written research documentation, machine-readable indexes,
@@ -88,8 +93,10 @@ Later retractions override earlier progress summaries.
 6. Historical localhost observer v0.1-v0.4 is `RETRACTED`. A second connection to RC-local
    `40007`/`40009` can replace DJI Fly's single active fd even if no payload is written.
 7. v0.10 is the current zero-permission admission-probe candidate. Its exact APK SHA-256 is
-   `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c`; it has not been copied,
-   installed, or run on RC 2.
+   `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c`. Exact A-001 has been
+   staged as removable-SD `Download/FindUAS_A001_V010.apk`; a fresh unique listing and full
+   same-session MTP readback matched its 2,570,983-byte size and hash (C-231). Installation and
+   execution remain pending; staging is not a live environment report or permission to attach.
 8. V2.2 SHA-256 `7aa794ff8611582fd7cf27808a9d9eb11c44e307889d615d0511c100522845fb`
    is permanently rejected. V2.3 SHA-256
    `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` fixes the documented
@@ -150,7 +157,8 @@ Later retractions override earlier progress summaries.
 23. Current SKYROVER `1.2.0` adds an independent Boolean `RIDCtrlEnable`, distinct from France
     `EIDSwitch`, and exact native evidence maps it to FC parameter `rid_ctrl_enable_0`, hash
     `0x3CBD864F`, through `0x03/F7-F9` with default modern route `0x82 -> 0x92`. DJI Fly `1.21.10`
-    lacks the same strings, so Mini 5 Pro support is a live F7/F8 question, not a static transfer.
+    lacks the same strings, which by itself did not resolve Mini 5 Pro support. Correction 40 now
+    records the later direct-USB FLYC result; do not reopen that question from the static mapping.
     A-023 was the first fixed clean-room Binder client for that question. It was installed and run;
     Binder lookup, transaction 1, callback transaction 4, and exception parsing succeeded, but the
     target F7 ended in callback `ECode 1` after about 3.1 seconds without an F7 ACK. This is not a
@@ -288,6 +296,14 @@ Later retractions override earlier progress summaries.
     PackageInstaller `apk_tmp_file` staging directory denied target search and was abandoned
     (C-210). The next discriminator is the actual RC 2 caller/target domains and a legitimate shared
     executable path or mediated descriptor; neither source-only APK is an active RC 2 candidate.
+40. C-227--C-230 record a live `01.00.0600` direct-USB FLYC positive control, table count 1558
+    and 915 named rows. Both `EU_CE_enable_c0_rid(_0)` and `rid_ctrl_enable_0` have
+    positive-controlled absence on that surface. The neighbouring EU C0 block is shifted +1
+    relative to the public table and its sampled flags have min/max 0. Do not repeat old parameter
+    or route variants, treat index 1306 as authoritative, or unlock a neighbour as a substitute.
+    This does not establish absence in DJI Fly, another firmware surface or encrypted `0802`.
+    The next device objective is trusted read-only RC 2 identity, a legitimate loader/descriptor,
+    then one official inventory query; field-owner mapping proceeds independently.
 
 ## Privacy and redaction
 

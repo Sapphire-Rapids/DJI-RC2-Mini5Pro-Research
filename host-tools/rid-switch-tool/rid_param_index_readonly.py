@@ -27,6 +27,8 @@ import time
 
 import usb1
 
+from index_protocol_guard import validate_response, verify_table_identity
+from switch_safety import close_usb
 
 VID = 0x2CA3
 LEGACY_TARGET_FC = 0x03
@@ -133,7 +135,7 @@ def transport_config(name: str) -> dict[str, int]:
     raise ValueError("unsupported transport")
 
 
-def main() -> None:
+def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description="Read-only by-index RID parameter probe."
     )
@@ -155,7 +157,7 @@ def main() -> None:
         default=2.0,
         help="per-reply receive window in seconds (default: 2.0)",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if not 0.25 <= args.reply_seconds <= 5.0:
         raise SystemExit("--reply-seconds must be between 0.25 and 5.0")
 
@@ -172,14 +174,9 @@ def main() -> None:
         route_source = config["source"]
         route_target = LEGACY_TARGET_FC
 
-    context = usb1.USBContext()
-    device = context.getByVendorIDAndProductID(VID, config["pid"])
-    if device is None:
-        context.close()
-        raise SystemExit(f"DJI {args.transport} USB device not found")
-
-    handle = device.open()
-    handle.claimInterface(config["interface"])
+    context = None
+    handle = None
+    claimed = False
     pending = bytearray()
     sequence = int(time.monotonic() * 1000) & 0xFFFF
 
@@ -214,25 +211,38 @@ def main() -> None:
                     continue
                 if int.from_bytes(frame[6:8], "little") != sequence:
                     continue
-                if frame[4] != route_target or frame[5] != route_source:
-                    continue
-                if frame[9] != protocol.CMD_SET_FLYC or frame[10] != command_id:
-                    continue
-                return frame[11:-2]
+                try:
+                    return validate_response(
+                        frame, duml=duml, sender=route_target, receiver=route_source,
+                        sequence=sequence, command=command_id,
+                    )
+                except RuntimeError:
+                    rejected += 1
+        if rejected:
+            raise RuntimeError("no valid by-index response")
         raise TimeoutError("no matching response")
 
     report: dict[str, object] = {
         "transport": args.transport,
         "route": args.route,
         "source": f"0x{route_source:02X}",
-        "target": f"0x{route_target:02X}",
+        "route_target": f"0x{route_target:02X}",
         "mode": "by-index read-only",
         "table": 0,
         "table_attributes": None,
         "results": [],
     }
 
-    try:
+    def run():
+        nonlocal context, handle, claimed
+        context = usb1.USBContext()
+        device = context.getByVendorIDAndProductID(VID, config["pid"])
+        if device is None:
+            raise RuntimeError("USB device not found")
+
+        handle = device.open()
+        handle.claimInterface(config["interface"])
+        claimed = True
         # Table identity positive control.
         try:
             attr_payload = exchange(
@@ -240,6 +250,7 @@ def main() -> None:
                 protocol.build_table_attributes_request(0),
             )
             attrs = protocol.parse_table_attributes(attr_payload)
+            verify_table_identity(attrs)
             report["table_attributes"] = {
                 "crc": f"0x{attrs.crc:08X}",
                 "count": attrs.count,
@@ -251,6 +262,7 @@ def main() -> None:
             usb1.USBError,
         ) as exc:
             report["table_attributes"] = {"error": f"{type(exc).__name__}: {exc}"}
+            return 1
 
         for candidate in CANDIDATES:
             record: dict[str, object] = {
@@ -296,13 +308,18 @@ def main() -> None:
             ) as exc:
                 record["reason"] = f"{type(exc).__name__}: {exc}"
             report["results"].append(record)
+        return 0 if all(item["state"] == "read" for item in report["results"]) else 1
+    try:
+        exit_code = run()
+    except (Exception, KeyboardInterrupt) as exc:
+        report["error_type"] = type(exc).__name__
+        exit_code = 1
     finally:
-        handle.releaseInterface(config["interface"])
-        handle.close()
-        context.close()
-
-    print(json.dumps(report, indent=2, ensure_ascii=False))
+        close_usb(context=context, handle=handle, claimed=claimed,
+                  interface=config["interface"], report=report)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+    return 1 if report.get("cleanup_errors") else exit_code
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

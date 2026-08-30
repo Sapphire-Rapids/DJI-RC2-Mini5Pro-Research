@@ -35,6 +35,12 @@ jobs:
         run: python -m compileall -q host-tools libraries experiments
       - name: Test protocol probes
         run: python -m unittest discover -s libraries/protocol-probes -p 'test_*.py'
+      - name: Test device-read parsers without hardware
+        run: python -m unittest discover -s host-tools/device-read-probes -p 'test_*.py'
+      - name: Test bounded control flows with fake transports
+        run: python -m unittest discover -s host-tools/rid-switch-tool -p 'test_*.py'
+      - name: Test offline Remote ID codec
+        run: python -m unittest discover -s libraries/opendroneid-synthetic-codec -p 'test_*.py'
       - name: Test request-quiescence model
         working-directory: libraries/rid-quiescence-model
         run: python -m unittest discover -s tests -p 'test_*.py'
@@ -42,3 +48,25 @@ jobs:
         run: python -m unittest discover -s host-tools/firmware-acquisition -p 'test_*.py'
       - name: Test runtime DEX boundary scanner
         run: python -m unittest discover -s host-tools/runtime-dex-scan -p 'test_*.py'
+
+  android-admin-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Install pinned Android build inputs
+        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager 'platforms;android-35' 'build-tools;35.0.0'"
+      - name: Test, lint and build Admin without a device
+        working-directory: apps/rc2-rid-admin
+        run: gradle --no-daemon testDebugUnitTest lintDebug assembleDebug
+      - name: Test same-process inventory parser without Android runtime
+        working-directory: experiments/jvmti/jvmti_flysafe_inprocess_query
+        env:
+          FINDUAS_JDK_ROOT: ${{ env.JAVA_HOME }}
+        run: sh scripts/run_host_tests.sh

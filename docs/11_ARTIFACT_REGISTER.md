@@ -12,7 +12,7 @@
 
 | ID | 工件 / 类型 / 版本 | 大小 | SHA-256 | 状态 |
 | --- | --- | ---: | --- | --- |
-| A-001 | RC 2 admission probe；self-developed；v0.10 | `2,570,983` | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` | `NOT ADMITTED`；从未复制、安装或运行；当前候选但未 staging；只公开 hash |
+| A-001 | RC 2 admission probe；self-developed；v0.10 | `2,570,983` | `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c` | `NOT ADMITTED`；MTP staging 与完整读回 hash 已匹配；安装/运行待操作者确认；当前候选已 staged；只公开 hash |
 | A-002 | Route-only resolver；self-developed；V2.2 | `29,019` | `7aa794ff8611582fd7cf27808a9d9eb11c44e307889d615d0511c100522845fb` | `RETRACTED`；从未复制、安装或运行；**REJECTED / DO NOT USE**；只公开 hash |
 | A-003 | Corrected route-only resolver；self-developed；V2.3 | `29,019` | `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` | `NOT ADMITTED`；从未复制、安装、附加或运行；只作索引、不分发；只公开 hash |
 | A-004 | RC 2 adjacent Android OTA；input-sample；RC331 `10.00.0700/0205` | `985,959,104` | `f707cf3dc0be2894b111ce4973d0206e896a2c7e9c4ebe43de1040b528cf49ce` | `STATIC`；相邻样本；排除且不分发；只公开 metadata |
@@ -48,6 +48,7 @@
 | A-034 | DJI Fly runtime private mapping；runtime-derived input；`1.21.10` disposable emulator | `205,443,072` | `2926709cc6896c7315d003c4e61208d5a9fa53ae73cda897d820a581c5c8325c` | `OBSERVED`；authorized read-only emulator process-memory copy；仅本地分析；排除且不分发；只公开 hash |
 | A-035 | FindUAS FlySafe agent carrier；self-developed；`0.1.0-emulator-observed` | `23,032` | `16a59c1996e817891dfb84208202cb942456095d4ee98dfa7d8eb17c4c10f289` | `NEGATIVE`；disposable emulator normal installed path 在首个 `=` 被截断；未在 RC 2 使用；generated APK 排除、源码公开 |
 | A-036 | FindUAS FlySafe ART TI staging payload；self-developed；`0.1.0-emulator-observed` | `38,998` | `20a96fdd834e921b546105fd0b2314393a33d242690f731a776c867f70e47069` | `NEGATIVE`；disposable emulator uncommitted `apk_tmp_file` search denied，session 已 abandon；未在 RC 2 使用；generated APK 排除、源码公开 |
+| A-037 | FindUAS RC 2 RID Admin identity safety lock；self-developed；`0.8.1-identity-safety-locked` / code 14 | `225,937` | `8ee7a4edd36c7f97c631fabf3186ac3df79e6611869ebf05b11e83ccba4e84ba` | `NOT ADMITTED`；仅离线构建/测试，未 staged、安装或运行；generated APK 排除、源码公开 |
 
 ## 3. A-001：当前 v0.10 admission probe
 
@@ -60,7 +61,9 @@
 - 无 service、receiver、provider 或 packaged native library；
 - 无 socket、localhost、DUML、application Binder transaction、process execution、file persistence、agent attach 或 library load path。
 
-`NOT ADMITTED`：A-001 尚未复制、安装或运行在 RC 2。即使将来得到 `COMPLETE` report，也只建立报告声明的环境/身份事实，不建立 RID 状态、Binder transaction authorization、attach permission 或 setter admission。
+`OBSERVED`（C-231，2026-08-30）：保存的精确 APK 再次通过源码/final-DEX 审计及 21/21 mutation 检查；已作为单个新文件 `Download/FindUAS_A001_V010.apk` 放入 RC 2 removable SD。fresh 唯一文件名/大小检查及同会话完整读回 SHA-256 均匹配，没有重传或覆盖旧文件。
+
+`NOT ADMITTED`：安装与运行仍待操作者确认。即使将来得到 `COMPLETE` report，也只建立报告声明的环境/身份事实，不建立 RID 状态、Binder transaction authorization、attach permission 或 setter admission。
 
 旧 v0.8/v0.9 只作为本地 provenance 保留，不是当前 staging instruction。v0.1–v0.4 统一登记在 A-012，因 localhost second-client 架构而 `RETRACTED`。
 
@@ -369,3 +372,9 @@ sh scripts/check_sensitive_patterns.sh
 ```
 
 不得仅更新 Markdown 或仅更新 CSV。若当前任务无权修改 CSV，则新工件保持在候选审计记录中，等待拥有索引更新权限的维护者一次性加入两处。
+
+## A-037：身份控制锁定修复版
+
+C-232 固定的是新版本 `0.8.1-identity-safety-locked` / code 14，不能冒用 A-033 的 hash 或运行状态。170 JVM tests 通过；lint 0 errors / 15 warnings；两次 clean 构建相同；v2 签名和 zipalign 通过；零权限、无 packaged native library。
+
+EID/OPID 写入由 UI/入口/sender 共同锁定，完整 OPID 不进入可复制诊断。保留事务逻辑只以 fake device 验证可恢复基线、ACK/读回不确定、成功变更后仍需恢复、会话漂移时拒绝覆盖旧基线。其他实验写入面仍保留自身边界，所以整个 APK 不是全局只读。新安装包没有 staged、安装或运行，也不证明任何 RID/RF 控制能力。

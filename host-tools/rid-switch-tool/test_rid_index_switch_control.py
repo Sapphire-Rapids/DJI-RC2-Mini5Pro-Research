@@ -67,9 +67,9 @@ class TargetTests(unittest.TestCase):
 class GateTests(unittest.TestCase):
     def test_exchange_refuses_unlisted_command(self):
         session = object.__new__(control.IndexSession)
-        session.protocol = None
-        with self.assertRaises(AttributeError):
-            control.IndexSession.exchange(session, 0xE3, b"")
+        session.protocol = control.load_protocol_module()
+        with self.assertRaises(AssertionError):
+            control.IndexSession.exchange(session, 0xF9, b"")
 
 
 if __name__ == "__main__":

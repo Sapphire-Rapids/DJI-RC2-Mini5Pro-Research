@@ -736,3 +736,12 @@ work when a report did not contain a more precise timestamp.
 - `NEGATIVE`: `rid_ctrl_enable_0` is absent on this FC — by-hash F7 (0x3CBD864F) returns status 0x03
   and the by-index enumeration has no `rid_ctrl_enable` row, positive-controlled (C-230).
 - No F9/E3/0x11/0x12 write, no license change, no motor action, no RF experiment was performed.
+
+### 2026-08-30 — takeover baseline and exact read-only probe staging
+
+- Established a new work branch from the latest committed research; preserved all old checkouts and uncommitted drafts without importing them. Core excluded input/artifact hashes were rechecked against their existing register.
+- Re-ran exact A-001 source/final-DEX audit and 21 audit mutations, then staged one new removable-SD `Download/FindUAS_A001_V010.apk`; fresh unique listing and same-session full readback matched the registered bytes/hash (C-231).
+- A separate-session stock getfile attempt failed. The read-only exact-name enumeration/download in one session succeeded; no second upload or overwrite was performed.
+- Asked the operator to install/open the probe and run its read-only capability check. Installation, execution and report remain unconfirmed. No ADB start, attach, DJI command, aircraft write, motor or RF action occurred.
+
+- Built the distinct A-037 identity-safety revision offline: 170 JVM tests and two matching clean builds, with v2/zipalign/permission/native-entry checks (C-232). No Admin APK was staged or executed. Host fault tests now cover ACK uncertainty, recovery, frame/table validation and report failures; these fixes do not reopen the rejected FLYC candidates.

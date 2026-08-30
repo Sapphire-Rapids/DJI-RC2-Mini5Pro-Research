@@ -34,6 +34,10 @@ The `test_*.py` files cover the protocol, listener-boundary, privacy-reduction, 
 by-hash parameter, and by-index parameter codec code. `function_discovery_protocol.py` and the two
 low-level bulk capture helpers currently have no dedicated test module in this import.
 
+Boolean write encoding is limited to the established one-byte representation in both parameter
+codecs. Integer/float read support does not admit a multi-byte control encoding. Encoding bytes
+does not replace live metadata/range checks or admit the two rejected `01.00.0600` candidates.
+
 ## Dependencies
 
 - Python 3.10 or newer.
@@ -68,7 +72,8 @@ python3 -m unittest -v \
   test_rid_param_index_protocol.py
 ```
 
-Expected result for this source snapshot: `Ran 68 tests ... OK`.
+For the complete suite, including hash and write-encoding regressions, run
+`python3 -m unittest discover -s . -p 'test_*.py'`.
 
 Before running any USB helper, use `--help` to confirm its fixed route and output behavior. Do not
 commit live command output; only privacy-reduced, reviewed summaries belong in the evidence record.

@@ -37,6 +37,31 @@ final class OperatorIdCodec {
         return payload;
     }
 
+    static byte[] decodeGetData(byte[] data) {
+        if (data == null || data.length < 1) {
+            throw new IllegalStateException("OPID GET 数据为空");
+        }
+        int length = data[0] & 0xff;
+        if (length >= 101 || length > data.length - 1) {
+            throw new IllegalStateException("OPID GET 长度无效");
+        }
+        return java.util.Arrays.copyOfRange(data, 1, 1 + length);
+    }
+
+    static void requireRestorableBaseline(byte[] value) {
+        if (value == null || (value.length != 0 && value.length != 16)) {
+            throw new IllegalStateException(
+                    "OPID 基线无法无损恢复（必须为 0 或 16 字节）；未发送写入。");
+        }
+    }
+
+    static String maskedSummary(byte[] value) {
+        if (value == null) {
+            return "未知";
+        }
+        return value.length == 0 ? "未设置" : "已设置（值已隐藏；长度=" + value.length + "）";
+    }
+
     static String validationError(String input) {
         if (input == null || input.length() != 20) {
             return "请输入完整 20 字符 EASA 运营人编号";

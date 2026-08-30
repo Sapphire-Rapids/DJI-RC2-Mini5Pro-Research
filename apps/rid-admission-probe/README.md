@@ -5,6 +5,12 @@ directory contains only independently written `src/safe` and `src/safeTest` code
 the repository-root [MIT license](../../LICENSE). Generated APKs, vendor files, and the withdrawn
 localhost/socket source are intentionally excluded.
 
+2026-08-30 checkpoint (C-231): the preserved exact v0.10 APK passed the current source/final-DEX
+audit and 21/21 mutation checks again. It is now staged as one new removable-SD
+`Download/FindUAS_A001_V010.apk`; fresh unique listing and full readback match the registered
+size/hash. Installation and execution remain unconfirmed. This does not admit any attach, DJI
+protocol transaction or control operation. The historical audit below is unchanged.
+
 Build and source-only audit with Gradle 8.10.2, JDK 21, and Android SDK 35:
 
 ```sh

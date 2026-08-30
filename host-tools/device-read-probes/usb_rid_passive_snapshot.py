@@ -79,11 +79,24 @@ def valid_crc(frame: bytes, duml) -> bool:
     )
 
 
-def rid_summary(payload: bytes) -> str | None:
-    if len(payload) != 7:
+@dataclass(frozen=True, repr=False)
+class RidSnapshot:
+    summary: str
+    trailing_bytes: bytes
+
+    def __str__(self):
+        # Unknown extension bytes stay in memory, never in the public report.
+        return f"{self.summary} trailing_length={len(self.trailing_bytes)}"
+
+    def __repr__(self):
+        return str(self)
+
+
+def parse_rid_status(payload: bytes) -> RidSnapshot | None:
+    if len(payload) < 7:
         return None
     flags = int.from_bytes(payload[0:2], "little")
-    return (
+    summary = (
         f"eid_supported={str(bool(flags & (1 << 1))).lower()} "
         f"rid_supported={str(bool(flags & (1 << 0))).lower()} "
         f"eid_normal={str(bool(flags & (1 << 9))).lower()} "
@@ -91,6 +104,12 @@ def rid_summary(payload: bytes) -> str | None:
         f"area_code={int.from_bytes(payload[2:6], 'little', signed=True)} "
         f"failure_code={payload[6]}"
     )
+    return RidSnapshot(summary, bytes(payload[7:]))
+
+
+def rid_summary(payload: bytes) -> str | None:
+    snapshot = parse_rid_status(payload)
+    return str(snapshot) if snapshot is not None else None
 
 
 def observe(route: InputRoute, duml) -> None:
@@ -139,7 +158,7 @@ def observe(route: InputRoute, duml) -> None:
                 if command in command_counts:
                     command_counts[command] += 1
                 if command == (0x11, 0x1C) and frame[8] == 0:
-                    decoded = rid_summary(frame[11:-2])
+                    decoded = parse_rid_status(frame[11:-2])
                     if decoded is not None:
                         latest_rid = decoded
         print(f"{route.name}_available=true")

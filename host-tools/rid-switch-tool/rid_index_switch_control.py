@@ -3,8 +3,8 @@
 This tool addresses only the wa150 table parameter ``EU_CE_enable_c0_rid``
 (index 1306, U8 0..1) over verified USB DUML paths. It never sends a write
 unless the table identity (0xE0), the on-board name (0xE1), and the current
-value (0xE2) all pass in the same session, and it always restores the captured
-baseline immediately after the forward write. It has no generic payload, route,
+value (0xE2) all pass in the same session, and it attempts to restore the captured
+baseline immediately after any possible forward write. It has no generic payload, route,
 command, or parameter interface.
 
 Commands reachable: FLYC 0x03/0xE0 (table), 0x03/0xE1 (get_info), 0x03/0xE2
@@ -27,6 +27,10 @@ import time
 
 import usb1
 
+from index_protocol_guard import (
+    WA150_TABLE_CRC, WA150_TABLE_COUNT, validate_response, verify_table_identity,
+)
+from switch_safety import close_usb, run_transition, validate_boolean_write_range
 
 
 VID = 0x2CA3
@@ -39,8 +43,6 @@ RID_NAME = "EU_CE_enable_c0_rid"
 
 # wa150 (Mini 5 Pro) table identity published by lmdegreeds/djiparam. The probe
 # re-verifies the live CRC/count through 0xE0 before any write.
-WA150_TABLE_CRC = 0x5F8B2AE1
-WA150_TABLE_COUNT = 1557
 
 # The by-hash name for the same wa150 row. Its hash is pinned by the independent
 # helper libraries/protocol-probes/dji_flyc_parameter_hash.py.
@@ -168,6 +170,7 @@ class IndexSession:
         endpoint_out: int,
         endpoint_in: int,
         reply_seconds: float,
+        hash_protocol=None,
     ):
         self.handle = handle
         self.duml = duml
@@ -177,11 +180,18 @@ class IndexSession:
         self.endpoint_out = endpoint_out
         self.endpoint_in = endpoint_in
         self.reply_seconds = reply_seconds
+        self.hash_protocol = hash_protocol
         self.pending = bytearray()
         self.sequence = int(time.monotonic() * 1000) & 0xFFFF
 
     def exchange(self, command_id: int, payload: bytes) -> bytes:
-        if command_id not in (
+        hash_read = command_id in (0xF7, 0xF8)
+        if hash_read:
+            if payload != HASH_BRIDGE_HASH.to_bytes(4, "little"):
+                raise AssertionError("refusing an unlisted hash bridge parameter")
+            if self.hash_protocol is None:
+                raise AssertionError("hash bridge codec is unavailable")
+        elif command_id not in (
             self.protocol.READ_ONLY_INDEX_COMMANDS | {self.protocol.CMD_WRITE_VALUE}
         ):
             raise AssertionError("refusing an unlisted by-index command")
@@ -195,6 +205,8 @@ class IndexSession:
             payload,
             self.sequence,
         )
+        if hash_read:
+            packet = self.hash_protocol.encrypt_read_request_frame(packet, duml=self.duml)
         written = self.handle.bulkWrite(self.endpoint_out, packet, timeout=1000)
         if written != len(packet):
             raise RuntimeError("short USB write")
@@ -212,11 +224,19 @@ class IndexSession:
                     continue
                 if int.from_bytes(frame[6:8], "little") != self.sequence:
                     continue
-                if frame[4] != self.target or frame[5] != self.source:
-                    continue
-                if frame[9] != self.protocol.CMD_SET_FLYC or frame[10] != command_id:
-                    continue
-                return frame[11:-2]
+                try:
+                    if hash_read:
+                        return self.hash_protocol.validate_response_frame(
+                            frame, duml=self.duml, expected_sender=self.target,
+                            expected_receiver=self.source, expected_sequence=self.sequence,
+                            expected_command_id=command_id,
+                        )
+                    return validate_response(
+                        frame, duml=self.duml, sender=self.target, receiver=self.source,
+                        sequence=self.sequence, command=command_id,
+                    )
+                except (ValueError, RuntimeError):
+                    rejected += 1
         if rejected:
             raise RuntimeError(f"no valid response; rejected {rejected} matching frame(s)")
         raise TimeoutError("no matching response")
@@ -231,6 +251,7 @@ def probe_value(session: IndexSession):
         protocol.build_table_attributes_request(0),
     )
     attrs = protocol.parse_table_attributes(attr_payload)
+    verify_table_identity(attrs)
 
     info_payload = session.exchange(
         protocol.CMD_GET_INFO, protocol.build_get_info_request(0, RID_INDEX)
@@ -243,6 +264,8 @@ def probe_value(session: IndexSession):
         protocol.CMD_READ_VALUE, protocol.build_read_value_request(0, RID_INDEX)
     )
     value = protocol.parse_read_value(value_payload, index=RID_INDEX, info=info)
+    if info.size != 1 or info.type_id not in (0, 4, 11) or value.raw not in (b"\x00", b"\x01"):
+        raise protocol.ParamIndexError("RID baseline is not a one-byte Boolean")
     return attrs, info, value
 
 
@@ -268,7 +291,7 @@ def probe_hash_bridge(session: IndexSession, hash_protocol):
     return metadata, value, f7_payload, f8_payload
 
 
-def main() -> None:
+def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description="Bounded USB DUML by-index A-B-A for EU_CE_enable_c0_rid."
     )
@@ -295,7 +318,7 @@ def main() -> None:
         help="after the by-index baseline, read-only F7/F8 probe the same row via "
         "its _0 by-hash name EU_CE_enable_c0_rid_0 (default: off)",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if not 0.25 <= args.reply_seconds <= 5.0:
         raise SystemExit("--reply-seconds must be between 0.25 and 5.0")
 
@@ -307,30 +330,15 @@ def main() -> None:
         raise SystemExit("hash bridge name/hash mismatch; refusing to run")
     config = transport_config(args.transport)
 
-    context = usb1.USBContext()
-    device = context.getByVendorIDAndProductID(VID, config["pid"])
-    if device is None:
-        context.close()
-        raise SystemExit(f"DJI {args.transport} USB device not found")
-
-    handle = device.open()
-    handle.claimInterface(config["interface"])
-    session = IndexSession(
-        handle=handle,
-        duml=duml,
-        protocol_module=protocol,
-        source=config["source"],
-        target=LEGACY_TARGET_FC,
-        endpoint_out=config["endpoint_out"],
-        endpoint_in=config["endpoint_in"],
-        reply_seconds=args.reply_seconds,
-    )
+    context = None
+    handle = None
+    claimed = False
 
     report: dict[str, object] = {
         "transport": args.transport,
         "parameter": RID_NAME,
         "index": RID_INDEX,
-        "target": args.target,
+        "requested_target": args.target,
         "state": "unavailable",
         "steps": [],
     }
@@ -341,7 +349,28 @@ def main() -> None:
     baseline: bool | None = None
     info = None
 
-    try:
+    def run():
+        nonlocal context, handle, claimed
+        context = usb1.USBContext()
+        device = context.getByVendorIDAndProductID(VID, config["pid"])
+        if device is None:
+            raise RuntimeError("USB device not found")
+
+        handle = device.open()
+        handle.claimInterface(config["interface"])
+        claimed = True
+        session = IndexSession(
+            handle=handle,
+            duml=duml,
+            protocol_module=protocol,
+            source=config["source"],
+            target=LEGACY_TARGET_FC,
+            endpoint_out=config["endpoint_out"],
+            endpoint_in=config["endpoint_in"],
+            reply_seconds=args.reply_seconds,
+            hash_protocol=hash_protocol,
+        )
+
         try:
             attrs, info, value = probe_value(session)
             record("table_identity", "verified", {
@@ -352,6 +381,7 @@ def main() -> None:
             })
             record("get_info", "verified", {"info": protocol.info_summary(info)})
             baseline = bool(value.decoded)
+            baseline_raw = bytes(value.raw)
             record("baseline", "read", {
                 "value": value.decoded,
                 "raw_hex": value.raw.hex(),
@@ -366,11 +396,14 @@ def main() -> None:
             report["state"] = "baseline_unavailable"
             raise RuntimeError("no same-session by-index baseline; no write attempted") from exc
 
+        bridge_verified = True
         if args.hash_bridge:
             try:
                 bridge_metadata, bridge_value, bridge_f7, bridge_f8 = probe_hash_bridge(
                     session, hash_protocol
                 )
+                if bridge_value.decoded != baseline:
+                    raise RuntimeError("hash bridge disagrees with the by-index baseline")
                 record("hash_bridge", "pass", {
                     "parameter": HASH_BRIDGE_NAME,
                     "hash": f"0x{HASH_BRIDGE_HASH:08X}",
@@ -387,92 +420,58 @@ def main() -> None:
                 usb1.USBError,
             ) as exc:
                 record("hash_bridge", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
+                bridge_verified = False
 
+        if not bridge_verified:
+            report["state"] = "partial_bridge_unverified"
+            return 1
         report["state"] = "baseline"
         if args.target is None:
             report["state"] = "probe_only"
-            return
+            return 0
 
+        report["state"] = "write_encoding_not_admitted"
+        validate_boolean_write_range(
+            type_id=info.type_id, size=info.size,
+            minimum_raw=info.minimum_raw, maximum_raw=info.maximum_raw,
+        )
         target_value = args.target == "on"
         if baseline == target_value:
             record("forward_write", "no_op", {"reason": "baseline already equals target"})
             report["state"] = "already_target"
-            return
+            return 0
 
-        write_payload = protocol.build_write_value_request(
-            0,
-            RID_INDEX,
-            protocol.encode_boolean_value(target_value, info=info),
-            info=info,
-        )
-        try:
-            ack = session.exchange(protocol.CMD_WRITE_VALUE, write_payload)
-            status = protocol.parse_write_status(ack)
-            record("forward_write", "ack", {"status": status})
-        except (
-            TimeoutError,
-            RuntimeError,
-            protocol.ParamIndexError,
-            usb1.USBError,
-        ) as exc:
-            record("forward_write", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
-            report["state"] = "write_failed_restoring"
-            raise
+        target_raw = bytes((int(target_value),))
+        # Both encodings are validated before any possible mutation.
+        protocol.build_write_value_request(0, RID_INDEX, target_raw, info=info)
+        protocol.build_write_value_request(0, RID_INDEX, baseline_raw, info=info)
 
-        forward_ok = False
-        try:
-            _, _, fwd_value = probe_value(session)
-            forward_ok = bool(fwd_value.decoded) == target_value
-            record("forward_readback", "match" if forward_ok else "mismatch", {
-                "value": fwd_value.decoded,
-                "raw_hex": fwd_value.raw.hex(),
-            })
-        except (
-            TimeoutError,
-            RuntimeError,
-            protocol.ParamIndexError,
-            usb1.USBError,
-        ) as exc:
-            record("forward_readback", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
+        def write(raw):
+            payload = protocol.build_write_value_request(0, RID_INDEX, raw, info=info)
+            ack = session.exchange(protocol.CMD_WRITE_VALUE, payload)
+            protocol.parse_write_status(ack)
 
-        # Always restore the baseline.
-        restore_payload = protocol.build_write_value_request(
-            0,
-            RID_INDEX,
-            protocol.encode_boolean_value(baseline, info=info),
-            info=info,
-        )
-        restore_ok = False
-        try:
-            restore_ack = session.exchange(protocol.CMD_WRITE_VALUE, restore_payload)
-            protocol.parse_write_status(restore_ack)
-            _, _, restore_value = probe_value(session)
-            restore_ok = bool(restore_value.decoded) == baseline
-            record("restore", "ack" if restore_ok else "readback_mismatch", {
-                "value": restore_value.decoded,
-                "raw_hex": restore_value.raw.hex(),
-            })
-        except (
-            TimeoutError,
-            RuntimeError,
-            protocol.ParamIndexError,
-            usb1.USBError,
-        ) as exc:
-            record("restore", "fail", {"reason": f"{type(exc).__name__}: {exc}"})
+        def read():
+            _, observed_info, observed = probe_value(session)
+            if observed_info != info:
+                raise RuntimeError("parameter metadata changed during transition")
+            return bytes(observed.raw)
 
-        if restore_ok and forward_ok:
-            report["state"] = "A_B_A_complete"
-        elif restore_ok:
-            report["state"] = "restored_forward_unverified"
-        else:
-            report["state"] = "restore_unverified"
+        return 0 if run_transition(
+            report=report, record=record, write=write, read=read,
+            target_raw=target_raw, baseline_raw=baseline_raw,
+        ) else 1
+    try:
+        exit_code = run()
+    except (Exception, KeyboardInterrupt) as exc:
+        report["error_type"] = type(exc).__name__
+        exit_code = 1
     finally:
-        handle.releaseInterface(config["interface"])
-        handle.close()
-        context.close()
-
-    print(json.dumps(report, indent=2, ensure_ascii=False))
+        close_usb(context=context, handle=handle, claimed=claimed,
+                  interface=config["interface"], report=report)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+    return 1 if report.get("cleanup_errors") else exit_code
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
