@@ -232,3 +232,24 @@ It skips the area string. Native terminal matching and file restoration precede 
 invalid/partial reports are preserved for recovery. Budgets remain 120/210/30 seconds for
 baseline/read/cleanup within a one-hour, 64-job session. Current staging and live results are
 recorded in [the runtime topic](../../docs/23_RC2_LIVE_RUNTIME.md).
+
+## B4 fixed cloud-policy lane
+
+The first B4 session is **OBSERVED** and closed (C-290--C-292): baseline/read/cleanup/STOP all
+returned rc0; candidate content correlation, file absence and permanent receipts were verified.
+
+B4 adds `POLICY_BASELINE`, `POLICY_READ` and `POLICY_CLEANUP` alongside PING/SNAPSHOT/STOP.
+The client requires the exact B4 session marker, a completely received successful latest baseline,
+and a single read allocation. Uncertain transfers keep their original immutable sequence; a
+terminal read is not replayed. L3 pins the independent A054 payload and retains separate receipts.
+
+```sh
+python3 bridge.py --state-dir /path/to/private-state stage-policy --b4 /path/to/B4.sh --l3 /path/to/L3.sh --probe /path/to/libfinduas_cloud_cache.so
+python3 bridge.py --state-dir /path/to/private-state prepare
+```
+
+After the operator starts B4, the host collects the baseline, performs the fixed read, confirms
+cleanup and sends STOP. The probe compares existing RID namespace candidates, ProductType and
+CloudControlData caches. Logs contain numeric metadata/counts, not namespace/area/policy strings.
+The same 120/210/30-second helper budgets and one-hour session apply. Current source hashes,
+staging and live outcome are in [the runtime record](../../docs/23_RC2_LIVE_RUNTIME.md).

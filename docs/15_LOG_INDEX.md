@@ -230,3 +230,14 @@ volume/session identifiers and transport errors are not copied into this reposit
 - C-280--C-282 add the four B3 job reports, strict native parsing, exact copy/attempt receipts
   and CLOSED STOP. The single RID cache snapshot is retained privately with its process binding;
   only the four status booleans and numeric failure value are recorded publicly.
+
+## Exact control-source and cloud-comparison preparation
+
+C-283--C-289 use excluded status/expiry/notify slices, exact UI consumer references, the three-SDK
+control inventory, cloud-service selection and MMKV analysis, A054 manifests and host tests,
+plus MTP staging/session records. Product/receiver numbers are protocol metadata; namespace,
+area, payloads, volume/session IDs and native addresses stay private. Synthetic parser/differential
+fixtures are public and contain TEST values only.
+- C-290--C-292 add the four B4 reports, strict native parsing, fixed A054 copy/attempt receipts
+  and CLOSED STOP. The report contains only numeric metadata/counts; no namespace/area/payload
+  strings or hashes were collected. PID/UID, boot and transport/session identities stay private.

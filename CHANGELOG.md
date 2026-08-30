@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.30 - 2026-08-31
+
+- Resolved RID cache expiry/deduplication and exact-version UI/adapter ownership (C-283--C-285).
+- Closed the app cloud selector, product-type exclusions, service gate and shared last-SET cache
+  source; recovered an existing-instance MMKV read path (C-286).
+- Added sanitized offline/C candidate comparison and A054/L3/B4, with native/JNI/receiver/client
+  and differential tests (C-287/C-288).
+- Staged all three files with matching full SD readbacks and prepared the B4 session (C-289).
+  B4 then completed baseline/read/cleanup/STOP: ProductType139,41 rows,36 distinct candidates,
+  candidate match1 and DEFAULT match0; JNI/guard/parser/disposal succeeded. File absence,
+  permanent receipts and CLOSED STOP were independently checked (C-290--C-292).
+  This progress remains local.
+
 ## 0.4.29 - 2026-08-31
 
 - Closed the exact Fly 1.19.4 synchronous RID cache entry and serialized value format (C-277).

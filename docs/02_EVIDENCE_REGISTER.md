@@ -12,7 +12,7 @@ chain.
 | C-002 | `STATIC` | Adjacent RC331 `10.00.0700/0205` Android OTA/platform passed the recorded verification boundary | Adjacent version is not exact live v07 identity |
 | C-003 | `STATIC` | RC331 `10.00.0700/0200` outer layer passed; protected inner FLYA did not | No verified plaintext inner image |
 | C-004 | `STATIC` | WA150/product 139 is the current Mini 5 Pro static route candidate | Runtime owner/route must be re-established live |
-| C-005 | `UNKNOWN` | Exact current product ID and private-owner route are not closed | Static product-139 mapping is insufficient |
+| C-005 | `UNKNOWN` | Private-owner transport identity remains open; SDK ProductType cache is139 in C-291 | Product enum is separate from device token/HostID |
 | C-006 | `STATIC` | DJI Fly 1.21.10 is the principal analyzed app sample | It is not automatically the RC 2 loaded package |
 | C-007 | `STATIC` | MSDK 5.18.0 supplies schema/handler cross-checks | MSDK declaration is not consumer-product support |
 | C-008 | `OBSERVED` | macOS saw aircraft and RC 2 as separate DJI USB devices | Visibility is neither a supported MSDK session nor stable pair identity |
@@ -395,3 +395,23 @@ A claim changes status only when new evidence directly satisfies the missing bou
 | C-282 | `OBSERVED` | Independent cleanup confirmed absence, copy/attempt receipts matched, and STOP/CLOSED STOP completed | Permanent receipts retained; no second query, runtime unload or Fly restart |
 
 Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
+
+## Exact-version control ownership and cloud source
+
+| ID | Status | Claim | Boundary |
+| --- | --- | --- | --- |
+| C-283 | `STATIC` | RID cache has1000ms expiry; sync ignores it; same-valued pushes refresh timestamps but suppress change callbacks | Existing A051 result is a retained-cache snapshot; packet freshness needs another observation |
+| C-284 | `STATIC` | Settings switch is EID; import-status UI is Japan registration; native BLE start/stop is the local adapter | These names do not supply another aircraft RID actuator |
+| C-285 | `NEGATIVE` | Old CCC/global RID/C0 names absent from three exact1.19.4 SDK inputs; bounded paths have other owners | Named/versioned inventory; closed F7/Binder variants stay closed |
+| C-286 | `STATIC` | Product-based RID cloud selector and its legacy MMKV source are closed; successful generic SET retains the original value in a shared cache | Area predicate not observed; content matches identify candidates, not applied state |
+
+| C-287 | `STATIC` | Independent selector/C parser and sanitized candidate audit agree on427 valid synthetic cases;27 Python and101 C checks pass | Strict JSON subset; no actual-area selection or writer/applied-state attribution |
+| C-288 | `STATIC` | A054 existing-MMKV/two-cache reader and L3/B4 are built and host-tested with complete cleanup paths | New guarded MMKV execution awaits its live report |
+| C-289 | `OBSERVED` | Three cloud-comparison files passed full SD readback; new session prepared and B4 command supplied | No POLICY_READ/native execution yet |
+
+| C-290 | `OBSERVED` | B4 startup and full23-check baseline passed with rc0 | Baseline has no copy/attach/cache reads; POLICY_READ is separate |
+
+| C-291 | `OBSERVED` | One guarded MMKV decode and two SDK cache reads found ProductType139, receiver18/4,41 rows,36 distinct candidates, match1/default0; parse/disposal and file removal succeeded | Candidate content membership, not unique-country/actual-area/writer/applied-state evidence |
+| C-292 | `OBSERVED` | Independent cleanup, receipt readbacks and STOP/CLOSED STOP completed | No second attach or Fly restart; runtime mappings/permanent receipts remain |
+
+Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTROL_SURFACES.md).

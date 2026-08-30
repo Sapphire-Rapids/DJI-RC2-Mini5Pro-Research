@@ -272,3 +272,34 @@ Android linker and owner reads use a test double there. The real ARMv7 build and
 system checks are recorded separately. L2/B3 add fixed baseline/read/cleanup SD jobs using a
 new internal test filename and A-051 receipts. See [the host transport](../../../host-tools/rc2-sd-bridge/README.md)
 and [the runtime record](../../../docs/23_RC2_LIVE_RUNTIME.md) for staging and execution state.
+
+## A054: existing cloud-policy source comparison
+
+Status: **OBSERVED** on RC2 with Fly1.19.4 (C-291/C-292): one guarded MMKV read and two SDK
+cache reads returned ProductType139,41 rows,36 distinct candidates and match1/default0. All
+native/parser/disposal checks passed, PID/APK stayed stable, the file was removed and independently
+confirmed absent, and B4 closed normally. Keep the completed probe's permanent attempt receipt.
+
+This independent probe uses initialized namespace/key/MMKV metadata, verifies the loaded SDK
+and MMKV build IDs, and reads one existing default-MMKV key under bounded trylocks. Native
+instance, load mode and Java-handle checks select the memory-only read path. It releases both
+MMKV locks before parsing or making one SDK cache call each for CloudControlData and ProductType.
+It does not call the app area/service predicate, namespace lifecycle or cloud writer.
+
+The fixed UTF8 parser derives possible candidates using first-country/DEFAULT, product exclusions
+and nonempty strings. The report contains only numeric presence/receiver/product/count/error data;
+it omits source strings and hashes. It keeps missing namespace/cache/product, malformed policy
+and guard failures separate. Candidate string equality does not select an actual area or identify
+the writer of the shared last-SET cache.
+
+```sh
+FINDUAS_ANDROID_NDK_ROOT=/path/to/android-ndk sh scripts/build_cloud_cache_probe.sh
+FINDUAS_JDK_ROOT=/path/to/jdk sh scripts/run_cloud_cache_probe_host_tests.sh
+sh scripts/run_cloud_policy_parser_host_tests.sh
+```
+
+The native/JNI harness has40 cases with sanitizers; the parser has101 native checks plus a
+Python differential suite. Android linker/instance ownership is simulated in host tests and
+statically checked against the exact samples. L3/B4 provide fixed baseline/read/cleanup jobs
+with separate A054 receipts. [Current execution state](../../../docs/23_RC2_LIVE_RUNTIME.md)
+is recorded independently of host tests. The original A048/A051 bytes are unchanged.

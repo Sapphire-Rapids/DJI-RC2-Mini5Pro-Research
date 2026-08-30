@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-282；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-292；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -343,11 +343,83 @@ RID_READ 再次执行同样检查，然后独占创建、核对 A-051 的普通�
 STOP 与 CLOSED STOP 均已确认（C-282）。环境已释放、磁盘测试文件已回收，未卸载运行时
 映射或重启 Fly。A-048/A-051 的永久记录均保留。
 
+## 状态新鲜性与启停入口追踪
+
+`STATIC`：RID 的四个状态位来自飞机状态包，area 只作字符串映射。缓存记录1000ms有效期，
+但同步 getter 不检查这个期限。每个同值新推送仍会更新时间戳，只有值变化才通知 listener；
+缺包不会自动清空已有值（C-283）。因此 A-051 的记录继续保留为真实缓存快照。
+
+现有 native listener 对这个 push-only key 不启动 GET、也不回放首值；取消则先移除回调ID，
+再排队清理 worker 项。它适合后续研究状态变化，目前不把零回调当作新包到达记录。
+
+`STATIC`：当前设置页开关对应 France EID，状态页对应 Japan 注册导入；working-status的
+直接 UI 消费者使用 support 位决定序列号行显示。Native BLE start/stop 则通向本机
+Android action handler（C-284）。三份 exact SDK 中的旧 CCC/global-RID/C0 固定名字未见，
+这轮没有形成新的飞机 RID 普通开关读回/恢复链（C-285）。
+
+`STATIC`：RID 云策略使用旧 namespace 存储家族，名称中的 V2 不表示 getter-V2 API。
+`block_device` 是产品类型列表；选择器按首个 country/default 项、产品排除、空串过滤和
+同连接去重决定下发字符串。业务区域谓词会在服务层阻断 RID namespace；当前没有读取
+该谓词或实际 App area。Native sender 把该字符串从 hex 解码为00/DD载荷（C-286）。
+
+发送成功后原 CloudControlData 会留在 SDK 缓存，同一 key 也供限速、电池逻辑使用。
+下一只读比对将读取固定 RID namespace 的现存内存项、产品类型和共享缓存，按有效首项/
+DEFAULT规则比较可能的 RID 候选。原文、区域和payload摘要不输出；本轮不读取App area，
+因此匹配结果只记为候选内容关联。
+
+## 云策略比对程序与SD准备
+
+`STATIC`：独立 Python 选择器与 C 候选解析器完成（C-287）。它们保留首项、DEFAULT、
+产品排除及空串规则；不读取实际 App area 时只报告可能候选集合。UTF-8/JSON转义与代理对
+经过101项C检查、427组有效差分和5组限额拒绝对照，另有27项Python测试。
+
+A-054从已初始化枚举字段取得实际RID namespace，不猜测配置名。它先确认现存默认MMKV
+实例，用两层递归mutex的trylock守住固定键读取；缺实例、需重新加载、multiprocess或ashmem
+分支均以数字原因结束。普通Java包装对象允许，nativeHandle须匹配。拿到String后先释放
+MMKV锁，再转UTF-8并各读一次ProductType/CloudControlData缓存。只输出数字、计数及候选
+匹配结果，原文和payload摘要不输出（C-288）。
+
+40项JNI/锁顺序sanitizer案例、两次相同ARMv7构建、10项L3和3项B4真实mksh/Java测试，
+以及43项host protocol测试通过。独立检查确认两次SDK读在MMKV锁之外，失败路径逆序释放。
+
+`OBSERVED`：前一B3会话已正常关闭并归档，新会话已准备，三份文件完整SD回读均匹配（C-289）：
+
+- `Download/FindUAS_CLOUD_POLICY.so`：A-054，22,336 bytes。
+- `Download/L3.sh`：A-055，22,348 bytes。
+- `Download/B4.sh`：A-056，10,555 bytes。
+
+## 实机云策略缓存比对结果
+
+`OBSERVED`：操作者启动B4，完整基线的23项检查全部通过（C-290）。POLICY_READ重复基线，
+核对A054并加载一次。11,229-byte报告、DONE回执及独立解析一致，只有一组对应本轮SID/
+PID/UID的原生enter/result。一次MMKV解码、一次CloudControlData缓存读取、一次ProductType
+缓存读取均完成；JNI、环境、guard、JSON及Dispose返回码均为0（C-291）。
+
+| 输出 | 结果 |
+| --- | --- |
+| namespace/存储值/cloud缓存/product缓存 | 全部存在 |
+| ProductType | `139` |
+| 缓存接收者type/index | `18/4` |
+| 策略项 / country重复数 | `41 / 0` |
+| 去重后的非空可能候选内容 | `36` |
+| 缓存内容命中候选集合 | `1` |
+| DEFAULT候选匹配 | `0` |
+| 产品139命中block列表的首项数 | `0` |
+
+匹配数针对去重后的payload字符串集合，不代表唯一country行；41→36的差额可能包含空值和
+重复payload。DEFAULT匹配0未区分DEFAULT缺失、空或其他内容。实际App area和服务谓词没有
+读取，原文/区域/payload摘要没有输出；本轮建立的是现存RID候选与共享SDK缓存的内容关联。
+
+`OBSERVED`：Fly PID/UID/APK保持一致，匹配文件已删除；独立POLICY_CLEANUP确认不存在。
+copy/attempt回执与报告匹配，STOP/CLOSED STOP均已收到（C-292）。没有第二次attach或
+Fly重启；永久回执和已加载运行时映射保留。
+
 ## 下一步
 
-官方同步缓存读取已实机完成，不重复基础加载测试。后续应把状态采样与 C-207 的已有
-独立 RID 接收记录/电机时序对齐，并继续核对具有独立读回和恢复路径的控制 owner。
-当前没有需要操作者继续执行的命令，开发助手页面可以退出。
+缓存内容关联已经完成，后续重点是匹配候选的内部payload结构，而不是重复基础状态读取。
+最小补充数据是匹配内容对应行数、DEFAULT存在/非空标记，以及匹配hex内容解码后的长度和
+结构/版本摘要，随后对照确切接收/解析路径寻找启停字段。当前没有新实机命令；开发助手
+页面可以退出。
 
 ## 同步状态
 

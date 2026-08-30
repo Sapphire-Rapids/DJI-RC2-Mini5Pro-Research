@@ -65,6 +65,9 @@
 | A-051 | FindUAS ARMv7 official RID cache probe；self-developed；`rid-cache-v1-armeabi-v7a` | `14,376` | `3dea20698eee556706189fd9910705fa60a1d80d0d18ba31a496fa443b38837b` | `OBSERVED`；一次实机 cache call 成功，RID1/1、EID0/0、failReason0；环境释放、文件回收、PID/APK 稳定；SO 排除、source/hash 公开 |
 | A-052 | FindUAS L2 fixed RID cache loader；self-developed；`rc2-rid-cache-loader-v1` | `22,121` | `78ba8c4b2e7176048b16d582cd6c688f207131f4c246f0de45804ed47f478b52` | `OBSERVED`；BASELINE/READ/独立 CLEANUP 完整报告均 rc0，文件回收并独立确认不存在；source/hash 公开，原始报告排除 |
 | A-053 | FindUAS B3 fixed RID cache session；self-developed；`sd-rid-cache-bridge-v1` | `10,513` | `82e781c1e0b5a5e06849499e8d76076f8831b8fee1cf12dd866273089e7475ea` | `OBSERVED`；操作者启动后完成 BASELINE/READ/CLEANUP/STOP，均 rc0，CLOSED STOP 已确认；source/hash 公开，会话记录排除 |
+| A-054 | FindUAS ARMv7 cloud-policy cache comparator；self-developed；`cloud-cache-v1-armeabi-v7a` | `22,336` | `23c769203a26c6649c95770f50f49676965b06b30d292a302ddb2ce6eba8ea7f` | `OBSERVED`；一次实机MMKV解码及两项SDK缓存读取成功；product139、41项/36候选、match1/default0；环境释放、文件回收；SO排除，source/hash公开 |
+| A-055 | FindUAS L3 fixed cloud-policy loader；self-developed；`rc2-cloud-policy-loader-v1` | `22,348` | `f9768d94ba3adaec7211da195f2743a67ca5213f2471f8e0a457224ce372b837` | `OBSERVED`；BASELINE/READ/独立CLEANUP完整报告均rc0；PID/APK稳定，文件回收复查完成；source/hash公开，原始报告排除 |
+| A-056 | FindUAS B4 fixed cloud-policy session；self-developed；`sd-cloud-policy-bridge-v1` | `10,555` | `fab6f0645bea70151c843ed93e80f6300f1d66f15d4a79695cafc46230c17e88` | `OBSERVED`；操作者启动后完成BASELINE/READ/CLEANUP/STOP，均rc0，CLOSED STOP核验；source/hash公开，会话记录排除 |
 
 ## 3. A-001：历史 v0.10 admission probe
 

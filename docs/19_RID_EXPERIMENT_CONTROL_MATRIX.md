@@ -72,7 +72,7 @@ until that field's owner, baseline, readback, restore and independent RF corresp
 | Surface | Owner and path | Read | Write | Current disposition |
 | --- | --- | --- | --- | --- |
 | Global Broadcast RID master | same-family SDK `RIDCtrlEnable -> rid_ctrl_enable_0`; authoritative WA150 broadcaster control unclosed | `rid_ctrl_enable_0` is absent on the positive-controlled `01.00.0600` direct-USB FLYC surface, with no matching name in the reported enumeration (C-227/C-230); Binder controls previously failed | no admitted write | `STATIC LOCKED`; do not repeat the same target/route; reopen only with materially new owner, handler or version evidence |
-| RID/EID working status | product-139 `RidImportModule`, natural `0x11/0x1C` push | support/normal flags, area, failure | none | `PASSIVE OWNER`; no GET builder and onboard normal is not RF truth |
+| RID/EID working status | exact1.19.4 `RidImportModule` and synchronous SDK cache | A-051 received RID1/1, EID0/0, failure0; retained cache has1000ms expiry that sync ignores | none | `READ-ONLY LIVE`; C-281/C-283; same-valued pushes do not generate change callbacks |
 | Regional capability | product-139 interpretation of the same push | US bit 0, Cloud bit 10, EU/Japan/France bits 11/12/13 in explicit mode | none | `PASSIVE OWNER`; show capability separately from real area and RF standard |
 | RID health/diagnostics | FC health manager plus Remote ID delegate | working/idle/location/firmware/no-broadcast/unsupported/unknown | none | `PASSIVE OWNER`; preserve the raw failure class without coordinates |
 | Broadcast start/stop timing | aircraft firmware plus independent receiver | A-024 Binder listener was false-negative while the independent detector confirmed real motor-on RID | no safe trigger | `READ-ONLY LIVE`; use the independent receiver for RF truth and do not repeat the tested Binder listener |
@@ -232,3 +232,16 @@ does not mean the current Mac or attached DJI aircraft has a compatible transmit
 
 No current surface in this matrix is admitted as a stable Mini 5 Pro RID transmitter switch or
 free-form device editor.
+
+### Exact-version cloud-source follow-up (C-286)
+
+The RID namespace's V2 label uses the legacy service/MMKV getter. Its exclusion list contains
+ProductType values rather than unique aircraft identities. The successful00/DD path caches the
+original CloudControlData, shared with speed-limit and battery writers. The next fixed reader
+compares that snapshot to possible RID namespace candidates without reading actual App area or
+sending a policy. This adds a source-comparison step; applied readback and restoration remain open.
+
+C-291/C-292 now observe and recover that comparison: ProductType139,41 rows,36 distinct
+nonempty candidate strings, receiver18/4 and candidate match1/default match0. Actual area,
+matched-row uniqueness, payload schema and applied readback are not supplied by this report.
+The opaque-policy control row remains unchanged while structural analysis continues.
