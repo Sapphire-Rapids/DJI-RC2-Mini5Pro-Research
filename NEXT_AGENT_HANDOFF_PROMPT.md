@@ -40,10 +40,10 @@ Current facts:
   do not call them lost or replace missing provenance with a new device request by default.
 - No real-aircraft field editor is admitted. Synthetic OpenDroneID work stays offline and does
   not substitute for aircraft owner/readback/RF evidence.
-- Exact A-001 v0.10 is staged as removable-SD `Download/FindUAS_A001_V010.apk`; fresh unique
-  listing and same-session full MTP readback matched size/hash (C-231). Installation and run
-  remain pending. Obtain its privacy-reduced environment report before promoting live identities;
-  the probe does not itself admit an attach or aircraft request.
+- Exact A-038 v0.11 is staged as removable-SD `Download/FindUAS_A038_V011.apk`; full MTP
+  readback matched its size/hash (C-233/C-234). After operator installation/check, retrieve its
+  final report from `Download/FindUAS/Probe/` directly through MTP. Installation/run and report
+  receipt are pending; APK delivery or export success does not admit an attach or aircraft request.
 
 Priority:
 

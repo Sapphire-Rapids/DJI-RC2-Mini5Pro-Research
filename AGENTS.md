@@ -92,11 +92,12 @@ Later retractions override earlier progress summaries.
    Boolean. Never publish or synthesize license IDs, tokens, signatures, or blobs.
 6. Historical localhost observer v0.1-v0.4 is `RETRACTED`. A second connection to RC-local
    `40007`/`40009` can replace DJI Fly's single active fd even if no payload is written.
-7. v0.10 is the current zero-permission admission-probe candidate. Its exact APK SHA-256 is
-   `fdad29bfb1237bc224a805d6eb5a99358a044bd226610d9f0fc33975d94b606c`. Exact A-001 has been
-   staged as removable-SD `Download/FindUAS_A001_V010.apk`; a fresh unique listing and full
-   same-session MTP readback matched its 2,570,983-byte size and hash (C-231). Installation and
-   execution remain pending; staging is not a live environment report or permission to attach.
+7. v0.11 (A-038) is the current zero-permission probe with the user-requested SD report sink.
+   Its exact APK SHA-256 is `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed4ec0f8771d6eb8044aa`.
+   `Download/FindUAS_A038_V011.apk` is staged with full MTP readback verified (C-233/C-234).
+   Installation/run and actual report receipt are pending. Only generated reports may be written
+   under fixed removable-SD `Download/FindUAS/Probe/`; no target-code or aircraft write is added.
+   A-001 v0.10 remains historical; its unchanged audit does not certify the new report sink.
 8. V2.2 SHA-256 `7aa794ff8611582fd7cf27808a9d9eb11c44e307889d615d0511c100522845fb`
    is permanently rejected. V2.3 SHA-256
    `49d5d1d3b6e2dcb72b23f48b688effb2be3f320bec6997a9dcb15779904156c2` fixes the documented

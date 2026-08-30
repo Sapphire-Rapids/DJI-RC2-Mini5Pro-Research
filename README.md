@@ -108,10 +108,10 @@
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
   没有 shell。下一次 operator session 先采集 exact Fuli UID/SELinux/properties/hashes/path labels，
   再据实生成第二段单次启动命令，不预猜 `/data` path。
-- 当前 Android admission probe v0.10（A-001）已重新通过 source/final-DEX audit，并 staged 为
-  removable-SD `Download/FindUAS_A001_V010.apk`；fresh 唯一文件 listing 与同 session 全量
-  MTP readback 的 size/hash 匹配（C-231）。安装/运行及实机环境报告仍待完成，不能把交付当作
-  live identity、attach 或 aircraft-control 准入。
+- 当前 Android probe 为 v0.11（A-038）：在原只读检查之上，仅增加用户要求的 SD 报告导出。
+  `Download/FindUAS_A038_V011.apk` 已 staged 并完整读回核对（C-233/C-234）。运行检查后报告
+  自动进入 SD `Download/FindUAS/Probe/`，由主机读取；安装/运行及实际报告读回仍待完成，不能
+  把 APK 交付或报告保存当作 live identity、attach 或 aircraft-control 准入。
 - 固定 clean-room 管理客户端 `0.3.0-research` 已安装并执行：live `protocol` Binder lookup、
   manager transaction 和 callback exception layer 均成功，但 target F7 在约 3.1 秒后以
   `ECode 1` 结束，没有 F7 ACK，也没有发送 F9。相邻 RC331 `ActQueue` 将该错误映射为重试耗尽；

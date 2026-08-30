@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 import re
 import sys
@@ -13,6 +14,11 @@ from audit_artifact import (
     audit_app_dex_safety,
     audit_completion_gate_dex_dump,
     dex_class_block,
+    dex_enclosing_method_block,
+    dex_instructions,
+    dex_method_block,
+    local_register,
+    REPORT_DESCRIPTOR,
     run,
     tool,
 )
@@ -43,10 +49,26 @@ def replace_completion_caller(dex_dump: str, pattern: str, replacement) -> str:
     if start < 0:
         raise RuntimeError("completion caller class missing")
     block = dex_dump[start:] if end < 0 else dex_dump[start:end]
-    mutated, count = re.subn(pattern, replacement, block, count=1)
+    method = dex_enclosing_method_block(block, CALL_NEEDLE)
+    mutated, count = re.subn(pattern, replacement, method, count=1)
     if count != 1:
         raise RuntimeError(f"caller mutation target did not match exactly once: {pattern}")
-    return dex_dump[:start] + mutated + dex_dump[start + len(block):]
+    return dex_dump.replace(method, mutated, 1)
+
+
+def completion_caller(dex_dump: str) -> str:
+    offset = dex_dump.index(CALL_NEEDLE)
+    start = dex_dump.rfind("Class descriptor  : '", 0, offset)
+    end = dex_dump.find("\nClass #", offset)
+    block = dex_dump[start:] if end < 0 else dex_dump[start:end]
+    return dex_enclosing_method_block(block, CALL_NEEDLE)
+
+
+def replace_report_class(dex_dump: str, descriptor: str, old: str, new: str) -> str:
+    block = dex_class_block(dex_dump, descriptor)
+    if old not in block:
+        raise RuntimeError(f"report mutation target missing: {old}")
+    return dex_dump.replace(block, block.replace(old, new, 1), 1)
 
 
 def duplicate_protocol_argument(match: re.Match[str]) -> str:
@@ -56,13 +78,30 @@ def duplicate_protocol_argument(match: re.Match[str]) -> str:
     )
 
 
+def overwrite_file_error(match: re.Match[str]) -> str:
+    pc = int(match.group(2), 16) + 1
+    return (match.group(1) + f"\n|{pc:04x}: sget-object {match.group(3)}, "
+            "Lcom/finduas/ridobserver/ArtIdentityState;.COMPLETE:"
+            "Lcom/finduas/ridobserver/ArtIdentityState;")
+
+
 def main() -> int:
-    if len(sys.argv) != 2:
-        print("usage: test_audit_mutations.py APK", file=sys.stderr)
-        return 2
-    apk = Path(sys.argv[1]).resolve()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=("v10", "v11"), default="v11")
+    parser.add_argument("apk", type=Path)
+    args = parser.parse_args()
+    apk = args.apk.resolve()
     dex_dump = run(tool("dexdump"), "-d", apk)
     audit_completion_gate_dex_dump(dex_dump)
+    caller = completion_caller(dex_dump)
+    protocol_register = local_register(caller, "nextProtocolCompleted", "Z")
+    bridge_register = local_register(caller, "nextLocalBridgeCompleted", "Z")
+    art_register = local_register(caller, "nextArtIdentity",
+                                  "Lcom/finduas/ridobserver/AndroidArtIdentityResult;")
+    instructions = dex_instructions(caller)
+    art_call_index = next(index for index, (_, operation) in enumerate(instructions)
+                          if "AndroidArtIdentityProbe;.run:()" in operation)
+    art_success_pc = instructions[art_call_index + 2][0]
 
     policy_mutations = {
         "protocol_branch_removed": (
@@ -104,7 +143,7 @@ def main() -> int:
                 "protocol_completion_initialized_true",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|0000:\s+const/4 v1, #int )0",
+                    rf"(\|[0-9a-f]{{4}}:\s+const/4 {protocol_register}, #int )0",
                     r"\g<1>1",
                 ),
             ),
@@ -112,7 +151,7 @@ def main() -> int:
                 "bridge_completion_initialized_true",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|0017:\s+const/4 v2, #int )0",
+                    rf"(\|[0-9a-f]{{4}}:\s+const/4 {bridge_register}, #int )0",
                     r"\g<1>1",
                 ),
             ),
@@ -151,8 +190,8 @@ def main() -> int:
                 "art_probe_success_result_replaced",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|0072:\s+move-object v7, )v0",
-                    r"\g<1>v4",
+                    rf"(\|{art_success_pc:04x}:\s+move-object {art_register}, )v\d+",
+                    rf"\g<1>{protocol_register}",
                 ),
             ),
             (
@@ -169,16 +208,19 @@ def main() -> int:
                 "terminal_result_replaced_before_snapshot",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|0100:\s+invoke-static/range "
-                    r"\{v4, v5, v6, v7, v8, v9, )v10",
-                    r"\g<1>v12",
+                    r"(invoke-static/range \{)([^}]+)(\}, "
+                    r"Lcom/finduas/ridobserver/ProbeSessionSnapshot;\.copy\$default:)",
+                    lambda match: match.group(1) + ", ".join(
+                        protocol_register if index == 6 else value.strip()
+                        for index, value in enumerate(match.group(2).split(","))
+                    ) + match.group(3),
                 ),
             ),
             (
                 "snapshot_result_not_persisted",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|0104:\s+)sput-object (v\d+), "
+                    r"(\|[0-9a-f]{4}:\s+)sput-object (v\d+), "
                     r"Lcom/finduas/ridobserver/ProbeSessionCoordinator;\.state:",
                     r"\1sget-object \2, "
                     r"Lcom/finduas/ridobserver/ProbeSessionCoordinator;.state:",
@@ -188,19 +230,17 @@ def main() -> int:
                 "file_error_overwritten_before_fallback_constructor",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|0078:\s+sget-object v8, "
+                    r"(\|([0-9a-f]{4}):\s+sget-object (v\d+), "
                     r"Lcom/finduas/ridobserver/ArtIdentityState;\.FILE_READ_ERROR:"
                     r"Lcom/finduas/ridobserver/ArtIdentityState;[^\n]*)",
-                    r"\1\n|0079: sget-object v8, "
-                    r"Lcom/finduas/ridobserver/ArtIdentityState;.COMPLETE:"
-                    r"Lcom/finduas/ridobserver/ArtIdentityState;",
+                    overwrite_file_error,
                 ),
             ),
             (
                 "snapshot_mask_defaults_observed_run_state",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|00ef:\s+const/16 v17, #int )3776",
+                    r"(\|[0-9a-f]{4}:\s+const/16 v\d+, #int )3776",
                     r"\g<1>3808",
                 ),
             ),
@@ -208,7 +248,7 @@ def main() -> int:
                 "duplicate_retained_state_store",
                 replace_completion_caller(
                     dex_dump,
-                    r"(\|00b6:\s+)sget-object (v\d+), "
+                    r"(\|[0-9a-f]{4}:\s+)sget-object (v\d+), "
                     r"Lcom/finduas/ridobserver/ProbeSessionCoordinator;\.state:",
                     r"\1sput-object \2, "
                     r"Lcom/finduas/ridobserver/ProbeSessionCoordinator;.state:",
@@ -227,6 +267,7 @@ def main() -> int:
             print(f"MUTATION_ACCEPTED: {name}", file=sys.stderr)
             return 1
     app_dump = application_dex_dump(dex_dump)
+    audit_app_dex_safety(app_dump, profile=args.profile)
     safety_mutations = {
         "system_load_call_added": (
             app_dump + "\n|fffe: invoke-static {v0}, "
@@ -239,9 +280,45 @@ def main() -> int:
             "ILjava/lang/Object;)V"
         ),
     }
+    if args.profile == "v11":
+        store_descriptor = REPORT_DESCRIPTOR + ";"
+        android_descriptor = REPORT_DESCRIPTOR + "$AndroidStore;"
+        safety_mutations.update({
+            "report_directory_becomes_arbitrary_path": replace_report_class(
+                app_dump, android_descriptor, "Download/FindUAS/Probe/", "/data/local/tmp/"),
+            "report_relative_path_becomes_data_path": replace_report_class(
+                app_dump, android_descriptor, '"relative_path"', '"_data"'),
+            "report_file_prefix_becomes_arbitrary_uri": replace_report_class(
+                app_dump, store_descriptor, "FindUAS_Probe_v011_", "content://other/"),
+            "primary_volume_rejection_removed": replace_report_class(
+                app_dump, store_descriptor, '"external_primary"', '"unmatched_volume"'),
+            "removable_check_replaced_by_primary_check": replace_report_class(
+                app_dump, android_descriptor, ".isRemovable:()Z", ".isPrimary:()Z"),
+            "report_output_changes_to_append_mode": replace_report_class(
+                app_dump, android_descriptor, '"w"', '"wa"'),
+            "additional_class_opens_arbitrary_uri": (
+                app_dump + "\nClass #999999 -\n"
+                "  Class descriptor  : 'Lcom/finduas/ridobserver/UnreviewedWriter;'\n"
+                "|0000: invoke-virtual {v0, v1, v2}, "
+                "Landroid/content/ContentResolver;.openOutputStream:"
+                "(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;"
+            ),
+            "additional_class_writes_existing_stream": (
+                app_dump + "\nClass #999999 -\n"
+                "  Class descriptor  : 'Lcom/finduas/ridobserver/UnreviewedWriter;'\n"
+                "|0000: invoke-virtual {v0, v1}, Ljava/io/OutputStream;.write:([B)V"
+            ),
+        })
+        android_block = dex_class_block(app_dump, android_descriptor)
+        cleanup_method = dex_method_block(android_block, "remove")
+        if ".ownedUri:" not in cleanup_method:
+            raise RuntimeError("owned cleanup URI call missing")
+        safety_mutations["cleanup_uses_unowned_uri"] = app_dump.replace(
+            cleanup_method, cleanup_method.replace(".ownedUri:", ".unownedUri:", 1), 1
+        )
     for name, mutation in safety_mutations.items():
         try:
-            audit_app_dex_safety(mutation, enforce_frozen_surface=False)
+            audit_app_dex_safety(mutation, enforce_frozen_surface=False, profile=args.profile)
         except AuditFailure:
             rejected += 1
         else:

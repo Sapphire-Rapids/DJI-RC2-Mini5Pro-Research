@@ -30,16 +30,18 @@ Effect: ADB and Fuli statements explicitly tied to C-174--C-176 may be promoted 
 target-package `STATIC`; they are not live execution facts. Other adjacent Binder, Parcelable,
 policy, ART, and installed-file conclusions remain unpromoted.
 
-## B-02 — v0.10 runtime result
+## B-02 — runtime report and SD export
 
-Exact A-001 is staged as removable-SD `Download/FindUAS_A001_V010.apk`; fresh unique listing and
-same-session full MTP readback matched its registered size/hash (C-231). Installation and run
-remain pending. No attach, ADB-daemon or aircraft request follows from that delivery.
+Exact A-038 v0.11 is staged as removable-SD `Download/FindUAS_A038_V011.apk`; full MTP readback
+matched its registered size/hash (C-233/C-234). Installation/run and report receipt are pending.
+The explicit report-output exception adds no attach, ADB-daemon or aircraft request.
 
-Missing: a complete redacted `finduas-rid-probe/v0.10-schema-1` report from the exact reviewed APK.
+Missing: the inspected device's complete `finduas-rid-probe/v0.10-schema-1` report, with v0.11
+app-version and final file marker. Fetch the published final-name file in `Download/FindUAS/Probe/`
+through fresh MTP enumeration/readback; incomplete diagnostics must remain labelled incomplete.
 
-Effect: live environment, package, Binder descriptor, bridge, ART file/mapping, and named range
-gates remain unknown. Offline audit does not establish device compatibility.
+Effect: unobserved live environment/package/ART gates stay unknown. Saving a report and receiving
+it on the host are separate from its diagnostic result and from any later loader admission.
 
 ## B-03 — side-effect-free privileged caller
 

@@ -1,6 +1,6 @@
 # FindUAS RID Observer — research-only APK
 
-Status: **OBSERVED** source boundary; current v0.10 build is an unexecuted admission probe. This
+Status: **source-only v0.11 report-export revision**; device installation/run remain unconfirmed. This
 directory contains only independently written `src/safe` and `src/safeTest` code. It is covered by
 the repository-root [MIT license](../../LICENSE). Generated APKs, vendor files, and the withdrawn
 localhost/socket source are intentionally excluded.
@@ -29,6 +29,39 @@ export GRADLE_BIN=/path/to/gradle-8.10.2/bin/gradle
 > Fly even when the new client never writes a byte. Do not start their observer service, do not
 > use them for passive capture, and do not treat “input-only” as non-disruptive. If one is
 > installed, leave it stopped and update in place to v0.10.
+
+## Current v0.11: save the report on SD for host retrieval
+
+The user explicitly requested SD report output. Version `0.11.0-report-export` / code `11`
+keeps the same package/signing identity and the existing read-only device checks. It adds no
+permission, device command, target-code write, socket, attach, service or automatic network upload.
+Only the generated diagnostic report is written.
+
+After tapping **执行只读能力检查**, both `COMPLETE` and `INCOMPLETE` results automatically save
+one new UTF-8 file on the unique mounted removable SD volume:
+
+```text
+Download/FindUAS/Probe/FindUAS_Probe_v011_<completed-time>_<run-id>_<attempt-id>.txt
+```
+
+Keep the app open until the save result. No file picker or clipboard transfer is required. A failed
+save offers **重新保存报告到 SD 卡（不重新检查）**. Each attempt has a new name; existing files
+are never replaced. No/multiple SD volumes, unavailable MediaStore, oversized/truncated output,
+write/close/publish failure and failed pending-row cleanup are separate results. There is no
+internal-storage fallback and no broad storage permission.
+
+The report is at most 256 KiB and must end with `report_file_end=true`. Its core machine schema
+remains `finduas-rid-probe/v0.10-schema-1`, with `app_version=0.11.0-report-export` added. Export
+success never changes the inspection's completion verdict. Report files contain local diagnostic
+paths and run metadata; keep them private and do not commit them.
+
+The host must obtain a fresh final-name MTP listing and full readback. `IS_PENDING=0`/the UI's saved
+state proves only local publication, not host receipt. Rotation/resume cannot duplicate an export;
+process death can lose an unfinished report. See [v0.11 export and audit](REPORT_EXPORT_V11.md).
+
+The following v0.10 design and audit notes describe the preserved historical artifact. Their
+blanket file-output ban is unchanged for v0.10; the current source has only the reviewed v0.11
+report sink exception above.
 
 ## Safe replacement design: v0.10
 
