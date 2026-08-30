@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-248；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-253；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -16,7 +16,8 @@
 | Shell 身份 | `id` 实测 UID/GID 1000（system），域为 `u:r:system_app:s0` | C-246 |
 | 目录基线 | `/data`、`/data/app` 均为 system:system、771；后者标签为 `apk_data_file` | C-247 |
 | 同进程加载 | ARMv7 ART TI canary 已构建、测试并放到 SD 卡；尚未执行 | C-243 |
-| 当前操作 | Shell 执行 `ls -laZ /data/app` 并回传，核对测试文件名是否占用 | C-247、C-248 |
+| 目录内容 | 七个子目录；拟用 `finduas_A040_canary.so` 文件名未出现 | C-249 |
+| 当前操作 | `/storage` 枚举被拒绝；读取该目录元数据及系统存储管理接口信息 | C-252、C-253 |
 
 本轮尚未执行 RID 切换。操作者说明未办理解禁，证书页面的人工查看已暂缓；后续优先
 观察独立 RID 工作状态，FlySafe 清单不作为继续研究的前提。
@@ -121,6 +122,11 @@ ART 文件身份不变。目录 `ABSENT` 是 Observer 进程所见，另以直�
 因此不采用新建子目录的方案；
 直接放置独立 `.so` 普通文件的候选见 [H-32](10_HYPOTHESES_AND_UNKNOWNS.md#h-32--the-remaining-loader-problem-is-a-callertarget-path-policy-intersectionc-208--c-211)。
 
+`OBSERVED`：操作者发送 `ls -laZ /data/app` 一次，两张相互重叠的照片覆盖列表首尾。
+共有七个子目录：`DJI_FLY` 为 system:system、0777、apk_data_file；其余六个 Android
+随机安装根为 system:system、0775、同一标签。拟用的 `finduas_A040_canary.so` 文件名未出现
+（C-249）。既有报告已记录 Fly 的固定 APK 与 native-library 位置，不再重复检查这些路径。
+
 `STATIC`：A-040 是独立的 ARMv7 ART TI 加载测试，仅请求接口版本 `0x70010200`、
 查询版本并输出一次结果，不枚举类或发起飞机查询。10 项 fake-VM 测试通过，4 个故障
 变体被拒绝，ARMv7/ARM64 均构建成功。ARMv7 文件已在 SD 卡回读核对，未复制到内部路径
@@ -129,12 +135,39 @@ ART 文件身份不变。目录 `ABSENT` 是 Observer 进程所见，另以直�
 `OBSERVED`：8 个已被替代的研究 APK 已移至 `Download/FindUAS/Archive/`，文件名和大小
 清单前后一致，没有删除文件。A-039、原版 Fuli 和当前工具留在 Download（C-244）。
 
+## F1 一次性报告收集
+
+`STATIC`：独立脚本 A-043 合并调用方身份、固定系统属性、已有 Fly 进程身份、PID/starttime
+前后检查与 SD 上 A-040 的大小/哈希读取。仅在当前 SD 的 `Download/FindUAS/Probe/` 新建
+报告，已有同名文件不覆盖；每条命令保留退出码和错误输出。独立源码审查、shell 语法、
+三个实际 Java `Runtime.exec(String)` 启动用例及七个主机 shell 模拟场景通过（C-250）。
+
+`OBSERVED`：`Download/F1.sh` 已经 RC 2 MTP 暂存，完整回读与源码逐字节一致：7,196 bytes，
+SHA-256 `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece`（C-251）。
+`OBSERVED`：操作者执行下方原定启动命令，照片确认输入一致。内层 `sh` 报告字面路径
+`/storage/????-????/Download/F1.sh: No such file or directory`，没有出现 F1 标记；脚本尚未
+进入采集。接下来读取调用方能看到的存储入口（C-252）。
+
+原定命令保留作记录，当前不重复执行：
+
+```text
+sh -c (sh${IFS}/storage/????-????/Download/F1.sh)2>&1
+```
+
+`OBSERVED`：随后用合并 stderr 的命令列举 `/storage`，照片明确返回
+`ls: /storage: Permission denied`（C-253）。因此先读取父目录的权限/标签与系统 volume
+信息，再选择脚本入口；F1 源码与 SD 上的文件仍保持 C-251 的同一身份。
+
 ## 下一步
 
-1. 安装后报告、Shell 身份与两个父目录的权限/标签已收到，不再重复这些检查。
-2. 当前 Shell 输入 `ls -laZ /data/app`，点“发送”并回传照片，核对拟用文件名是否已占用。
-   再完成独占创建/复制、实际文件校验及加载前目标进程身份检查。
-3. 先验证纯 canary 的成功标记与 Fly PID 稳定，再推进独立 RID 状态观测。
+1. 安装后报告、Shell 身份、父目录权限/标签及目录内容已收到。
+2. 在同一 Shell 页面合并读取目录元数据和系统存储管理信息，点击“发送”并回传结果照片：
+
+   ```text
+   sh -c (ls${IFS}-ldZ${IFS}/storage;sm${IFS}list-volumes${IFS}public)2>&1
+   ```
+
+3. 按实际路径修正 F1 入口后，再采集并读取报告，准备 canary 文件与后续加载测试。
 
 按操作者最新要求，进度仅同步本地仓库，暂停 GitHub 推送。
 

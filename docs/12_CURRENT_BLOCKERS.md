@@ -4,10 +4,12 @@ This document lists missing evidence. It does not assert that the missing work w
 control.
 
 The post-install A-039 COMPLETE report, actual Shell identity and parent-directory observations
-are received (C-245--C-247). The only current operator command is `ls -laZ /data/app`, to
-inspect contents and check the proposed basename for a conflict. C-248 changes the candidate to
-a separate regular `.so` directly in `/data/app`, with no new subdirectory. No test file has
-been created, copied or executed; file-level and target-process baselines remain open. See
+are received (C-245--C-247), followed by the complete directory contents in C-249. The candidate
+remains a regular `.so` directly in `/data/app` (C-248); its basename was absent. F1/A-043 passed
+review/tests (C-250) and is SD-staged with matching full readback (C-251). The C-252 launch
+wrapper reported a literal-path open error without entering F1. C-253 confirms `/storage`
+enumeration returns Permission denied. Await directory metadata and public-volume API results
+before selecting the storage entry; no internal canary copy or attach has occurred. See
 [the runtime topic](23_RC2_LIVE_RUNTIME.md).
 Per the latest user instruction, continue local updates, validation and commits, but do not
 resume GitHub pushes without renewed user authorization. Historical pushes remain recorded.
@@ -37,7 +39,7 @@ Still missing:
 
 - full signed module/package set beyond the verified system/`0205` lane;
 - current mounted adbd hash/branch result; the reported `dbg_cnt` was an empty string;
-- the standalone regular-file basename check and file-level access/label checks;
+- file-level access/label/hash checks; the candidate basename was absent in C-249;
 - target Fly process mapping/loader behavior and the relevant executable path/namespace.
 
 The installed-file matches support the specific framework/service and package comparisons in
@@ -68,9 +70,14 @@ treats directories as package candidates and failure may remove them; systemRead
 can also remove unregistered directories. Both examined rules skip ordinary non-APK files.
 The candidate is therefore a separate regular `.so` directly in `/data/app`, not a subdirectory.
 
-Current command: `ls -laZ /data/app`, to inspect contents and check the proposed basename for
-a conflict. No test file has been created, copied or executed. This cleanup analysis does not
-replace file-level checks or the target-process baseline before loading.
+C-249 supplies the complete listing: seven subdirectories, with DJI_FLY at 0777 and six
+randomized installation roots at 0775; all are system:system and apk_data_file. The candidate
+`finduas_A040_canary.so` was absent. F1/A-043 is staged with matching full readback (C-251);
+C-252 shows the correctly entered wrapper reaching `sh` but failing to open the literal
+wildcard path, with no F1 marker. C-253 supplies the precise stderr result:
+`ls: /storage: Permission denied`. Listing refusal does not establish that an exact known child
+file is unreadable. Await directory metadata and public-volume API output before changing the
+launch entry; F1 and the SD file remain unchanged, with no script run or report received.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -434,8 +441,8 @@ Missing live:
 
 Effect: A-032 remains `NOT ADMITTED`. Do not guess `/data` paths, run from removable storage, change
 APEX/partition/boot state, or describe the staged file as an ADB workaround. This contingency list
-is not the current operator instruction. B-03 requests only `ls -laZ /data/app` for the
-regular-file basename check; target-process and file-level baselines remain pending.
+is not the current operator instruction. B-03 awaits directory metadata and public-volume API
+results after C-253; target-process and file-level baselines remain pending.
 
 Bricking precedent: the pinned public RC 2 report C-212 records framework/TEE tamper followed by a
 DJI Fly update boot-logo loop and failure of every documented software recovery attempt. Before any
@@ -450,7 +457,12 @@ The current evidence dependencies are:
 ```text
 verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
   -> actual Shell identity and parent-directory observations received (C-246/C-247)
-  -> ls -laZ /data/app; check regular .so basename for conflict (C-248)
+  -> complete directory listing received; candidate basename absent (C-249)
+  -> F1 reviewed/tested and SD-staged with matching readback (C-250/C-251)
+  -> F1 wrapper path-open failure; script not entered (C-252)
+  -> /storage enumeration refused (C-253)
+  -> receive directory metadata + public-volume API results; select storage entry
+  -> receive target PID/domain + source canary hash report
   -> file-level and target-process baselines before loading
   -> A-040 pure ARMv7 ART TI canary and unchanged Fly PID
   -> verified independent RID-state observer and callback provenance
@@ -473,7 +485,7 @@ exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
 ```
 
 The F7 route matrix is closed at the generic attach level, and the tested Binder status listener is
-closed as a truth source. Current work follows C-240/C-243/C-245--C-248; FlySafe inventory remains a
+closed as a truth source. Current work follows C-240/C-243/C-245--C-253; FlySafe inventory remains a
 separate branch. The older resolver sequence below is historical context, not the current operator
 procedure:
 

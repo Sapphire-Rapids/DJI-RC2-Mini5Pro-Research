@@ -3,10 +3,11 @@
 ## Start here
 
 The post-install A-039 COMPLETE report, actual Shell identity and parent-directory observations
-are received (C-245--C-247). The only current operator command is `ls -laZ /data/app`, to
-inspect contents and check the proposed basename for a conflict. C-248 changes the candidate to
-a separate regular `.so` directly under `/data/app`, with no new subdirectory. No test file has
-been created, copied or executed; the pure ARMv7 ART TI canary remains unexecuted.
+are received (C-245--C-247); C-249 adds the complete contents/basename check. F1/A-043 is now
+SD-staged as `Download/F1.sh` with matching full readback (C-251). C-252 records a wrapper
+path-open error before F1 started; C-253 confirms `/storage` enumeration is denied. The current
+step collects directory metadata and public-volume API results before selecting an entry.
+F1 execution/report receipt and internal canary copy/attach remain pending.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -43,9 +44,17 @@ the actual Shell `id` photo: UID/GID 1000/system and `system_app:s0`. C-247 reco
 and `/data/app` mode 0771, system:system, labelled `system_data_root_file` and `apk_data_file`
 respectively. C-248 identifies directory cleanup in the examined PackageManager scan and
 reconciliation paths; those two rules skip ordinary non-APK files. The candidate is a separate
-regular `.so` directly in `/data/app`, not a new subdirectory. No test file has been created or
-copied and no payload has executed. Unlock registration and the deferred certificate-page
-screenshot are not prerequisites for the independent RID-state route.
+regular `.so` directly in `/data/app`, not a new subdirectory. C-249 shows seven subdirectories:
+DJI_FLY at 0777 and six randomized installation roots at 0775, all system:system/apk_data_file.
+`finduas_A040_canary.so` was absent. F1 passed independent review, shell syntax checking,
+three Java Runtime.exec launch cases and seven shell-body cases with mocked Android commands
+(C-250). C-251 records one new SD file and matching full readback. C-252 shows the correctly
+entered wrapper failing to open the literal wildcard path; it did not enter F1. C-253 then
+records `ls: /storage: Permission denied`; this does not test a known child file. Await the
+directory metadata and public-volume API results using [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步),
+without changing F1 or the SD file yet.
+Unlock registration and the deferred certificate-page screenshot are not prerequisites for
+the independent RID-state route.
 
 After each material result, append the completed action to the existing timeline, synchronize
 the local evidence/source records and run repository checks. Local commits remain allowed;
@@ -86,8 +95,8 @@ repository.
 This historical contingency remains `NOT ADMITTED`: no internal copy, chmod, execution, daemon
 stop or new ADB response has occurred through A-032; C-246 records the separate Fuli Shell.
 Section 11 of the ADB topic preserves its proposed baseline-dependent sequence. It is not the
-current operator instruction. The current read-only step is `ls -laZ /data/app`; keep
-file-level and target-process checks separate from this listing. Follow
+current operator instruction. The `/data/app` listing is complete (C-249); after C-253,
+directory metadata and public-volume API results must precede a new F1 launch instruction. Follow
 [the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步) before selecting a later device action.
 
 Do not return to first-packet public key, WebADB, banner/MAXDATA/checksum variants, USB-debugging
@@ -542,8 +551,9 @@ collection; absence from that search is not proof that the records are lost.
 
 Installed-package identity, actual Fuli Shell identity and parent-directory observations are now
 recorded in C-245--C-247. C-248 narrows the candidate to a regular `.so` directly in
-`/data/app`, with no new subdirectory; the current listing checks for a basename conflict.
-File-level checks and the target-process baseline remain pending. Admit a legitimate
+`/data/app`, with no new subdirectory; C-249 found no matching candidate basename. F1/A-043
+staging/readback is closed by C-251. C-252 did not enter the script and C-253 refused directory
+enumeration; await metadata/public-volume API results before selecting the entry. Admit a legitimate
 delimiter-free path or mediated descriptor before the first
 query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.

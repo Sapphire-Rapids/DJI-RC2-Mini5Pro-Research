@@ -825,3 +825,19 @@ work when a report did not contain a more precise timestamp.
   或执行 canary。
 - `STATIC`：核对匹配 services 的扫描及启动清理规则：未登记子目录会进入包处理，而普通
   非 APK 文件在两处检查中被跳过；据此放弃新建测试子目录（C-248）。
+
+### 目录内容确认
+
+- `OBSERVED`：收到 `ls -laZ /data/app` 的两张重叠照片，覆盖七个子目录；拟用 canary
+  文件名未出现（C-249）。固定 `DJI_FLY` 目录与此前报告路径一致，无需重复检查。
+
+### F1 报告脚本准备
+
+- `STATIC`：完成独立只读 F1 脚本，将进程身份与 SD 源文件校验合并到一次运行和一份
+  SD 报告。源码审查、shell 语法、三项真实 Java 启动检查和七项主机模拟场景通过（C-250）。
+- `OBSERVED`：将 A-043 暂存为 `Download/F1.sh`，完整回读与 7,196-byte 源码一致（C-251）。
+  已给出单行启动命令；等待操作者运行后读取报告。本轮仍只同步本地。
+- `OBSERVED`：操作者尝试后回传命令与错误照片：`sh` 未匹配到通配 SD 路径，尚未进入
+  F1 脚本（C-252）。已改为先读取 `/storage` 目录内容，不重复原启动命令。
+- `OBSERVED`：合并 stderr 后，目录命令明确返回 `/storage: Permission denied`（C-253）。
+  下一项改为目录自身权限/标签及系统 volume 信息读取。

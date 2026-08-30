@@ -95,6 +95,34 @@ test checks. These are synthetic host results, not RC 2 execution evidence.
 Both remain `NOT ADMITTED` for RC 2 execution. Artifact identities and distribution boundaries are
 indexed in [the artifact register](../../../docs/11_ARTIFACT_REGISTER.md).
 
+## Fixed Fuli baseline report script
+
+`scripts/rc2_fuli_baseline.sh` is a separate, not-yet-run baseline script. Stage its reviewed bytes
+as removable-SD `Download/F1.sh`. It accepts no arguments, requires a unique matching SD startup
+path and an existing `Download/FindUAS/Probe/` directory, and exclusively creates one new
+`FindUAS_F1_<UTC-date>_<pid>.txt` report there. It never copies a library internally or attaches it.
+
+The original Fuli `Runtime.exec(String)` entry has exactly three whitespace-delimited tokens.
+Host launcher checks passed, but the first device attempt did not match this SD pattern (C-252).
+Keep it as the recorded attempt; the current storage-listing diagnostic is in the
+[live-runtime steps](../../../docs/23_RC2_LIVE_RUNTIME.md#下一步):
+
+```text
+sh -c (sh${IFS}/storage/????-????/Download/F1.sh)2>&1
+```
+
+The fixed `finduas-rc2-fuli-baseline/v1` report records identity, SELinux/Wi-Fi/debuggable reads,
+the existing Fly PID/domain/executable and selected process fields, PID/starttime stability,
+`/data/app` entries and the staged A-040 size/hash. Each command retains stderr and its exit code;
+Binder reads and hashing require the available `timeout` tool with a three-second limit. Output
+is capped per command. Missing/nonunique Fly PID, read failures or source mismatch produce
+`INCOMPLETE`; `COMPLETE` means the baseline reads completed. The script reports zero protocol
+requests, attaches and internal copies. File preparation and loading remain separate steps.
+
+`F1_SAVED` prints the report path; retrieve it through fresh MTP enumeration/full readback and
+require `report_end=true`. Startup/storage failure prints `F1_ERROR` instead. Reports contain
+private runtime paths and identifiers and must remain excluded. No media-scan broadcast is sent.
+
 ## Exact observed emulator result
 
 The privacy-reduced log shapes were:

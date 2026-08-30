@@ -62,12 +62,17 @@
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
 - **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
   `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
-- **当前实机进展（C-245--C-248）**：安装后 COMPLETE 报告、开发助手 Shell `id` 照片及目录结果均已收到。
+- **当前实机进展（C-245--C-253）**：安装后 COMPLETE 报告、开发助手 Shell `id` 照片及目录结果均已收到。
   Shell 实测 UID/GID 为 1000/system，domain 为 `system_app:s0`；`/data` 与 `/data/app`
   均为 0771、system:system，标签分别为 `system_data_root_file` 与 `apk_data_file`。
   C-248 静态检查显示系统包扫描/清理可能删除未登记子目录；候选改为 `/data/app` 直下
-  独立的普通 `.so` 文件，不创建子目录。当前仅执行 `ls -laZ /data/app`，检查内容与拟用
-  basename 是否冲突；尚未创建、复制或执行测试文件，A-040 尚未运行。
+  独立的普通 `.so` 文件，不创建子目录。C-249 完整目录图已收到：7 个子目录，未见
+  `finduas_A040_canary.so`。F1/A-043 只读报告脚本已通过审阅和测试，暂存为 SD
+  `Download/F1.sh` 并完整读回匹配（C-250/C-251）。C-252 启动包装器尝试打开字面通配路径
+  时报 `No such file or directory`，未进入 F1。C-253 随后明确收到 `/storage: Permission denied`；
+  这是目录枚举拒绝，尚不等于已知子文件不可读。当前等待目录 metadata 与存储 API 结果，
+  操作见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
+  canary 尚未内部复制或 attach。
   字段 owner 与后续 RID 状态观测继续独立推进，合成 codec 保持离线。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
@@ -117,7 +122,7 @@
 - 只改该 gate-value instruction、保留 ordinary TLS/auth path 的 A-032 userspace copy 已生成；
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
   没有通过 A-032 获得 ADB shell。开发助手 Shell 身份及父目录读取另由 C-246/C-247 闭合。
-  A-032 保留为备选；当前只读步骤为 `ls -laZ /data/app`，确认普通 `.so` 候选 basename 无冲突，
+  A-032 保留为备选；F1 暂存事实保留，C-253 后等待目录 metadata 与存储 API 结果，再选择入口，
   操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
 - 当前 Android probe 为 v0.12（A-039），文件名 `Download/FindUAS_A039_V012.apk`。
   首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；安装后复测也已收到 COMPLETE

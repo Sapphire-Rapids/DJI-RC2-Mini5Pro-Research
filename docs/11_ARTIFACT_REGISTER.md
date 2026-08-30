@@ -54,6 +54,7 @@
 | A-040 | FindUAS pure ARMv7 ART TI canary；self-developed；`art-ti-canary-v1-armeabi-v7a` | `4,340` | `9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a` | `NOT ADMITTED`；MTP staged/完整读回匹配；未复制到内部、未 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
 | A-041 | DJI Fly exact live ARM32 application sample；input-sample；`1.19.4` / code `3113157` / armeabi-v7a | `426,180,752` | `fb695817a885bd9d4084643d8cae07285a8ac560b6e94edd5c87af4a70b8528c` | `OBSERVED`；从既有实机安装导出，收到后独立完整验证；排除且不分发；只公开 hash |
 | A-042 | FindUAS ARMv7 FlySafe read-only query agent；self-developed；`device-id-minus-one-guard-armeabi-v7a` | `15,464` | `88d88ba10396a790d5d6675e70b44a21c01a71bbb92b4c80978998837ae75e25` | `NOT ADMITTED`；离线构建与 host 检查通过；未 staged、未在 RC 2 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
+| A-043 | FindUAS F1 Fuli baseline report script；self-developed；`fuli-baseline-v1` | `7,196` | `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` | `STATIC`；源码审查及 host 检查通过；已 SD 暂存且完整读回一致；首个启动路径未匹配，尚未进入脚本；脚本源码公开，运行报告排除；只公开 hash/source |
 
 ## 3. A-001：历史 v0.10 admission probe
 

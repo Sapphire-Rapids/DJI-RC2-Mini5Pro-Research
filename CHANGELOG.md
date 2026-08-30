@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.24 - 2026-08-31
+
+- Received the full two-photo `/data/app` listing; the proposed standalone canary basename is
+  absent. Existing Fly package/library path records avoid another manual directory check (C-249).
+- Added A-043 F1 to collect fixed process/source-file reads into one SD report. Source review,
+  syntax, three Java launcher cases and seven host shell fixtures passed (C-250). SD staging and
+  full readback matched; operator execution/report receipt are next (C-251).
+- The first launcher attempt returned an unmatched wildcard path before entering F1; the next
+  read is the storage layout visible to Fuli (C-252).
+- The stderr-capturing follow-up identifies `/storage` enumeration as permission-denied;
+  directory metadata and the system volume API are the next diagnostics (C-253).
+
 ## 0.4.23 - 2026-08-31
 
 - Received the post-install A-039 COMPLETE report: Fuli is updated-system with the original

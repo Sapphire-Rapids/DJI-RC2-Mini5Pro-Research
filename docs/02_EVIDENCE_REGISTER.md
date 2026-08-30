@@ -338,8 +338,13 @@ The two source-only deployment experiments are retained as explicit negatives:
 | C-246 | `OBSERVED` | Operator-run id returns UID/GID 1000 (system) and u:r:system_app:s0 in the original Fuli Shell page | Target Fly domain and canary remain pending |
 | C-247 | `OBSERVED` | Operator-run ls -ldZ reads /data and /data/app as system:system, mode 771, labelled system_data_root_file and apk_data_file respectively | Parent metadata only; no internal test directory/file created |
 | C-248 | `STATIC` | Exact PackageManager selects APK files/directories in scanDirLI and boot-time reconcileApps; failed or unregistered directory candidates can be removed, ordinary non-APK files are skipped | Two scanner paths checked; no live test-file creation or cleanup test |
+| C-249 | `OBSERVED` | Two overlapping Shell photos cover /data/app contents: seven child directories, DJI_FLY mode 0777 and six randomized roots mode 0775; proposed canary basename absent | No internal copy/load; raw listing and photos stay private |
+| C-250 | `STATIC` | A-043 F1 fixed read-only baseline script exclusively writes a new SD report; independent source review, syntax, three Java launcher cases and seven host body fixtures passed | Android execution and live report pending |
+| C-251 | `OBSERVED` | Download/F1.sh created through RC 2 removable-SD MTP; full readback matches the 7196-byte reviewed source and SHA-256 | Staging/readback only; execution/report pending |
+| C-252 | `OBSERVED` | Fuli executes the supplied wrapper but sh cannot open the literal wildcard SD path; no F1 marker appears | Actual caller-visible storage layout is the next read |
+| C-253 | `OBSERVED` | Stderr-capturing Shell listing returns /storage: Permission denied | Enumeration failure; directory metadata/system-volume reads are next |
 
-C-235–C-248 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
+C-235–C-253 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
 
 ## Promotion rules
 
