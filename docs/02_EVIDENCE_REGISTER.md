@@ -357,8 +357,17 @@ The two source-only deployment experiments are retained as explicit negatives:
 | C-265 | `OBSERVED` | F4/B1 full SD readbacks match A-046/A-047; same-SID preparation succeeds with spaced MTP calls, active marker published last | Current status awaits receiver start; no job or internal/aircraft action ran |
 | C-266 | `OBSERVED` | One B1 startup followed by three host-submitted jobs: PING → SNAPSHOT → PING; every accepted/report/done binding verified, return codes 0/10/0 | Finite diagnostic session; no live STOP, internal copy, attach or aircraft request |
 | C-267 | `OBSERVED` | F4 4036-byte report passes strict parsing; both AMS parsers succeed and PID is stable, target proc reads fail under observed hidepid=2 | Heredoc defect fixed; target context/starttime remain unavailable, source checks pass |
+| C-268 | `STATIC` | Exact v07 system-mediated attach lookup/gates and ART TI environment allocation/disposal mapped | No live attach; disposal does not unload the agent or plugin |
+| C-269 | `STATIC` | A-048 bounded self-identity canary: 32 tests, sanitizer checks, six rejected mutations and matching ARMv7 builds | Original A-040 unchanged; no DJI/aircraft calls |
+| C-270 | `OBSERVED` | A-048 SD staging/full readback matches 8372 bytes; B1 STOP 0004 and CLOSED STOP verified | SD only; no internal copy/attach, DJI Fly not stopped |
+| C-271 | `STATIC` | Fixed L1/B2 canary path: repeated preflight, exclusive copy, permanent attempt marker and canonical identity/result cleanup; 13 mksh/39 scenarios, 2 composition and 29 client tests pass | Partial copy or unobserved completion retains file; no runtime-map unload or permanent update setting |
+| C-272 | `OBSERVED` | L1/B2/canary full SD readbacks match; prior closed active record archived, new session prepared | Awaiting one B2 startup; no baseline/copy/attach yet |
+| C-273 | `OBSERVED` | B2 startup and complete canary baseline: all23 checks pass, including network/update-trigger, APK/process/source and log controls | Interval reads; no copy or attach in baseline |
+| C-274 | `OBSERVED` | One normal AMS dispatch loads A-048 in Fly: canonical native identity/API/disposal success, unchanged PID/UID/APK, verified test file removed | No RID getter/request; agent/plugin mappings not unloaded; starttime sampled once |
+| C-275 | `OBSERVED` | Separate cleanup confirms file absent; global receipts match; STOP and CLOSED STOP verified | No second attach or Fly restart; permanent records retained |
+| C-276 | `STATIC` | Existing Lazy field ownership mapped; wrapper default DTO separated from current state, getter traverses interceptors before native_get_sync | Runtime instances/current RID value and native pure-cache semantics remain unknown |
 
-C-235–C-267 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
+C-235–C-276 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
 
 ## Promotion rules
 

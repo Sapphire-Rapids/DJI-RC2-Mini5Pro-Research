@@ -307,7 +307,7 @@ Later retractions override earlier progress summaries.
     This does not establish absence in DJI Fly, another firmware surface or encrypted `0802`.
     C-235--C-238 now supply the first RC 2 identity reports and installed Fly samples;
     C-245--C-247 add the post-install Fuli report and direct Shell identity/directory baseline;
-    the next dependency is a legitimate loader and the target process baseline.
+    C-273--C-275 now close the tested A-048 loader and target self-identity baseline.
 41. The installed Fly is `1.19.4` / code `3113157`, ARMv7. Earlier `1.21.10` results keep their
     emulator/static version labels. C-239/C-240 map the actual FlySafe and independent RID-state
     owners. Fuli's original same-version reinstall has been operator-confirmed to open DevActivity
@@ -315,9 +315,20 @@ Later retractions override earlier progress summaries.
     `id` reports UID/GID 1000 and `u:r:system_app:s0` (C-246); `/data` and `/data/app` are
     mode 771, owned by system:system, with system_data_root_file/apk_data_file labels respectively
     (C-247). A-040 is the ARMv7 ART TI-only canary, built/tested and SD-staged but not executed
-    (C-243). Target-process identity and the actual test-file path remain to be checked before
-    same-process observation. Unlock registration is not a prerequisite for
+    (C-243). The separate A-048 later supplies the tested target identity/path in correction 42.
+    Unlock registration is not a prerequisite for
     investigating the independent RID-state route.
+42. A-048, `8,372` bytes with SHA-256
+    `28b96744bef7f4cf3e64911134683ee71a6c950c44a88193fae2fdc7b60b4f4b`, loaded once through
+    the normal fixed-name AMS route in the existing Fly `1.19.4` process (C-273--C-275).
+    Canonical native identity, ART TI and DisposeEnvironment results succeeded; the observed
+    base domain is `untrusted_app`, interface version is `0x70010200`, and AMS PID/UID/APK
+    remained stable. The verified ordinary SO was removed, independent cleanup confirmed
+    absence, and B2 closed by STOP. Preserve its permanent attempt record; do not repeat the
+    successful canary. File/environment cleanup did not unload agent/plugin mappings or restart
+    Fly. No RID getter or aircraft request ran. C-276 identifies the next exact
+    `native_get_sync`/cache question: Lazy factories, mutable interceptors and default DTOs must
+    remain distinct from an observed current RID value.
 
 ## Privacy and redaction
 

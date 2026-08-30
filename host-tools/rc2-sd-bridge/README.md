@@ -1,12 +1,14 @@
 # RC 2 SD bridge transport
 
-Status: **OBSERVED** for verified staging and the operator-started PING/SNAPSHOT/PING round trip.
+Status: **OBSERVED** for B1 diagnostics and the B2 baseline/load/cleanup/STOP sequence.
+A-048 successfully ran in Fly; the test file was removed and B2 is closed (C-273--C-275).
 See [the runtime record](../../docs/23_RC2_LIVE_RUNTIME.md) for the changing job results and live
 state. Compilation and synthetic tests remain separate evidence.
 The libmtp helper transports bounded B1 diagnostic-mailbox files and does not itself execute
 device code, install an application, attach an agent or change permissions. The Python client
-can submit only `PING`, `SNAPSHOT` and `STOP` to the separately started receiver; it accepts no
-arbitrary Shell command. No aircraft protocol request is provided by this transport/client.
+submits fixed jobs: B1 supports `PING`, `SNAPSHOT` and `STOP`; B2 adds the three canary operations
+below. It accepts no arbitrary Shell command. No aircraft protocol request is provided by this
+transport/client.
 The repository [MIT license](../../LICENSE) applies; generated binaries and all live output stay
 excluded. See [the current runtime record](../../docs/23_RC2_LIVE_RUNTIME.md) for device evidence.
 
@@ -37,13 +39,13 @@ use an uncached MTP connection. No device serial or local port topology is embed
 
 | Path | Operations |
 | --- | --- |
-| `Download/B1.sh`, `Download/F4.sh` | put/get |
+| `Download/B1.sh`, `Download/F4.sh`, `Download/B2.sh`, `Download/L1.sh`, `Download/FindUAS_ARTTI_V2.so` | put/get |
 | `Download/FindUAS/Bridge/active.session` | put/get |
 | `Download/FindUAS/Bridge/<sid>` and its `inbox`, `outbox` directories | mkdir |
 | `…/<sid>/inbox/<seq>.job`, `<seq>.ready` | put/get |
 | `…/<sid>/outbox/<seq>.accepted`, `<seq>.report`, `<seq>.done` | get only |
-| `…/<sid>/worker.lock`, `worker.log`, `session.ready`, `session.closed`, archived `active.session` | get only |
-| `Download/FindUAS/Probe/FindUAS_F4_*.txt` | get only |
+| `…/<sid>/worker.lock`, `worker.log`, `session.ready`, `session.closed`, `session.receiver`, archived `active.session` | get only |
+| `Download/FindUAS/Probe/FindUAS_F4_*.txt`, `A048_copy.receipt`, `A048_attach.attempted` | get only |
 
 `sid` is exactly 16 lowercase hex characters; `seq` is exactly four decimal digits. Only the
 listed directory ancestors may also be created. Paths must be relative ASCII, at most 511 bytes,
@@ -157,3 +159,46 @@ python3 -m unittest discover -s tests -p 'test_receiver.py' -v
 Its eleven cases include Java stdout EOF, inherited FD3, input-read failure, partial/invalid jobs,
 result collisions, helper snapshot integrity, expiry and the 64-job limit. Without `MKSH` these
 tests skip; the receiver checks do not access USB or an Android device.
+
+## B2 fixed canary lane
+
+B2/A-050 preserves the B1 mailbox protocol and adds a canonical `session.receiver` record naming
+B2. The client checks that marker before submitting `CANARY_BASELINE`, `CANARY_LOAD` or
+`CANARY_CLEANUP`. These operations run only the SHA-pinned L1/A-049 text; L1 in turn pins
+the 8,372-byte A-048 ARMv7 identity canary. Staging/readback and current execution state are in
+[the runtime record](../../docs/23_RC2_LIVE_RUNTIME.md) (C-268--C-276).
+
+```sh
+python3 bridge.py --state-dir /path/to/private-state stage-canary --b2 /path/to/B2.sh --l1 /path/to/L1.sh --canary /path/to/identity.so
+python3 bridge.py --state-dir /path/to/private-state prepare
+# The operator starts B2 once, then the host checks its status and reads the baseline.
+python3 bridge.py --state-dir /path/to/private-state submit CANARY_BASELINE
+python3 bridge.py --state-dir /path/to/private-state collect 0001
+```
+
+Only the latest completely received baseline with return code zero and one section-external
+`preflight_ready=true` permits a LOAD allocation. The client allocates at most one LOAD per
+session; uncertain transfer retries keep that same sequence. A complete outer result with
+truncated/invalid L1 content is retained as a terminal diagnostic failure, permitting explicit
+cleanup without treating that content as a successful baseline.
+
+LOAD repeats the baseline, exclusively creates the one ordinary internal SO, verifies its
+FD-derived identity/hash/label, and permanently records the attempt before one fixed-name
+Activity Manager dispatch. Its own strict native parser binds enter/result to the expected
+PID/UID and session. The API return is recorded separately from the native `ready` outcome.
+
+Normal cleanup removes only that verified file after a matched native terminal record. Later
+`CANARY_CLEANUP` may collect a late result or recover after a different boot; it never repeats
+the dispatch. A partial copy with a different hash remains for explicit recovery. Neither the
+copy receipt nor the global attempt record is automatically deleted, and file/environment
+cleanup does not unload the agent/JVMTI plugin from a running process.
+
+The fixed helper budgets are 120 seconds for BASELINE, 210 for LOAD and 30 for CLEANUP, within
+the receiver's one-hour lease. Reports, upgrade/network observations and native identity logs
+remain private. The real-mksh loader tests cover 13 methods/39 scenarios; the B2 composition
+suite covers the Java startup and pinned helper dispatch. Run them with the same MKSH/JDK
+setup as the receiver suite:
+
+```sh
+python3 -m unittest discover -s tests -p 'test_canary_*.py' -v
+```

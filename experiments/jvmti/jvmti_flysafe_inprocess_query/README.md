@@ -1,6 +1,6 @@
 # DJI Fly same-process FlySafe query experiment
 
-Status: **OBSERVED on a disposable emulator; NOT ADMITTED on RC 2**.
+Status: **A-048 identity loading OBSERVED on RC 2; FlySafe query OBSERVED only on the disposable emulator**.
 
 This source-only experiment demonstrated a narrow Android 11 ART TI path into DJI Fly `1.21.10`
 on a disposable emulator. The query agent locates already-loaded FlySafe owner classes, obtains
@@ -95,6 +95,48 @@ test checks. These are synthetic host results, not RC 2 execution evidence.
 Both remain `NOT ADMITTED` for RC 2 execution. Artifact identities and distribution boundaries are
 indexed in [the artifact register](../../../docs/11_ARTIFACT_REGISTER.md).
 
+## Self-identity canary A-048
+
+The separate `src/native/art_ti_identity_canary.c` preserves A-040 unchanged. It accepts exactly
+one 16-character lowercase-hex session token, records its own PID/UID/GID, bounded self-proc
+SELinux context and starttime, then requests ART TI `0x70010200`, reads the interface version and
+disposes that newly allocated environment once. A valid entry returns `JNI_OK` even when a check
+fails, preventing a framework fallback from repeating initialization. The canonical result log's
+`ready` field, tied to the session and process, carries the outcome.
+
+Thirty-two host cases, sanitizer checks and six compiled behavior mutations pass. Two ARMv7
+builds match 8,372 bytes, SHA-256
+`28b96744bef7f4cf3e64911134683ee71a6c950c44a88193fae2fdc7b60b4f4b` (C-269).
+`Download/FindUAS_ARTTI_V2.so` was fully read back from SD (C-270), then A-048 loaded once
+in the original Fly process with canonical identity/API/disposal success. The verified ordinary
+file was removed and independently confirmed absent; B2 closed by STOP (C-273--C-275).
+Build and test with the same tool-root variables above:
+
+```sh
+sh scripts/run_identity_canary_host_tests.sh
+sh scripts/build_identity_canary.sh
+```
+
+Generated output is `build/identity-canary/armeabi-v7a/libfinduas_artti_identity.so` and stays
+excluded. The canary does not query DJI classes or aircraft state. It releases its environment;
+the native agent and JVMTI plugin mappings can remain until the target process exits.
+
+## Fixed loader L1 and canary receiver B2
+
+`scripts/rc2_canary_loader.sh` (A-049) implements the fixed baseline, one-load and cleanup
+operations for A-048. `scripts/rc2_sd_canary_bridge.sh` (A-050) runs that SHA-pinned helper
+through the existing finite mailbox protocol. Neither changes the original B1/F4 source.
+Thirteen real-mksh loader tests cover 39 scenarios, two Java/mksh composition cases pass,
+and the extended host client passes 29 synthetic tests. C-271 records the code checks;
+C-272 records matching staging; C-273--C-275 subsequently record successful baseline/load,
+independent cleanup and session closure.
+
+The ordinary internal file is created exclusively after baseline checks and verified by its
+actual descriptor identity, hash and label. A permanent attempt record precedes the sole
+fixed-name dispatch. Normal cleanup requires canonical matching native completion and the
+same file identity; partial or uncertain copies are retained. Details and host commands are in
+[the SD client](../../../host-tools/rc2-sd-bridge/README.md).
+
 ## Fixed Fuli baseline report script
 
 `scripts/rc2_fuli_baseline.sh` is the F4 source revision. It has been SD-staged with matching
@@ -184,24 +226,18 @@ FLYSAFE_RAW_QUERY callback=failure error_code=417
 The PID before and after attach was identical. Because no aircraft was present, the success-side
 type-6 parser has synthetic host coverage but no real callback input yet.
 
-## RC 2 boundary
+## RC 2 execution state
 
-An ordinary third-party APK cannot attach an agent to DJI Fly merely because it contains this
-library. The emulator observation used an authorized root shell and an executable file label.
-RC 2 `07.00.0100` still needs an admitted same-process loader. C-245's received and validated
-post-installation `COMPLETE` report now shows Fuli as an updated system app with all three inspected
-Activities enabled. Its original version code 155, APK hash, signer and two audited DEX hashes are
-unchanged, as are the Fly and ART identity readings. Directory `ABSENT` is still an Observer-view
-result.
+The exact post-install Fuli identity and system-UID Shell are recorded in C-245--C-247. The
+A-048 identity canary now loaded once through the normal fixed-name AMS route on RC 2
+`07.00.0100` / Fly `1.19.4` (C-273--C-275), with canonical native identity/API/disposal success.
+The ordinary internal file had the verified apk_data_file label and registered hash; it was
+removed and an independent cleanup job confirmed absence. AMS PID/UID and Fly APK stayed stable.
+B2 closed by STOP. Original A-040 and the FlySafe query A-042 remain unexecuted on RC 2.
 
-`OBSERVED`, operator-supplied Shell output (C-246): commands execute with system UID/GID identity
-in the `system_app` domain. The read-only directory listing (C-247) shows `/data` and `/data/app`
-owned by `system:system`, both mode `0771`, with `system_data_root_file` and `apk_data_file` labels
-respectively. No internal test directory/file has been created or library copied there;
-the target Fly process domain and canary loading remain unverified. See
+No bootloader, boot partition, TEE or proc permission changed. The canary's environment was
+released, while native agent/plugin mappings were not unloaded from the running Fly process.
+Preserve the permanent attempted marker and do not replay this successful canary. Further
+RID state reads must follow the exact initialized-owner and native_get_sync review in C-276;
+no current RID value or transition was read by A-048. See
 [the live-runtime record](../../../docs/23_RC2_LIVE_RUNTIME.md).
-
-Do not unlock the bootloader, modify boot/TEE, or treat an attach request as proof that the agent
-loaded. The proposed first load is the pure canary, followed only after its evidence is closed by
-one query with a fresh callback and unchanged DJI Fly PID. Neither has run on RC 2, and no RID
-transition has occurred through this route.

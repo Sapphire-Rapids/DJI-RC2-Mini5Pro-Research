@@ -62,12 +62,11 @@
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
 - **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
   `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
-- **当前实机进展（C-245--C-267）**：报告、Shell system 身份与目录基线已收到。
-  F3 的完整原始报告记录 `/proc` 的 `gid=3009,hidepid=2`，前后原始 AMS 记录使用同一主 PID。
-  Android mksh 创建 heredoc 临时文件被拒，导致 F3 解析失败；原始报告保留，修正后不再重跑 F3。
-  B1 已由操作者启动；PING → F4 → PING 的三项自动往返与报告核验完成（C-266/C-267）。
-  F4 已修好解析问题，当前 INCOMPLETE 仅记录 pidof/proc 的读取失败。
-  操作见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。canary 尚未内部复制或 attach。
+- **当前实机进展（C-273--C-276）**：A-048 已通过正常系统服务在原 Fly 进程内加载成功，
+  自身身份、ART TI 接口及环境释放均正常，PID/UID/APK 保持一致。测试文件已删除，独立
+  回读确认不存在，B2 会话正常结束。无需先 root，也不重复这个加载测试。
+  下一步核对官方 RID 同步读取接口的缓存语义，避免把默认 DTO 当当前状态；详见
+  [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France

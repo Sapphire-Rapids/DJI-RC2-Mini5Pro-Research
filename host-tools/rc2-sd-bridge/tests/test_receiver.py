@@ -47,7 +47,8 @@ public final class Launch {
 
 
 class Session:
-    def __init__(self, java_classes, ttl=90):
+    def __init__(self, java_classes, ttl=90, source=SOURCE,
+                 script_name="B1.sh", start_marker="B1_START_REQUESTED"):
         self.temp = tempfile.TemporaryDirectory(prefix="finduas-b1-test-")
         self.root = Path(self.temp.name).resolve()
         self.base = self.root / "storage/ABCD-1234/Download"
@@ -90,8 +91,9 @@ except subprocess.TimeoutExpired:
     rc=124
 sys.exit(rc if rc>=0 else 128-rc)
 """)
-        self.script = self.base / "B1.sh"
-        text = SOURCE.read_text()
+        self.script = self.base / script_name
+        self.start_marker = start_marker
+        text = source.read_text()
         text = text.replace("/storage/", str(self.root / "storage") + "/")
         text = text.replace("/proc/uptime", str(self.root / "uptime"))
         text = text.replace("PATH=/system/bin", "PATH=" + shlex.quote(self.env["PATH"]))
@@ -148,7 +150,7 @@ sys.exit(rc if rc>=0 else 128-rc)
         assert fields["rc"] == "0", fields
         assert int(fields["eof_ms"]) < 2500, fields
         output = base64.b64decode(fields["output"]).decode()
-        assert output == "B1_START_REQUESTED sid=" + SID + "\n", output
+        assert output == self.start_marker + " sid=" + SID + "\n", output
         ready = self.wait_file(self.session / "session.ready").decode().split()
         assert ready[:3] == ["B1", "READY_SESSION", SID] and ready[-1] == "END", ready
         assert len(ready) == 6 and ready[3].isdigit() and ready[4].isdigit(), ready

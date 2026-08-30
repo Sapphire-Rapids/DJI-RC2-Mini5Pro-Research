@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-267；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-276；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -15,11 +15,11 @@
 | 开发助手 | 原包已安装；新报告确认 updated-system、原身份保持一致、三个入口启用 | C-241、C-242、C-245 |
 | Shell 身份 | `id` 实测 UID/GID 1000（system），域为 `u:r:system_app:s0` | C-246 |
 | 目录基线 | `/data`、`/data/app` 均为 system:system、771；后者标签为 `apk_data_file` | C-247 |
-| 同进程加载 | ARMv7 ART TI canary 已构建、测试并放到 SD 卡；尚未执行 | C-243 |
+| 同进程加载 | 新 A-048 已在原 Fly 进程成功运行；身份/API/释放均正常，文件已回收 | C-274、C-275 |
 | 目录内容 | 七个子目录；拟用 `finduas_A040_canary.so` 文件名未出现 | C-249 |
 | Shell 报告回传 | F2 已运行，报告完整读回；源文件校验通过，只有 pidof 未取到进程 | C-257 |
 | Fly 进程 | AMS 已返回名称精确为 dji.go.v5、PID 非零的 HOME 主进程记录 | C-258 |
-| 自动诊断 | B1 已启动；PING → F4 → PING 三项自动往返成功，F4 报告已严格解析 | C-266、C-267 |
+| 自动诊断 | B1/B2 均完成任务并正常停止；B2 预检、加载和独立回收报告已核验 | C-266--C-275 |
 
 本轮尚未执行 RID 切换。操作者说明未办理解禁，证书页面的人工查看已暂缓；后续优先
 观察独立 RID 工作状态，FlySafe 清单不作为继续研究的前提。
@@ -228,16 +228,71 @@ PING 在 F4 收齐后新发出并得到正常响应（C-266）。会话继续使
 调用方不含该读取组。A-040 SD 文件大小/哈希匹配，内部 canary 文件名仍未出现。
 因此当前 INCOMPLETE 对应明确的进程文件可见性失败；数据回传与 AMS 解析已经完成。
 
+## 最小身份加载测试准备
+
+`STATIC`：匹配的 v07 系统服务保留 system UID 与全局调试开关分支；固定进程名查询可
+选择 Fly，数字 PID 查询则不再校验包名。因此本轮选择固定 `dji.go.v5` 名称，并独立核对
+前后 AMS PID/UID 和原生结果。ARM32 ART TI 每次成功 GetEnv 建立独立环境，Dispose 可
+释放本次环境；它不卸载 agent 或 JVMTI plugin（C-268）。
+
+`STATIC`：A-048 新探针记录自身 PID/UID/GID、SELinux 域和 starttime，以及 ART TI
+申请、版本读取与释放结果。有效入口始终返回 JNI_OK，结果由 ready 字段判读，避免框架
+再次初始化。32 项主机测试、sanitizer、6 个故障变体和两次相同构建通过（C-269）。
+
+`OBSERVED`：8,372-byte A-048 已以 `Download/FindUAS_ARTTI_V2.so` 放到 SD 并完整读回。
+B1 的 STOP 任务和 CLOSED STOP 均已核验（C-270）。内部测试文件仍未创建；新的 L1/B2
+加载任务已完成预检和回收场景测试（C-271）。
+
+`STATIC`：L1/A-049 在加载前重新检查固定应用、网络和日志基线；独占创建普通 SO、
+记录 FD 实际身份，再核 hash/label。永久 attempted 标记写完读回后，只向固定进程名
+派发一次。原生日志必须有绑定 PID/UID/SID 的完整 enter/result，才进入正常文件回收。
+13 个真实 mksh 测试覆盖 39 场景；B2/A-050 的两项 Java/mksh 分派和 29 项 host client
+测试通过（C-271）。不完整复制或未见原生完成时保留文件；不会把延时当成完成信号。
+
+`OBSERVED`：L1/B2 和 A-048 均已 SD 完整回读核对。旧 active 记录已在 CLOSED STOP
+之后归档并核验，新会话已准备、active 最后发布；该准备阶段等待操作者启动 B2（C-272）。
+
+## 实机加载成功与回收
+
+`OBSERVED`：B2 预检报告完整收到，23 个检查均为 true（C-273）：Wi-Fi 设置和服务均关闭，
+没有默认网络或已登记当前网络，四项升级触发值处于非活动状态；应用哈希、AMS PID/UID、
+目录标签、源文件和日志通路检查通过。加载任务随后重新进行了这些检查。
+
+`OBSERVED`：L1 独占创建普通测试 SO，核对实际 FD 身份、8,372-byte 大小、0644 模式、
+system 所有者、apk_data_file 标签和 A-048 哈希。永久 attempt 标记写完读回后，发起一次
+固定 `dji.go.v5` 名称的系统服务加载请求（C-274）。较后的日志快照中出现一组完整的
+enter/result，绑定本轮 SID、预期 PID/UID 和 32-bit ABI：
+
+- `ready=1`、`identity_ok=1`、`artti_ok=1`、`dispose_ok=1`。
+- GetEnv、GetVersionNumber、DisposeEnvironment 返回码均为 0。
+- 实测接口版本为 `0x70010200`；自身 SELinux 基础域为 `untrusted_app`。
+- 前后 AMS PID/UID 和 Fly APK 哈希保持一致。
+
+原始类别、PID/UID、starttime 和日志保留私有。starttime 是一次原生读取，同一日志被多次
+回读不算第二次采样。测试文件删除前再次核对身份/哈希/标签，随后删除成功。
+
+`OBSERVED`：另一个 CANARY_CLEANUP 任务返回 `cleanup_already_absent=true`，再次确认文件
+已不存在，派发计数为 0。主机回读 copy 和永久 attempt 记录并与报告核对；最后 STOP 和
+CLOSED STOP 也已核验（C-275）。B2 已结束，不需继续保持开发助手页面。
+本次释放了申请的 ART TI 环境并回收磁盘文件，没有重启 Fly；agent/plugin 映射未执行卸载。
+
+## RID 状态读取的后续入口
+
+`STATIC`：当前字段链从已初始化的 FlyModel flight Lazy，经过 FlightModelImpl regulation
+Lazy、RegulationModelImpl RemoteID Lazy，抵达 RemoteIDModelImpl working-status Lazy。
+三种 Kotlin Lazy 均保留 `_value`；读取应先确认类已初始化，每跳验证实例类型并在 sentinel/
+空值处退出，不调用 Lazy getter 或工厂（C-276）。
+
+ToggleFlyObservable 没有直接的最新状态 DTO 字段；V1FlyObservable 的默认 DTO 也不是当前
+RID 值。`getOrNull()` 会经过可变拦截器，默认处理最终进入 `JNIKeyValue.native_get_sync`；
+其类初始化还会加载库。该原生同步入口的主体/缓存语义尚需核对，当前没有调用这些 getter、
+创建监听或读取 RID 字段。
+
 ## 下一步
 
-当前不需要新的人工命令或截图；保持开发助手页面与 USB 连接即可继续使用当前诊断会话。
-会话不会跨重启，并在启动一小时后结束。下次任务先检查原会话状态，保留原始 host state，
-不要丢弃未完成的任务编号或重放已接受的任务。
-
-研究下一步是解决目标进程自身信息的读取与合法加载路径；现有 F4 已完成其诊断任务，
-不再重复相同的 pidof/proc 查询。内部 payload copy/attach 仍未进行。现有 B1 操作集为
-PING/SNAPSHOT/STOP；增加后续研究操作时须单独审阅实现和对应基线。
+最小加载路线已在实机跑通，无需重复 A-048。后续聚焦 `native_get_sync` 的确切缓存行为，
+必要时先通过已初始化字段读取现存 owner/key/API 分支元数据。保持 A-048 永久尝试标记，
+不以新的会话号重放旧加载；后续探针使用独立工件身份和明确操作范围。
 
 按操作者最新要求，进度仅同步本地仓库，暂停 GitHub 推送。
-
 私有材料的定位类别见 [排除日志索引](15_LOG_INDEX.md)。
