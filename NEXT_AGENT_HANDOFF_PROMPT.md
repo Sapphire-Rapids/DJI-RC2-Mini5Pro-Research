@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-248 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-253 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -53,19 +53,39 @@ Current facts:
 - C-248 statically identifies package scanning/reconciliation that can delete unregistered
   subdirectories; both examined rules skip ordinary non-APK files. The candidate is a separate
   regular `.so` directly under `/data/app`, with no new subdirectory. This is not yet a tested
-  file location or loader.
+  file location or loader. C-249 now records the complete listing: seven subdirectories
+  (DJI_FLY at 0777, six randomized installation roots at 0775), all system:system with
+  apk_data_file labels; `finduas_A040_canary.so` was absent.
 - A-040 is the new ARMv7 ART TI-only canary, already SD-staged but unexecuted. A-042 is the
   ARMv7 query build with the additional `-1` guard. The separate RID-state chain is mapped in
   C-240; unlock registration and the deferred certificate-page screenshot are not prerequisites.
+
+F1/A-043 remains staged as `Download/F1.sh` with full readback matching 7,196 bytes and
+SHA-256 `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` (C-250/C-251).
+C-252 records the photographed wrapper reaching `sh`, which tried the literal
+`/storage/????-????/Download/F1.sh` path and reported `No such file or directory`. The input
+matched the instruction; no F1 marker appeared and the script did not start. C-253 then
+photographed `ls: /storage: Permission denied`. This is a directory-enumeration refusal,
+not a result for reading an exact known child file.
+
+The only current diagnostic collects directory metadata and public-volume API output, with
+stderr. In the development assistant's Shell page, send exactly:
+
+```text
+sh -c (ls${IFS}-ldZ${IFS}/storage;sm${IFS}list-volumes${IFS}public)2>&1
+```
+
+Return both results, including any error. Await them before choosing the storage entry;
+leave F1 source and the SD file unchanged and do not retry the old launch command.
 
 Priority:
 
 1. Recover provenance for existing FLYC and receiver records where available; account for the
    1558 reported table slots versus 915 named rows without exposing private data.
 2. The post-install report, actual Shell identity and parent-directory observations are closed by
-   C-245--C-247. The only current operator command is `ls -laZ /data/app`, to inspect its
-   contents and check the proposed regular-file basename for a conflict (C-248). Do not create
-   a subdirectory. File-level and target-process checks remain prerequisites before loading.
+   C-245--C-247; the complete `/data/app` contents/basename check is received in C-249. Await
+   the directory metadata and public-volume API results above before selecting a storage entry.
+   C-251 remains staging evidence; F1 execution and report receipt are still pending.
 3. After the regular-file path checks and the target-process baseline are complete, validate A-040's
    explicit success marker and unchanged Fly PID, then advance the independent
    RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to

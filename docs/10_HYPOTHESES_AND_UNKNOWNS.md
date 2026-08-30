@@ -405,5 +405,6 @@ hypotheses. No new listener or aircraft-control execution has occurred.
   two checked paths. A new test subdirectory is therefore dropped from consideration.
 - Narrow remaining hypothesis: one independently created ordinary `.so` directly under
   `/data/app`, with no `=` in its path, can supply the canary after its identity/label and the
-  actual Fly process baseline are verified. The file has not been created; directory contents
-  are the next read. The two scanner checks do not describe every possible cleanup path.
+  actual Fly process baseline are verified. C-249 supplies the directory listing with the
+  proposed basename absent; the file has not been created. Target-process checks are next.
+  The two scanner checks do not describe every possible cleanup path.
