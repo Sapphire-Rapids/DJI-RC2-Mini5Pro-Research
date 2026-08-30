@@ -841,3 +841,19 @@ work when a report did not contain a more precise timestamp.
   F1 脚本（C-252）。已改为先读取 `/storage` 目录内容，不重复原启动命令。
 - `OBSERVED`：合并 stderr 后，目录命令明确返回 `/storage: Permission denied`（C-253）。
   下一项改为目录自身权限/标签及系统 volume 信息读取。
+
+### 精确卷路径与 F2
+
+- `OBSERVED`：读取到 `/storage` 为 0710、shell:everybody、mnt_user_file；已知调用方组
+  可穿过该目录而不能列举。系统接口返回唯一 mounted public 卷，卷标识只保留本地（C-254）。
+- `STATIC`：F2 仅去除全局目录枚举并更新版本标记；八个主机场景通过，含实际不可列举、
+  可穿过父目录的启动测试（C-255）。
+- `OBSERVED`：F2 已暂存到 SD，完整回读与 6,845-byte 源码匹配；旧 F1 移入 Archive，
+  移动前后完整回读一致，没有删除（C-256）。已给出精确路径的单行启动命令，等待报告。
+- `OBSERVED`：F2 已执行，2,553-byte 报告完整回传并通过格式检查。十二条命令只有 pidof
+  返回 1/空；其余检查及 A-040 源文件大小/哈希通过。Shell 写 SD、主机读取的流程闭合（C-257）。
+  目标进程检查转为 AMS 的单包记录，不重复 F2。
+- `OBSERVED`：AMS 单包 LRU 查询返回 Fly HOME 主进程的非零 PID；主进程名精确匹配。
+  记录 PID 后改为直接读取目标标签与 `/proc` 挂载信息，未重启 Fly（C-258）。
+- `OBSERVED`：直接目标标签路径返回文件不存在，未显示挂载选项行；转为准备同次采集
+  AMS 前后 PID 与 proc 信息的 F3 报告（C-259）。

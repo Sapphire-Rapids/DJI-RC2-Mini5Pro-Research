@@ -1,5 +1,8 @@
 # DJI RC 2 / Mini 5 Pro research archive
 
+最新进展（C-259）：按先前 PID 读取目标标签返回文件不存在。正在准备 F3，把 AMS 前后 PID 和进程信息合并采集；当前无需继续手工输入命令。
+
+
 [![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -62,18 +65,16 @@
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
 - **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
   `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
-- **当前实机进展（C-245--C-253）**：安装后 COMPLETE 报告、开发助手 Shell `id` 照片及目录结果均已收到。
-  Shell 实测 UID/GID 为 1000/system，domain 为 `system_app:s0`；`/data` 与 `/data/app`
-  均为 0771、system:system，标签分别为 `system_data_root_file` 与 `apk_data_file`。
-  C-248 静态检查显示系统包扫描/清理可能删除未登记子目录；候选改为 `/data/app` 直下
-  独立的普通 `.so` 文件，不创建子目录。C-249 完整目录图已收到：7 个子目录，未见
-  `finduas_A040_canary.so`。F1/A-043 只读报告脚本已通过审阅和测试，暂存为 SD
-  `Download/F1.sh` 并完整读回匹配（C-250/C-251）。C-252 启动包装器尝试打开字面通配路径
-  时报 `No such file or directory`，未进入 F1。C-253 随后明确收到 `/storage: Permission denied`；
-  这是目录枚举拒绝，尚不等于已知子文件不可读。当前等待目录 metadata 与存储 API 结果，
-  操作见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
-  canary 尚未内部复制或 attach。
-  字段 owner 与后续 RID 状态观测继续独立推进，合成 codec 保持离线。
+- **当前实机进展（C-245--C-258）**：安装后 COMPLETE 报告、Shell system 身份、目录权限与
+  内容已收到；`/data/app` 未见 `finduas_A040_canary.so`，候选保持直下普通 `.so`、不建子目录。
+  F1 包装器未进入脚本；C-254 确认 `/storage` 可 search、不可枚举，并取得唯一公共卷，标识私存。
+  当前 F2/A-044 已通过 8 个 host fixtures 和审阅，暂存为 `Download/F2.sh` 且完整读回匹配。
+  F1 已移入 Archive，移动前后读回一致、无删除（C-255/C-256）。C-257 已收到并验证 F2 实机报告：
+  SD Shell 写报告到主机读回的链路闭合；唯一失败是 `pidof dji.go.v5` 返回 rc=1、空输出，
+  报告为 `INCOMPLETE`。C-258 的 AMS LRU 随后明确返回 Fly HOME 主进程条目，PID/UID 私存。
+  当前等待目标 domain 与实时 `/proc` 挂载选项，尚未实测确认 hidepid；无需重开 Fly、重跑 F2
+  或重复装包，操作入口见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
+  canary 尚未内部复制或 attach；字段 owner 独立推进，合成 codec 保持离线。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France
@@ -122,7 +123,7 @@
 - 只改该 gate-value instruction、保留 ordinary TLS/auth path 的 A-032 userspace copy 已生成；
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
   没有通过 A-032 获得 ADB shell。开发助手 Shell 身份及父目录读取另由 C-246/C-247 闭合。
-  A-032 保留为备选；F1 暂存事实保留，C-253 后等待目录 metadata 与存储 API 结果，再选择入口，
+  A-032 保留为备选；F2/A-044 已运行并收到报告（C-257），C-258 已有 AMS 主进程记录，当前等待目标 domain 与实时 `/proc` 挂载选项，
   操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
 - 当前 Android probe 为 v0.12（A-039），文件名 `Download/FindUAS_A039_V012.apk`。
   首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；安装后复测也已收到 COMPLETE

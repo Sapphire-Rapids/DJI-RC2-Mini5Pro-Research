@@ -51,10 +51,11 @@
 | A-037 | FindUAS RC 2 RID Admin identity safety lock；self-developed；`0.8.1-identity-safety-locked` / code 14 | `225,937` | `8ee7a4edd36c7f97c631fabf3186ac3df79e6611869ebf05b11e83ccba4e84ba` | `NOT ADMITTED`；仅离线构建/测试，未 staged、安装或运行；generated APK 排除、源码公开 |
 | A-038 | RC 2 probe with SD report export；self-developed；`0.11.0-report-export` / code 11 | `2,601,935` | `aaa6f8bf22002c907d8de89fff58c04755bbfdd08feed4ec0f8771d6eb8044aa` | `OBSERVED`；已安装运行并收到报告，ART build-ID 检查 INCOMPLETE；历史 APK 已移入 SD Archive，由 A-039 接续；generated APK 排除、源码公开；只公开 artifact hash |
 | A-039 | RC 2 ARM32 probe and installed Fly sample exporter；self-developed；`0.12.0-live32-samples` / code 12 | `2,651,903` | `46eb6ef19971256a02514fc51a94b21522c488d82294c8853a7beb52fbab3ce4` | `OBSERVED`；MTP/readback 匹配、已安装运行；COMPLETE 报告与样本收到；当前版本，generated APK 排除、源码公开；只公开 hash/source |
-| A-040 | FindUAS pure ARMv7 ART TI canary；self-developed；`art-ti-canary-v1-armeabi-v7a` | `4,340` | `9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a` | `NOT ADMITTED`；MTP staged/完整读回匹配；未复制到内部、未 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
+| A-040 | FindUAS pure ARMv7 ART TI canary；self-developed；`art-ti-canary-v1-armeabi-v7a` | `4,340` | `9b02f2b3a7e5a8e2afb200bd7d1fae2e75d2753eaa9c7ea86071dd47cccf086a` | `NOT ADMITTED`；MTP staged/完整读回匹配，F2 Shell 源文件校验通过；未复制到内部、未 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
 | A-041 | DJI Fly exact live ARM32 application sample；input-sample；`1.19.4` / code `3113157` / armeabi-v7a | `426,180,752` | `fb695817a885bd9d4084643d8cae07285a8ac560b6e94edd5c87af4a70b8528c` | `OBSERVED`；从既有实机安装导出，收到后独立完整验证；排除且不分发；只公开 hash |
 | A-042 | FindUAS ARMv7 FlySafe read-only query agent；self-developed；`device-id-minus-one-guard-armeabi-v7a` | `15,464` | `88d88ba10396a790d5d6675e70b44a21c01a71bbb92b4c80978998837ae75e25` | `NOT ADMITTED`；离线构建与 host 检查通过；未 staged、未在 RC 2 attach/运行；generated SO 排除、源码公开；只公开 hash/source |
-| A-043 | FindUAS F1 Fuli baseline report script；self-developed；`fuli-baseline-v1` | `7,196` | `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` | `STATIC`；源码审查及 host 检查通过；已 SD 暂存且完整读回一致；首个启动路径未匹配，尚未进入脚本；脚本源码公开，运行报告排除；只公开 hash/source |
+| A-043 | FindUAS F1 Fuli baseline report script；self-developed；`fuli-baseline-v1` | `7,196` | `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` | `STATIC`；源码审查及 host 检查通过；启动路径未匹配，未进入脚本；已归档到 SD Archive，由 F2 接续；历史源码保留，报告排除；只公开 hash/source |
+| A-044 | FindUAS F2 exact-path Fuli baseline report script；self-developed；`fuli-baseline-v2` | `6,845` | `808998e211f6af204f42df7fdce4257532dcccefd3f61420c8cfbccba08be02c` | `OBSERVED`；独立 diff/host 检查、MTP/readback 通过；已执行并收到完整 SD 报告，INCOMPLETE 仅因 pidof 失败；脚本源码公开，报告排除；只公开 hash/source |
 
 ## 3. A-001：历史 v0.10 admission probe
 

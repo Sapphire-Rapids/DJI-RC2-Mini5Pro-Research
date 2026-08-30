@@ -343,8 +343,14 @@ The two source-only deployment experiments are retained as explicit negatives:
 | C-251 | `OBSERVED` | Download/F1.sh created through RC 2 removable-SD MTP; full readback matches the 7196-byte reviewed source and SHA-256 | Staging/readback only; execution/report pending |
 | C-252 | `OBSERVED` | Fuli executes the supplied wrapper but sh cannot open the literal wildcard SD path; no F1 marker appears | Actual caller-visible storage layout is the next read |
 | C-253 | `OBSERVED` | Stderr-capturing Shell listing returns /storage: Permission denied | Enumeration failure; directory metadata/system-volume reads are next |
+| C-254 | `OBSERVED` | /storage is 0710 shell:everybody, mnt_user_file; system volume API returns one mounted public volume; caller group permits search but not enumeration | Exact volume identifier stays private; file access is next |
+| C-255 | `STATIC` | F2 removes global storage enumeration and updates its version markers; same fixed reads/report boundary; diff/syntax and eight host cases pass, including search-only parent | Live report pending |
+| C-256 | `OBSERVED` | F2 SD staging/full readback matches 6845 bytes and registered SHA; F1 moved to Archive with matching before/after full readbacks | Transfer/archive only; no deletion; F2 report pending |
+| C-257 | `OBSERVED` | F2 ran and its 2553-byte SD report was fully received; only pidof failed (rc1/empty), other eleven commands and A-040 source checks passed | Target PID/domain branch not entered; filtered AMS process read is next |
+| C-258 | `OBSERVED` | Official package-filtered AMS LRU read returns a HOME main-process record named exactly dji.go.v5 with nonzero PID | Direct target context and live proc mount options are next; identifiers stay private |
+| C-259 | `OBSERVED` | Direct attr/current read under the earlier AMS PID returns No such file or directory; no mount-option line is visible | Combined AMS-before/after and proc report is next; no target-domain or hidepid conclusion |
 
-C-235–C-253 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
+C-235–C-259 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
 
 ## Promotion rules
 

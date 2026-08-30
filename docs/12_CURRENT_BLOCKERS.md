@@ -1,16 +1,18 @@
 # Current blockers and dependency gates
 
+Current update (C-259): the direct target context path returned No such file or directory. Prepare F3 to collect AMS PID before/after and proc metadata in one report; no further manual command is currently requested.
+
+
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-The post-install A-039 COMPLETE report, actual Shell identity and parent-directory observations
-are received (C-245--C-247), followed by the complete directory contents in C-249. The candidate
-remains a regular `.so` directly in `/data/app` (C-248); its basename was absent. F1/A-043 passed
-review/tests (C-250) and is SD-staged with matching full readback (C-251). The C-252 launch
-wrapper reported a literal-path open error without entering F1. C-253 confirms `/storage`
-enumeration returns Permission denied. Await directory metadata and public-volume API results
-before selecting the storage entry; no internal canary copy or attach has occurred. See
-[the runtime topic](23_RC2_LIVE_RUNTIME.md).
+F2/A-044 has run, saved its SD report and had the full report read back and validated (C-257).
+The status is INCOMPLETE solely because `pidof dji.go.v5` returned rc=1 with empty output;
+all other checks passed, including A-040 source size/hash. C-258 now supplies an AMS LRU HOME
+main-process entry for DJI Fly with a nonzero PID kept privately. Await the target domain and
+live proc mount options using that private identity; hidepid is not yet observed. No Fly
+reopening, F2 rerun or installation is requested. Internal canary copy/attach has not occurred.
+See [the runtime topic](23_RC2_LIVE_RUNTIME.md).
 Per the latest user instruction, continue local updates, validation and commits, but do not
 resume GitHub pushes without renewed user authorization. Historical pushes remain recorded.
 C-227--C-230 have already answered the two tested FLYC parameter
@@ -39,7 +41,7 @@ Still missing:
 
 - full signed module/package set beyond the verified system/`0205` lane;
 - current mounted adbd hash/branch result; the reported `dbg_cnt` was an empty string;
-- file-level access/label/hash checks; the candidate basename was absent in C-249;
+- internal-payload access/label/hash checks; the candidate basename was absent in C-249;
 - target Fly process mapping/loader behavior and the relevant executable path/namespace.
 
 The installed-file matches support the specific framework/service and package comparisons in
@@ -72,12 +74,24 @@ The candidate is therefore a separate regular `.so` directly in `/data/app`, not
 
 C-249 supplies the complete listing: seven subdirectories, with DJI_FLY at 0777 and six
 randomized installation roots at 0775; all are system:system and apk_data_file. The candidate
-`finduas_A040_canary.so` was absent. F1/A-043 is staged with matching full readback (C-251);
+`finduas_A040_canary.so` was absent. F1/A-043 staging/readback matched (C-251);
 C-252 shows the correctly entered wrapper reaching `sh` but failing to open the literal
 wildcard path, with no F1 marker. C-253 supplies the precise stderr result:
 `ls: /storage: Permission denied`. Listing refusal does not establish that an exact known child
-file is unreadable. Await directory metadata and public-volume API output before changing the
-launch entry; F1 and the SD file remain unchanged, with no script run or report received.
+file is unreadable. C-254 records `/storage` mode 0710, shell:everybody and `mnt_user_file`.
+Fuli's supplementary everybody group (9997) has search but no directory-read permission. The
+storage API reports one mounted public volume; its identifier remains private.
+
+F2/A-044 passed review/tests and staging/readback (C-255/C-256); F1 was archived without
+deletion. C-257 now closes script execution, SD report saving and complete MTP receipt with
+schema/end/parser validation. The report is INCOMPLETE only for `pidof dji.go.v5`: rc=1 and
+empty output. System/system_app identity, SELinux Permissive, ro.debuggable=1, wifi_on=0 and
+A-040 source size/hash all passed.
+
+C-258 records a DJI Fly HOME main-process entry with a nonzero PID in AMS; PID/UID remain
+private. The current read-only step obtains that target's domain and live proc mount options.
+The pidof and AMS observations differ; no hidepid setting is yet established. Do not reopen
+Fly or repeat F2/packages. Internal canary copy/attach remains unperformed.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -441,8 +455,8 @@ Missing live:
 
 Effect: A-032 remains `NOT ADMITTED`. Do not guess `/data` paths, run from removable storage, change
 APEX/partition/boot state, or describe the staged file as an ADB workaround. This contingency list
-is not the current operator instruction. B-03 awaits directory metadata and public-volume API
-results after C-253; target-process and file-level baselines remain pending.
+is not the current operator instruction. C-258 supplies the AMS process identity; B-03 now
+awaits target domain and live proc mount options. Internal-file baselines remain pending.
 
 Bricking precedent: the pinned public RC 2 report C-212 records framework/TEE tamper followed by a
 DJI Fly update boot-logo loop and failure of every documented software recovery attempt. Before any
@@ -461,9 +475,12 @@ verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
   -> F1 reviewed/tested and SD-staged with matching readback (C-250/C-251)
   -> F1 wrapper path-open failure; script not entered (C-252)
   -> /storage enumeration refused (C-253)
-  -> receive directory metadata + public-volume API results; select storage entry
-  -> receive target PID/domain + source canary hash report
-  -> file-level and target-process baselines before loading
+  -> search-only parent and unique mounted public volume confirmed (C-254)
+  -> F2 validated and SD-staged/readback matched; F1 archived (C-255/C-256)
+  -> F2 report received: source checks pass; pidof rc1/empty is the only failure (C-257)
+  -> AMS HOME main-process record received; PID retained privately (C-258)
+  -> await target domain and live proc mount options; hidepid not yet observed
+  -> internal-file and target-process baselines before loading
   -> A-040 pure ARMv7 ART TI canary and unchanged Fly PID
   -> verified independent RID-state observer and callback provenance
 ```
@@ -485,7 +502,7 @@ exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
 ```
 
 The F7 route matrix is closed at the generic attach level, and the tested Binder status listener is
-closed as a truth source. Current work follows C-240/C-243/C-245--C-253; FlySafe inventory remains a
+closed as a truth source. Current work follows C-240/C-243/C-245--C-258; FlySafe inventory remains a
 separate branch. The older resolver sequence below is historical context, not the current operator
 procedure:
 

@@ -1,5 +1,8 @@
 # Next-agent prompt
 
+Current update (C-259): the direct target context path returned No such file or directory. Prepare F3 to collect AMS PID before/after and proc metadata in one report; no further manual command is currently requested.
+
+
 Continue from the current reviewed checkout on the DJI RC 2 `07.00.0100` / Mini 5 Pro `01.00.0600`
 lab setup. The objective covers a controllable Remote ID switch plus Basic/UAS ID, aircraft-position
 and operator-position controls, each requiring its own authoritative owner, readback, restoration
@@ -18,7 +21,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-253 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-258 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -48,8 +51,8 @@ Current facts:
   and all three component entries are enabled. Earlier directory ABSENT results remain only the
   Observer app's view. C-246 now records the actual Shell `id` output: UID/GID 1000/system and
   domain `system_app:s0`. C-247 records `/data` and `/data/app` as mode 0771, system:system,
-  with `system_data_root_file` and `apk_data_file` labels respectively. No test file has been
-  created, copied or executed; canary execution remains pending.
+  with `system_data_root_file` and `apk_data_file` labels respectively. No internal canary copy
+  or attach has occurred.
 - C-248 statically identifies package scanning/reconciliation that can delete unregistered
   subdirectories; both examined rules skip ordinary non-APK files. The candidate is a separate
   regular `.so` directly under `/data/app`, with no new subdirectory. This is not yet a tested
@@ -60,7 +63,7 @@ Current facts:
   ARMv7 query build with the additional `-1` guard. The separate RID-state chain is mapped in
   C-240; unlock registration and the deferred certificate-page screenshot are not prerequisites.
 
-F1/A-043 remains staged as `Download/F1.sh` with full readback matching 7,196 bytes and
+Historical F1/A-043 was staged as `Download/F1.sh` with full readback matching 7,196 bytes and
 SHA-256 `636a57319d6b53e874324adb67c6eab4b79fd73d703588e7a52e51bc1a381ece` (C-250/C-251).
 C-252 records the photographed wrapper reaching `sh`, which tried the literal
 `/storage/????-????/Download/F1.sh` path and reported `No such file or directory`. The input
@@ -68,24 +71,43 @@ matched the instruction; no F1 marker appeared and the script did not start. C-2
 photographed `ls: /storage: Permission denied`. This is a directory-enumeration refusal,
 not a result for reading an exact known child file.
 
-The only current diagnostic collects directory metadata and public-volume API output, with
-stderr. In the development assistant's Shell page, send exactly:
+C-254 closes the metadata/API check: `/storage` is mode 0710, shell:everybody, with
+`mnt_user_file`; Fuli belongs to the everybody group and has search but not directory-read
+permission. The API returned exactly one mounted public volume. Its identifier is retained
+privately and must not be copied into public instructions.
 
-```text
-sh -c (ls${IFS}-ldZ${IFS}/storage;sm${IFS}list-volumes${IFS}public)2>&1
-```
+Current F2/A-044 removes global `/storage` traversal and uses that private exact entry. It
+passed independent diff review, `sh -n` and eight host fixtures, including an actual mode-0111
+parent that cannot be enumerated but permits an exact-path launch (C-255). `Download/F2.sh`
+is now created on SD and fully read back: 6,845 bytes, SHA-256
+`808998e211f6af204f42df7fdce4257532dcccefd3f61420c8cfbccba08be02c` (C-256). The old F1 was
+moved to `Download/FindUAS/Archive/F1.sh`, with matching full readbacks before/after and no deletion.
 
-Return both results, including any error. Await them before choosing the storage entry;
-leave F1 source and the SD file unchanged and do not retry the old launch command.
+C-257 closes F2 execution, SD report saving and full MTP receipt: the 2,553-byte report passed
+schema, terminal-marker and parser validation. Its status is INCOMPLETE solely because
+`pidof dji.go.v5` returned rc=1 with empty output. System/system_app identity, SELinux Permissive,
+ro.debuggable=1, wifi_on=0 and the 4,340-byte A-040 source hash all passed. No internal canary
+copy or attach occurred. Keep the report name, volume identity and any process identifiers private.
+
+C-258 now records the AMS LRU result: a `dji.go.v5` HOME main-process entry with a nonzero
+PID. Its PID/UID are retained privately. This differs from the earlier empty pidof observation
+and does not call for reopening Fly.
+
+Current operator step: use the read-only command already sent privately for the PID recorded
+in C-258. It reads `/proc/<PID>/attr/current` and searches `/proc/self/mountinfo` for hidepid.
+Here `<PID>` denotes the private observed value, not a literal path to execute. Await the target
+domain and live mount-option output; hidepid is not yet observed. Do not rerun F2, reopen Fly
+or reinstall packages.
 
 Priority:
 
 1. Recover provenance for existing FLYC and receiver records where available; account for the
    1558 reported table slots versus 915 named rows without exposing private data.
 2. The post-install report, actual Shell identity and parent-directory observations are closed by
-   C-245--C-247; the complete `/data/app` contents/basename check is received in C-249. Await
-   the directory metadata and public-volume API results above before selecting a storage entry.
-   C-251 remains staging evidence; F1 execution and report receipt are still pending.
+   C-245--C-247; the complete `/data/app` contents/basename check is received in C-249. C-254
+   supplies the storage entry privately. C-257 closes F2 execution/report receipt and C-258
+   supplies the AMS main-process identity privately. Obtain its target domain and the live
+   proc mount options; do not treat the earlier pidof result as process absence or confirmed hidepid.
 3. After the regular-file path checks and the target-process baseline are complete, validate A-040's
    explicit success marker and unchanged Fly PID, then advance the independent
    RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to
