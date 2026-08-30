@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-244 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-248 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -43,8 +43,17 @@ Current facts:
   not substitute for aircraft owner/readback/RF evidence.
 - A-039 is the current probe: `Download/FindUAS_A039_V012.apk`. Old installers are in
   `Download/FindUAS/Archive/`. The original Fuli package has been reinstalled and the operator
-  confirms DevActivity opens, with no internal button clicked. The next expected input is a new
-  A-039 report after that installation (C-242).
+  confirms DevActivity opens. The post-install A-039 COMPLETE report is now received (C-245):
+  updated-system=true, the original code/hash/signer and two checked DEX entries are unchanged,
+  and all three component entries are enabled. Earlier directory ABSENT results remain only the
+  Observer app's view. C-246 now records the actual Shell `id` output: UID/GID 1000/system and
+  domain `system_app:s0`. C-247 records `/data` and `/data/app` as mode 0771, system:system,
+  with `system_data_root_file` and `apk_data_file` labels respectively. No test file has been
+  created, copied or executed; canary execution remains pending.
+- C-248 statically identifies package scanning/reconciliation that can delete unregistered
+  subdirectories; both examined rules skip ordinary non-APK files. The candidate is a separate
+  regular `.so` directly under `/data/app`, with no new subdirectory. This is not yet a tested
+  file location or loader.
 - A-040 is the new ARMv7 ART TI-only canary, already SD-staged but unexecuted. A-042 is the
   ARMv7 query build with the additional `-1` guard. The separate RID-state chain is mapped in
   C-240; unlock registration and the deferred certificate-page screenshot are not prerequisites.
@@ -53,9 +62,12 @@ Priority:
 
 1. Recover provenance for existing FLYC and receiver records where available; account for the
    1558 reported table slots versus 915 named rows without exposing private data.
-2. Read the post-install A-039 report, then obtain Fuli's actual Shell identity and directory
-   permissions. Keep the verified Fly version fixed and select an executable path from that data.
-3. Validate A-040's explicit success marker and unchanged Fly PID, then advance the independent
+2. The post-install report, actual Shell identity and parent-directory observations are closed by
+   C-245--C-247. The only current operator command is `ls -laZ /data/app`, to inspect its
+   contents and check the proposed regular-file basename for a conflict (C-248). Do not create
+   a subdirectory. File-level and target-process checks remain prerequisites before loading.
+3. After the regular-file path checks and the target-process baseline are complete, validate A-040's
+   explicit success marker and unchanged Fly PID, then advance the independent
    RID-state observation route. The deeper listener dispatcher/cancellation behavior remains to
    be checked before creating an observer. Keep old closed loaders and sender variants retired.
 4. Independently map Basic/UAS ID, aircraft position, operator position and Operator ID owners,
@@ -67,6 +79,8 @@ Priority:
 
 Keep privileged runtime actions bounded and controlled. Do not repeat the public RC 2 TEE/eFuse
 tamper/update bricking path (C-212). Do not publish vendor material, raw captures, full identifiers,
-or coordinates. Keep scripts small, record every result, run the four repository checks, commit,
-and push to `main` after each material result. Append completed actions to the existing timeline;
+or coordinates. Keep scripts small, record every result and run the four repository checks.
+The latest user instruction pauses GitHub pushes only: keep local updates, validation and
+commits, but do not resume pushes until the user restores authorization. Preserve historical
+pushed results. Append completed actions to the existing timeline;
 keep current operator instructions in the runtime topic and handoff, rather than creating competing logs.

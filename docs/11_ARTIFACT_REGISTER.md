@@ -42,7 +42,7 @@
 | A-028 | FindUAS RC 2 RID Admin；self-developed；`0.7.1-flysafe-direct-diagnostic` / code 11 | `197,061` | `d7c32636e19d1bce1b8b8994206355f42d0278b2f15048b14a948a8bbda1d540` | `OBSERVED`；exact audit/MTP/install/run；current direct-readonly transport diagnostic result；group transport callback failed，`11/12 count=0`；无 protobuf/page/terminator/write；不进入本 documentation repo |
 | A-029 | RC331 v07 system aggregate；input-sample；`07.00.0100` | `1,446,604,800` | `296cfa63e3c6b011fd1ee8dd911c11f64dac9d34a8424a6fbb95b0c237ab1ae3` | `STATIC`；signed-chain verification 与离线提取；排除且不分发；只公开 metadata/hash |
 | A-030 | RC331 v07 APEX `adbd`；input-sample；`07.00.0100` | `1,497,232` | `b300d9bb90f5941fe2952bc9f6dacc30e639a498be4435f59a4ae95134bd5422` | `STATIC`；从 exact signed package 离线提取并审计；排除且不分发；只公开 hash |
-| A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `OBSERVED`；原实机 APK/hash 匹配；原包 MTP/readback 匹配，用户已安装并打开 DevActivity；Shell/复测待完成；排除且不分发；只公开 hash |
+| A-031 | RC331 v07 DJI development assistant；input-sample；`07.00.0100` `dpad_fuli` | `8,849,471` | `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f` | `OBSERVED`；原包 MTP/readback 匹配，已安装/open；安装后 COMPLETE 报告确认 updated-system 和组件启用；Shell 身份及目录标签已读取；loader 未执行；排除且不分发；只公开 hash |
 | A-032 | RC331 v07 APEX `adbd` CNXN-gate derivative；input-sample；userspace copy | `1,497,232` | `3fceaa1724a77a153c17f725a2e3f3001b0543e31e0830aca0c77d785df9225f` | `NOT ADMITTED`；MTP staging/readback 闭合；未复制到内部存储、未 chmod、未执行；vendor derivative 排除且不分发 |
 | A-033 | FindUAS RC 2 RID Admin；self-developed；`0.8.0-flysafe-diagnostic-export` / code 12 | `204,449` | `8ce8e0c13ecfcf69517a64e809a475b79bbc750124225744b6b35f281d3d7177` | `STATIC`；exact audit；MTP staged/readback matched；未安装或运行；sealed APK 排除，源码公开 |
 | A-034 | DJI Fly runtime private mapping；runtime-derived input；`1.21.10` disposable emulator | `205,443,072` | `2926709cc6896c7315d003c4e61208d5a9fa53ae73cda897d820a581c5c8325c` | `OBSERVED`；authorized read-only emulator process-memory copy；仅本地分析；排除且不分发；只公开 hash |
@@ -305,7 +305,7 @@ backing path，exact target image 没有 `/system/bin/adbd`。A-030 与此前审
 `cmp` 相等，因此 target-version gate 结论不再只是 adjacent inference。
 
 A-031 是 exact package 中的 `dpad_fuli.apk`。它与已审计样本逐字节相等，所以 manifest、
-`ShellCommandActivity` 和 `Runtime.exec` 行为是 target-package `STATIC` 事实。C-235/C-237 的实机报告后来核对了原安装 APK/hash、平台 signer 和 system-shared-UID 身份。C-242 又记录原包 MTP staging/readback 匹配及用户安装后打开 DevActivity；未进入 Shell 页。当前尚无安装后 probe、Shell output 或 loader 执行结果。
+`ShellCommandActivity` 和 `Runtime.exec` 行为是 target-package `STATIC` 事实。C-235/C-237 的实机报告后来核对了原安装 APK/hash、平台 signer 和 system-shared-UID 身份。C-242 记录原包 MTP staging/readback 匹配及用户安装后打开 DevActivity。C-245 的安装后 COMPLETE 报告确认 updated-system、原版身份和组件启用；C-246/C-247 记录直接 Shell 的 system 身份及两个父目录权限/标签。loader 尚未执行。
 
 A-032 是 vendor-derived、不可分发的 userspace-copy 实验工件。语义 patcher 只将 exact A-030
 的 `handle_packet(CNXN)` gate-value instruction 从 `cset w21, lt` 改为 `mov w21, wzr`，保持

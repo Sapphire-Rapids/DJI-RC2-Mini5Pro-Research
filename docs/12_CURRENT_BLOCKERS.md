@@ -3,9 +3,14 @@
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
-Current device priority is the post-install A-039 report -> actual Shell identity and executable
-path -> pure ARMv7 ART TI canary -> independent RID-state observation. The first live identities
-and samples are recorded in C-235--C-238 and [the runtime topic](23_RC2_LIVE_RUNTIME.md).
+The post-install A-039 COMPLETE report, actual Shell identity and parent-directory observations
+are received (C-245--C-247). The only current operator command is `ls -laZ /data/app`, to
+inspect contents and check the proposed basename for a conflict. C-248 changes the candidate to
+a separate regular `.so` directly in `/data/app`, with no new subdirectory. No test file has
+been created, copied or executed; file-level and target-process baselines remain open. See
+[the runtime topic](23_RC2_LIVE_RUNTIME.md).
+Per the latest user instruction, continue local updates, validation and commits, but do not
+resume GitHub pushes without renewed user authorization. Historical pushes remain recorded.
 C-227--C-230 have already answered the two tested FLYC parameter
 candidates on `01.00.0600`; they are not pending probes. Basic/UAS ID, aircraft position,
 operator position and the separate Operator ID plane require their own evidence chains (B-22).
@@ -21,35 +26,51 @@ Closed for the signed target package:
 Closed by the first live reports and samples (C-235--C-238): installed Fly 1.19.4/ARMv7 and its
 signer/APK/SDK library identities; pre-reinstall Fuli and framework/services hashes; the probe's
 32-bit ART identity; `ro.debuggable=1`, `mp_state=production` and SELinux enforcing=false.
+C-245 also closes post-reinstall Fuli metadata: updated-system=true, unchanged original
+code/hash/signer and two checked DEX entries, with all three component entries enabled. Fly/ART
+identity remains stable. Earlier directory ABSENT results describe only the Observer app's view.
+C-246 establishes actual Shell UID/GID 1000/system and `system_app:s0`; C-247 establishes
+`/data` and `/data/app` mode 0771, system:system, with `system_data_root_file` and
+`apk_data_file` labels respectively.
 
 Still missing:
 
 - full signed module/package set beyond the verified system/`0205` lane;
 - current mounted adbd hash/branch result; the reported `dbg_cnt` was an empty string;
-- post-reinstall Fuli metadata, actual Shell execution identity and directory permissions;
+- the standalone regular-file basename check and file-level access/label checks;
 - target Fly process mapping/loader behavior and the relevant executable path/namespace.
 
 The installed-file matches support the specific framework/service and package comparisons in
-C-237/C-241; target process execution remains a separate next step.
+C-237/C-241/C-245. Actual Shell identity now has its own direct evidence (C-246); target-process
+loading and execution remain untested.
 
 ## B-02 — runtime report and SD export
 
 Initial report/export work is closed: v0.11's INCOMPLETE report and v0.12's COMPLETE report were
 received, followed by the verified fixed sample ZIP. A-039 is current; A-038 is archived.
 
-Next input: a new A-039 report after the operator-confirmed Fuli installation. The operator should
-open FindUAS RID Bridge Probe, select the capability check and wait for the SD save result.
-Fetch it from `Download/FindUAS/Probe/` before selecting the internal loading path (C-242).
+The post-install A-039 report has also been received and is COMPLETE (C-245). No further
+capability report is currently requested. The separate Shell and parent-directory results are
+also received (C-246/C-247); remaining loading work is listed in B-03.
 
 ## B-03 — actual Shell caller and loading path
 
-The original Fuli package is reinstalled and DevActivity opens (C-242). Its Shell page has not yet
-been opened. The stock page's startup checks and Runtime.exec(String) behavior are documented in
+The original Fuli package is reinstalled and DevActivity opens (C-242); the post-install report
+confirms all three entries enabled (C-245). The operator subsequently opened the Shell page,
+ran `id` and returned the photo (C-246), followed by the directory listing (C-247). The stock
+page's startup checks and Runtime.exec(String) behavior are documented in
 [the Android topic](08_ANDROID_ADB.md); it is a manual interface, not an automatic command RPC.
 
-Next obtain actual UID/domain, target PID and path permissions with fixed read-only commands and
-explicit result codes. Then test A-040's loading marker and stable Fly PID. The historical root
-check's Boolean is not used as the caller identity.
+The Shell itself reports UID/GID 1000/system and `system_app:s0`. Both parent directories have
+mode 0771 and system:system ownership; their labels are recorded in C-247. These observations
+do not test a payload file or a target-process load. C-248 statically shows that scanDirLI
+treats directories as package candidates and failure may remove them; systemReady reconciliation
+can also remove unregistered directories. Both examined rules skip ordinary non-APK files.
+The candidate is therefore a separate regular `.so` directly in `/data/app`, not a subdirectory.
+
+Current command: `ls -laZ /data/app`, to inspect contents and check the proposed basename for
+a conflict. No test file has been created, copied or executed. This cleanup analysis does not
+replace file-level checks or the target-process baseline before loading.
 
 ## B-04 — V2.3 independent post-fix audit
 
@@ -401,8 +422,9 @@ Closed offline:
 
 Missing live:
 
-- `id`, `getenforce`, `mp_state`, `dbg_cnt`, init/USB/FunctionFS state;
-- mounted stock `adbd`, staged copy, and installed Fuli hashes;
+- the contingency-specific daemon/USB/FunctionFS baseline; C-246 supplies the Fuli Shell identity
+  and C-237 supplies probe-visible boot properties, but no ADB Shell identity has been obtained;
+- mounted stock `adbd` and the selected staged copy hashes; Fuli's post-install hash is closed by C-245;
 - a proven internal location that is both writable by the observed caller and executable under the
   observed mount/SELinux policy;
 - internal copy size/hash, mode, label, and successful process start;
@@ -411,9 +433,9 @@ Missing live:
 - if transport becomes `device`, actual shell UID/GID/SELinux context and fixed property readback.
 
 Effect: A-032 remains `NOT ADMITTED`. Do not guess `/data` paths, run from removable storage, change
-APEX/partition/boot state, or describe the staged file as an ADB workaround. The first operator batch
-collects the baseline; only that evidence may generate the second command batch in the same assisted
-session.
+APEX/partition/boot state, or describe the staged file as an ADB workaround. This contingency list
+is not the current operator instruction. B-03 requests only `ls -laZ /data/app` for the
+regular-file basename check; target-process and file-level baselines remain pending.
 
 Bricking precedent: the pinned public RC 2 report C-212 records framework/TEE tamper followed by a
 DJI Fly update boot-logo loop and failure of every documented software recovery attempt. Before any
@@ -426,8 +448,10 @@ boot chain, flash startup partitions, or treat physical EDL as an authorized fal
 The current evidence dependencies are:
 
 ```text
-verified Fly 1.19.4 samples and first A-039 COMPLETE report
-  -> post-install Fuli report and actual Shell/path baseline
+verified Fly 1.19.4 samples and post-install A-039 COMPLETE report (C-245)
+  -> actual Shell identity and parent-directory observations received (C-246/C-247)
+  -> ls -laZ /data/app; check regular .so basename for conflict (C-248)
+  -> file-level and target-process baselines before loading
   -> A-040 pure ARMv7 ART TI canary and unchanged Fly PID
   -> verified independent RID-state observer and callback provenance
 ```
@@ -449,7 +473,7 @@ exact A-026 first run = GATE_UNOBSERVED / zero query (C-165)
 ```
 
 The F7 route matrix is closed at the generic attach level, and the tested Binder status listener is
-closed as a truth source. Current work follows C-240/C-242/C-243; FlySafe inventory remains a
+closed as a truth source. Current work follows C-240/C-243/C-245--C-248; FlySafe inventory remains a
 separate branch. The older resolver sequence below is historical context, not the current operator
 procedure:
 
@@ -506,8 +530,9 @@ deployment shortcuts are now retired on emulator evidence:
 3. uncommitted PackageInstaller staging: target search denied on `apk_tmp_file`, session abandoned
    (C-210).
 
-Within the same-process lane, the next blocker is C-211: identify the actual RC 2 DJI Fly
-signer/SELinux domain and Fuli caller domain, then find a legitimate delimiter-free path/descriptor
+Within the same-process lane, signer/package identities are now recorded in C-237/C-245. The
+Fuli Shell caller identity and parent-directory labels are now recorded in C-246/C-247. The
+remaining C-211 blocker is the target-process baseline and a verified test-file path/descriptor
 at their policy intersection. If no intersection exists, prioritize the already separate
 userspace-ADB route or an existing system-mediated loader only after its own baseline and recovery
 gates close. C-207's written standard-RID bearer/timing record remains open, independently of the

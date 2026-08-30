@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-244；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-248；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -12,9 +12,11 @@
 | SD 回传 | v0.11/v0.12 报告已收到；实机 APK 和三份 SDK 库已完整校验 | C-235--C-238 |
 | Android/ART 检查 | v0.12 为 `COMPLETE`，32 位 GNU build ID 解析成功 | C-237 |
 | 官方调用链 | FlySafe 查询与独立 RID 工作状态链均已在实机版本中定位 | C-239、C-240 |
-| 开发助手 | 原包已回读核对；操作者安装后可正常打开，未点击内部按钮 | C-241、C-242 |
+| 开发助手 | 原包已安装；新报告确认 updated-system、原身份保持一致、三个入口启用 | C-241、C-242、C-245 |
+| Shell 身份 | `id` 实测 UID/GID 1000（system），域为 `u:r:system_app:s0` | C-246 |
+| 目录基线 | `/data`、`/data/app` 均为 system:system、771；后者标签为 `apk_data_file` | C-247 |
 | 同进程加载 | ARMv7 ART TI canary 已构建、测试并放到 SD 卡；尚未执行 | C-243 |
-| 当前操作 | 打开 A-039，执行一次能力检查并保存安装开发助手后的新报告 | C-242 |
+| 当前操作 | Shell 执行 `ls -laZ /data/app` 并回传，核对测试文件名是否占用 | C-247、C-248 |
 
 本轮尚未执行 RID 切换。操作者说明未办理解禁，证书页面的人工查看已暂缓；后续优先
 观察独立 RID 工作状态，FlySafe 清单不作为继续研究的前提。
@@ -87,8 +89,37 @@ Java owner、JNI descriptor、回调及成功 envelope 与现有独立解析器�
 “卸载更新”可恢复 vendor 原包，重启后既有启动策略再应用禁用状态（C-241）。
 
 `OBSERVED`：A-031 原始包以 `Download/RC2_FULI_ORIG.apk` 放入 SD 卡，完整 MTP 回读
-哈希匹配。操作者确认安装后开发助手可正常打开，未点击内部按钮。安装后的 A-039 报告、
-Shell 执行身份和实际目录权限仍待读取；撤回流程尚未执行（C-242）。
+哈希匹配。操作者当时确认安装后开发助手可正常打开，未点击内部按钮（C-242）。
+
+`OBSERVED`：随后通过同一 RC 2 可移除 SD 卡 MTP 收到安装后的 A-039 报告，结果为
+`COMPLETE`，报告时间换算至 Asia/Shanghai 为 2026-08-31。Fuli 的 updated-system 标志为 true；版本 code
+155、APK SHA-256、平台签名与两份已检查 DEX 保持一致。三个固定组件分别为
+`EXPORTED_ENABLED`、`PRIVATE_ENABLED`、`PRIVATE_ENABLED`。Fly 1.19.4/ARMv7 及
+ART 文件身份不变。目录 `ABSENT` 是 Observer 进程所见，另以直接 Shell 读取补齐（C-245）。
+
+`OBSERVED`：操作者进入“开发助手 → shell命令测试”，输入 `id` 并发送一次。
+照片显示 `uid=1000(system) gid=1000(system)`、`context=u:r:system_app:s0`，附加组
+包括 log、reserved_disk、external_storage、net_bt_admin、net_bt、inet、net_bw_acct
+和 everybody（C-246）。该身份来自实际命令输出。
+
+`OBSERVED`：随后同页发送一次 `ls -ldZ /data /data/app`，照片中的命令与两行输出
+一致（C-247）：
+
+| 目录 | 权限 | 所有者/组 | SELinux 标签 |
+| --- | --- | --- | --- |
+| `/data` | `drwxrwx--x`（771） | system:system | `u:object_r:system_data_root_file:s0` |
+| `/data/app` | `drwxrwx--x`（771） | system:system | `u:object_r:apk_data_file:s0` |
+
+两条命令各执行一次，均已返回；未测耗时和单独退出码。正向对照为命令文本、预期身份行与
+两个明确目录行相符。此次只读取元数据，无需恢复；测试目录/文件尚未创建，目标进程域、
+加载与新 RF 数据尚待取得。原始照片及目录时间等元数据仅保留本地。
+
+`STATIC`：已匹配 services 中，PackageManager 的 `scanDirLI` 把目录或 APK 作为包候选；
+非系统包扫描失败可进入删除路径。`systemReady` 调用的 `reconcileApps` 也会清理未登记的
+目录。普通非 `.apk` 文件由这两处候选判断跳过（C-248）。输入 services.jar 的 SHA-256 为
+`1372cd839fc8f495d4e166bd4f29e08a446ca7fcd4154bfa642174ca4e7352ed`，与实机报告匹配。
+因此不采用新建子目录的方案；
+直接放置独立 `.so` 普通文件的候选见 [H-32](10_HYPOTHESES_AND_UNKNOWNS.md#h-32--the-remaining-loader-problem-is-a-callertarget-path-policy-intersectionc-208--c-211)。
 
 `STATIC`：A-040 是独立的 ARMv7 ART TI 加载测试，仅请求接口版本 `0x70010200`、
 查询版本并输出一次结果，不枚举类或发起飞机查询。10 项 fake-VM 测试通过，4 个故障
@@ -100,9 +131,12 @@ Shell 执行身份和实际目录权限仍待读取；撤回流程尚未执行�
 
 ## 下一步
 
-1. 操作者保持遥控器离线，打开已安装的 A-039（`FindUAS_A039_V012.apk`），执行能力检查并保存报告。
-2. 根据新报告取得实际 Shell 身份和文件路径权限，再选择加载测试文件的位置。
+1. 安装后报告、Shell 身份与两个父目录的权限/标签已收到，不再重复这些检查。
+2. 当前 Shell 输入 `ls -laZ /data/app`，点“发送”并回传照片，核对拟用文件名是否已占用。
+   再完成独占创建/复制、实际文件校验及加载前目标进程身份检查。
 3. 先验证纯 canary 的成功标记与 Fly PID 稳定，再推进独立 RID 状态观测。
+
+按操作者最新要求，进度仅同步本地仓库，暂停 GitHub 推送。
 
 未采集新的无线广播数据；起桨由操作者另行控制。私有材料的定位类别见
 [排除日志索引](15_LOG_INDEX.md)。

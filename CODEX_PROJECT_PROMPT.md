@@ -76,6 +76,7 @@ action, readback, restoration, final readback, and independently observed RF beh
 Treat a timeout or absent callback as a narrow result, not as "off", "empty", or "unsupported".
 
 For every reproducible result, update the relevant topic document, claims/artifacts register,
-timeline, blocker/handoff, and changelog together. Run the four repository checks, commit, and push
-to `main`.
+timeline, blocker/handoff, and changelog together. Run the four repository checks and keep the
+changes local. The operator paused GitHub synchronization on 2026-08-31; do not push until they
+request resumption.
 ```

@@ -812,3 +812,16 @@ work when a report did not contain a more precise timestamp.
 
 - 按操作者要求补齐本轮源码、脱敏进度和证据/工件索引，并在首页加入本时间线入口。
 - 协作规则已加入每次新结果后的 timeline、校验、提交及 GitHub 同步步骤。
+
+### 安装后报告与直接 Shell 基线
+
+- `OBSERVED`：安装后的 A-039 报告已完整收到，结果为 COMPLETE；Fuli 为 updated-system，
+  原版本/hash/signer 与两份已检查 DEX 一致，三个固定入口均已启用；Fly/ART 身份未变（C-245）。
+- `OBSERVED`：操作者在 Shell 页执行 `id`，照片确认 UID/GID 1000（system）和
+  `u:r:system_app:s0`（C-246）。
+- `OBSERVED`：随后执行 `ls -ldZ /data /data/app`，两目录均为 system:system、771；
+  标签分别为 system_data_root_file 和 apk_data_file（C-247）。原始照片保留本地。
+- 操作者要求暂时停止 GitHub 同步，后续变更仅更新本地仓库；当前尚未创建内部测试文件
+  或执行 canary。
+- `STATIC`：核对匹配 services 的扫描及启动清理规则：未登记子目录会进入包处理，而普通
+  非 APK 文件在两处检查中被跳过；据此放弃新建测试子目录（C-248）。

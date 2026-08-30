@@ -175,10 +175,16 @@ detected. A-040 is the default ARMv7 build, `4,340` bytes, SHA-256
 `OBSERVED`: its removable-SD copy was read back with a matching hash, but it has not been copied internally
 or executed; A-042 remains offline only. Both are `NOT ADMITTED` for RC 2 execution.
 
-`OBSERVED` by operator report: the original Fuli development assistant can now open, with no button
-pressed. The subsequent report and actual execution UID/domain/path baseline remain pending
-(C-242); opening an Activity does not prove a privileged shell or an admissible loader path.
-The next evidence is that baseline, then a separately admitted pure-canary load before any query.
+`OBSERVED`, C-245: the post-installation v0.12 report was received and validated as `COMPLETE`.
+Fuli now has `updated-system=true` and all three inspected Activities enabled; its original version
+code 155, APK hash, signer and two audited DEX hashes are unchanged. Fly and ART identity readings
+match the earlier report. Directory `ABSENT` remains the Observer's view.
+
+`OBSERVED`, operator-supplied Shell output (C-246): commands execute with system UID/GID identity
+and the `system_app` domain. A separate read-only listing (C-247) establishes `/data` and `/data/app`
+as `system:system` directories with mode `0771`; their labels are `system_data_root_file` and
+`apk_data_file` respectively. The target Fly process domain and canary loading are pending.
+No internal test directory/file has been created or library copied internally.
 
 The independent RID working-status owner route is tracked under C-240 in
 [the live-runtime note](23_RC2_LIVE_RUNTIME.md). It does not depend on applying for an unlock
