@@ -306,13 +306,17 @@ Later retractions override earlier progress summaries.
     or route variants, treat index 1306 as authoritative, or unlock a neighbour as a substitute.
     This does not establish absence in DJI Fly, another firmware surface or encrypted `0802`.
     C-235--C-238 now supply the first RC 2 identity reports and installed Fly samples;
-    the next dependency is the post-install Fuli baseline and a legitimate loader.
+    C-245--C-247 add the post-install Fuli report and direct Shell identity/directory baseline;
+    the next dependency is a legitimate loader and the target process baseline.
 41. The installed Fly is `1.19.4` / code `3113157`, ARMv7. Earlier `1.21.10` results keep their
     emulator/static version labels. C-239/C-240 map the actual FlySafe and independent RID-state
     owners. Fuli's original same-version reinstall has been operator-confirmed to open DevActivity
-    (C-241/C-242); its new probe report and Shell identity/path baseline are pending. A-040 is the
-    ARMv7 ART TI-only canary, built/tested and SD-staged but not executed (C-243). Obtain that
-    baseline before any same-process observation. Unlock registration is not a prerequisite for
+    (C-241/C-242). C-245 confirms updated-system state and enabled components. Direct Shell
+    `id` reports UID/GID 1000 and `u:r:system_app:s0` (C-246); `/data` and `/data/app` are
+    mode 771, owned by system:system, with system_data_root_file/apk_data_file labels respectively
+    (C-247). A-040 is the ARMv7 ART TI-only canary, built/tested and SD-staged but not executed
+    (C-243). Target-process identity and the actual test-file path remain to be checked before
+    same-process observation. Unlock registration is not a prerequisite for
     investigating the independent RID-state route.
 
 ## Privacy and redaction
@@ -352,9 +356,10 @@ license to redistribute the artifact.
    `docs/10_HYPOTHESES_AND_UNKNOWNS.md`, or `docs/12_CURRENT_BLOCKERS.md` as applicable.
 5. Update `CHANGELOG.md`.
 6. Run link, CSV, whitespace, and sensitive-pattern checks before publishing.
-7. After each material new result, append the completed action to `docs/03_TIMELINE.md`, commit the
-   synchronized source/evidence records, and push validated changes to GitHub `main`. Report the
-   commit and any pending CI status; keep raw/private material excluded.
+7. After each material new result, append the completed action to `docs/03_TIMELINE.md` and
+   synchronize and validate the local source/evidence records. The operator paused GitHub
+   synchronization on 2026-08-31: keep changes local and do not push until they request resumption.
+   Keep raw/private material excluded; preserve earlier published history.
 
 ## Live-experiment record minimum
 

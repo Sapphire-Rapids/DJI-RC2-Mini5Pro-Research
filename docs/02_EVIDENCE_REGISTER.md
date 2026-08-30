@@ -331,11 +331,15 @@ The two source-only deployment experiments are retained as explicit negatives:
 | C-239 | `STATIC` | Exact 1.19.4 FlySafe Java/native registration/core bridge match existing query descriptors/envelope; -1 initialization sentinel rejected; ARMv7 A-042 built and host checked | No RC 2 query; selected interface compatibility does not establish entitlement or other negative-token semantics |
 | C-240 | `STATIC` | Exact independent RID status chain: 11/1C update → RidWorkingStatusPush → RemoteID observable; default/cached initial values distinguished; cloud-policy writer remains 00/DD SET | No recovered status GET builder or executed observer; no fresh/RF inference from defaults/cache |
 | C-241 | `STATIC` | Fuli boot policy sets DISABLED=2; standard same-version original-APK replacement resets target user DEFAULT=0; official uninstall-updates restores saved vendor base | No immediate PackageMgr package-replaced disable edge found; base restoration does not alone restore state2 |
-| C-242 | `OBSERVED` | A-031 original APK staged/readback matched; operator installed and opened DevActivity without entering Shell or pressing test buttons | Post-install probe, Shell and loader execution pending |
+| C-242 | `OBSERVED` | A-031 original APK staged/readback matched; operator installed and opened DevActivity without entering Shell or pressing test buttons | Later report/Shell observations in C-245--C-247; loader pending |
 | C-243 | `OBSERVED` | Pure ARMv7 ART TI canary A-040: 10 host tests, 4 rejected mutations; SD staging/full readback matched | No internal copy, attach, class enumeration or query execution |
 | C-244 | `OBSERVED` | Eight historical SD APK files moved to Download/FindUAS/Archive; current A-039 retained; no deletion | SD organization only; installed applications and prior results unchanged |
+| C-245 | `OBSERVED` | Post-install A-039 report is COMPLETE: Fuli is updated-system, original package identity retained, and all three fixed entries enabled; Fly/ART identities stable | Directory state remains probe-view only; direct Shell follows in C-246/C-247 |
+| C-246 | `OBSERVED` | Operator-run id returns UID/GID 1000 (system) and u:r:system_app:s0 in the original Fuli Shell page | Target Fly domain and canary remain pending |
+| C-247 | `OBSERVED` | Operator-run ls -ldZ reads /data and /data/app as system:system, mode 771, labelled system_data_root_file and apk_data_file respectively | Parent metadata only; no internal test directory/file created |
+| C-248 | `STATIC` | Exact PackageManager selects APK files/directories in scanDirLI and boot-time reconcileApps; failed or unregistered directory candidates can be removed, ordinary non-APK files are skipped | Two scanner paths checked; no live test-file creation or cleanup test |
 
-C-235–C-244 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
+C-235–C-248 的主体、步骤与当前状态见 [RC 2 实机运行时进展](23_RC2_LIVE_RUNTIME.md)。
 
 ## Promotion rules
 

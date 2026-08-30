@@ -2,9 +2,12 @@
 
 ## Start here
 
-The next device objective is the post-install A-039 report, Fuli's actual Shell/path baseline,
-and the pure ARMv7 ART TI canary, followed by independent RID-state observation. The installed
-Fly 1.19.4/ARMv7 reports, samples and current steps are in
+The post-install A-039 COMPLETE report, actual Shell identity and parent-directory observations
+are received (C-245--C-247). The only current operator command is `ls -laZ /data/app`, to
+inspect contents and check the proposed basename for a conflict. C-248 changes the candidate to
+a separate regular `.so` directly under `/data/app`, with no new subdirectory. No test file has
+been created, copied or executed; the pure ARMv7 ART TI canary remains unexecuted.
+The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
 Basic/UAS ID, aircraft position and operator position; keep Operator ID separate and map each
@@ -32,14 +35,23 @@ The current probe is A-039 v0.12. A-001/v0.10 and A-038/v0.11 are historical and
 are archived; V2.2 remains rejected and V2.3 remains unexecuted.
 
 A-039's COMPLETE report and its fixed sample export have been received (C-236--C-238). The
-operator then installed original Fuli and confirmed DevActivity opens without clicking its
-internal buttons. Ask only for the next capability check in the already-installed A-039 and read
-the resulting report from `Download/FindUAS/Probe/` (C-242). Unlock registration and the deferred
-certificate-page screenshot are not prerequisites for the independent RID-state route.
+operator then installed original Fuli and confirmed DevActivity opens (C-242). Its post-install
+COMPLETE report is now received (C-245): updated-system=true, original code/hash/signer and
+two checked DEX entries unchanged, all three component entries enabled, and Fly/ART identity
+stable. Earlier directory ABSENT results remain the Observer app's view. C-246 now records
+the actual Shell `id` photo: UID/GID 1000/system and `system_app:s0`. C-247 records `/data`
+and `/data/app` mode 0771, system:system, labelled `system_data_root_file` and `apk_data_file`
+respectively. C-248 identifies directory cleanup in the examined PackageManager scan and
+reconciliation paths; those two rules skip ordinary non-APK files. The candidate is a separate
+regular `.so` directly in `/data/app`, not a new subdirectory. No test file has been created or
+copied and no payload has executed. Unlock registration and the deferred certificate-page
+screenshot are not prerequisites for the independent RID-state route.
 
 After each material result, append the completed action to the existing timeline, synchronize
-the evidence/source records, run repository checks, commit and push to GitHub main. Keep the
-current operator step in the runtime topic and this handoff.
+the local evidence/source records and run repository checks. Local commits remain allowed;
+the latest user instruction pauses GitHub pushes only. Do not resume pushes until the user
+restores authorization. Preserve historical pushed results. Keep the current operator state
+in the runtime topic and this handoff.
 
 ## Topic entry points
 
@@ -61,8 +73,9 @@ Exact target-package facts:
   AUTH. This closes target-package code, not the live property values or taken branch.
 - Exact packaged `dpad_fuli.apk`: `8,849,471` bytes, SHA-256
   `58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f`; its operator Shell page is
-  exact-v07 static evidence, and the pre-reinstall installed hash matches (C-237).
-  Post-install metadata and actual Shell identity remain pending (C-242).
+  exact-v07 static evidence. Both pre- and post-reinstall reports match the original package
+  identity (C-237/C-245); post-install entries are enabled. C-246 separately verifies actual
+  Shell UID/GID 1000/system and `system_app:s0`; C-247 supplies parent-directory observations.
 
 A-032 changes only `cset w21, lt -> mov w21, wzr` at the exact gate-value instruction and preserves
 the normal TLS/auth target. Its `1,497,232`-byte SHA-256 is
@@ -71,10 +84,11 @@ matching fresh size/full readback as removable-SD `Download/RC2_ADBD_CNXN.bin`; 
 repository.
 
 This historical contingency remains `NOT ADMITTED`: no internal copy, chmod, execution, daemon
-stop, new ADB response or shell has occurred. Section 11 of the ADB topic preserves its proposed
-baseline-dependent sequence. It is not the current operator instruction. The immediate step is
-only A-039's capability check and SD report; follow [the current runtime steps](23_RC2_LIVE_RUNTIME.md#下一步)
-before selecting any later action.
+stop or new ADB response has occurred through A-032; C-246 records the separate Fuli Shell.
+Section 11 of the ADB topic preserves its proposed baseline-dependent sequence. It is not the
+current operator instruction. The current read-only step is `ls -laZ /data/app`; keep
+file-level and target-process checks separate from this listing. Follow
+[the runtime topic](23_RC2_LIVE_RUNTIME.md#下一步) before selecting a later device action.
 
 Do not return to first-packet public key, WebADB, banner/MAXDATA/checksum variants, USB-debugging
 toggle, wireless ADB, or `tcpip 5555` before that discriminator. Never use bootloader/fastboot/OEM
@@ -486,7 +500,8 @@ Record only redacted values and include:
 - effects that were not measured.
 
 Update claim CSV, topic document, timeline, negative/hypothesis/blocker tables, artifact register if
-applicable, and changelog in the same commit.
+applicable, and changelog together in the local working tree, then validate before a local
+commit. GitHub pushes remain paused until renewed user authorization.
 
 ## Publication checks
 
@@ -525,8 +540,11 @@ The bounded sandbox search did not find the latest 1558-slot/915-name enumeratio
 completed C-207 timeline. Check old task outputs and existing local history before repeating any
 collection; absence from that search is not proof that the records are lost.
 
-The next device session begins with exact read-only installed/mounted identity and caller/target
-policy facts. Admit a legitimate delimiter-free path or mediated descriptor before the first
+Installed-package identity, actual Fuli Shell identity and parent-directory observations are now
+recorded in C-245--C-247. C-248 narrows the candidate to a regular `.so` directly in
+`/data/app`, with no new subdirectory; the current listing checks for a basename conflict.
+File-level checks and the target-process baseline remain pending. Admit a legitimate
+delimiter-free path or mediated descriptor before the first
 query-only ART TI execution; success requires a fresh callback and unchanged DJI Fly PID. The
 independent userspace-ADB contingency retains its own baseline and recovery gates.
 

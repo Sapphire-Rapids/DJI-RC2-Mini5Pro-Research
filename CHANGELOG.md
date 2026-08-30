@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.23 - 2026-08-31
+
+- Received the post-install A-039 COMPLETE report: Fuli is updated-system with the original
+  package identity and all three checked entries enabled (C-245).
+- Recorded direct Developer Assistant Shell output: UID/GID 1000, system_app domain, and
+  system-owned mode-771 `/data` and `/data/app` with their actual SELinux labels (C-246/C-247).
+  The canary remains SD-staged; no internal test file or attach has run.
+- Checked exact PackageManager scanning/boot reconciliation rules and dropped the proposed test
+  subdirectory; ordinary non-APK files are skipped by both examined candidate filters (C-248).
+- Paused GitHub synchronization at the operator's request; subsequent progress stays local.
+
 ## 0.4.22 - 2026-08-31
 
 - Closed SD report receipt and identified the installed Fly as `1.19.4` / code `3113157`, ARMv7.

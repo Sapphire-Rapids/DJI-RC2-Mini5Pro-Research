@@ -12,6 +12,7 @@
 
 **最新进展：[2026-08-31 时间线](docs/03_TIMELINE.md#2026-08-31)** ·
 [实机环境与当前操作](docs/23_RC2_LIVE_RUNTIME.md)。每次取得新结果后同步更新。
+按用户最新要求，目前在本地更新、验证并可提交；用户恢复授权前不再推送 GitHub，历史已推送记录保留。
 
 新建或接续 Codex 任务时，请使用
 [`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md) 中的精简提示词。它把本项目准确界定为
@@ -25,7 +26,7 @@
 
 | 对象 | 记录值 | 证据边界 |
 | --- | --- | --- |
-| 遥控器 | DJI RC 2；界面固件 `07.00.0100` | 已读回 ART、Fuli、framework/services 与部分系统属性；mounted adbd 身份仍待核对（C-235/C-237） |
+| 遥控器 | DJI RC 2；界面固件 `07.00.0100` | 已读回 ART、Fuli、framework/services 与部分系统属性，Fuli 安装后复测、Shell 身份和父目录基线已完成；mounted adbd 身份仍待核对（C-245--C-247） |
 | 飞机 | DJI Mini 5 Pro；固件 `01.00.0600`；静态候选 WA150 / product 139 | 固件为操作者确认（C-220）；product/route 仍需 live session 重新确认；`01.00.0600` 落在 CVE-2026-78306/77812 受影响窗口 |
 | DJI Fly | 实机 `1.19.4` / code `3113157`，ARMv7；另保留 `1.21.10` 对照 | 实机 APK/库已回传并校验；1.21.10 的模拟器结果保留原版本标签（C-238/C-239） |
 | MSDK | 重点交叉验证 5.18.0 | schema/handler 证据不等于消费级产品支持 |
@@ -61,8 +62,12 @@
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
 - **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
   `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
-- **当前实机步骤（C-242/C-243）**：开发助手原包重装后已能打开。接下来运行 A-039
-  保存新报告，确认系统调用方和文件路径，再执行已准备的 ARMv7 加载测试。
+- **当前实机进展（C-245--C-248）**：安装后 COMPLETE 报告、开发助手 Shell `id` 照片及目录结果均已收到。
+  Shell 实测 UID/GID 为 1000/system，domain 为 `system_app:s0`；`/data` 与 `/data/app`
+  均为 0771、system:system，标签分别为 `system_data_root_file` 与 `apk_data_file`。
+  C-248 静态检查显示系统包扫描/清理可能删除未登记子目录；候选改为 `/data/app` 直下
+  独立的普通 `.so` 文件，不创建子目录。当前仅执行 `ls -laZ /data/app`，检查内容与拟用
+  basename 是否冲突；尚未创建、复制或执行测试文件，A-040 尚未运行。
   字段 owner 与后续 RID 状态观测继续独立推进，合成 codec 保持离线。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
@@ -111,11 +116,12 @@
   `dbg_cnt` 字符串；mounted adbd hash 和实际分支仍待获取。
 - 只改该 gate-value instruction、保留 ordinary TLS/auth path 的 A-032 userspace copy 已生成；
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
-  没有 shell。A-032 保留为备选方案；当前按 A-039 报告、实际 Shell/路径基线、A-040 canary
-  的顺序推进，操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
+  没有通过 A-032 获得 ADB shell。开发助手 Shell 身份及父目录读取另由 C-246/C-247 闭合。
+  A-032 保留为备选；当前只读步骤为 `ls -laZ /data/app`，确认普通 `.so` 候选 basename 无冲突，
+  操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
 - 当前 Android probe 为 v0.12（A-039），文件名 `Download/FindUAS_A039_V012.apk`。
-  首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；当前等待开发助手安装后的
-  新能力报告。v0.11/A-038 已归档。
+  首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；安装后复测也已收到 COMPLETE
+  报告（C-245），Fuli 原版 hash/版本/signer 保持一致、updated-system=true。v0.11/A-038 已归档。
 - 固定 clean-room 管理客户端 `0.3.0-research` 已安装并执行：live `protocol` Binder lookup、
   manager transaction 和 callback exception layer 均成功，但 target F7 在约 3.1 秒后以
   `ECode 1` 结束，没有 F7 ACK，也没有发送 F9。相邻 RC331 `ActQueue` 将该错误映射为重试耗尽；

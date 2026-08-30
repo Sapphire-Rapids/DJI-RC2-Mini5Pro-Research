@@ -66,11 +66,18 @@ snapshot with a fresh output name. Report and sample export results never change
 verdict. The report retains `finduas-rid-probe/v0.10-schema-1`, adds the current `app_version`, and
 ends with `report_file_end=true`. Both report bodies and vendor ZIPs stay private.
 
-C-237 records the received v0.12 `COMPLETE` report; C-238 records all four sample files received
-and independently validated. Local MediaStore success alone is still not host receipt: every new
-output needs a fresh MTP listing and complete readback. The developer assistant can now be opened
-according to the operator, but a new probe report after that installation is pending. The next
-operator action is to reopen the installed probe and tap **执行只读能力检查**.
+C-237 records the earlier v0.12 `COMPLETE` report; C-238 records all four samples received and
+validated. C-245 now records the received and validated post-installation `COMPLETE` report:
+Fuli is an updated system app, all three inspected Activities are enabled, and version code 155,
+APK hash, signer and both audited DEX hashes are unchanged. Fly and ART identity readings also
+match the earlier report. Directory `ABSENT` results remain limited to the Observer's view.
+Local publication still requires fresh MTP listing/full readback for each new output.
+
+`OBSERVED`, operator-supplied Shell output (C-246/C-247): execution uses the system UID/GID and
+`system_app` SELinux domain; a read-only listing has established ownership, mode and labels for
+`/data` and `/data/app`. These are separate Shell observations, not new probe capabilities.
+No internal test directory or file has been created. The target Fly process domain, usable test-file
+placement and canary loading are the remaining checks.
 
 C-236 records 94 JVM tests, 8 auditor tests, 37/37 rejected audit mutations, lint with no issues,
 v2 signature and zip alignment, manual source/final-DEX review, and two byte-identical clean builds.

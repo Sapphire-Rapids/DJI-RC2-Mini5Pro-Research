@@ -111,10 +111,18 @@ type-6 parser has synthetic host coverage but no real callback input yet.
 
 An ordinary third-party APK cannot attach an agent to DJI Fly merely because it contains this
 library. The emulator observation used an authorized root shell and an executable file label.
-RC 2 `07.00.0100` still needs an admitted same-process loader. `OBSERVED` by operator report
-(C-242): the original development assistant now opens, with no button pressed. The follow-up report
-and actual caller UID/domain/PID baseline remain pending. No internal executable path
-has been selected. See [the live-runtime sequence](../../../docs/23_RC2_LIVE_RUNTIME.md).
+RC 2 `07.00.0100` still needs an admitted same-process loader. C-245's received and validated
+post-installation `COMPLETE` report now shows Fuli as an updated system app with all three inspected
+Activities enabled. Its original version code 155, APK hash, signer and two audited DEX hashes are
+unchanged, as are the Fly and ART identity readings. Directory `ABSENT` is still an Observer-view
+result.
+
+`OBSERVED`, operator-supplied Shell output (C-246): commands execute with system UID/GID identity
+in the `system_app` domain. The read-only directory listing (C-247) shows `/data` and `/data/app`
+owned by `system:system`, both mode `0771`, with `system_data_root_file` and `apk_data_file` labels
+respectively. No internal test directory/file has been created or library copied there;
+the target Fly process domain and canary loading remain unverified. See
+[the live-runtime record](../../../docs/23_RC2_LIVE_RUNTIME.md).
 
 Do not unlock the bootloader, modify boot/TEE, or treat an attach request as proof that the agent
 loaded. The proposed first load is the pure canary, followed only after its evidence is closed by

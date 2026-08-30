@@ -90,11 +90,18 @@ size, read the complete file, and validate report markers or ZIP manifest/entry 
 Keep report bodies, sample ZIPs, extracted vendor files and transport logs in excluded private
 storage. No vendor binary or full live report is distributed with this source tree.
 
-C-237 closes the earlier v0.12 `COMPLETE` report and C-238 closes sample receipt. The operator has
-since confirmed that Developer Assistant can be opened; its new post-installation probe report
-is still pending. The next action is to reopen the already installed probe and tap
-**执行只读能力检查**, then retrieve that new report. The older disabled-component observation must
-not be silently relabeled as a new measurement.
+C-237 closes the earlier v0.12 `COMPLETE` report and C-238 closes sample receipt. C-245 records
+the new post-installation report, received and validated as `COMPLETE`: Fuli has
+`updated-system=true`, with DevActivity, ProtocalActivity and ShellCommandActivity enabled.
+Version code 155, original APK hash, signer and both audited DEX hashes are unchanged; Fly and
+ART identity readings match the earlier report. The older disabled-component result remains a
+separate historical observation. Directory `ABSENT` remains the Observer's view.
+
+`OBSERVED`, subsequent operator-supplied Shell output (C-246): the executed command has system
+UID/GID identity and the `system_app` SELinux domain. A read-only directory listing also establishes
+the ownership, mode and labels of `/data` and `/data/app` (C-247).
+No internal test directory/file has been created and no library has been placed internally.
+The target Fly process domain, test-file access and canary loading remain unverified.
 
 ## Audit continuity
 
