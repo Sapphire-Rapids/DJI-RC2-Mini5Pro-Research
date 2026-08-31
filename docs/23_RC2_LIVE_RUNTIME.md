@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-292；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-295；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -414,12 +414,32 @@ PID/UID的原生enter/result。一次MMKV解码、一次CloudControlData缓存�
 copy/attempt回执与报告匹配，STOP/CLOSED STOP均已收到（C-292）。没有第二次attach或
 Fly重启；永久回执和已加载运行时映射保留。
 
+## 匹配策略结构采集准备
+
+`STATIC`：确切发送端只做hex解码，解码字节完整进入`00/DD`正文；没有额外RID内部头或
+版本字段（C-293）。因此后续直接分析现存payload，并与首个DEFAULT逐字段/逐字节比较。
+
+A-057保留A054的现存MMKV和SDK guard，各读取一次策略、CloudControlData及ProductType。
+仅在receiver18/4且缓存属于有效候选集合时导出匹配hex和首个DEFAULT；同时记录原始匹配
+行数，区分DEFAULT缺失与空串。JSON最多32KiB，由Fly自己的Application context通过
+MediaStore写入可移除SD的`Download/FindUAS/Probe/`新文件；普通日志只有状态和长度。
+
+`STATIC`：42项JNI/主流程案例、22组提取测试及272次sanitizer调用、66项存储案例、
+14项离线格式/差分测试、13项loader/receiver集成和50项host测试通过。两次ARMv7构建
+相同（C-294）。离线工具检查JSON、protobuf wire、ASN.1 TLV及gzip/zlib，并输出结构差异。
+
+`OBSERVED`：三份新文件SD完整回读匹配，新会话已准备（C-295）：
+
+- `Download/FindUAS_POLICY_STRUCTURE.so`：A-057，27,072 bytes。
+- `Download/L4.sh`：A-058，23,349 bytes。
+- `Download/B5.sh`：A-059，10,591 bytes。
+
 ## 下一步
 
-缓存内容关联已经完成，后续重点是匹配候选的内部payload结构，而不是重复基础状态读取。
-最小补充数据是匹配内容对应行数、DEFAULT存在/非空标记，以及匹配hex内容解码后的长度和
-结构/版本摘要，随后对照确切接收/解析路径寻找启停字段。当前没有新实机命令；开发助手
-页面可以退出。
+在开发助手Shell页面执行私下提供的B5精确路径命令。看到`B5_START_REQUESTED`后告知
+已启动。主机随后执行STRUCTURE_BASELINE、一次STRUCTURE_READ，取回本轮私有JSON并
+解析匹配/DEFAULT差异，再完成独立STRUCTURE_CLEANUP和STOP。保持当前USB连接，不起桨。
+此时尚未提交STRUCTURE_READ；实际启停字段等待这份正文。
 
 ## 同步状态
 

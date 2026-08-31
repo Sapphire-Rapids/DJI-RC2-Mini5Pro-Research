@@ -241,3 +241,9 @@ fixtures are public and contain TEST values only.
 - C-290--C-292 add the four B4 reports, strict native parsing, fixed A054 copy/attempt receipts
   and CLOSED STOP. The report contains only numeric metadata/counts; no namespace/area/payload
   strings or hashes were collected. PID/UID, boot and transport/session identities stay private.
+
+## Policy-structure preparation
+
+C-293--C-295 reference excluded exact hex/transport slices, bounded old-corpus search notes,
+A057 manifests, test runs and MTP/session records. The next JSON contains only two policy hex
+strings and numeric metadata and remains private. Source and TEST-only fixtures are public.

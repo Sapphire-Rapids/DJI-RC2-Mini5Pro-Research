@@ -76,7 +76,9 @@ static unsigned allowed_path(const struct path *p) {
                          !strcmp(p->part[1], "B3.sh") || !strcmp(p->part[1], "L2.sh") ||
                          !strcmp(p->part[1], "FindUAS_RID_CACHE.so") ||
                          !strcmp(p->part[1], "B4.sh") || !strcmp(p->part[1], "L3.sh") ||
-                         !strcmp(p->part[1], "FindUAS_CLOUD_POLICY.so")))
+                         !strcmp(p->part[1], "FindUAS_CLOUD_POLICY.so") ||
+                         !strcmp(p->part[1], "B5.sh") || !strcmp(p->part[1], "L4.sh") ||
+                         !strcmp(p->part[1], "FindUAS_POLICY_STRUCTURE.so")))
         return CAN_GET | CAN_PUT;
     if (strcmp(p->part[1], "FindUAS")) return 0;
     if (p->count == 2) return CAN_MKDIR;
@@ -87,6 +89,16 @@ static unsigned allowed_path(const struct path *p) {
         if (!strcmp(name, "A048_copy.receipt") || !strcmp(name, "A048_attach.attempted")) return CAN_GET;
         if (!strcmp(name, "A051_copy.receipt") || !strcmp(name, "A051_attach.attempted")) return CAN_GET;
         if (!strcmp(name, "A054_copy.receipt") || !strcmp(name, "A054_attach.attempted")) return CAN_GET;
+        if (!strcmp(name, "A057_copy.receipt") || !strcmp(name, "A057_attach.attempted")) return CAN_GET;
+        const char *policy_prefix = "FindUAS_A057_policy_";
+        size_t policy_prefix_length = strlen(policy_prefix);
+        if (strlen(name) == policy_prefix_length + 16 + 5 &&
+            !strncmp(name, policy_prefix, policy_prefix_length) &&
+            !strcmp(name + policy_prefix_length + 16, ".json")) {
+            char sid[17];
+            memcpy(sid, name + policy_prefix_length, 16); sid[16] = '\0';
+            return hex_sid(sid) ? CAN_GET : 0;
+        }
         size_t n = strlen(name), prefix_length = strlen(prefix);
         return n > prefix_length + 4 && !strncmp(name, prefix, prefix_length) &&
             !strcmp(name + n - 4, ".txt") ? CAN_GET : 0;
@@ -408,6 +420,14 @@ static int self_test(void) {
         {"Download/FindUAS_RID_CACHE.so", CAN_GET | CAN_PUT},
         {"Download/B4.sh", CAN_GET | CAN_PUT}, {"Download/L3.sh", CAN_GET | CAN_PUT},
         {"Download/FindUAS_CLOUD_POLICY.so", CAN_GET | CAN_PUT},
+        {"Download/B5.sh", CAN_GET | CAN_PUT},
+        {"Download/L4.sh", CAN_GET | CAN_PUT},
+        {"Download/FindUAS_POLICY_STRUCTURE.so", CAN_GET | CAN_PUT},
+        {"Download/FindUAS/Probe/A057_copy.receipt", CAN_GET},
+        {"Download/FindUAS/Probe/A057_attach.attempted", CAN_GET},
+        {"Download/FindUAS/Probe/FindUAS_A057_policy_0123456789abcdef.json", CAN_GET},
+        {"Download/FindUAS/Probe/FindUAS_A057_policy_0123456789abcdef.json.extra", 0},
+        {"Download/FindUAS/Probe/FindUAS_A057_policy_0123456789abcdeG.json", 0},
         {"Download/FindUAS_ARTTI_V1.so", 0},
         {"Download/FindUAS/Bridge/active.session", CAN_GET | CAN_PUT},
         {"Download/FindUAS/Bridge/0123456789abcdef/inbox", CAN_MKDIR},

@@ -1002,3 +1002,11 @@ membership, first country/default selection and legacy MMKV persistence feed a h
 writer. Its original successful SET value is cached, but three app writers share the same key.
 The next probe compares existing RID candidates and that cached content, with no actual-area
 selection or policy write. See [the runtime record](23_RC2_LIVE_RUNTIME.md).
+
+## Exact 1.19.4 policy byte boundary
+
+`STATIC` (C-293): the sender decodes paired ASCII hex and moves the complete result into
+`00/DD`'s request Buffer. Generic transport framing wraps those bytes; it adds no RID-specific
+inner header, version or length. The two current private payloads are therefore sufficient for
+repeatable offline structure/difference analysis. A057's prepared capture is described in the
+[runtime topic](23_RC2_LIVE_RUNTIME.md#匹配策略结构采集准备) (C-294/C-295).

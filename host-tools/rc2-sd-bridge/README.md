@@ -253,3 +253,17 @@ cleanup and sends STOP. The probe compares existing RID namespace candidates, Pr
 CloudControlData caches. Logs contain numeric metadata/counts, not namespace/area/policy strings.
 The same 120/210/30-second helper budgets and one-hour session apply. Current source hashes,
 staging and live outcome are in [the runtime record](../../docs/23_RC2_LIVE_RUNTIME.md).
+
+## B5 matched-policy structure capture
+
+A057/L4/B5 are built and SD-staged with complete matching readbacks (C-294/C-295); runtime
+capture is pending. The distinct `STRUCTURE_BASELINE`, `STRUCTURE_READ`, `STRUCTURE_CLEANUP`
+lane requires B5's receiver marker and a collected successful baseline. It allocates one read,
+preserves A057's own permanent attempt receipt, and accepts a canonical numeric
+enter/export/result sequence before recovering its file. B2/B3/B4 histories remain intact.
+
+Use `stage-structure --b5 SOURCE --l4 SOURCE --probe SOURCE` after normal session preparation.
+The MTP allow-list adds only B5.sh, L4.sh, FindUAS_POLICY_STRUCTURE.so, A057 receipts and a
+GET-only session-named A057 JSON under `Download/FindUAS/Probe/`. The payload never enters
+ordinary logcat or the public repository. After one capture, collect the JSON, issue independent
+cleanup, then STOP. Current operator steps are in [the runtime topic](../../docs/23_RC2_LIVE_RUNTIME.md#下一步).

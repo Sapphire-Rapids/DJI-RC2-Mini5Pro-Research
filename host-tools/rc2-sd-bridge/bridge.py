@@ -26,7 +26,8 @@ SHA = r"[0-9a-f]{64}"
 CANARY_OPS = ("CANARY_BASELINE", "CANARY_LOAD", "CANARY_CLEANUP")
 RID_OPS = ("RID_BASELINE", "RID_READ", "RID_CLEANUP")
 POLICY_OPS = ("POLICY_BASELINE", "POLICY_READ", "POLICY_CLEANUP")
-OPERATIONS = ("PING", "SNAPSHOT", "STOP", *CANARY_OPS, *RID_OPS, *POLICY_OPS)
+STRUCTURE_OPS = ("STRUCTURE_BASELINE", "STRUCTURE_READ", "STRUCTURE_CLEANUP")
+OPERATIONS = ("PING", "SNAPSHOT", "STOP", *CANARY_OPS, *RID_OPS, *POLICY_OPS, *STRUCTURE_OPS)
 PATTERNS = {
     "SESSION": rf"B1 SESSION (?P<sid>{SID}) END\n",
     "READY_SESSION": rf"B1 READY_SESSION (?P<sid>{SID}) (?P<pid>[1-9][0-9]*) (?P<uptime>{NUMBER}) END\n",
@@ -38,6 +39,7 @@ PATTERNS = {
     "RECEIVER": rf"B1 RECEIVER (?P<sid>{SID}) B2 END\n",
     "RID_RECEIVER": rf"B1 RECEIVER (?P<sid>{SID}) B3 END\n",
     "POLICY_RECEIVER": rf"B1 RECEIVER (?P<sid>{SID}) B4 END\n",
+    "STRUCTURE_RECEIVER": rf"B1 RECEIVER (?P<sid>{SID}) B5 END\n",
 }
 SNAPSHOT_PATH = re.compile(
     r"report=/storage/[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}/Download/FindUAS/Probe/"
@@ -306,6 +308,14 @@ def validate_result(job: bytes, accepted: bytes, done: bytes, report: bytes) -> 
         summary["policy_validation"] = ("envelope_received_only" if complete else
                                         "incomplete_envelope" if rc else "invalid_envelope")
         summary["policy_preflight_ready"] = complete and canary_preflight_ready(body[len(beginning):-len(ending)])
+    if actual_op in STRUCTURE_OPS:
+        beginning = (f"schema=finduas-rc2-policy-structure-loader/v1\nsid={sid}\n"
+                     f"operation={actual_op}\nreport_begin=true\n").encode()
+        ending = b"report_end=true\n"
+        complete = body.startswith(beginning) and body.endswith(ending)
+        summary["structure_validation"] = ("envelope_received_only" if complete else
+                                        "incomplete_envelope" if rc else "invalid_envelope")
+        summary["structure_preflight_ready"] = complete and canary_preflight_ready(body[len(beginning):-len(ending)])
     if actual_op == "SNAPSHOT" and rc in (0, 10):
         try:
             lines = body.decode("utf-8").splitlines()
@@ -377,6 +387,8 @@ class Client:
                 task["rid_preflight_ready"] = summary.get("rid_preflight_ready", False)
                 task["policy_validation"] = summary.get("policy_validation")
                 task["policy_preflight_ready"] = summary.get("policy_preflight_ready", False)
+                task["structure_validation"] = summary.get("structure_validation")
+                task["structure_preflight_ready"] = summary.get("structure_preflight_ready", False)
             elif unavailable.exists():
                 closed = self.task_path(sid, seq, ".closed").read_bytes()
                 if json.loads(unavailable.read_bytes()) != unavailable_summary(task, closed):
@@ -465,6 +477,9 @@ class Client:
     def stage_policy(self, b4: Path, l3: Path, probe: Path) -> str:
         return self.stage_files((("B4.sh", b4), ("L3.sh", l3), ("FindUAS_CLOUD_POLICY.so", probe)))
 
+    def stage_structure(self, b5: Path, l4: Path, probe: Path) -> str:
+        return self.stage_files((("B5.sh", b5), ("L4.sh", l4), ("FindUAS_POLICY_STRUCTURE.so", probe)))
+
     def stage_files(self, files) -> str:
         for basename, source in files:
             if source.is_symlink() or not source.is_file() or source.stat().st_size > 32768:
@@ -524,6 +539,11 @@ class Client:
             if receiver is None:
                 raise BridgeError("B4_RECEIVER_REQUIRED")
             record(receiver, "POLICY_RECEIVER", sid)
+        if operation in STRUCTURE_OPS:
+            receiver = self.transport.get(f"{BASE}/{sid}/session.receiver")
+            if receiver is None:
+                raise BridgeError("B5_RECEIVER_REQUIRED")
+            record(receiver, "STRUCTURE_RECEIVER", sid)
         if operation == "CANARY_LOAD":
             previous_loads = [task for task in tasks if task["op"] == "CANARY_LOAD"]
             if previous_loads and not (previous_loads[-1] is tasks[-1] and not tasks[-1]["complete"]):
@@ -551,6 +571,15 @@ class Client:
                     baselines[-1].get("policy_validation") != "envelope_received_only" or \
                     not baselines[-1].get("policy_preflight_ready"):
                 raise BridgeError("SUCCESSFUL_POLICY_BASELINE_REQUIRED")
+        if operation == "STRUCTURE_READ":
+            previous_reads = [task for task in tasks if task["op"] == "STRUCTURE_READ"]
+            if previous_reads and not (previous_reads[-1] is tasks[-1] and not tasks[-1]["complete"]):
+                raise BridgeError("STRUCTURE_READ_ALREADY_CREATED_FOR_SESSION")
+            baselines = [task for task in tasks if task["op"] == "STRUCTURE_BASELINE"]
+            if not baselines or not baselines[-1]["complete"] or baselines[-1].get("handler_rc") != 0 or \
+                    baselines[-1].get("structure_validation") != "envelope_received_only" or \
+                    not baselines[-1].get("structure_preflight_ready"):
+                raise BridgeError("SUCCESSFUL_STRUCTURE_BASELINE_REQUIRED")
         if tasks and not tasks[-1]["complete"]:
             task = tasks[-1]
             if task["op"] != operation:
@@ -642,6 +671,10 @@ def main(argv=None) -> int:
     policy.add_argument("--b4", type=Path, required=True)
     policy.add_argument("--l3", type=Path, required=True)
     policy.add_argument("--probe", type=Path, required=True)
+    structure = commands.add_parser("stage-structure")
+    structure.add_argument("--b5", type=Path, required=True)
+    structure.add_argument("--l4", type=Path, required=True)
+    structure.add_argument("--probe", type=Path, required=True)
     submit = commands.add_parser("submit")
     submit.add_argument("operation", choices=OPERATIONS)
     commands.add_parser("collect").add_argument("sequence")
@@ -659,6 +692,8 @@ def main(argv=None) -> int:
                 output = client.stage_rid(args.b3, args.l2, args.probe)
             elif args.command == "stage-policy":
                 output = client.stage_policy(args.b4, args.l3, args.probe)
+            elif args.command == "stage-structure":
+                output = client.stage_structure(args.b5, args.l4, args.probe)
             elif args.command == "submit":
                 output = client.submit(args.operation)
             elif args.command == "collect":

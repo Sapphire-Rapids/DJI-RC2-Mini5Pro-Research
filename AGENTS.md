@@ -354,6 +354,13 @@ Later retractions override earlier progress summaries.
     Preserve its permanent attempt record. Next resolve matched payload structure/receiver
     semantics rather than repeat the completed baseline or fabricate a cloud policy.
 
+46. C-293 closes the exact paired-hex decode to complete00/DD payload boundary; the sender adds
+    no RID-specific inner header/version/length. A057/L4/B5 are the new two-payload capture,
+    host-tested and SD-staged with matching readbacks (C-294/C-295), not yet executed. They keep
+    matched-row count and missing/empty first DEFAULT separate, write only the two eligible hex
+    strings to a private SD MediaStore report, and log numeric metadata. B5 startup is the next
+    operator action. Preserve A048/A051/A054 receipts and do not replay their completed probes.
+
 ## Privacy and redaction
 
 Never commit:

@@ -427,3 +427,7 @@ candidate content membership with ProductType139 and DEFAULT-match0. The encoded
 internal schema and receiving aircraft owner remain unresolved. A054 records no raw payload,
 actual App area, DEFAULT-presence flag or matching-country-row count. The next bounded data
 request should target those structural gaps before any control transition is designed.
+
+C-293 closes the sender-side hex/transport wrapping question. The inner RID policy schema and
+receiver enable-field mapping remain `UNKNOWN`; A057's matched/first-DEFAULT private capture
+is prepared in C-294/C-295. No new field interpretation is introduced by the generic format tests.

@@ -197,3 +197,12 @@ python3 -m unittest test_rid_cloud_policy_audit
 
 This tool has no device transport or write operation. Matching a candidate and receiver does not
 identify the shared cache's writer. See [the runtime record](../../docs/23_RC2_LIVE_RUNTIME.md).
+
+## Offline policy structure inspection
+
+`rid_cloud_payload_structure.py PRIVATE_CAPTURE --output PRIVATE_ANALYSIS` consumes the two
+captured hex strings (`matched_hex`, `default_hex`) and presence/count metadata. It validates
+hex, checks bounded JSON/protobuf-wire/ASN.1-TLV/gzip/zlib syntax and compares byte ranges and
+structural fields. Output omits opaque string/byte values; Boolean names remain candidates until
+connected to the receiver's implementation. It has no device or network operations. Tests use
+synthetic input only; actual A057 bytes are pending (C-293--C-295).

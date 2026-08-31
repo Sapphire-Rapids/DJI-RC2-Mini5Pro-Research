@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.31 - 2026-08-31
+
+- Closed the exact hex-to00/DD inner-byte boundary (C-293).
+- Added a bounded matched/first-DEFAULT private SD export and offline structural comparison;
+  native, storage, parser and bridge tests pass (C-294).
+- Staged A057/L4/B5 with matching readbacks and prepared the next session (C-295).
+  Runtime payload capture awaits one operator startup; updates remain local.
+
 ## 0.4.30 - 2026-08-31
 
 - Resolved RID cache expiry/deduplication and exact-version UI/adapter ownership (C-283--C-285).

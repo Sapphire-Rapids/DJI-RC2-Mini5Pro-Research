@@ -933,3 +933,10 @@ work when a report did not contain a more precise timestamp.
   得到产品139、41项/36份候选内容、集合匹配1/DEFAULT匹配0，PID/APK稳定，文件回收（C-291）。
 - `OBSERVED`：独立清理确认文件不存在、copy/attempt回读匹配、STOP/CLOSED STOP完成；
   本轮没有第二次加载或重启Fly（C-292）。
+
+### 匹配策略内部结构分析准备
+
+- `STATIC`：闭合hex解码到00/DD正文的边界，确认发送端没有插入RID内部头（C-293）。
+- `STATIC`：完成仅匹配/首个DEFAULT的提取器、MediaStore新报告、离线格式和差分工具，
+  A057/L4/B5构建及host测试通过（C-294）。
+- `OBSERVED`：保留B4历史并准备新会话，三份新文件SD完整回读匹配（C-295）；等待一次B5启动。

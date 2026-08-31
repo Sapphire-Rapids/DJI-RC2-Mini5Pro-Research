@@ -616,3 +616,7 @@ The existing FindUASMac persisted history was located separately through its sou
 Application Support location. A bounded read found no explicit motor-transition or aircraft-air-
 bearer fields. The writer rate-limits persistence per UAS to one row per two seconds, so rows are
 not RF packet counts and do not close C-207. Identifiers, coordinates and raw records stay private.
+
+C-293 resolves the sender's inner-byte boundary. The remaining immediate dependency is one
+A057 payload capture: L4/B5 are built, tested and SD-staged (C-294/C-295), awaiting B5 startup.
+The matching/DEFAULT bytes will drive the internal-schema and enable-field investigation.

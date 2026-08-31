@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-292 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-295 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -147,3 +147,10 @@ The latest user instruction pauses GitHub pushes only: keep local updates, valid
 commits, but do not resume pushes until the user restores authorization. Preserve historical
 pushed results. Append completed actions to the existing timeline;
 keep current operator instructions in the runtime topic and handoff, rather than creating competing logs.
+
+Latest prepared action (C-293--C-295): exact hex decode feeds the whole00/DD payload without
+a new RID inner header. A057/L4/B5 and the offline structure analyzer are built and tested; all
+three SD readbacks match. The current session awaits one B5 startup. Next collect one
+STRUCTURE_BASELINE/STRUCTURE_READ, fetch only the session-named two-payload private JSON,
+parse matched/DEFAULT structures and differences, then independent CLEANUP/STOP. No A057
+attach has been submitted. Use original private SD client history and keep raw payload excluded.
