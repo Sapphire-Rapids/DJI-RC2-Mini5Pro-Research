@@ -418,4 +418,12 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 | C-294 | `STATIC` | A057 extracts only eligible matched/first-DEFAULT hex; bounded MediaStore export and offline structure analysis pass host tests | New A057 runtime capture pending |
 | C-295 | `OBSERVED` | A057/L4/B5 SD upload/readbacks match and the new session is prepared | One operator B5 startup is next; no new attach submitted |
 
+| C-296 | `OBSERVED` | B5 startup and23-check baseline succeeded; MTP interruption occurred before READ allocation | Preserve the running session; USB reconnect is next, not B5 relaunch |
+
+| C-297 | `OBSERVED` | Operator reported repeated connection interruptions during MTP recovery; G HUB and ADB stopped, then operator reported stability | A057 READ remains unallocated; controller reboot chosen by operator |
+| C-298 | `CORROBORATED` | Host static-link guard blocks both libmtp whole-device reset calls; tests and live blocked markers agree | MTP still unavailable; existing one-close/reopen retry remains |
+
+| C-299 | `STATIC` | Explicit operator-reboot recovery preserves completed diagnostic-only history and one old/new SID mapping;67 tests pass | READ/LOAD or incomplete history rejected; no fabricated CLOSED |
+| C-300 | `OBSERVED` | Reboot restored guarded MTP reads; close-time resets blocked; old baseline archived and one new session activated | A057 capture pending fresh B5 startup/baseline |
+
 Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTROL_SURFACES.md).

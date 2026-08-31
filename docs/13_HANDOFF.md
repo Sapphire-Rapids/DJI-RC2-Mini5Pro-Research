@@ -599,6 +599,18 @@ not RF packet counts and do not close C-207. Identifiers, coordinates and raw re
 ### Current prepared action: B5
 
 C-293 closes the hex-to00/DD byte boundary. A057/L4/B5 are now built, tested and SD-staged
-(C-294/C-295). The new session awaits operator startup. Then collect STRUCTURE_BASELINE,
-one STRUCTURE_READ and the fixed private JSON, analyze matched versus first DEFAULT, and
-finish independent cleanup/STOP. Keep A048/A051/A054 history and receipts untouched.
+(C-294/C-295). B5 started and the23-check baseline passed (C-296). MTP failed before STRUCTURE_READ was
+allocated; the operator has been asked to reconnect only the RC-to-host USB cable. Retry in
+the original session, collect one READ and the fixed private JSON, analyze matched/DEFAULT,
+and independently clean the temporary file. No STOP was sent; retain the receiver during
+continuing analysis. Keep A048/A051/A054 history and receipts untouched.
+
+Latest recovery state (C-297/C-298): repeated connection interruptions ceased after G HUB and
+ADB were stopped. Automatic whole-device USB reset is now blocked in the host build. The
+operator chose controller reboot. Do not reuse a stale B5 worker marker; preserve old history
+and explicitly recover the baseline-only session before preparing a new one.
+
+C-299/C-300 close reboot recovery: the operator confirmed reboot/stable link, guarded MTP
+reads succeeded, the old baseline-only session was archived under its original SID and one
+fresh session was activated. No canonical CLOSED was fabricated. The next operator step is
+one B5 launch; run a fresh baseline before the still-unexecuted A057 capture.

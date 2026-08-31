@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-295 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-300 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -154,3 +154,19 @@ three SD readbacks match. The current session awaits one B5 startup. Next collec
 STRUCTURE_BASELINE/STRUCTURE_READ, fetch only the session-named two-payload private JSON,
 parse matched/DEFAULT structures and differences, then independent CLEANUP/STOP. No A057
 attach has been submitted. Use original private SD client history and keep raw payload excluded.
+
+C-296 supersedes the awaiting-start state: B5 started and all23 baseline checks passed. MTP
+failed before STRUCTURE_READ allocation. Only reconnect the RC-to-host USB cable, retain
+the original session and retry that submission; no B5 relaunch or STOP is needed. Cleanup
+the temporary probe independently and keep the receiver during continuing analysis.
+
+C-297/C-298 supersede the USB-replug step: the operator chose controller reboot after MTP
+remained unavailable. Connection stabilized after G HUB and ADB were stopped; keep them off.
+The host now blocks libmtp's automatic whole-device reset. A057 READ was never allocated.
+After reboot confirmation, preserve the old baseline-only session and use explicit reboot
+recovery to prepare a fresh SID; do not run B5 against its stale worker marker.
+
+C-299/C-300 close the reboot recovery: guarded MTP works again, the operator-confirmed old
+baseline-only session was archived without deleting history or fabricating CLOSED, and one
+new B5 session is activated. Await one B5 startup, then fresh baseline and one A057 capture.
+G HUB and host ADB stay stopped; use only the no-reset host transport build.

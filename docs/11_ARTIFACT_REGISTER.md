@@ -69,8 +69,8 @@
 | A-055 | FindUAS L3 fixed cloud-policy loader；self-developed；`rc2-cloud-policy-loader-v1` | `22,348` | `f9768d94ba3adaec7211da195f2743a67ca5213f2471f8e0a457224ce372b837` | `OBSERVED`；BASELINE/READ/独立CLEANUP完整报告均rc0；PID/APK稳定，文件回收复查完成；source/hash公开，原始报告排除 |
 | A-056 | FindUAS B4 fixed cloud-policy session；self-developed；`sd-cloud-policy-bridge-v1` | `10,555` | `fab6f0645bea70151c843ed93e80f6300f1d66f15d4a79695cafc46230c17e88` | `OBSERVED`；操作者启动后完成BASELINE/READ/CLEANUP/STOP，均rc0，CLOSED STOP核验；source/hash公开，会话记录排除 |
 | A-057 | FindUAS ARMv7 matched-policy structure capture；self-developed；`policy-structure-v1-armeabi-v7a` | `27,072` | `3b62094ac76515277bf251c59ecac0e2cca761aab92c60d925e4daa0bb16112e` | `STATIC`；构建/host测试通过，SD完整回读匹配，尚未执行；独立source公开，生成SO/私有报告排除 |
-| A-058 | FindUAS L4 fixed policy-structure loader；self-developed；`rc2-policy-structure-loader-v1` | `23,349` | `7baffaef8ea4167b443c8d5688c65cc6de7357bbf3663f66a30cd0c969b62713` | `STATIC`；构建/host测试通过，SD完整回读匹配，尚未执行；独立source公开，生成SO/私有报告排除 |
-| A-059 | FindUAS B5 fixed policy-structure session；self-developed；`sd-policy-structure-bridge-v1` | `10,591` | `db3646a9f6f5262781daf5fb9165f66f509a253db22aaab1c22a89f43f58e9ac` | `STATIC`；构建/host测试通过，SD完整回读匹配，尚未执行；独立source公开，生成SO/私有报告排除 |
+| A-058 | FindUAS L4 fixed policy-structure loader；self-developed；`rc2-policy-structure-loader-v1` | `23,349` | `7baffaef8ea4167b443c8d5688c65cc6de7357bbf3663f66a30cd0c969b62713` | `OBSERVED`；BASELINE返回0、23项通过；未分配READ/未attach；源码公开，私有报告排除 |
+| A-059 | FindUAS B5 fixed policy-structure session；self-developed；`sd-policy-structure-bridge-v1` | `10,591` | `db3646a9f6f5262781daf5fb9165f66f509a253db22aaab1c22a89f43f58e9ac` | `OBSERVED`；操作者启动，receiver及基线核验；USB重连待续，未发STOP；源码公开，会话记录排除 |
 
 ## 3. A-001：历史 v0.10 admission probe
 

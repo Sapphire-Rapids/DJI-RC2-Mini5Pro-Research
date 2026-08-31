@@ -28,6 +28,8 @@ RID_OPS = ("RID_BASELINE", "RID_READ", "RID_CLEANUP")
 POLICY_OPS = ("POLICY_BASELINE", "POLICY_READ", "POLICY_CLEANUP")
 STRUCTURE_OPS = ("STRUCTURE_BASELINE", "STRUCTURE_READ", "STRUCTURE_CLEANUP")
 OPERATIONS = ("PING", "SNAPSHOT", "STOP", *CANARY_OPS, *RID_OPS, *POLICY_OPS, *STRUCTURE_OPS)
+REBOOT_RECOVERY_OPS = ("PING", "SNAPSHOT", "CANARY_BASELINE", "RID_BASELINE",
+                       "POLICY_BASELINE", "STRUCTURE_BASELINE")
 PATTERNS = {
     "SESSION": rf"B1 SESSION (?P<sid>{SID}) END\n",
     "READY_SESSION": rf"B1 READY_SESSION (?P<sid>{SID}) (?P<pid>[1-9][0-9]*) (?P<uptime>{NUMBER}) END\n",
@@ -235,6 +237,9 @@ class Transport:
 
     def archive(self, sid: str):
         self.call("archive-active", sid)
+
+    def archive_after_reboot(self, sid: str):
+        self.call("archive-after-reboot", sid)
 
 
 def canary_preflight_ready(content: bytes) -> bool:
@@ -465,6 +470,89 @@ class Client:
         self.transport.put(BASE + "/active.session", self.state.session(current) / "owned.session")
         return "SESSION_PREPARED"
 
+    def recover_after_reboot(self, sid: str, operator_confirmed: bool = False) -> str:
+        """Rotate one diagnostic-only session after an explicit operator reboot report."""
+        if not operator_confirmed:
+            raise BridgeError("OPERATOR_CONFIRMED_REBOOT_REQUIRED")
+        tasks = self.history(sid)  # Requires original ownership and validates every receipt.
+        if any(task["op"] not in REBOOT_RECOVERY_OPS for task in tasks):
+            raise BridgeError("REBOOT_RECOVERY_DIAGNOSTIC_ONLY_SESSION_REQUIRED")
+        if any(not task["complete"] or task["unavailable"] for task in tasks):
+            raise BridgeError("REBOOT_RECOVERY_COLLECT_ALL_RESULTS_FIRST")
+        history = [{"seq": task["seq"], "op": task["op"],
+                    "job_sha256": digest(self.task_path(sid, task["seq"], ".job").read_bytes()),
+                    "collection_sha256": digest(self.task_path(sid, task["seq"], ".collected.json").read_bytes())}
+                   for task in tasks]
+        expected = {"schema": "finduas-reboot-recovery/v1", "reason": "operator-confirmed-reboot",
+                    "old_sid": sid, "task_count": len(tasks),
+                    "history_sha256": digest(json.dumps(history, sort_keys=True).encode())}
+        directory = self.state.session(sid)
+        request = directory / "reboot-recovery.request.json"
+        complete = directory / "reboot-recovery.complete.json"
+        for path in (request, complete):
+            if path.is_symlink():
+                raise BridgeError("LOCAL_RECORD_SYMLINK")
+        plan = None
+        if request.exists():
+            plan = json.loads(request.read_bytes())
+            if not isinstance(plan, dict):
+                raise BridgeError("REBOOT_RECOVERY_REQUEST_CONFLICT")
+            new_sid = plan.get("new_sid", "")
+            if (not isinstance(new_sid, str) or not re.fullmatch(SID, new_sid) or new_sid == sid or
+                    plan != dict(expected, new_sid=new_sid)):
+                raise BridgeError("REBOOT_RECOVERY_REQUEST_CONFLICT")
+            encoded = json.dumps(plan, sort_keys=True).encode() + b"\n"
+            immutable(request, encoded)
+            if complete.exists():
+                immutable(complete, encoded)
+                return "SESSION_ALREADY_RECOVERED_AFTER_REBOOT"
+        elif complete.exists():
+            raise BridgeError("REBOOT_RECOVERY_REQUEST_MISSING")
+
+        current = self.state.current()
+        if current not in ((sid, new_sid) if plan else (sid,)):
+            raise BridgeError("LOCAL_ACTIVE_SESSION_CONFLICT")
+        active = self.active()
+        if plan is None:
+            if active != sid:
+                raise BridgeError("REBOOT_RECOVERY_ACTIVE_MISMATCH")
+            new_sid = secrets.token_hex(8)
+            while new_sid == sid or self.state.session(new_sid).exists():
+                new_sid = secrets.token_hex(8)
+            plan = dict(expected, new_sid=new_sid)
+            encoded = json.dumps(plan, sort_keys=True).encode() + b"\n"
+            # Persist this exact old->new mapping before the first remote mutation.
+            immutable(request, encoded)
+        if active not in (None, sid, new_sid):
+            raise BridgeError("REBOOT_RECOVERY_ACTIVE_MISMATCH")
+        if active == sid:
+            self.check_next_empty(sid, len(tasks) + 1)
+        if active != new_sid:
+            # Also handles a completed move whose transport response was lost.
+            self.transport.archive_after_reboot(sid)
+            if self.active() is not None:
+                raise BridgeError("REBOOT_RECOVERY_ARCHIVE_NOT_VERIFIED")
+        archived = self.transport.get(f"{BASE}/{sid}/active.session")
+        if archived != session_text(sid):
+            raise BridgeError("REBOOT_RECOVERY_ARCHIVE_NOT_VERIFIED")
+        immutable(directory / "reboot-recovery.archived.session", archived)
+
+        if active == new_sid:
+            self.state.require_owned(new_sid)
+            self.state.select(new_sid)
+        else:
+            self.state.own(new_sid)
+            self.check_next_empty(new_sid, 1)
+            if self.transport.get(f"{BASE}/{new_sid}/worker.lock") is not None:
+                raise BridgeError("REMOTE_HISTORY_REQUIRES_ORIGINAL_STATE")
+            for remote in (f"{BASE}/{new_sid}/inbox", f"{BASE}/{new_sid}/outbox", "Download/FindUAS/Probe"):
+                self.transport.mkdir(remote)
+            self.transport.put(BASE + "/active.session", self.state.session(new_sid) / "owned.session")
+            if self.active() != new_sid:
+                raise BridgeError("REBOOT_RECOVERY_NEW_ACTIVE_NOT_VERIFIED")
+        immutable(complete, encoded)
+        return "SESSION_RECOVERED_AFTER_REBOOT"
+
     def stage(self, b1: Path, f4: Path) -> str:
         return self.stage_files((("B1.sh", b1), ("F4.sh", f4)))
 
@@ -656,6 +744,9 @@ def main(argv=None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("prepare", "status"):
         commands.add_parser(name)
+    reboot = commands.add_parser("recover-after-reboot")
+    reboot.add_argument("session")
+    reboot.add_argument("--operator-confirmed-reboot", action="store_true", required=True)
     stage = commands.add_parser("stage")
     stage.add_argument("--b1", type=Path, required=True)
     stage.add_argument("--f4", type=Path, required=True)
@@ -698,6 +789,8 @@ def main(argv=None) -> int:
                 output = client.submit(args.operation)
             elif args.command == "collect":
                 output = client.collect(args.sequence)
+            elif args.command == "recover-after-reboot":
+                output = client.recover_after_reboot(args.session, args.operator_confirmed_reboot)
             else:
                 output = getattr(client, args.command)()
             print(output)

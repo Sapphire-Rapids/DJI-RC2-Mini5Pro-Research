@@ -68,7 +68,8 @@
   B4停止均核验。后续转向匹配payload的内部结构；详见
   [实机结果](docs/23_RC2_LIVE_RUNTIME.md#实机云策略缓存比对结果)。
   C-293--C-295已闭合hex发送边界，并完成A057/L4/B5的定向SD导出准备；
-  下一步是[一次B5启动](docs/23_RC2_LIVE_RUNTIME.md#下一步)，取得匹配/DEFAULT正文供内部结构解析。
+  B5基线已通过；USB恢复中出现断连，关闭后台客户端后稳定，主机自动USB重置已禁用。
+  重启后MTP已恢复，旧记录保留、新会话已准备；下一步[启动B5采集正文](docs/23_RC2_LIVE_RUNTIME.md#下一步)（C-299/C-300）。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France

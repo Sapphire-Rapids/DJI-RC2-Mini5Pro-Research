@@ -1,7 +1,7 @@
 # RC 2 实机环境与加载进展
 
 更新日期：2026-08-31。研究对象为 RC 2（界面固件 `07.00.0100`）与 Mini 5 Pro
-（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-295；行动顺序见
+（操作者确认固件 `01.00.0600`）。本页汇总 C-235--C-300；行动顺序见
 [时间线](03_TIMELINE.md#2026-08-31)，工件身份见 [工件登记](11_ARTIFACT_REGISTER.md)。
 
 ## 当前进度
@@ -434,12 +434,41 @@ MediaStore写入可移除SD的`Download/FindUAS/Probe/`新文件；普通日志�
 - `Download/L4.sh`：A-058，23,349 bytes。
 - `Download/B5.sh`：A-059，10,591 bytes。
 
+## B5基线与USB传输中断
+
+`OBSERVED`：B5已启动，receiver及完整STRUCTURE_BASELINE报告收到，23项检查全部通过、
+返回0，attach计数0（C-296）。提交采集任务前，读取session.ready发生MTP超时；随后重连
+返回RC2_OPEN_FAILED。原会话历史只有已完成的基线任务，尚未分配STRUCTURE_READ。
+
+## USB恢复与断连排查
+
+`OBSERVED`：重插后MTP仍打不开。USB调试记录显示，OpenSession的bulk OUT传输了0字节，
+返回device-not-responding；原libmtp进入自动USB重置路径。操作者随后报告遥控器/飞机连接
+短暂恢复后反复断连。暂停诊断、关闭G HUB，并停止仍连接遥控器的主机ADB服务后，操作者
+确认连接稳定（C-297）。G HUB依操作者要求保持关闭。全程尚未分配STRUCTURE_READ。
+
+`CORROBORATED`：发现libmtp的恢复行为作用于整个USB设备，并非只重置MTP接口。主机工具
+现强制静态链接libmtp并用独立guard拦截两处reset；缺guard或混入动态libmtp会拒绝构建。
+两项C自测、53项host测试通过。一次无reset状态读取实际拦截了两次调用，但MTP仍超时；
+另外两次标准MTP状态查询也超时（C-298）。旧的自动重置构建不再使用。
+
+## 重启后恢复
+
+`OBSERVED`：操作者确认遥控器重启、图传连接稳定。三次MTP读取恢复成功；每次正常关闭
+会话时，guard都拦截了一次USB重置，进一步确认正常关闭分支也需要阻断（C-300）。
+
+`STATIC`：新增显式重启恢复命令（C-299）。它只处理已完整收齐且没有READ/LOAD的诊断
+会话，保存原始记录及固定的旧/新SID映射；归档或发布回应丢失后可用原请求继续。
+重启回执单独记录操作者确认，不伪造worker的CLOSED。67项host测试及两项C自测通过。
+
+`OBSERVED`：旧基线会话已完整保留并归档，新的会话已激活（C-300）。A057/L4/B5文件保持
+原先核验的版本，A057尚未执行。G HUB和ADB保持关闭。
+
 ## 下一步
 
-在开发助手Shell页面执行私下提供的B5精确路径命令。看到`B5_START_REQUESTED`后告知
-已启动。主机随后执行STRUCTURE_BASELINE、一次STRUCTURE_READ，取回本轮私有JSON并
-解析匹配/DEFAULT差异，再完成独立STRUCTURE_CLEANUP和STOP。保持当前USB连接，不起桨。
-此时尚未提交STRUCTURE_READ；实际启停字段等待这份正文。
+在开发助手Shell输入已提供的B5精确路径命令一次，看到B5_START_REQUESTED后告知已启动。
+主机会使用新会话执行重启后的基线、一次STRUCTURE_READ，读取匹配/DEFAULT正文并解析，
+然后独立清理临时文件。保持当前稳定连接，不起桨；无需安装新APK或重新配对。
 
 ## 同步状态
 

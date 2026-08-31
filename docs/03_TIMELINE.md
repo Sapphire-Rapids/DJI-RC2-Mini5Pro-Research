@@ -940,3 +940,13 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：完成仅匹配/首个DEFAULT的提取器、MediaStore新报告、离线格式和差分工具，
   A057/L4/B5构建及host测试通过（C-294）。
 - `OBSERVED`：保留B4历史并准备新会话，三份新文件SD完整回读匹配（C-295）；等待一次B5启动。
+- `OBSERVED`：B5启动及完整基线收到，23项全部通过；采集任务分配前遇到MTP超时/重连
+  失败，已保留原会话并请求仅重插USB，未发送STOP或新attach（C-296）。
+- `OBSERVED`：MTP恢复期间操作者报告连接短暂及反复断开；暂停USB诊断，结束G HUB及
+  ADB后台后，操作者确认稳定。A057始终未执行；操作者随后决定重启遥控器（C-297）。
+- `CORROBORATED`：修复主机传输工具的隐式整设备USB重置，静态绑定/构建测试通过，实测
+  拦截两次reset调用；MTP会话尚未恢复（C-298）。
+- `STATIC`：完成显式“操作者确认重启”恢复，只接受收齐的诊断会话，保留旧记录和固定新SID；
+  67项host测试、两项C自测通过（C-299）。
+- `OBSERVED`：重启后连接稳定，MTP读取成功且三次close-time reset均被拦截；旧基线归档、
+  新B5会话激活，等待一次新启动，A057仍未执行（C-300）。

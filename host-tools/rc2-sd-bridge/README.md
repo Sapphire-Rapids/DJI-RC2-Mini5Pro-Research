@@ -267,3 +267,33 @@ The MTP allow-list adds only B5.sh, L4.sh, FindUAS_POLICY_STRUCTURE.so, A057 rec
 GET-only session-named A057 JSON under `Download/FindUAS/Probe/`. The payload never enters
 ordinary logcat or the public repository. After one capture, collect the JSON, issue independent
 cleanup, then STOP. Current operator steps are in [the runtime topic](../../docs/23_RC2_LIVE_RUNTIME.md#下一步).
+
+C-296 confirms B5 startup and the successful23-check baseline. MTP failed before READ
+allocation; retain the original SID and reconnect USB, then retry the same submission.
+Temporary-file cleanup does not stop the receiver. No STOP was sent at this point.
+
+## Host USB reset boundary
+
+C-297 records the MTP failure and operator-reported connection interruptions. G HUB and the
+remaining host ADB server were stopped; the operator subsequently confirmed stable connection.
+A057 has not executed. Keep those background clients stopped for the next transfer attempt.
+
+`build.sh` now requires the installed static `libmtp.a` and links `usb_reset_guard.c` directly.
+It checks that `libusb_reset_device` is local, rejects dynamic libmtp dependencies, runs guard
+and bridge self-tests without USB initialization, then atomically replaces the executable.
+Both library reset sites resolve to a guard returning NOT_SUPPORTED. The separate library
+close/reopen retry remains. Three negative build tests preserve the previous executable on
+failure. Generated binaries and third-party library code remain outside the repository (C-298).
+
+## Recovery after an operator-confirmed reboot
+
+For a rebooted, fully collected diagnostic-only session, use
+`recover-after-reboot OLD_SID --operator-confirmed-reboot` with the original state directory.
+It rejects READ/LOAD history, missing receipts and UNKNOWN outcomes. The old/new SID mapping
+is saved before remote mutation; archive and publish response loss can be resumed using the
+same command. The local `operator-confirmed-reboot` receipt is distinct from worker CLOSED.
+Ordinary `prepare` and canonical STOP/TTL/LIMIT/ERROR handling remain unchanged (C-299).
+
+C-300 used this route after the operator's reboot: MTP reads succeeded while close-time USB
+resets were blocked, old baseline history was archived and a fresh session prepared. The
+new session still needs B5 startup. Native A057 has not yet executed.

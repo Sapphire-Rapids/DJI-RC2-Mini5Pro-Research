@@ -22,6 +22,9 @@
 
 enum { RESULT_OK = 0, RESULT_USAGE = 2, RESULT_MISSING = 3, RESULT_ERROR = 4 };
 enum { LOOKUP_ERROR = -1, LOOKUP_MISSING = 0, LOOKUP_FOUND = 1 };
+enum archive_mode { ARCHIVE_NONE, ARCHIVE_CLOSED, ARCHIVE_AFTER_REBOOT };
+enum archive_plan { ARCHIVE_PLAN_ERROR, ARCHIVE_PLAN_MISSING, ARCHIVE_PLAN_CONFLICT,
+                    ARCHIVE_PLAN_MOVE, ARCHIVE_PLAN_ALREADY_DONE };
 struct path { char text[PATH_LIMIT + 1]; char *part[PART_COUNT]; size_t count; };
 struct object { uint32_t id, parent; uint64_t size; time_t modified; int directory; };
 struct device { LIBMTP_mtpdevice_t *mtp; uint32_t storage; };
@@ -36,6 +39,23 @@ static int hex_sid(const char *value) {
         if (!((value[i] >= '0' && value[i] <= '9') ||
               (value[i] >= 'a' && value[i] <= 'f'))) return 0;
     return 1;
+}
+
+static enum archive_mode archive_command(int argc, const char *command, const char *sid) {
+    if (argc != 3 || !command || !sid || !hex_sid(sid)) return ARCHIVE_NONE;
+    if (!strcmp(command, "archive-active")) return ARCHIVE_CLOSED;
+    if (!strcmp(command, "archive-after-reboot")) return ARCHIVE_AFTER_REBOOT;
+    return ARCHIVE_NONE;
+}
+
+/* Only a missing root record and an existing historical record can be an
+   already-completed reboot archive. Its contents are verified separately. */
+static enum archive_plan reboot_archive_plan(int active, int archived) {
+    if ((active != LOOKUP_MISSING && active != LOOKUP_FOUND) ||
+        (archived != LOOKUP_MISSING && archived != LOOKUP_FOUND)) return ARCHIVE_PLAN_ERROR;
+    if (archived == LOOKUP_FOUND)
+        return active == LOOKUP_MISSING ? ARCHIVE_PLAN_ALREADY_DONE : ARCHIVE_PLAN_CONFLICT;
+    return active == LOOKUP_FOUND ? ARCHIVE_PLAN_MOVE : ARCHIVE_PLAN_MISSING;
 }
 
 static int split_path(const char *value, struct path *path) {
@@ -373,7 +393,9 @@ static int closed_session(const struct bytes *b, const char *sid) {
     return 0;
 }
 
-static int archive_active(struct device *d, const char *sid) {
+static int archive_active(struct device *d, const char *sid, enum archive_mode mode) {
+    if ((mode != ARCHIVE_CLOSED && mode != ARCHIVE_AFTER_REBOOT) || !hex_sid(sid))
+        return error("INVALID_ARCHIVE_REQUEST");
     struct path bridge, session;
     char session_path[100], expected[80];
     snprintf(session_path, sizeof(session_path), "Download/FindUAS/Bridge/%s", sid);
@@ -384,18 +406,41 @@ static int archive_active(struct device *d, const char *sid) {
     if (directory(d, &bridge, bridge.count, 0, &parent) ||
         directory(d, &session, session.count, 0, &destination)) return error("SESSION_DIRECTORY_UNAVAILABLE");
     struct object active, closed, collision;
-    if (lookup(d, parent, "active.session", &active) != LOOKUP_FOUND ||
-        lookup(d, destination, "session.closed", &closed) != LOOKUP_FOUND)
-        return error("SESSION_RECORD_UNAVAILABLE");
-    if (lookup(d, destination, "active.session", &collision) != LOOKUP_MISSING)
-        return error("ARCHIVE_DESTINATION_NOT_EMPTY");
+    if (mode == ARCHIVE_AFTER_REBOOT) {
+        int active_state = lookup(d, parent, "active.session", &active);
+        int archived_state = lookup(d, destination, "active.session", &collision);
+        enum archive_plan plan = reboot_archive_plan(active_state, archived_state);
+        if (plan == ARCHIVE_PLAN_ERROR) return RESULT_ERROR;
+        if (plan == ARCHIVE_PLAN_MISSING) return error("SESSION_RECORD_UNAVAILABLE");
+        if (plan == ARCHIVE_PLAN_CONFLICT) return error("ARCHIVE_DESTINATION_NOT_EMPTY");
+        if (plan == ARCHIVE_PLAN_ALREADY_DONE) {
+            struct bytes archived = {0};
+            int result = fetch(d, &collision, "active.session", PUT_LIMIT, &archived);
+            if (!result && !exact_text(&archived, expected)) result = error("ARCHIVE_CONTENT_MISMATCH");
+            if (!result && lookup(d, parent, "active.session", &active) != LOOKUP_MISSING)
+                result = error("ARCHIVE_MOVE_READBACK_FAILED");
+            free(archived.data);
+            return result;
+        }
+    } else {
+        if (lookup(d, parent, "active.session", &active) != LOOKUP_FOUND ||
+            lookup(d, destination, "session.closed", &closed) != LOOKUP_FOUND)
+            return error("SESSION_RECORD_UNAVAILABLE");
+        if (lookup(d, destination, "active.session", &collision) != LOOKUP_MISSING)
+            return error("ARCHIVE_DESTINATION_NOT_EMPTY");
+    }
     struct bytes active_data = {0}, closed_data = {0}, archived_data = {0};
     int result = fetch(d, &active, "active.session", PUT_LIMIT, &active_data);
-    if (!result) result = fetch(d, &closed, "session.closed", GET_LIMIT, &closed_data);
-    if (!result && (!exact_text(&active_data, expected) || !closed_session(&closed_data, sid)))
+    if (!result && mode == ARCHIVE_CLOSED)
+        result = fetch(d, &closed, "session.closed", GET_LIMIT, &closed_data);
+    if (!result && (!exact_text(&active_data, expected) ||
+                   (mode == ARCHIVE_CLOSED && !closed_session(&closed_data, sid))))
         result = error("SESSION_PROTOCOL_MISMATCH");
     if (!result && !LIBMTP_Check_Capability(d->mtp, LIBMTP_DEVICECAP_MoveObject))
         result = error("MOVE_UNSUPPORTED");
+    if (!result && mode == ARCHIVE_AFTER_REBOOT &&
+        lookup(d, destination, "active.session", &collision) != LOOKUP_MISSING)
+        result = error("ARCHIVE_DESTINATION_NOT_EMPTY");
     if (!result && LIBMTP_Move_Object(d->mtp, active.id, d->storage, destination))
         result = error("ARCHIVE_MOVE_FAILED_OR_UNCERTAIN");
     if (!result) {
@@ -480,6 +525,35 @@ static int self_test(void) {
     CHECK(supply_bytes(NULL, &bytes, 9, input, &count) == LIBMTP_HANDLER_RETURN_OK && count == 4);
     CHECK(supply_bytes(NULL, &bytes, 1, input, &count) == LIBMTP_HANDLER_RETURN_OK && !count);
     const char *sid = "0123456789abcdef";
+    CHECK(archive_command(3, "archive-active", sid) == ARCHIVE_CLOSED);
+    CHECK(archive_command(3, "archive-after-reboot", sid) == ARCHIVE_AFTER_REBOOT);
+    CHECK(archive_command(2, "archive-after-reboot", sid) == ARCHIVE_NONE);
+    CHECK(archive_command(4, "archive-after-reboot", sid) == ARCHIVE_NONE);
+    CHECK(archive_command(3, "archive-after-reboot", "0123456789abcdeF") == ARCHIVE_NONE);
+    CHECK(archive_command(3, "archive-after-reboot", "0123456789abcde") == ARCHIVE_NONE);
+    CHECK(archive_command(3, "archive-after-reboot", "0123456789abcdef\n") == ARCHIVE_NONE);
+    CHECK(archive_command(3, "archive-after-reboot", "../0123456789abc") == ARCHIVE_NONE);
+    CHECK(archive_command(3, "archive-after-reboot-extra", sid) == ARCHIVE_NONE);
+    CHECK(archive_command(3, NULL, sid) == ARCHIVE_NONE);
+    CHECK(archive_command(3, "archive-after-reboot", NULL) == ARCHIVE_NONE);
+    for (int active = LOOKUP_ERROR; active <= LOOKUP_FOUND; ++active) {
+        for (int archived = LOOKUP_ERROR; archived <= LOOKUP_FOUND; ++archived) {
+            enum archive_plan expected = active == LOOKUP_ERROR || archived == LOOKUP_ERROR ?
+                ARCHIVE_PLAN_ERROR : active == LOOKUP_FOUND ?
+                (archived == LOOKUP_FOUND ? ARCHIVE_PLAN_CONFLICT : ARCHIVE_PLAN_MOVE) :
+                (archived == LOOKUP_FOUND ? ARCHIVE_PLAN_ALREADY_DONE : ARCHIVE_PLAN_MISSING);
+            CHECK(reboot_archive_plan(active, archived) == expected);
+        }
+    }
+    CHECK(reboot_archive_plan(2, LOOKUP_MISSING) == ARCHIVE_PLAN_ERROR);
+    CHECK(reboot_archive_plan(LOOKUP_MISSING, 2) == ARCHIVE_PLAN_ERROR);
+    const char *session = "B1 SESSION 0123456789abcdef END\n";
+    struct bytes session_text = { (unsigned char *)session, strlen(session), 0, 0 };
+    CHECK(exact_text(&session_text, "B1 SESSION 0123456789abcdef END\n"));
+    CHECK(!exact_text(&session_text, "B1 SESSION 0123456789abcdee END\n"));
+    CHECK(!exact_text(&session_text, "B1 SESSION 0123456789abcdef END\nEXTRA\n"));
+    --session_text.size;
+    CHECK(!exact_text(&session_text, session));
     const char *valid = "B1 CLOSED 0123456789abcdef STOP END\n";
     struct bytes text = { (unsigned char *)valid, strlen(valid), 0, 0 };
     CHECK(closed_session(&text, sid));
@@ -504,13 +578,14 @@ int main(int argc, char **argv) {
     int is_mkdir = argc == 3 && !strcmp(argv[1], "mkdir");
     int is_put = argc == 4 && !strcmp(argv[1], "put");
     int is_get = argc == 4 && !strcmp(argv[1], "get");
-    int is_archive = argc == 3 && !strcmp(argv[1], "archive-active");
+    enum archive_mode archive = argc >= 3 ? archive_command(argc, argv[1], argv[2]) : ARCHIVE_NONE;
+    int is_archive = archive != ARCHIVE_NONE;
     struct path path;
     unsigned required = is_mkdir ? CAN_MKDIR : is_put ? CAN_PUT : CAN_GET;
     if ((!is_mkdir && !is_put && !is_get && !is_archive) ||
         (is_archive ? !hex_sid(argv[2]) :
          (!split_path(argv[2], &path) || !(allowed_path(&path) & required)))) {
-        fprintf(stderr, "usage: mtp_bridge mkdir DIR | put FILE SOURCE | get FILE NEW_OUTPUT | archive-active SID\n");
+        fprintf(stderr, "usage: mtp_bridge mkdir DIR | put FILE SOURCE | get FILE NEW_OUTPUT | archive-active SID | archive-after-reboot SID\n");
         return RESULT_USAGE;
     }
     struct bytes source = {0}, received = {0};
@@ -547,7 +622,7 @@ int main(int argc, char **argv) {
             else result = fetch(&device, &object, path.part[path.count - 1], GET_LIMIT, &received);
         }
         if (!result) result = write_local(argv[3], &received);
-    } else if (!result && is_archive) result = archive_active(&device, argv[2]);
+    } else if (!result && is_archive) result = archive_active(&device, argv[2], archive);
     if (device.mtp) {
         if (result != RESULT_OK && result != RESULT_MISSING) LIBMTP_Dump_Errorstack(device.mtp);
         LIBMTP_Release_Device(device.mtp);
