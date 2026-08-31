@@ -328,3 +328,27 @@ C-301/C-302 now record A057 execution: one attach, one MMKV decode, two cache re
 MediaStore export, stable process/APK, successful environment disposal and independent file
 recovery. Matched and first DEFAULT are97 bytes each. The A057 attempt receipt is permanent;
 this completed capture is not replayed. Offline envelope/signature findings are C-303--C-305.
+
+
+## A060 complete stored RID policy set
+
+A060 extends the private export to every raw row in the already identified RID MMKV value.
+It makes one guarded decode and one ProductType cache read. It does not query CloudControlData
+or the current App area. The export preserves row order, duplicate country labels, hex case,
+empty data and each row's blocked-for-product Boolean; unknown fields and block-list contents
+are omitted. Bounds are256 rows,4096 hex characters per row and32768 JSON bytes, all-or-nothing.
+The separate MediaStore sink uses the A060 filename and retains the A057 sink unchanged.
+
+Build and test from this directory:
+
+```sh
+FINDUAS_ANDROID_NDK_ROOT=/path/to/android-ndk sh scripts/build_policy_set_probe.sh
+FINDUAS_JDK_ROOT=/path/to/jdk sh scripts/run_policy_set_host_tests.sh
+python3 -m unittest discover -s tests -p test_global_payload_extract.py
+```
+
+The ARMv7 output is `build/policy-set/armeabi-v7a/libfinduas_policy_set.so`. C-308 records
+43 native probe cases,274 extractor calls/1044 checks and66 storage cases/9060 checks under
+ASan/UBSan, plus15 Python differential tests. The fixed L5/B6 lane has separate A060 permanent
+receipts and one read allocation. Deployment and execution state are tracked in
+[the runtime topic](../../../docs/23_RC2_LIVE_RUNTIME.md). Raw policy sets remain excluded.

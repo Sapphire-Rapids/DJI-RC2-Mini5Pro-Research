@@ -8,8 +8,10 @@ expiry and notification deduplication. A054 now closes the guarded existing-MMKV
 comparison (C-286--C-292): ProductType139,41 policy rows,36 distinct nonempty candidates,
 receiver18/4 and a candidate match with DEFAULT-match0. Parsing/disposal, stable PID/APK,
 file removal, independent cleanup/receipts and B4 closure all passed.
-The next gap is the matched payload's structure and aircraft consumer, together with applied
-readback/restore; candidate matching does not choose an actual area or identify a writer.
+C-301--C-304 close the two97-byte policies and their20+13+64 signed envelope. The main gap
+is now the13-byte body's field semantics and aircraft consumer. C-306/C-307 narrow the available
+firmware and adjacent SDK leads. A060/L5/B6 collect the complete stored RID policy set next,
+to compare byte0 and other offsets across rows while keeping the payloads private.
 See [the runtime topic](23_RC2_LIVE_RUNTIME.md). Prior commits through `2f31394` were pushed on
 one explicit request; new results remain local unless another push is requested.
 C-227--C-230 have already answered the two tested FLYC parameter
@@ -632,3 +634,13 @@ C-301--C-304 close the A057 data dependency: actual matched/default97-byte polic
 20+13+64 signed structure are available privately, with file/environment recovery complete.
 The next dependency is the aircraft00/DD body decoder and names/semantics of the five H-33
 candidate fields. Current bounded plaintext search has not located that owner (C-305).
+
+
+### Complete stored policy-set discriminator
+
+C-306 finds no plain outer chunk in the five local WA150 IMaH samples; the missing small
+1200/1100 entries correspond to ESC/battery families. C-307 maps CloudControlVersion to the
+separate MSDK5.18 WA34550/20 route. Neither supplies the required00/DD body parser.
+A060/L5/B6 are prepared in C-308. One complete stored RID namespace export can test the observed
+value domains and row correlations without invoking the current-area selector or cloud writer.
+A field name still requires a matching owner/consumer; H-33 retains the current interpretation.

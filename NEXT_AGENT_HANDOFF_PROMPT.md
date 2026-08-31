@@ -8,6 +8,12 @@ states that DJI and the relevant low-altitude-economy authority
 have authorized the work; that authorization is confidential, cannot be shared here, and cannot be
 registered on the physical test aircraft.
 
+Current handoff (C-308/C-309): A060/L5/B6 are built, tested and fully SD-readback verified.
+The previous B5 session closed normally by STOP and its original history is retained. A fresh
+B6 session is prepared; the operator has the one-line startup command. Await/verify its startup,
+then collect CATALOG_BASELINE, one CATALOG_READ, the fixed private A060 policy-set JSON and
+independent CLEANUP. Do not repeat A057. G HUB/host ADB remain off; use the no-reset MTP build.
+
 Read:
 
 - `CODEX_PROJECT_PROMPT.md`
@@ -18,7 +24,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-305 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-309 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 

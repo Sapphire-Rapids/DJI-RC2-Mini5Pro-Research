@@ -959,3 +959,12 @@ work when a report did not contain a more precise timestamp.
 - `CORROBORATED`：两份原始策略用同一P-256验证点通过SHA-256验签，覆盖完整33字节
   头部/正文；错误摘要负对照失败，独立工具与47项测试完成（C-304）。
 - `NEGATIVE`：有界明文搜索尚未定位对应解析器/验证owner，后续追飞机端00/DD（C-305）。
+
+
+### 全组RID策略采集准备
+
+- `STATIC`：完成WA150两份manifest/五份IMaH复核，缺失小模块对应电调/电池家族（C-306）。
+- `STATIC`：把MSDK5.18 CloudControlVersion定位到独立WA34550/20接口（C-307）。
+- `STATIC`：A060/L5/B6构建与sanitizer、差分、13集成/74主机测试通过，固定全组导出格式（C-308）。
+- `OBSERVED`：三份新文件SD完整回读匹配；B5 STOP/CLOSED STOP完成，原历史归档保留，
+  新B6会话准备并提供一次启动命令（C-309）。A060尚未采集，源码与记录继续仅同步本地。

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.33 - 2026-08-31
+
+- Narrowed the firmware and adjacent SDK receiver leads (C-306/C-307).
+- Added A060 complete stored RID policy export, L5/B6 fixed jobs and passing native,
+  differential,13 integration and74 host tests (C-308).
+- Verified all three SD readbacks, closed B5 normally and prepared a new B6 session;
+  one operator startup is pending (C-309). Changes remain local.
+
 ## 0.4.32 - 2026-08-31
 
 - Captured the actual matched/first-DEFAULT policies with A057:97 bytes each,826-byte private

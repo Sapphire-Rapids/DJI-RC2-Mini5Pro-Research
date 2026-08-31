@@ -302,3 +302,31 @@ C-301/C-302 close the first post-reboot A057 run: baseline/read/independent-clea
 the826-byte private JSON is received, and copy/attempt receipts match. The internal probe
 file is absent; no STOP was sent. Preserve the permanent A057 attempt and do not replay it.
 The current next action is offline payload/receiver analysis, not another capture request.
+
+
+## B6 complete stored policy-set capture
+
+B6 adds `CATALOG_BASELINE`, `CATALOG_READ` and `CATALOG_CLEANUP` and pins L5/A061.
+The client requires the B6 receiver marker and the latest fully received successful baseline
+before allocating one A060 read. A057 receipts and completed history are preserved. Native
+enter/export/result records are bound to the current SID and target identity; CloudControlData
+query count remains zero, and its match/receiver fields remain unobserved constants.
+
+```sh
+python3 bridge.py --state-dir /path/to/private-state stage-catalog --b6 /path/to/B6.sh --l5 /path/to/L5.sh --probe /path/to/libfinduas_policy_set.so
+# Close the previous worker normally, then prepare and ask the operator to start B6 once.
+python3 bridge.py --state-dir /path/to/private-state prepare
+python3 bridge.py --state-dir /path/to/private-state submit CATALOG_BASELINE
+python3 bridge.py --state-dir /path/to/private-state collect 0001
+```
+
+Staging fully reads back each file. The only new capture GET is the session-named
+`FindUAS_A060_policyset_<session>.json` under `Download/FindUAS/Probe/`; its rows stay private.
+After READ, retrieve and validate the export and independently confirm file cleanup. Preserve
+worker availability during offline analysis until explicit STOP or lease expiry. B6 retains the
+one-hour/64-job limit; changing receiver versions requires one operator startup. There is no
+self-upgrade operation. C-308 records preparation; live state is in
+[the runtime topic](../../docs/23_RC2_LIVE_RUNTIME.md).
+
+Host regression:74 client/transport/build tests and13 real-mksh/Java L5/B6 integration methods.
+Use `MKSH` and JDK configuration described above with `test_catalog_*.py` for the latter.
