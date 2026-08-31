@@ -641,3 +641,11 @@ The validated ARMv7 SDK JNI/key-value/base inputs lack the old CCC/global-RID/C0
 listed in the runtime record. Examined EID/registration/BLE names resolve to those individual
 planes. This inventory supplies no new ordinary Broadcast RID switch; encrypted firmware and
 other versions remain separate inputs. No F7/Binder route or device write was repeated.
+
+## Current inner-policy owner search (C-305)
+
+Exact Fly1.19.4 APK/SDK searches found no complete inner magic/decoder; the same verification
+point was not found in the bounded APK, existing exact-v07 plaintext images/files or separately
+labelled adjacent RC corpus. Common binary/text key forms were checked. The similarly named
+AddCloudControlSign is an HTTP request-signing helper. These inputs do not include a matching
+plaintext aircraft00/DD implementation; no new firmware decryption was attempted.

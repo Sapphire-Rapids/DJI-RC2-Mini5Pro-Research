@@ -206,3 +206,17 @@ hex, checks bounded JSON/protobuf-wire/ASN.1-TLV/gzip/zlib syntax and compares b
 structural fields. Output omits opaque string/byte values; Boolean names remain candidates until
 connected to the receiver's implementation. It has no device or network operations. Tests use
 synthetic input only; actual A057 bytes are pending (C-293--C-295).
+
+## Observed signed policy envelope
+
+C-301--C-304 provide the first private matched/DEFAULT bodies: each has a20-byte header,
+LE16 body length at18,13-byte body and64-byte trailer. Use
+`rid_cloud_payload_envelope.py PRIVATE_CAPTURE --output NEW_PRIVATE_ANALYSIS` for the
+bounded structure/difference report. Body widths remain an unnamed alignment candidate (H-33).
+
+`rid_cloud_payload_signature.py PRIVATE_CAPTURE --public-key PRIVATE_VERIFICATION_PEM`
+checks only existing P-256/SHA-256 signatures over the complete header/body. It re-encodes
+original big-endian r/s values to DER for OpenSSL, checks the supplied key's named curve,
+and prints booleans/lengths. It does not generate signatures or contact a device. The actual
+verification key and captured signatures stay private.15 verifier,18 envelope and14 generic
+structure tests pass. Generic envelope recognition alone still treats its trailer as opaque.

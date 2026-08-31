@@ -297,3 +297,8 @@ Ordinary `prepare` and canonical STOP/TTL/LIMIT/ERROR handling remain unchanged 
 C-300 used this route after the operator's reboot: MTP reads succeeded while close-time USB
 resets were blocked, old baseline history was archived and a fresh session prepared. The
 new session still needs B5 startup. Native A057 has not yet executed.
+
+C-301/C-302 close the first post-reboot A057 run: baseline/read/independent-cleanup all return0,
+the826-byte private JSON is received, and copy/attempt receipts match. The internal probe
+file is absent; no STOP was sent. Preserve the permanent A057 attempt and do not replay it.
+The current next action is offline payload/receiver analysis, not another capture request.

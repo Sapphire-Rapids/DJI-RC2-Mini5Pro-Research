@@ -431,3 +431,16 @@ request should target those structural gaps before any control transition is des
 C-293 closes the sender-side hex/transport wrapping question. The inner RID policy schema and
 receiver enable-field mapping remain `UNKNOWN`; A057's matched/first-DEFAULT private capture
 is prepared in C-294/C-295. No new field interpretation is introduced by the generic format tests.
+
+## H-33 — the13-byte matched policy body contains a switch candidate
+
+`HYPOTHESIS`: the observed13-byte body can be grouped at relative offsets0/1/3/5/9 with
+widths1/2/2/4/4. The matched and first-DEFAULT records yield candidate scalar lists
+`[1,3,2,16,16]` and `[0,2,0,20,3]`. The first byte is the leading switch candidate because
+its values are1/0; an enum, format revision or regional-policy discriminator could use the
+same values. These widths and names still need the device-side00/DD reader.
+
+The structural record separately closes20-byte header +13-byte body +64-byte trailer.
+Independent P-256/SHA-256 checks verify both trailers over each complete header/body with
+one common verification key. That cryptographic result does not assign body-field semantics.
+The next discriminator is a matching00/DD parsing owner and the branch consuming body+0.

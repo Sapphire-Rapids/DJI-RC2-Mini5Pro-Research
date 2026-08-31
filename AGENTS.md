@@ -377,6 +377,16 @@ Later retractions override earlier progress summaries.
     A057 remains unexecuted; repeat the post-reboot baseline before capture. Keep G HUB and
     host ADB stopped and retain the no-reset transport build.
 
+49. C-301--C-305 close A057's actual capture: one MMKV decode and two cache reads,97-byte
+    matched/first-DEFAULT policies in an826-byte private report, unique matching row1 and
+    nonempty DEFAULT. PID/APK/environment/file recovery and permanent receipts passed;
+    no STOP was sent. Do not replay A057. Structure is20-byte header +13-byte body +64-byte
+    ECDSA/P-256 signature over SHA-256(header+body); both originals verify with one common
+    verification point kept private. Body+0 is1 versus0 and remains H-33's unnamed candidate,
+    not a recovered enable field. Current APK/RC plaintext searches found no matching inner
+    decoder/key owner; continue toward the aircraft00/DD handler. Do not treat DEFAULT as
+    an off policy or rewrite the signed body from this structural result.
+
 ## Privacy and redaction
 
 Never commit:

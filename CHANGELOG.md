@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.32 - 2026-08-31
+
+- Captured the actual matched/first-DEFAULT policies with A057:97 bytes each,826-byte private
+  report, successful lifecycle/file recovery and retained receiver (C-301/C-302).
+- Parsed the20+13+64 envelope and recorded the first body byte as an unnamed1/0 candidate
+  under H-33 (C-303).
+- Independently verified both existing P-256/SHA-256 signatures and added47 tested offline
+  structure/verification checks (C-304). Bounded plaintext owner searches are recorded in C-305.
+- Results are synchronized locally; no new GitHub push was made.
+
 ## 0.4.31 - 2026-08-31
 
 - Closed the exact hex-to00/DD inner-byte boundary (C-293).

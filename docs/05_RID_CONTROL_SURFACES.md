@@ -1010,3 +1010,8 @@ selection or policy write. See [the runtime record](23_RC2_LIVE_RUNTIME.md).
 inner header, version or length. The two current private payloads are therefore sufficient for
 repeatable offline structure/difference analysis. A057's prepared capture is described in the
 [runtime topic](23_RC2_LIVE_RUNTIME.md#匹配策略结构采集准备) (C-294/C-295).
+
+C-301--C-304 supply the actual signed policy structure:20-byte header,13-byte body and64-byte
+P-256/SHA-256 signature over header/body. The observed matched/default body first byte is1/0;
+H-33 tracks its candidate interpretation. The exact field name and consuming branch remain
+at the aircraft-side00/DD owner. The signature format is independent of those field semantics.

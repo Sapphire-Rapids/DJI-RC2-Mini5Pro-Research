@@ -18,7 +18,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-300 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-305 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 
@@ -170,3 +170,10 @@ C-299/C-300 close the reboot recovery: guarded MTP works again, the operator-con
 baseline-only session was archived without deleting history or fabricating CLOSED, and one
 new B5 session is activated. Await one B5 startup, then fresh baseline and one A057 capture.
 G HUB and host ADB stay stopped; use only the no-reset host transport build.
+
+C-301--C-305 supersede awaiting-capture: A057 ran once and exported826 bytes. The private
+matched/default policies are97 bytes each:20-byte header +13-byte body +64-byte ECDSA/P-256
+signature, SHA-256 covering header/body. Both originals verify with one common key retained
+privately. The first body byte1/0 is H-33's candidate; no field name is established. Temporary
+file recovery and receipts are complete, no STOP was sent. Continue offline00/DD receiver
+analysis and preserve A057's permanent attempt; current SDK/RC plaintext searches were negative.

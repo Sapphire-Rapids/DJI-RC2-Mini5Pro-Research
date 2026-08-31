@@ -323,3 +323,8 @@ python3 -m unittest discover -s tests -p test_payload_extract.py
 The build strips unneeded ELF symbols and retains the export needed by ART. Generated SOs and
 captured JSON stay excluded. C-294 records host validation and C-295 SD readback; actual A057
 execution awaits the operator startup. See [runtime steps](../../../docs/23_RC2_LIVE_RUNTIME.md#下一步).
+
+C-301/C-302 now record A057 execution: one attach, one MMKV decode, two cache reads,826-byte
+MediaStore export, stable process/APK, successful environment disposal and independent file
+recovery. Matched and first DEFAULT are97 bytes each. The A057 attempt receipt is permanent;
+this completed capture is not replayed. Offline envelope/signature findings are C-303--C-305.

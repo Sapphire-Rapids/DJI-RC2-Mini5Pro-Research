@@ -950,3 +950,12 @@ work when a report did not contain a more precise timestamp.
   67项host测试、两项C自测通过（C-299）。
 - `OBSERVED`：重启后连接稳定，MTP读取成功且三次close-time reset均被拦截；旧基线归档、
   新B5会话激活，等待一次新启动，A057仍未执行（C-300）。
+
+### A057实际策略与签名结构
+
+- `OBSERVED`：重启后基线通过，A057一次读取/导出成功；826-byte报告收到，matched与
+  DEFAULT均为97字节，唯一匹配行1，文件清理和回执核验完成，保留接收端（C-301/C-302）。
+- `OBSERVED`：拆出20+13+64结构及五处正文差异，首字节1/0列为H-33候选（C-303）。
+- `CORROBORATED`：两份原始策略用同一P-256验证点通过SHA-256验签，覆盖完整33字节
+  头部/正文；错误摘要负对照失败，独立工具与47项测试完成（C-304）。
+- `NEGATIVE`：有界明文搜索尚未定位对应解析器/验证owner，后续追飞机端00/DD（C-305）。
