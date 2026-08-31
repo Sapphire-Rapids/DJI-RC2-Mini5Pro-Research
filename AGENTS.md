@@ -356,10 +356,26 @@ Later retractions override earlier progress summaries.
 
 46. C-293 closes the exact paired-hex decode to complete00/DD payload boundary; the sender adds
     no RID-specific inner header/version/length. A057/L4/B5 are the new two-payload capture,
-    host-tested and SD-staged with matching readbacks (C-294/C-295), not yet executed. They keep
+    host-tested and SD-staged with matching readbacks (C-294/C-295). C-296 then confirms B5
+    startup and all23 L4 baseline checks; A057 itself is not yet executed. They keep
     matched-row count and missing/empty first DEFAULT separate, write only the two eligible hex
-    strings to a private SD MediaStore report, and log numeric metadata. B5 startup is the next
-    operator action. Preserve A048/A051/A054 receipts and do not replay their completed probes.
+    strings to a private SD MediaStore report, and log numeric metadata. MTP failed before READ
+    allocation; reconnect only USB and continue the original B5 session. No STOP was sent.
+    Preserve A048/A051/A054 receipts and do not replay their completed probes.
+
+47. C-297 records operator-reported connection instability during MTP recovery, then stable
+    connection after G HUB and host ADB were stopped. Keep G HUB off per operator request.
+    C-298 replaces the host transport with static libmtp plus a local guard against both
+    automatic whole-device USB reset sites; do not use the old dynamic build or restart ADB
+    as a transport fallback. A057 READ remains unallocated. The operator chose controller
+    reboot; preserve old session/attempt history and prepare a new session after confirmation.
+
+48. C-299/C-300 close operator-confirmed controller reboot recovery. Guarded MTP reads now
+    succeed, including interception of close-time reset calls. The completed baseline-only
+    session was archived with original history and a separate operator-reboot receipt, not
+    a fabricated worker CLOSED. One fresh B5 session is activated and awaits startup.
+    A057 remains unexecuted; repeat the post-reboot baseline before capture. Keep G HUB and
+    host ADB stopped and retain the no-reset transport build.
 
 ## Privacy and redaction
 

@@ -618,5 +618,12 @@ bearer fields. The writer rate-limits persistence per UAS to one row per two sec
 not RF packet counts and do not close C-207. Identifiers, coordinates and raw records stay private.
 
 C-293 resolves the sender's inner-byte boundary. The remaining immediate dependency is one
-A057 payload capture: L4/B5 are built, tested and SD-staged (C-294/C-295), awaiting B5 startup.
+A057 payload capture: L4/B5 are built, tested and SD-staged (C-294/C-295), B5 started and its baseline passed (C-296). MTP reconnect is needed before READ allocation.
 The matching/DEFAULT bytes will drive the internal-schema and enable-field investigation.
+
+C-297/C-298 pause the original capture after MTP failure and reported connection instability.
+G HUB/ADB are stopped and the host reset guard is implemented. The operator is rebooting the
+controller; recover the old baseline-only session explicitly, then prepare the next session.
+
+C-299/C-300 resolve file access after the controller reboot and explicitly archive the old
+baseline-only session. A fresh B5 session is ready for operator startup; A057 remains unexecuted.

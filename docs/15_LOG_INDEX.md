@@ -247,3 +247,15 @@ fixtures are public and contain TEST values only.
 C-293--C-295 reference excluded exact hex/transport slices, bounded old-corpus search notes,
 A057 manifests, test runs and MTP/session records. The next JSON contains only two policy hex
 strings and numeric metadata and remains private. Source and TEST-only fixtures are public.
+
+C-296 uses the private B5 baseline report, original client history and two transport failure
+records. The numeric baseline result is public; session, process and USB details stay excluded.
+
+C-297/C-298 use private transport debug output, passive registry samples, process-stop records,
+class-status results and exact libmtp/libusb inspection. Registry names, process IDs, native
+addresses and USB topology stay excluded. Public source contains only the independent reset
+guard, build enforcement and synthetic tests.
+
+C-299/C-300 use synthetic recovery tests and excluded operator-reboot request/completion,
+archive-readback and new-session publication receipts. The old/new session identifiers remain
+private. Original baseline records were preserved rather than rewritten as a worker shutdown.

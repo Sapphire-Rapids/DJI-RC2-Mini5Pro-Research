@@ -6,7 +6,13 @@
 - Added a bounded matched/first-DEFAULT private SD export and offline structural comparison;
   native, storage, parser and bridge tests pass (C-294).
 - Staged A057/L4/B5 with matching readbacks and prepared the next session (C-295).
-  Runtime payload capture awaits one operator startup; updates remain local.
+  B5 startup and all23 baseline checks then succeeded (C-296); MTP failed before READ allocation.
+  G HUB and ADB were stopped after the operator reported repeated connection interruptions;
+  the operator then confirmed stability (C-297).
+- Disabled libmtp's automatic whole-device USB resets with an enforced static-link guard;
+  host tests and a live blocked-reset observation passed (C-298). Controller reboot recovery
+  recovered file access; old baseline history was preserved and a fresh B5 session activated
+  through explicit reboot recovery (C-299/C-300). Updates remain local.
 
 ## 0.4.30 - 2026-08-31
 
