@@ -1015,3 +1015,11 @@ C-301--C-304 supply the actual signed policy structure:20-byte header,13-byte bo
 P-256/SHA-256 signature over header/body. The observed matched/default body first byte is1/0;
 H-33 tracks its candidate interpretation. The exact field name and consuming branch remain
 at the aircraft-side00/DD owner. The signature format is independent of those field semantics.
+
+
+C-310--C-314 add the complete stored RID policy set without another cloud SET:41 rows contain
+36 verified signed envelopes but only six whole-body patterns. Forty bodies are13 bytes and
+one is26; the latter can be split into two aligned13-byte candidates. The first byte remains
+an unnamed0/1 candidate, and values2/3/4/5 at the following LE16 position are a new discriminator
+for enum/consumer lookup. Keep the byte3/4 field-width alternatives in H-33; this capture does
+not change the existing aircraft command allow-list.

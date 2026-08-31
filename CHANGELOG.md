@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.34 - 2026-08-31
+
+- Completed the B6 baseline and one A060 capture:41 rows/10907 private JSON bytes,
+  stable target, successful file recovery and matched permanent receipts (C-310--C-312).
+- Verified all36 signature envelopes; independent comparison finds25 signed messages,
+  six whole-body patterns and one26-byte/two-segment candidate body (C-313).
+- Added offline repeated13-byte segment and split-byte interpretations with52 passing
+  public tests (C-314). Related local enums did not match the candidate discriminator (C-315).
+  Field names remain under H-33; results stay local.
+
 ## 0.4.33 - 2026-08-31
 
 - Narrowed the firmware and adjacent SDK receiver leads (C-306/C-307).

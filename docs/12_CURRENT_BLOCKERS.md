@@ -10,8 +10,8 @@ receiver18/4 and a candidate match with DEFAULT-match0. Parsing/disposal, stable
 file removal, independent cleanup/receipts and B4 closure all passed.
 C-301--C-304 close the two97-byte policies and their20+13+64 signed envelope. The main gap
 is now the13-byte body's field semantics and aircraft consumer. C-306/C-307 narrow the available
-firmware and adjacent SDK leads. A060/L5/B6 collect the complete stored RID policy set next,
-to compare byte0 and other offsets across rows while keeping the payloads private.
+firmware and adjacent SDK leads. A060 now supplies the complete stored policy set (C-310--C-314):41 rows, all signatures verified,
+six whole-body patterns and13/26-byte body lengths. The remaining gap is enum/consumer mapping.
 See [the runtime topic](23_RC2_LIVE_RUNTIME.md). Prior commits through `2f31394` were pushed on
 one explicit request; new results remain local unless another push is requested.
 C-227--C-230 have already answered the two tested FLYC parameter
@@ -644,3 +644,15 @@ separate MSDK5.18 WA34550/20 route. Neither supplies the required00/DD body pars
 A060/L5/B6 are prepared in C-308. One complete stored RID namespace export can test the observed
 value domains and row correlations without invoking the current-area selector or cloud writer.
 A field name still requires a matching owner/consumer; H-33 retains the current interpretation.
+
+
+C-310--C-314 close this capture dependency:10907 bytes received,41 nonempty rows,36 verified
+signature envelopes,25 signed messages and six whole bodies. One26-byte body supplies the
+second13-byte candidate segment. The next unresolved items are the meaning of the2/3/4/5
+candidate values, the byte3/4 width/mask choice and the branch consuming the0/1 first byte.
+No further baseline or whole-policy recapture is pending.
+
+
+The bounded related-enum comparison is also complete without a mapping (C-315). The next
+single discriminator is a receiver loop advancing13 bytes and consuming the candidate type at+1,
+including the second segment of the26-byte body. Existing runtime-status enums are not substitutes.

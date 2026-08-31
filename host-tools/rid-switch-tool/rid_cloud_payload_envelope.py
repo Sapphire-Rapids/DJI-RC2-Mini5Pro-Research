@@ -2,7 +2,7 @@
 
 Recognition uses only the fixed magic, LE16 length at offset18, and a64-byte
 opaque trailer. Other header values have no assigned meaning. The optional
-13-byte body layout is a width/alignment candidate, not a named RID schema.
+13-byte body layout and repeated segments are unnamed width/alignment candidates.
 Inputs stay local; no packet generation, device access or trailer values exist
 in the output.
 """
@@ -73,6 +73,23 @@ def analyze_bytes(data: bytes) -> dict:
             "body_relative_offsets": [offset for offset, _ in BODY_CANDIDATE_LAYOUT],
             "fields": _fields(body, BODY_CANDIDATE_LAYOUT, HEADER_BYTES),
         }
+    repeated_candidate = None
+    if body_bytes and body_bytes % 13 == 0:
+        segments = []
+        for offset in range(0, body_bytes, 13):
+            segment = body[offset:offset + 13]
+            segments.append({
+                "body_relative_offset": offset,
+                "fields": _fields(segment, BODY_CANDIDATE_LAYOUT, HEADER_BYTES + offset),
+                "alternative_u8_fields": _fields(segment, ((3, 1), (4, 1)), HEADER_BYTES + offset),
+            })
+        repeated_candidate = {
+            "evidence": "HYPOTHESIS",
+            "basis": "UNNAMED_REPEATED_WIDTH_ALIGNMENT_ONLY",
+            "segment_bytes": 13,
+            "segment_count": len(segments),
+            "segments": segments,
+        }
     return {
         "schema": "finduas-cloud-policy-envelope/v1",
         "envelope_structure_valid": True,
@@ -82,7 +99,8 @@ def analyze_bytes(data: bytes) -> dict:
                    "unnamed_fields": _fields(data[:HEADER_BYTES], HEADER_LAYOUT)},
         "body": {"offset": HEADER_BYTES, "bytes": body_bytes,
                  "length_field_offset": 18, "length_field_width_bytes": 2,
-                 "layout_candidate": candidate},
+                 "layout_candidate": candidate,
+                 "repeated_layout_candidate": repeated_candidate},
         "trailer": {"offset": HEADER_BYTES + body_bytes, "bytes": TRAILER_BYTES,
                     "interpretation": "OPAQUE"},
         "named_rid_switch_field": None,

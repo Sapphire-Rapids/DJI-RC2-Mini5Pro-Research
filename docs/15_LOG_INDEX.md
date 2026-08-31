@@ -277,3 +277,18 @@ results, real-mksh/Java fixtures and host regression output. Only independent so
 TEST data are public. Complete policy JSON, country rows, signatures, verification key and all
 session/process/USB details remain local. C-309 indexes the new staging readbacks and normal
 B5 STOP/closure plus B6 session preparation receipts.
+
+
+## A060 complete capture and independent body comparison
+
+C-310--C-312 reference the three immutable B6 jobs, strict L5/native parsing,10907-byte capture,
+export receipt and permanent A060 copy/attempt comparison. C-313 uses the private whole-set
+signature report and an independent direct-byte grouping script/report, including prior A057
+membership and country-to-candidate grouping. Country rows, packet bodies, header values,
+signatures, verification key and all session/process/volume details remain excluded. C-314
+records public synthetic parser tests and private synthetic capture/analysis helper tests.
+
+
+C-315 adds a private bounded named-enum comparison note for exact Fly1.19.4 and MSDK5.18,
+using only existing inputs. Decompiled enum bodies and configuration-country associations remain
+excluded; the public record distinguishes registration/runtime state from an unnamed policy type.

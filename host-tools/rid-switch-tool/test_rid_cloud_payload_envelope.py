@@ -59,6 +59,70 @@ class EnvelopeTests(unittest.TestCase):
                 self.assertEqual(result["body"]["bytes"], size)
                 self.assertIsNone(result["body"]["layout_candidate"])
 
+    def test_repeated_candidate_covers_13_26_and_39_bytes(self):
+        values = [(7, 0x1234, 0x0100, 123456, 654321),
+                  (8, 0x5678, 0x0200, 234567, 765432),
+                  (9, 0x9abc, 0x3405, 345678, 876543)]
+        for count in (1, 2, 3):
+            with self.subTest(count=count):
+                body = b"".join(struct.pack("<BHHII", *row) for row in values[:count])
+                result = probe.analyze_bytes(fixture(body))
+                repeated = result["body"]["repeated_layout_candidate"]
+                self.assertEqual(repeated["evidence"], "HYPOTHESIS")
+                self.assertEqual(repeated["basis"], "UNNAMED_REPEATED_WIDTH_ALIGNMENT_ONLY")
+                self.assertEqual(repeated["segment_bytes"], 13)
+                self.assertEqual(repeated["segment_count"], count)
+                self.assertEqual([row["body_relative_offset"] for row in repeated["segments"]],
+                                 [index * 13 for index in range(count)])
+                for index, row in enumerate(repeated["segments"]):
+                    self.assertEqual([field["unsigned_value"] for field in row["fields"]],
+                                     list(values[index]))
+                    self.assertEqual([field["width_bytes"] for field in row["fields"]], [1, 2, 2, 4, 4])
+                    self.assertEqual([field["offset"] for field in row["fields"]],
+                                     [20 + index * 13 + offset for offset in (0, 1, 3, 5, 9)])
+                if count == 1:
+                    self.assertEqual(result["body"]["layout_candidate"]["fields"],
+                                     repeated["segments"][0]["fields"])
+                else:
+                    self.assertIsNone(result["body"]["layout_candidate"])
+
+    def test_repeated_candidate_requires_nonempty_exact_multiple(self):
+        for size in (0, 1, 12, 14, 25, 27, 38, 40):
+            with self.subTest(size=size):
+                result = probe.analyze_bytes(fixture(bytes(size)))
+                self.assertIsNone(result["body"]["repeated_layout_candidate"])
+
+    def test_repeated_candidate_exposes_independent_bytes_at_3_and_4(self):
+        body = struct.pack("<BHHII", 4, 5, 0x0100, 6, 7) + struct.pack("<BHHII", 8, 9, 0x0203, 10, 11)
+        segments = probe.analyze_bytes(fixture(body))["body"]["repeated_layout_candidate"]["segments"]
+        self.assertEqual([field["unsigned_value"] for field in segments[0]["alternative_u8_fields"]], [0, 1])
+        self.assertEqual([field["unsigned_value"] for field in segments[1]["alternative_u8_fields"]], [3, 2])
+        for index, segment in enumerate(segments):
+            self.assertEqual([field["offset"] for field in segment["alternative_u8_fields"]],
+                             [20 + index * 13 + 3, 20 + index * 13 + 4])
+            self.assertEqual([field["width_bytes"] for field in segment["alternative_u8_fields"]], [1, 1])
+
+    def test_repeated_count_does_not_use_header_offset_6(self):
+        for header_value in (0, 1, 2, 65535):
+            with self.subTest(header_value=header_value):
+                result = probe.analyze_bytes(fixture(bytes(26), fields=(7, header_value, 123456, 234567, 11)))
+                self.assertEqual(result["body"]["repeated_layout_candidate"]["segment_count"], 2)
+                field = next(field for field in result["header"]["unnamed_fields"] if field["offset"] == 6)
+                self.assertEqual(field["unsigned_value"], header_value)
+
+    def test_repeated_candidate_remains_numeric_and_propagates_to_pair_capture(self):
+        body = b"TEST-SEGMENT!" * 2
+        result = probe.analyze_capture({"matched_hex": fixture(body).hex(),
+                                        "default_hex": fixture(body[:13]).hex()})
+        self.assertEqual(result["schema"], "finduas-cloud-policy-envelope-capture/v1")
+        self.assertEqual(result["matched"]["schema"], "finduas-cloud-policy-envelope/v1")
+        self.assertEqual(result["matched"]["body"]["repeated_layout_candidate"]["segment_count"], 2)
+        self.assertEqual(result["default"]["body"]["repeated_layout_candidate"]["segment_count"], 1)
+        self.assertIsNone(result["comparison"]["body_changed_candidate_fields"])
+        encoded = json.dumps(result)
+        for raw_or_name in (body.hex(), "TEST-SEGMENT", "TEST-OPAQUE", "signature", "enabled"):
+            self.assertNotIn(raw_or_name, encoded)
+
     def test_truncation_magic_and_unclaimed_trailing_data_rejected(self):
         good = fixture()
         for raw, code in ((good[:83], "TRUNCATED_ENVELOPE"),

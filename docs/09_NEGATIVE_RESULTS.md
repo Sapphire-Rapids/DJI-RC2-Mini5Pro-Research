@@ -659,3 +659,12 @@ available plain main/network owner. No extra module download or aircraft query w
 MSDK5.18 CloudControlVersion is registered by WA345 and uses50/20, not the00/DD signed policy
 body. Exact installed Fly1.19.4 lacks that typed interface in the examined16 DEX/three SDK
 libraries. Further work uses the existing RID policy set rather than sending this adjacent getter.
+
+
+## Candidate policy record enum mapping (C-315)
+
+The related exact Fly1.19.4 and MSDK5.18 RID/RemoteID/UAS enums did not match the private
+A0602/3/4/5 configuration grouping. RIDInfoOpt/RIDResultState are registration/import state,
+RemoteIdWorkingState is runtime/error state, and AreaStrategy uses strings. Numeric overlap
+does not assign a record type. The bounded next search needs an actual13-byte-stride consumer
+that handles both the common segment and the second segment of the26-byte body.
