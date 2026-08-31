@@ -595,3 +595,10 @@ The existing FindUASMac persisted history was located separately through its sou
 Application Support location. A bounded read found no explicit motor-transition or aircraft-air-
 bearer fields. The writer rate-limits persistence per UAS to one row per two seconds, so rows are
 not RF packet counts and do not close C-207. Identifiers, coordinates and raw records stay private.
+
+### Current prepared action: B5
+
+C-293 closes the hex-to00/DD byte boundary. A057/L4/B5 are now built, tested and SD-staged
+(C-294/C-295). The new session awaits operator startup. Then collect STRUCTURE_BASELINE,
+one STRUCTURE_READ and the fixed private JSON, analyze matched versus first DEFAULT, and
+finish independent cleanup/STOP. Keep A048/A051/A054 history and receipts untouched.

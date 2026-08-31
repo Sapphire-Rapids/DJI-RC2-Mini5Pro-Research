@@ -303,3 +303,23 @@ Python differential suite. Android linker/instance ownership is simulated in hos
 statically checked against the exact samples. L3/B4 provide fixed baseline/read/cleanup jobs
 with separate A054 receipts. [Current execution state](../../../docs/23_RC2_LIVE_RUNTIME.md)
 is recorded independently of host tests. The original A048/A051 bytes are unchanged.
+
+## A057 matched-policy and DEFAULT capture
+
+A057 is a separate source/build from frozen A054. `payload_extract.c` reuses the independent
+frozen parser and exports only an eligible receiver18/4 cache string and the first DEFAULT.
+Both must be valid even-length hex; missing and empty DEFAULT remain distinct. Numeric counts
+and lengths are logged, while the at-most32KiB JSON is written to a new SD MediaStore row.
+`mediastore_sink.c` uses the existing Application context, chooses one mounted removable
+non-primary non-emulated volume and publishes after successful close. Failed writes clean up
+only their newly inserted URI. L4/B5 preserve baseline, one-attempt and owned-file recovery.
+
+```sh
+FINDUAS_ANDROID_NDK_ROOT="$ANDROID_NDK_ROOT" sh scripts/build_policy_structure_probe.sh
+FINDUAS_JDK_ROOT="$JAVA_HOME" sh scripts/run_policy_structure_host_tests.sh
+python3 -m unittest discover -s tests -p test_payload_extract.py
+```
+
+The build strips unneeded ELF symbols and retains the export needed by ART. Generated SOs and
+captured JSON stay excluded. C-294 records host validation and C-295 SD readback; actual A057
+execution awaits the operator startup. See [runtime steps](../../../docs/23_RC2_LIVE_RUNTIME.md#下一步).

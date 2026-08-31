@@ -67,6 +67,8 @@
   缓存命中候选集合且未匹配DEFAULT。JNI/guard/解析/释放成功，PID/APK稳定；文件回收和
   B4停止均核验。后续转向匹配payload的内部结构；详见
   [实机结果](docs/23_RC2_LIVE_RUNTIME.md#实机云策略缓存比对结果)。
+  C-293--C-295已闭合hex发送边界，并完成A057/L4/B5的定向SD导出准备；
+  下一步是[一次B5启动](docs/23_RC2_LIVE_RUNTIME.md#下一步)，取得匹配/DEFAULT正文供内部结构解析。
 
 - Current same-family SKYROVER `1.2.0` 已出现一个独立 Boolean `RIDCtrlEnable`：native 映射
   为 FC 参数 `rid_ctrl_enable_0`、hash `0x3CBD864F`，使用 FLYC `03/F7-F9`。它与 France

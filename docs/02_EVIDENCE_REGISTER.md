@@ -414,4 +414,8 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 | C-291 | `OBSERVED` | One guarded MMKV decode and two SDK cache reads found ProductType139, receiver18/4,41 rows,36 distinct candidates, match1/default0; parse/disposal and file removal succeeded | Candidate content membership, not unique-country/actual-area/writer/applied-state evidence |
 | C-292 | `OBSERVED` | Independent cleanup, receipt readbacks and STOP/CLOSED STOP completed | No second attach or Fly restart; runtime mappings/permanent receipts remain |
 
+| C-293 | `STATIC` | Exact hex decode feeds the complete00/DD transport payload without an extra RID header/version/length | Inner schema awaits the actual matched bytes |
+| C-294 | `STATIC` | A057 extracts only eligible matched/first-DEFAULT hex; bounded MediaStore export and offline structure analysis pass host tests | New A057 runtime capture pending |
+| C-295 | `OBSERVED` | A057/L4/B5 SD upload/readbacks match and the new session is prepared | One operator B5 startup is next; no new attach submitted |
+
 Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTROL_SURFACES.md).
