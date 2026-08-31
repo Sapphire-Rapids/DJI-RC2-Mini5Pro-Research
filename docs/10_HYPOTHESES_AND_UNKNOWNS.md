@@ -444,3 +444,10 @@ The structural record separately closes20-byte header +13-byte body +64-byte tra
 Independent P-256/SHA-256 checks verify both trailers over each complete header/body with
 one common verification key. That cryptographic result does not assign body-field semantics.
 The next discriminator is a matching00/DD parsing owner and the branch consuming body+0.
+
+
+C-306/C-307 narrow the available offline receiver leads. A060 (C-308) prepares a complete
+stored-row comparison: a third value at body+0 would reject a strict Boolean interpretation;
+a domain of0/1 would retain that hypothesis but still leave enum/version alternatives open.
+The comparison also records per-offset domains and repeated body tuples, rather than assuming
+that the initial five candidate widths are correct.

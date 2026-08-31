@@ -2,6 +2,15 @@
 
 ## Start here
 
+Latest continuation (C-301--C-309): the two signed97-byte policies have been captured and
+verified. Body-byte0 remains the unnamed H-33 candidate. A060/L5/B6 now prepare a complete
+stored RID policy-set comparison: source/tests and all three SD readbacks pass. B5 STOP and
+CLOSED STOP completed; a fresh B6 session is prepared with original history retained. The
+operator has received one B6 startup command. On startup collect CATALOG_BASELINE, then one
+CATALOG_READ, validate the private export, analyze signatures/byte domains and independently
+CLEANUP. No A060 read is allocated yet. Keep G HUB and host ADB stopped, use the no-reset
+host build, and do not replay A057. Current private client state must be preserved.
+
 C-273--C-275 close the real RC 2 A-048 loader experiment. The fixed system-mediated attach
 succeeded in the existing Fly process, with matching native identity, successful ART TI/API
 disposal, unchanged AMS PID/UID and unchanged APK. The verified ordinary file was removed,
@@ -15,7 +24,7 @@ cloud-source chain plus A054 live comparison: ProductType139,41 rows,36 distinct
 receiver18/4, candidate match1 and DEFAULT-match0. Its environment/file recovery, independent
 receipts and B4 STOP are complete. Preserve A054's permanent receipt too. Next inspect matched
 payload structure and its aircraft consumer; actual-area selection and applied readback/restore
-remain separate. No further operator command is pending.
+remain separate. This historical state is superseded by the B6 continuation above.
 The installed Fly 1.19.4/ARMv7 reports, samples and current steps are in
 [23_RC2_LIVE_RUNTIME.md](23_RC2_LIVE_RUNTIME.md). The two FLYC candidates are closed by
 C-227--C-230, not awaiting another parameter probe. The requested control target also includes
@@ -622,3 +631,18 @@ verify with one common private-retained verification point. Body+0 is1/0 and rem
 unnamed switch candidate. Independent cleanup and permanent receipts are complete. No STOP
 was sent. Continue offline aircraft00/DD owner work; do not repeat A057 or assume DEFAULT
 is an off policy merely from its first byte.
+
+
+### Current prepared action: B6 (C-308/C-309)
+
+A060 exports the entire existing RID policy row set with one guarded MMKV decode and one
+ProductType cache read, zero CloudControlData reads and no SET. It retains only country_code,
+data_hex and product-blocked status per row, in an at-most32768-byte private JSON. The native
+artifact is26624 bytes with the A060 hash in the artifact index. L5/A061 and B6/A062 are pinned
+and fully SD-readback verified. B5 is now canonically closed; preserve its completed history.
+
+After the already-requested B6 startup, keep one session and read only the newly prepared
+CATALOG lane. Validate native enter/export/result, file length/counts and immutable receipts.
+Use existing envelope/P-256 verification on all nonempty rows and compare body-byte domains
+without assigning field names. Keep the receiver available during offline analysis until explicit
+STOP or lease expiry. Full payloads and country rows stay in excluded private storage.

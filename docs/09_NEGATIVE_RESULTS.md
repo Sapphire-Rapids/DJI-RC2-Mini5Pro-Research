@@ -649,3 +649,13 @@ point was not found in the bounded APK, existing exact-v07 plaintext images/file
 labelled adjacent RC corpus. Common binary/text key forms were checked. The similarly named
 AddCloudControlSign is an HTTP request-signing helper. These inputs do not include a matching
 plaintext aircraft00/DD implementation; no new firmware decryption was attempted.
+
+
+## Local firmware and adjacent CloudControlVersion lead (C-306/C-307)
+
+The five existing WA1500600/0700 IMaH inputs have encrypted outer chunks. Manifest entries
+missing locally are the small1200 ESC and1100 battery families; they do not add a currently
+available plain main/network owner. No extra module download or aircraft query was made.
+MSDK5.18 CloudControlVersion is registered by WA345 and uses50/20, not the00/DD signed policy
+body. Exact installed Fly1.19.4 lacks that typed interface in the examined16 DEX/three SDK
+libraries. Further work uses the existing RID policy set rather than sending this adjacent getter.

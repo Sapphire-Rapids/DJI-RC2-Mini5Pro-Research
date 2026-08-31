@@ -431,5 +431,10 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 | C-303 | `OBSERVED` |20-byte header +13-byte body +64-byte trailer; body first byte1 versus0 | Width/name/enable interpretations remain H-33 |
 | C-304 | `CORROBORATED` | Both originals verify as P-256/SHA-256 over their33-byte header/body with one common verification key | Device trust anchor and field semantics remain separate |
 | C-305 | `NEGATIVE` | Bounded exact/adjacent plaintext searches found no matching inner parser or verification-key owner | Aircraft00/DD handler remains the next target |
+| C-306 | `STATIC` | Two WA150 manifests identify the missing1200/1100 ESC/battery families; all five available original IMaH modules have encrypted outer chunks and matching complete digests | Missing module containers remain uninspected;0802/E3 remains the receiver candidate |
+| C-307 | `STATIC` | MSDK5.18 CloudControlVersion belongs to WA345 and command0x50/0x20; the named interface is absent from the exact Fly1.19.4 inventory | Separate from WA15000/DD policy transport; no query executed |
+| C-308 | `STATIC` | A060/L5/B6 whole-policy-set capture is built and tested; one MMKV decode, one ProductType cache read, zero CloudControlData queries/SET | Preparation record; A060 execution pending and global policy bodies private |
 
 Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTROL_SURFACES.md).
+
+| C-309 | `OBSERVED` | A060/L5/B6 SD回读全部匹配，B5 STOP/CLOSED STOP及正常会话轮换完成，B6启动命令已给出 | B6尚未确认启动，A060采集未执行；原历史/回执保留 |

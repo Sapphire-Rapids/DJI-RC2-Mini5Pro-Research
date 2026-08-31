@@ -267,3 +267,13 @@ copy/attempt receipts, envelope summaries, verification-point recovery, independ
 checks and bounded key/owner searches. Full policies, signatures, verification key, raw header
 values, process/boot/session identifiers and vendor search inputs stay excluded. Public output
 contains lengths, selected structural scalars, hypothesis-labelled layout and independent tools.
+
+
+## Complete policy-set preparation and narrowed receiver leads
+
+C-306/C-307 use the excluded WA150 manifest/IMaH summaries, prior secondary-module mapping
+and exact MSDK5.18/Fly1.19.4 owner slices. C-308 adds A060 build manifests, sanitizer/differential
+results, real-mksh/Java fixtures and host regression output. Only independent source and synthetic
+TEST data are public. Complete policy JSON, country rows, signatures, verification key and all
+session/process/USB details remain local. C-309 indexes the new staging readbacks and normal
+B5 STOP/closure plus B6 session preparation receipts.
