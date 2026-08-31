@@ -71,10 +71,9 @@
 | A-057 | FindUAS ARMv7 matched-policy structure capture；self-developed；`policy-structure-v1-armeabi-v7a` | `27,072` | `3b62094ac76515277bf251c59ecac0e2cca761aab92c60d925e4daa0bb16112e` | `OBSERVED`；一次实机读取及826-byte报告收到；matched/DEFAULT各97B；环境释放、文件清理/回执核验；SO/私有报告排除 |
 | A-058 | FindUAS L4 fixed policy-structure loader；self-developed；`rc2-policy-structure-loader-v1` | `23,349` | `7baffaef8ea4167b443c8d5688c65cc6de7357bbf3663f66a30cd0c969b62713` | `OBSERVED`；重启后BASELINE/READ/独立CLEANUP均rc0，PID/APK稳定；源码公开，私有报告排除 |
 | A-059 | FindUAS B5 fixed policy-structure session；self-developed；`sd-policy-structure-bridge-v1` | `10,591` | `db3646a9f6f5262781daf5fb9165f66f509a253db22aaab1c22a89f43f58e9ac` | `OBSERVED`；新会话完成BASELINE/READ/CLEANUP；后续STOP/CLOSED STOP完成，历史保留；源码公开，会话记录排除 |
-
-| A-060 | FindUAS ARMv7 complete RID policy-set capture；self-developed；`policy-set-v1-armeabi-v7a` | `26,624` | `3c0c5988996e79e4bc8010344b62c5dead48d07471e5d6dac282a6841939c04d` | `STATIC`；SD完整回读匹配；尚未加载/执行；源码公开，生成SO/私有报告排除 |
-| A-061 | FindUAS L5 fixed policy-catalog loader；self-developed；`rc2-policy-catalog-loader-v1` | `23,055` | `a1e509cd10b55594151e3a5b9694247fab4a43b1850cf9602fccb23eac264060` | `STATIC`；SD完整回读匹配；尚未加载/执行；源码公开，生成SO/私有报告排除 |
-| A-062 | FindUAS B6 fixed policy-catalog session；self-developed；`sd-policy-catalog-bridge-v1` | `10,557` | `594ac137a897c6ceaf889df54acb91af2f407cedf214bd3715bc2a1550587440` | `STATIC`；SD完整回读匹配；尚未加载/执行；源码公开，生成SO/私有报告排除 |
+| A-060 | FindUAS ARMv7 complete RID policy-set capture；self-developed；`policy-set-v1-armeabi-v7a` | `26,624` | `3c0c5988996e79e4bc8010344b62c5dead48d07471e5d6dac282a6841939c04d` | `OBSERVED`；一次实机读取41行、10907-byte报告校验通过；环境释放、文件独立清理及回执核验完成；源码公开，SO/私有报告排除 |
+| A-061 | FindUAS L5 fixed policy-catalog loader；self-developed；`rc2-policy-catalog-loader-v1` | `23,055` | `a1e509cd10b55594151e3a5b9694247fab4a43b1850cf9602fccb23eac264060` | `OBSERVED`；BASELINE/READ/独立CLEANUP均rc0；PID/UID/APK稳定；源码公开，私有运行记录排除 |
+| A-062 | FindUAS B6 fixed policy-catalog session；self-developed；`sd-policy-catalog-bridge-v1` | `10,557` | `594ac137a897c6ceaf889df54acb91af2f407cedf214bd3715bc2a1550587440` | `OBSERVED`；会话BASELINE/READ/CLEANUP验证完成；未发送STOP，接收端保留；源码公开，会话记录排除 |
 
 ## 3. A-001：历史 v0.10 admission probe
 

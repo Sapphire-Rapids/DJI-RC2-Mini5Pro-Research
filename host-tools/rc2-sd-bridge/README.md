@@ -330,3 +330,10 @@ self-upgrade operation. C-308 records preparation; live state is in
 
 Host regression:74 client/transport/build tests and13 real-mksh/Java L5/B6 integration methods.
 Use `MKSH` and JDK configuration described above with `test_catalog_*.py` for the latter.
+
+
+C-310--C-312 close the first A060/B6 execution:baseline/read/independent-cleanup all returned0,
+41 stored nonempty rows were exported in10907 bytes and strictly validated, the target PID/UID/APK
+remained stable, the temporary file was removed and permanent receipts matched. No STOP was
+sent; keep the completed A060 attempt and original B6 history. C-313/C-314 record the resulting
+whole-set verification,13/26-byte structures and offline segment analysis. Do not repeat A060.

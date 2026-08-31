@@ -425,7 +425,6 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 
 | C-299 | `STATIC` | Explicit operator-reboot recovery preserves completed diagnostic-only history and one old/new SID mapping;67 tests pass | READ/LOAD or incomplete history rejected; no fabricated CLOSED |
 | C-300 | `OBSERVED` | Reboot restored guarded MTP reads; close-time resets blocked; old baseline archived and one new session activated | A057 capture pending fresh B5 startup/baseline |
-
 | C-301 | `OBSERVED` | A057 attached once after23 successful checks, read one MMKV/two SDK caches and completed with stable PID/APK | Existing policy content; no aircraft request/RF experiment |
 | C-302 | `OBSERVED` |826-byte SD JSON received; matched row1, nonempty DEFAULT,97 bytes each; cleanup/receipts match | Raw payload private; no STOP sent |
 | C-303 | `OBSERVED` |20-byte header +13-byte body +64-byte trailer; body first byte1 versus0 | Width/name/enable interpretations remain H-33 |
@@ -434,7 +433,13 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 | C-306 | `STATIC` | Two WA150 manifests identify the missing1200/1100 ESC/battery families; all five available original IMaH modules have encrypted outer chunks and matching complete digests | Missing module containers remain uninspected;0802/E3 remains the receiver candidate |
 | C-307 | `STATIC` | MSDK5.18 CloudControlVersion belongs to WA345 and command0x50/0x20; the named interface is absent from the exact Fly1.19.4 inventory | Separate from WA15000/DD policy transport; no query executed |
 | C-308 | `STATIC` | A060/L5/B6 whole-policy-set capture is built and tested; one MMKV decode, one ProductType cache read, zero CloudControlData queries/SET | Preparation record; A060 execution pending and global policy bodies private |
+| C-309 | `OBSERVED` | A060/L5/B6 SD回读全部匹配，B5 STOP/CLOSED STOP及正常会话轮换完成，B6启动命令已给出 | B6尚未确认启动，A060采集未执行；原历史/回执保留 |
+| C-310 | `OBSERVED` | B6已启动，完整CATALOG_BASELINE返回0，23项检查及preflight_ready全部通过 | 基线attach为0且未创建内部文件；全组采集结果另记 |
 
 Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTROL_SURFACES.md).
 
-| C-309 | `OBSERVED` | A060/L5/B6 SD回读全部匹配，B5 STOP/CLOSED STOP及正常会话轮换完成，B6启动命令已给出 | B6尚未确认启动，A060采集未执行；原历史/回执保留 |
+| C-311 | `OBSERVED` | A060一次MMKV解码和ProductType读取成功，41行/36独立字符串，进程/APK稳定，文件回收 | 现存策略存储读取；未查询CloudControlData或改变飞机策略 |
+| C-312 | `OBSERVED` | 10907-byte私有全组报告收到且严格校验匹配，独立清理及永久回执核验成功 | 原文/地区/签名私有；B6保留，未发送STOP |
+| C-313 | `CORROBORATED` | 全部36签名包验签通过；独立核验25个签名消息、6种完整正文；40×13B及1×26B，A057两值仍精确匹配 | 重复段和字段读法保留H-33；无启停字段定名 |
+| C-314 | `STATIC` | 离线解析器新增带假设标签的13B重复段及+3/+4分字节候选，52项公开测试通过 | 离线结构解析；不生成签名或访问设备 |
+| C-315 | `NEGATIVE` | 已有Fly1.19.4/MSDK5.18相关枚举未匹配A060候选2/3/4/5分组；同值枚举属于注册/工作状态面 | 有界本地定义比较；下一步追13字节段的接收消费者 |

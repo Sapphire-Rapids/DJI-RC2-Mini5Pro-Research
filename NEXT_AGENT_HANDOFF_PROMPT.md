@@ -8,11 +8,15 @@ states that DJI and the relevant low-altitude-economy authority
 have authorized the work; that authorization is confidential, cannot be shared here, and cannot be
 registered on the physical test aircraft.
 
-Current handoff (C-308/C-309): A060/L5/B6 are built, tested and fully SD-readback verified.
-The previous B5 session closed normally by STOP and its original history is retained. A fresh
-B6 session is prepared; the operator has the one-line startup command. Await/verify its startup,
-then collect CATALOG_BASELINE, one CATALOG_READ, the fixed private A060 policy-set JSON and
-independent CLEANUP. Do not repeat A057. G HUB/host ADB remain off; use the no-reset MTP build.
+Current handoff (C-310--C-315): A060 completed once through B6. The10907-byte export contains
+41 nonempty rows/36 unique signed payloads; all verify with the existing A057 P-256 point.
+There are25 unique signed messages and six whole-body patterns, with40 bodies of13 bytes and
+one of26. Candidate13-byte segments total42/six patterns; the0/1 field and2/3/4/5 discriminator
+remain unnamed. Baseline/read/independent cleanup all returned0; PID/UID/APK and exact receipts
+passed. No new operator step is pending. Do not repeat A057/A060; preserve B6 history and
+permanent receipts. No STOP was sent. Related official enums did not match (C-315); next seek
+the actual13-byte-stride/segment+1 receiver consumer. Keep country/payload/key material excluded
+and retain G HUB/ADB-off/no-reset transport rules.
 
 Read:
 
@@ -24,7 +28,7 @@ Read:
 - `docs/20_OFFICIAL_FLYSAFE_UI_PATH.md`
 - `host-tools/rid-switch-tool/README.md`
 - `docs/23_RC2_LIVE_RUNTIME.md`
-- claims C-235--C-309 for the latest progress, plus C-207 and C-227--C-230
+- claims C-235--C-315 for the latest progress, plus C-207 and C-227--C-230
 
 Current facts:
 

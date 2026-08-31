@@ -220,3 +220,15 @@ original big-endian r/s values to DER for OpenSSL, checks the supplied key's nam
 and prints booleans/lengths. It does not generate signatures or contact a device. The actual
 verification key and captured signatures stay private.15 verifier,18 envelope and14 generic
 structure tests pass. Generic envelope recognition alone still treats its trailer as opaque.
+
+
+### Complete policy-set structural follow-up
+
+C-313 verifies36 distinct existing signed envelopes across41 rows, yielding25 unique signed
+header/body messages and six whole-body patterns. Forty rows have13-byte bodies; one has26.
+`rid_cloud_payload_envelope.py` now adds `body.repeated_layout_candidate` for nonempty body
+lengths divisible by13. Each segment exposes unnamed numeric candidates and separate u8
+alternatives at+3/+4; the result remains labelled HYPOTHESIS. The original `layout_candidate`
+is still limited to exactly13-byte bodies, and header+6 never determines the segment count.
+The envelope/signature/generic-structure suite now has52 passing tests (C-314). Full policy
+sets, country mappings, signatures and verification keys remain private.

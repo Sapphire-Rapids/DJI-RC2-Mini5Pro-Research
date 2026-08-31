@@ -451,3 +451,21 @@ stored-row comparison: a third value at body+0 would reject a strict Boolean int
 a domain of0/1 would retain that hypothesis but still leave enum/version alternatives open.
 The comparison also records per-offset domains and repeated body tuples, rather than assuming
 that the initial five candidate widths are correct.
+
+
+A060 continuation (C-313):40 rows have13-byte bodies and one has26 bytes. Splitting at13 bytes
+produces42 segments with six distinct byte patterns. The26-byte body's first segment equals a
+common standalone13-byte body; its second segment has the same numeric alignment. A repeated
+record layout is therefore the next hypothesis. Header+6 remains1 even for that26-byte body,
+so it is not the count of these candidate segments.
+
+Across the42 segments, byte0 is0 once and1 in the other41. The LE16 at+1 takes2/3/4/5; it is
+an unnamed type/discriminator candidate to compare with official enums. Bytes+3/+4 produce
+pairs(0,0),(0,1),(0,2),(2,0), so two u8 fields or a composite bitmask remain alternatives to a
+single u16. The two following u32 candidates take16/20 and3/14/16. These are layout/value-domain
+observations; the receiving owner and branch must supply field names and control semantics.
+
+
+C-315 finds no matching official discriminator in the related local enum inventory. Retain
+the type hypothesis without mapping equal runtime-state integers onto it. The next supporting
+observation must connect the candidate field to a consumer/branch, including the dual-segment case.

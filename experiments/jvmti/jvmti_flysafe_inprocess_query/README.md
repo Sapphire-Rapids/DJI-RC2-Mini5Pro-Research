@@ -352,3 +352,10 @@ The ARMv7 output is `build/policy-set/armeabi-v7a/libfinduas_policy_set.so`. C-3
 ASan/UBSan, plus15 Python differential tests. The fixed L5/B6 lane has separate A060 permanent
 receipts and one read allocation. Deployment and execution state are tracked in
 [the runtime topic](../../../docs/23_RC2_LIVE_RUNTIME.md). Raw policy sets remain excluded.
+
+
+C-310--C-312 close the first A060/B6 execution:baseline/read/independent-cleanup all returned0,
+41 stored nonempty rows were exported in10907 bytes and strictly validated, the target PID/UID/APK
+remained stable, the temporary file was removed and permanent receipts matched. No STOP was
+sent; keep the completed A060 attempt and original B6 history. C-313/C-314 record the resulting
+whole-set verification,13/26-byte structures and offline segment analysis. Do not repeat A060.

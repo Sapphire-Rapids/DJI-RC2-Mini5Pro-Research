@@ -2,14 +2,19 @@
 
 ## Start here
 
-Latest continuation (C-301--C-309): the two signed97-byte policies have been captured and
-verified. Body-byte0 remains the unnamed H-33 candidate. A060/L5/B6 now prepare a complete
-stored RID policy-set comparison: source/tests and all three SD readbacks pass. B5 STOP and
-CLOSED STOP completed; a fresh B6 session is prepared with original history retained. The
-operator has received one B6 startup command. On startup collect CATALOG_BASELINE, then one
-CATALOG_READ, validate the private export, analyze signatures/byte domains and independently
-CLEANUP. No A060 read is allocated yet. Keep G HUB and host ADB stopped, use the no-reset
-host build, and do not replay A057. Current private client state must be preserved.
+Latest continuation (C-310--C-315): B6 started and A060 completed once. Baseline/read/independent
+cleanup all returned0, the10907-byte export and permanent receipts passed strict validation,
+and PID/UID/APK stayed stable. All41 rows are nonempty;36 unique signed payloads verify with
+the retained A057 point. These reduce to25 signed header/body messages and six whole-body
+patterns:40 rows have13-byte bodies, one has26. Candidate13-byte segmentation gives42 segments
+and six patterns; header+6 remains1. Segment byte0 is0/1, while the LE16 at+1 is2/3/4/5 and
+bytes+3/+4 need separate-u8 versus mask interpretation. All remain unnamed under H-33.
+
+No new manual step is pending. The bounded related-enum check found no mapping (C-315).
+Next seek a13-byte-stride consumer dispatching on segment+1, including the second segment
+of the26-byte body. Keep country mappings and complete payloads private. Do not replay A057 or A060. B6 has not received STOP;
+retain its original history through any lease expiry. G HUB/host ADB stay off and the no-reset
+MTP build remains mandatory. All new results stay local unless another push is requested.
 
 C-273--C-275 close the real RC 2 A-048 loader experiment. The fixed system-mediated attach
 succeeded in the existing Fly process, with matching native identity, successful ART TI/API
@@ -646,3 +651,21 @@ CATALOG lane. Validate native enter/export/result, file length/counts and immuta
 Use existing envelope/P-256 verification on all nonempty rows and compare body-byte domains
 without assigning field names. Keep the receiver available during offline analysis until explicit
 STOP or lease expiry. Full payloads and country rows stay in excluded private storage.
+
+
+### Completed B6 capture (C-310--C-314)
+
+The prepared A060 action is complete:23 successful baseline checks, one MMKV decode, one
+ProductType query, zero CloudControlData queries, stable target, saved/private-validated report
+and independently absent temporary file. Its copy/attempt records are permanent. Preserve all
+three collected tasks and the private receipt/completion index. No additional capture is needed
+to repeat the now-available global value-domain comparison.
+
+Next, use the private2/3/4/5-to-config-label grouping to compare official enum definitions,
+and seek the actual branch consuming segment byte0 and bytes3/4. The26-byte body supports
+continued repeated-record analysis; header+6 is not that candidate count. The independent
+envelope tool exposes this interpretation as HYPOTHESIS and all52 related public tests pass.
+
+
+C-315 closes the bounded named-enum comparison without a match. Continue from actual receiver
+control flow instead of reusing runtime-state/registration enum numbers as policy field names.
