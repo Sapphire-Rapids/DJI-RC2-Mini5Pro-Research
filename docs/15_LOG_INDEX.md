@@ -259,3 +259,11 @@ guard, build enforcement and synthetic tests.
 C-299/C-300 use synthetic recovery tests and excluded operator-reboot request/completion,
 archive-readback and new-session publication receipts. The old/new session identifiers remain
 private. Original baseline records were preserved rather than rewritten as a worker shutdown.
+
+## A057 capture and signed-policy analysis
+
+C-301--C-305 reference the private post-reboot baseline/read/cleanup,826-byte MediaStore JSON,
+copy/attempt receipts, envelope summaries, verification-point recovery, independent OpenSSL
+checks and bounded key/owner searches. Full policies, signatures, verification key, raw header
+values, process/boot/session identifiers and vendor search inputs stay excluded. Public output
+contains lengths, selected structural scalars, hypothesis-labelled layout and independent tools.

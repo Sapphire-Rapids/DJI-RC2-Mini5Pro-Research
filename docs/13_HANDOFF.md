@@ -614,3 +614,11 @@ C-299/C-300 close reboot recovery: the operator confirmed reboot/stable link, gu
 reads succeeded, the old baseline-only session was archived under its original SID and one
 fresh session was activated. No canonical CLOSED was fabricated. The next operator step is
 one B5 launch; run a fresh baseline before the still-unexecuted A057 capture.
+
+Current continuation (C-301--C-305): A057 completed once. Its826-byte private report has
+97-byte matched/default policies, one matching row and nonempty DEFAULT. The structure is
+20-byte header +13-byte body +64-byte P-256/SHA-256 signature over the first33 bytes; both
+verify with one common private-retained verification point. Body+0 is1/0 and remains H-33's
+unnamed switch candidate. Independent cleanup and permanent receipts are complete. No STOP
+was sent. Continue offline aircraft00/DD owner work; do not repeat A057 or assume DEFAULT
+is an off policy merely from its first byte.

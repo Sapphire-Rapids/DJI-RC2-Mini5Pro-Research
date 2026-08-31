@@ -426,4 +426,10 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 | C-299 | `STATIC` | Explicit operator-reboot recovery preserves completed diagnostic-only history and one old/new SID mapping;67 tests pass | READ/LOAD or incomplete history rejected; no fabricated CLOSED |
 | C-300 | `OBSERVED` | Reboot restored guarded MTP reads; close-time resets blocked; old baseline archived and one new session activated | A057 capture pending fresh B5 startup/baseline |
 
+| C-301 | `OBSERVED` | A057 attached once after23 successful checks, read one MMKV/two SDK caches and completed with stable PID/APK | Existing policy content; no aircraft request/RF experiment |
+| C-302 | `OBSERVED` |826-byte SD JSON received; matched row1, nonempty DEFAULT,97 bytes each; cleanup/receipts match | Raw payload private; no STOP sent |
+| C-303 | `OBSERVED` |20-byte header +13-byte body +64-byte trailer; body first byte1 versus0 | Width/name/enable interpretations remain H-33 |
+| C-304 | `CORROBORATED` | Both originals verify as P-256/SHA-256 over their33-byte header/body with one common verification key | Device trust anchor and field semantics remain separate |
+| C-305 | `NEGATIVE` | Bounded exact/adjacent plaintext searches found no matching inner parser or verification-key owner | Aircraft00/DD handler remains the next target |
+
 Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTROL_SURFACES.md).

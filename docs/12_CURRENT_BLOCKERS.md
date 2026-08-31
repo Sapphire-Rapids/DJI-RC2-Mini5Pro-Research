@@ -627,3 +627,8 @@ controller; recover the old baseline-only session explicitly, then prepare the n
 
 C-299/C-300 resolve file access after the controller reboot and explicitly archive the old
 baseline-only session. A fresh B5 session is ready for operator startup; A057 remains unexecuted.
+
+C-301--C-304 close the A057 data dependency: actual matched/default97-byte policies and their
+20+13+64 signed structure are available privately, with file/environment recovery complete.
+The next dependency is the aircraft00/DD body decoder and names/semantics of the five H-33
+candidate fields. Current bounded plaintext search has not located that owner (C-305).
