@@ -301,3 +301,15 @@ SHA256/384/512、salt 0/32/48/64 及 reserved/alg 清零变体下均失败（C-3
 
 以上全部是 `STATIC`/离线派生。签名只对 RC 侧的 exact 模块成立，且不是 live mounted 事实，也不构成刷写准入。
 第 8 节门禁不变；`0802` 明文仍未得，RID 因果仍未建立。
+
+### 11.5 内嵌 key 搜索（C-323/C-324）
+
+`OBSERVED`：额外取回最小模块 `1200`（`67,744` B，官方 MD5 `8fda0e65105ec628beee13108d175f60`）作廉价
+STUE brute oracle（C-323）。取得方式是在同一官方 API 路径上手动注入 LockedTarget，工具编译锁不变。
+
+`NEGATIVE`：官方 Assistant 六个 dylib 各内嵌四个明文 2048-bit PRAK RSA 结构（其中两个与公开
+PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验签，但**没有 3072-bit PRAK，也没有明文
+16 字节 enc/STUE 常量**。进一步对 Uav dylib 全量、libsdk_jni 非执行段、libuav_keys.so 全量 brute，零命中（C-324）。
+
+限定：只覆盖明文内嵌常量；白盒/混淆存储、运行时派生、TEE/引导链提取仍未被否定。简单 brute 到此告一段落，
+下一步是 whitebox 或公开释放。

@@ -455,3 +455,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-320 | `NEGATIVE` | WA150 modules are `enc_key=STUE`; no public key, derived-key/mode/IV/v1-v2 brute gives zero plaintext-checksum hits | Covers public corpus only; aircraft-only; not an unbreakable-key proof |
 | C-321 | `NEGATIVE` | WA150 3072-bit PRAK absent; PSS/PKCS1 across hash/salt/zeroed-field variants all fail | Does not affect the STUE payload path; records a lagging public auth corpus |
 | C-322 | `STATIC` | RC331 plaintext vs WA150 `STUE` across the fetched and decrypted set | Two-product sample; RC ownership of RID not established by this |
+| C-323 | `OBSERVED` | WA150 `1200` fetched as a cheap STUE oracle; MD5/size matched | Manual lock injection; same STUE boundary, no plaintext |
+| C-324 | `NEGATIVE` | No plain16-byte STUE constant in Assistant dylibs or Fly native data; Assistant embeds four2048-bit plain PRAK each | Plain constants only; whitebox/runtime/device paths remain |

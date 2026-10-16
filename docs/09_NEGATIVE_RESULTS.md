@@ -688,3 +688,14 @@ PRAK-2021-09；在 PSS 与 PKCS1、SHA256/384/512、salt 0/32/48/64、以及 res
 
 限定：加密走 STUE 而非 PRAK，故该失败不影响 payload 抽取路径；只说明公开 auth corpus 落后于本模块，不证明
 key 家族已轮换到不可用。
+
+
+## N-61 — STUE is not a plain embedded constant in Assistant or DJI Fly native (C-324)
+
+`NEGATIVE`：官方 DJI Assistant 的六个 DJIServices dylib 各自内嵌四个明文 2048-bit PRAK RSA 结构
+（其中两个与公开 PRAK-2017-12/-08 逐字节一致），证明 Assistant 本地确实做 IMaH 解析/验签；但没有
+3072-bit PRAK，也没有任何明文 16 字节 enc/STUE 常量。对 Uav dylib 全量、libsdk_jni 非执行段全量、
+以及 libuav_keys.so（`NativeKeysBridge`）全量做 STUE 暴力，明文 checksum 零命中。
+
+限定：只覆盖明文内嵌常量。白盒/混淆存储、运行时派生、TEE/引导链提取路径均未否定，因此不证明 key 不在。
+下一步不再是简单 brute，而是 whitebox 或等公开释放。

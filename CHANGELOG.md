@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.36 - 2026-10-16
+
+- Fetched the smallest WA150 `1200` module as a cheap STUE brute oracle by manual LockedTarget
+  injection (C-323); official MD5/size matched.
+- Parsed the Assistant dylibs: each embeds four plain2048-bit PRAK structs (two byte-identical to
+  public PRAK-2017-12/-08) but none3072-bit and no plain16-byte enc/STUE constant (C-324).
+- Full brute of Uav dylib, Fly libsdk_jni non-exec segments, and libuav_keys.so, zero plaintext
+  hits; simple brute exhausted, next is whitebox or public release (N-61).
+
 ## 0.4.35 - 2026-10-16
 
 - Fetched six current same-version firmware modules over the official Assistant metadata/CDN path;

@@ -998,3 +998,7 @@ work when a report did not contain a more precise timestamp.
 - `NEGATIVE`：WA150 三模块 enc_key=STUE，公开 corpus 无该 key；派生 key×mode×IV brute 对2603/0802零命中（C-320）。
 - `NEGATIVE`：0802 PRAK 3072-bit 验签在 PSS/PKCS1 与多哈希/salt 下失败（C-321）。
 - 结果与派生输入仅本地；未回写设备，无刷写。样本排除不入库。
+
+- `OBSERVED`：手动注入 LockedTarget，经官方 API 补取最小 wa1501200 模块（67744 B，MD5 匹配）作 STUE oracle（C-323）。
+- `STATIC`：解析 Assistant 六个 dylib，各得四个明文2048-bit PRAK 结构（两个与公开 PRAK-2017-12/-08 一致）（C-324）。
+- `NEGATIVE`：Uav dylib 全量、libsdk_jni 非执行段、libuav_keys.so 全量 STUE brute 零命中；无明文16字节 enc 常量（C-324）。

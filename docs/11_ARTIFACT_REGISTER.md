@@ -445,3 +445,7 @@ A-063、A-064、A-065 都是离线派生输入，处置为排除、不分发；�
 A-030/A-031 未变：本轮从 A-063 解密产物中重新得到 `adbd` 与 `dpad_fuli`，并逐字节匹配既有 identity（C-318），因此只补齐离线输入可用性，不产生新 ID。
 
 配套工具说明与落盘布局见 `firmware/EXTRACTION_NOTES.md`（本地排除，不入库）；样本本体仍不入库。
+
+## A-066：WA150 `1200` 小模块（STUE brute oracle）
+
+A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fda0e65105ec628beee13108d175f60` 与 SHA-256 `fb802d4d…ab5feb` 均匹配。经同一官方 API 手动注入 LockedTarget 取得（C-323）。它只作 oracle，不改变工具编译锁；状态 `STATIC`，排除、不分发。
