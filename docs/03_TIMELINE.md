@@ -1002,3 +1002,9 @@ work when a report did not contain a more precise timestamp.
 - `OBSERVED`：手动注入 LockedTarget，经官方 API 补取最小 wa1501200 模块（67744 B，MD5 匹配）作 STUE oracle（C-323）。
 - `STATIC`：解析 Assistant 六个 dylib，各得四个明文2048-bit PRAK 结构（两个与公开 PRAK-2017-12/-08 一致）（C-324）。
 - `NEGATIVE`：Uav dylib 全量、libsdk_jni 非执行段、libuav_keys.so 全量 STUE brute 零命中；无明文16字节 enc 常量（C-324）。
+
+- `OBSERVED`：定位六个 Assistant dylib 内嵌的白盒 AES-128（t_box_enc/dec 表六份逐字节一致），
+  搭镜像树 + ad-hoc 重签解释器，Rosetta/ctypes 加载 x86_64 dylib；roundtrip 通过（C-325）。
+- `STATIC`：固化为 wb_aes_bridge.py（进程内 load + 三测）与 stue_plaintext_probe.py（A-067/A-068）。
+- `NEGATIVE`：探针先独立验证加密 checksum 字节范围（补码形式）MATCH，再枚举 ck/stream 方向、CTR 端序/位置、
+  CBC iv、ECB；明文 checksum 仍 NONE（C-326）。

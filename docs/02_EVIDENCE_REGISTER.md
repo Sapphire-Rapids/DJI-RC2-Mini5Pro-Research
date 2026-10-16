@@ -457,3 +457,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-322 | `STATIC` | RC331 plaintext vs WA150 `STUE` across the fetched and decrypted set | Two-product sample; RC ownership of RID not established by this |
 | C-323 | `OBSERVED` | WA150 `1200` fetched as a cheap STUE oracle; MD5/size matched | Manual lock injection; same STUE boundary, no plaintext |
 | C-324 | `NEGATIVE` | No plain16-byte STUE constant in Assistant dylibs or Fly native data; Assistant embeds four2048-bit plain PRAK each | Plain constants only; whitebox/runtime/device paths remain |
+| C-325 | `OBSERVED` | Assistant whitebox AES pair recovered as a callable Rosetta/ctypes primitive; tables identical across services | Fixed Assistant artifact; not proven as the STUE key, no live fact |
+| C-326 | `NEGATIVE` | Encrypted-checksum ranges validate but the STUE plaintext checksum misses across enumerated whitebox schemes | Only key/mode unresolved; unenumerated modes or another key source remain |

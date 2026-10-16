@@ -676,3 +676,11 @@ including the second segment of the26-byte body. Existing runtime-status enums a
 顺序：先 `STUE`，再 `0802` 明文 owner 定位，再协议验证；刷写仍留在最后且第 8 节门禁不变。
 
 `NEGATIVE` 记录见 [09_NEGATIVE_RESULTS.md](09_NEGATIVE_RESULTS.md) N-59/N-60；假设见 H-34。
+
+## B-23 更新（C-325/C-326）
+
+`OBSERVED`/`NEGATIVE`：Assistant 白盒 AES-128 已可作为调用原语（六个服务表逐字节一致，Rosetta/ctypes 打通，A-067）。
+探针独立验证加密 checksum 字节范围 MATCH，但枚举 ck/stream 方向、CTR 端序/位置、CBC iv、ECB 后明文 checksum 仍 NONE。
+
+因此 B-23 从“无 key 材料”细化为“有原语但 key/mode 映射未定”：字节范围已对，下一步是找出正确 mode/mapping，
+或另一处 key 来源（RC2 dylib 表与 Uav 一致，可作交叉确认）。

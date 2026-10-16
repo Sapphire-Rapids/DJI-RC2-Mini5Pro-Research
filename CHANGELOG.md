@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.37 - 2026-10-16
+
+- Recovered DJI Assistant's baked whitebox AES-128 as a callable primitive: all six service dylibs
+  embed the same `t_box_enc`/`t_box_dec` tables; a mirrored framework tree plus an ad-hoc re-signed
+  interpreter loads the x86_64 dylib under Rosetta and roundtrips (C-325). Reproduced as
+  `wb_aes_bridge.py` with three passing tests (A-067).
+- Added `stue_plaintext_probe.py` (A-068): it first validates the encrypted-checksum byte ranges
+  (negated additive form) MATCH, then enumerates crypt-key/stream direction, CTR counter order and
+  position, CBC iv and ECB. The plaintext checksum still misses (C-326, N-62).
+- Byte ranges are confirmed, so only the key/mode mapping is open; an unenumerated mode, another key
+  source, or WAES being unrelated to STUE all remain possible.
+
 ## 0.4.36 - 2026-10-16
 
 - Fetched the smallest WA150 `1200` module as a cheap STUE brute oracle by manual LockedTarget

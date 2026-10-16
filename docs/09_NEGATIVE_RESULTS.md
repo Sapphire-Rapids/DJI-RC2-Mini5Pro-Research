@@ -699,3 +699,13 @@ key 家族已轮换到不可用。
 
 限定：只覆盖明文内嵌常量。白盒/混淆存储、运行时派生、TEE/引导链提取路径均未否定，因此不证明 key 不在。
 下一步不再是简单 brute，而是 whitebox 或等公开释放。
+
+
+## N-62 — STUE plaintext still misses under the recovered whitebox primitive (C-326)
+
+`NEGATIVE`：Assistant 服务 dylib 内嵌一套全局白盒 AES-128（`t_box_enc`/`t_box_dec` 在六个服务间逐字节一致），
+已在 Rosetta/ctypes 下打通并通过 roundtrip（C-325，A-067）。以该原语对2603 独立验证加密 checksum 字节范围
+（补码形式）**MATCH**，确认 offset/长度无误；随后枚举 crypt-key 方向（WAES enc/dec 作用于 scram）× stream 方向 ×
+CTR counter 端序/位置 × CBC iv/ECB，明文 checksum 仍 **NONE**。
+
+限定：字节范围已确认，只剩 key/mode 映射未定。未枚举的模式、另一处 key 来源、或“WAES 与 STUE 无关”均未否定。

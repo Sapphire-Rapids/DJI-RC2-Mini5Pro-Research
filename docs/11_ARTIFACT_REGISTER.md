@@ -449,3 +449,12 @@ A-030/A-031 未变：本轮从 A-063 解密产物中重新得到 `adbd` 与 `dpa
 ## A-066：WA150 `1200` 小模块（STUE brute oracle）
 
 A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fda0e65105ec628beee13108d175f60` 与 SHA-256 `fb802d4d…ab5feb` 均匹配。经同一官方 API 手动注入 LockedTarget 取得（C-323）。它只作 oracle，不改变工具编译锁；状态 `STATIC`，排除、不分发。
+
+## A-067/A-068：白盒 AES 桥与 STUE 方案探针（C-325/C-326）
+
+- **A-067** `wb_aes_bridge.py`（5,292 B，SHA-256 `3c6db060…70556`）：把 DJI Assistant 内嵌的白盒 AES-128
+  暴露为可调用的16字节块加/解密原语。各服务 dylib 的 `t_box_enc`/`t_box_dec` 表字节逐一对齐（一个全局 key）。
+  用镜像框架树 + ad-hoc 重签解释器在 Rosetta 下 ctypes 加载 x86_64 dylib；另含进程内 `load()`。3 项测试通过。
+  状态 `STATIC`，离线helper；只公开源码，镜像/临时目录排除。
+- **A-068** `stue_plaintext_probe.py`（4,661 B，SHA-256 `c2fc27ed…f1d26`）：用 A-067 原语枚举加密方案并只按明文
+  checksum 判定；先独立验证加密 checksum 字节范围（补码形式）。当前 scheme hits NONE。状态 `STATIC`，只公开源码。

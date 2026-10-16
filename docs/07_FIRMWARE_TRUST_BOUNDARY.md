@@ -313,3 +313,15 @@ PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验
 
 限定：只覆盖明文内嵌常量；白盒/混淆存储、运行时派生、TEE/引导链提取仍未被否定。简单 brute 到此告一段落，
 下一步是 whitebox 或公开释放。
+
+### 11.6 白盒 AES 原语与 STUE 探针（C-325/C-326）
+
+`OBSERVED`：六个 Assistant 服务 dylib 各内嵌一套白盒 AES-128（`t_box_enc`/`t_box_dec`，表字节六份逐字节一致，
+即一个全局 key），由 `WAES_encrypt`/`WAES_decrypt` 使用。搭镜像框架树 + ad-hoc 重签解释器，在 Rosetta 下 ctypes
+加载 x86_64 dylib，encrypt/decrypt roundtrip 通过；已固化为 [wb_aes_bridge.py](../host-tools/firmware-acquisition/wb_aes_bridge.py)
+（进程内 `load()` + 三测）。这给了 STUE 一个可调用的候选原语。
+
+`NEGATIVE`：以该原语撰写 [stue_plaintext_probe.py](../host-tools/firmware-acquisition/stue_plaintext_probe.py)，
+先独立验证加密 checksum 字节范围（补码形式）MATCH，再枚举 crypt-key 方向 × stream 方向 × CTR 端序/位置 × CBC iv/ECB，
+明文 checksum **NONE**（C-326）。字节范围已对，故只剩 key/mode 映射；未枚举模式、另一处 key 来源、或 WAES 与 STUE
+无关均未否定。
