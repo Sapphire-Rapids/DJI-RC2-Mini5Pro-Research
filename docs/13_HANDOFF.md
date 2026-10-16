@@ -669,3 +669,22 @@ envelope tool exposes this interpretation as HYPOTHESIS and all52 related public
 
 C-315 closes the bounded named-enum comparison without a match. Continue from actual receiver
 control flow instead of reusing runtime-state/registration enum numbers as policy field names.
+
+
+## 2026-10-16 firmware lane (C-316--C-322)
+
+Six current modules were fetched over the official Assistant path and matched official size/MD5 plus
+registered SHA-256 (C-316). RC331 `0205` decrypts fully and is byte-identical to A-030/A-031
+(C-317/C-318); RC331 `0200` and RC331 aggregate modules are plaintext (C-319/C-322). WA150 modules
+are `enc_key=STUE`; no public key, derived/mode/IV/v1-v2 brute is zero-hit (C-320), and the wa150
+3072-bit PRAK is absent (C-321). A local PKCS1-v1.5 fallback was needed because wa150 signs PKCS1
+while header_version2 makes the tool assume PSS.
+
+Firmware samples and derived outputs are gitignored under
+`host-tools/firmware-acquisition/firmware/`; layout and method are in its `EXTRACTION_NOTES.md` (an
+excluded local file). Do not re-brute `STUE` without new key material, do not alias it onto an
+existing key, and do not treat decrypt as live mounted or flash admission.
+
+Next for this lane: obtain `STUE` (whitebox/TEE extraction or later public release) per B-23/H-34,
+then decrypt `0802` and locate the RID broadcaster owner/enable parameter in plaintext before any
+protocol validation. RC-side static work is unblocked and can run in parallel.

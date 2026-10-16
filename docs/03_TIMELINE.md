@@ -983,3 +983,18 @@ work when a report did not contain a more precise timestamp.
 
 - `NEGATIVE`：相关Fly/MSDK枚举未匹配候选2/3/4/5分组；后续转向逐13字节推进的实际
   接收消费者，未增加设备请求（C-315）。
+
+
+### 2026-10-16 固件获取与RC侧解密
+
+- `OBSERVED`：经官方 Assistant 元数据/CDN 取得 6 份当前同版本模块（rc33110.00.0700/0205、/0200；
+  wa15001.00.0600/0802、/2603、01.00.0700/0806），逐份匹配官方 size/MD5 并独立复算 SHA256（C-316）。
+- `STATIC`：把先前本地第三方 archive 的 A-029 聚合体 clone 进同一棵树并复核哈希；澄清其非本次官方获取（C-316）。
+- `STATIC`：定位 `07.00.0100` ↔ product_version `10.00.0700` 的既有登记映射，未凭字面猜测（C-316）。
+- `STATIC`：本地工具补一条 PKCS1-v1.5 回退（wa150 以 PKCS1 签名而工具默认 PSS）（C-321）。
+- `STATIC`：RC3310205 无 force 完整解密，三层校验全过；明文为 Android11 A/B OTA，dump 29 分区（C-317）。
+- `CORROBORATED`：重新提取 adbd（A-030）与 dpad_fuli.apk（A-031），与登记逐字节一致（C-318）。
+- `STATIC`：RC3310200 及聚合体模块 enc_key 为空、均为明文；确认 STUE 为飞机专属（C-319/C-322）。
+- `NEGATIVE`：WA150 三模块 enc_key=STUE，公开 corpus 无该 key；派生 key×mode×IV brute 对2603/0802零命中（C-320）。
+- `NEGATIVE`：0802 PRAK 3072-bit 验签在 PSS/PKCS1 与多哈希/salt 下失败（C-321）。
+- 结果与派生输入仅本地；未回写设备，无刷写。样本排除不入库。

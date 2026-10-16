@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.35 - 2026-10-16
+
+- Fetched six current same-version firmware modules over the official Assistant metadata/CDN path;
+  every file matched official size/MD5 and registered SHA-256 (C-316). Cloned the pre-existing local
+  third-party A-029 aggregate for locality only and clarified `07.00.0100` ↔ product_version
+  `10.00.0700` via the existing register.
+- Added a local PKCS1-v1.5 fallback to the out-of-repo pinned tool (wa150 signs PKCS1 despite
+  header_version2). RC331 `0205` then decrypted with no force, all three layers passed, plaintext is
+  an Android11 A/B OTA with29 dumped partitions (C-317); recovered `adbd` (A-030) and
+  `dpad_fuli.apk` (A-031) are byte-identical to their identities (C-318).
+- Recorded that RC331 `0200` and all RC331 aggregate modules are plaintext, while every WA150 module
+  is `enc_key=STUE` (C-319/C-322). `STUE` is absent from the public corpus and its forks; a brute over
+  all16-byte keys with derived variants/3 modes/3 IVs/v1-v2 semantics gave zero plaintext-checksum
+  hits on2603/0802 (C-320). The3072-bit wa150 PRAK is also absent (C-321).
+- New artifacts A-063 (decrypted0205), A-064 (OTA payload) and A-065 (0802 STUE ciphertext);
+  new negatives N-59/N-60, hypothesis H-34, blocker B-23; correction50 in AGENTS.md. Results and
+  derived inputs stay local and excluded.
+
 ## 0.4.34 - 2026-08-31
 
 - Completed the B6 baseline and one A060 capture:41 rows/10907 private JSON bytes,

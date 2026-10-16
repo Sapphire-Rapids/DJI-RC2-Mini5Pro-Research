@@ -443,3 +443,15 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-313 | `CORROBORATED` | 全部36签名包验签通过；独立核验25个签名消息、6种完整正文；40×13B及1×26B，A057两值仍精确匹配 | 重复段和字段读法保留H-33；无启停字段定名 |
 | C-314 | `STATIC` | 离线解析器新增带假设标签的13B重复段及+3/+4分字节候选，52项公开测试通过 | 离线结构解析；不生成签名或访问设备 |
 | C-315 | `NEGATIVE` | 已有Fly1.19.4/MSDK5.18相关枚举未匹配A060候选2/3/4/5分组；同值枚举属于注册/工作状态面 | 有界本地定义比较；下一步追13字节段的接收消费者 |
+
+## Firmware acquisition and RC-side decrypt
+
+| ID | Status | Claim | Boundary |
+| --- | --- | --- | --- |
+| C-316 | `OBSERVED` | Six current modules fetched over official Assistant metadata/CDN; size/MD5 matched and SHA-256 matched the register | Network acquisition, not a device read; A-029 is local archive, not this fetch |
+| C-317 | `STATIC` | RC331 `0205` decrypts with no force; all three checksum/signature layers pass; plaintext is Android11 A/B OTA; 29 partitions dumped | Not live mounted, not flash admission; version maps via register only |
+| C-318 | `CORROBORATED` | Recovered `adbd` (A-030) and `dpad_fuli.apk` (A-031) are byte-identical to their identities | Restores offline input; not installed/mounted facts or A-032 admission |
+| C-319 | `STATIC` | RC331 `0200` and all RC331 aggregate modules have empty `enc_key` and decrypt to plaintext | No inner container decrypt; not an executable DJI Fly image |
+| C-320 | `NEGATIVE` | WA150 modules are `enc_key=STUE`; no public key, derived-key/mode/IV/v1-v2 brute gives zero plaintext-checksum hits | Covers public corpus only; aircraft-only; not an unbreakable-key proof |
+| C-321 | `NEGATIVE` | WA150 3072-bit PRAK absent; PSS/PKCS1 across hash/salt/zeroed-field variants all fail | Does not affect the STUE payload path; records a lagging public auth corpus |
+| C-322 | `STATIC` | RC331 plaintext vs WA150 `STUE` across the fetched and decrypted set | Two-product sample; RC ownership of RID not established by this |

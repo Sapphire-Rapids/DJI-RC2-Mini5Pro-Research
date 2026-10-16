@@ -656,3 +656,23 @@ No further baseline or whole-policy recapture is pending.
 The bounded related-enum comparison is also complete without a mapping (C-315). The next
 single discriminator is a receiver loop advancing13 bytes and consuming the candidate type at+1,
 including the second segment of the26-byte body. Existing runtime-status enums are not substitutes.
+
+
+## B-23 — WA150 STUE plaintext gate
+
+`STATIC`：RC331 侧已可解（C-317--C-319）;飞机侧 `01.00.0600/0802`、`/2603`、`01.00.0700/0806` 的 IMaH
+`enc_key=STUE`，公开 corpus 无该 key，brute 零命中（C-320）。主体已抽出但为密文（A-065）。
+
+缺失：
+
+- 可用的 `STUE` 16 字节 key（whitebox/TEE 提取，或公开释放）；
+- 取得后的 `plain_cksum` 校验与明文落盘；
+- 明文中的 RID 广播 owner / enable 参数 / `00/DD` 消费分支；
+- 与协议无刷写验证的对应关系。
+
+影响：飞机固件静态逆向在 STUE 破前只能读 header 与结构（name/type/version/date/anti_version/chunk/payload_digest），
+读不到字符串与代码。**RC 固件静态不受此 blocker 限制**，可作为并行线。
+
+顺序：先 `STUE`，再 `0802` 明文 owner 定位，再协议验证；刷写仍留在最后且第 8 节门禁不变。
+
+`NEGATIVE` 记录见 [09_NEGATIVE_RESULTS.md](09_NEGATIVE_RESULTS.md) N-59/N-60；假设见 H-34。

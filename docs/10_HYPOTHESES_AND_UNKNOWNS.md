@@ -469,3 +469,19 @@ observations; the receiving owner and branch must supply field names and control
 C-315 finds no matching official discriminator in the related local enum inventory. Retain
 the type hypothesis without mapping equal runtime-state integers onto it. The next supporting
 observation must connect the candidate field to a consumer/branch, including the dual-segment case.
+
+
+## H-34 — STUE is a rotated aircraft-only key family recoverable by whitebox or later release
+
+`HYPOTHESIS`：`STUE` 是 DJI 在 PRAK/enc-key 轮换后新增的飞机侧加密标识，公开 corpus 尚未收录（C-320），
+而 RC331 全系仍明文（C-322）。可验证的取得路径有两条：(a) 从设备引导链/TEE 的 whitebox（key 不存明文）中提取，
+(b) 等待公开研究释放。
+
+`HYPOTHESIS`：一旦取得 `STUE`，`0802` 明文即可解出，届时可按 RID 字符串/route/xref 定位广播 owner、enable
+参数与其消费分支，把当前 H-33 的盲结构推进为具名语义，并给出无刷写协议验证目标。
+
+判别实验：解出 `0802` 明文并核对 `plain_cksum`；随后在明文中搜 RID/BLE/Wi-Fi/`rid` 相关符号与 signature/参数
+注册，确认是否出现比既有 FLYC/`00/DD` 更窄的 owner。二者都未闭合前不得提升为事实。
+
+`UNKNOWN`：whitebox key 的确切存放位置（boot ROM、引导链、TEE、update engine），以及是否也存在于
+Assistant/DJI Fly native 的可提取常量中。

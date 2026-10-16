@@ -387,6 +387,28 @@ Later retractions override earlier progress summaries.
     decoder/key owner; continue toward the aircraft00/DD handler. Do not treat DEFAULT as
     an off policy or rewrite the signed body from this structural result.
 
+50. C-316--C-322 acquire and decrypt firmware. Six current modules were fetched over the official
+    Assistant metadata/CDN path and each matched official size/MD5 plus registered SHA-256:
+    rc33110.00.0700/0205 (A-004) and /0200 (A-005), wa15001.00.0600/0802, /2603 and
+    01.00.0700/0806. The pre-existing local third-party archive aggregate A-029 was cloned for
+    locality only; it is not this fetch. `07.00.0100` maps to product_version10.00.0700 through the
+    existing register, not by literal guessing. wa150 signs PKCS1-v1.5 despite header_version2 and
+    the pinned tool assumes PSS, so a local PKCS1 fallback was added to an out-of-repo tool copy;
+    the RC3310205 then decrypted with no force and all three layers passed. Its plaintext is an
+    Android11 A/B OTA (`pre-device rc331`, post-build `V00.01.14.99`),29 partitions were dumped,
+    and the recovered adbd (A-030) and dpad_fuli.apk (A-031) are byte-identical to their identities.
+    RC3310200 and every RC331 aggregate module have empty `enc_key` and are plaintext; every WA150
+    module uses `STUE`, so RC-side reversing is available while only aircraft is blocked. `STUE` is
+    absent from the pinned public corpus and its forks; a brute over all16-byte keys with derived
+    variants,3 modes,3 IV sources and v1/v2 semantics gave zero plaintext-checksum hits on2603/0802.
+    The wa1503072-bit PRAK is also absent (PSS/PKCS1 plus SHA256/384/512, salt and zeroed-field
+    variants all fail). Bodies are therefore kept as ciphertext (A-065); `STUE` is aircraft-only and
+    a public unknown for WA234/WA341. Do not repeat the brute without new key material, do not
+    alias `STUE` onto an existing key, and do not mutate or flash anything. Derivation is offline
+    only; exact signature success covers RC modules but is not a live mounted fact or flash
+    admission. Samples and derived outputs stay excluded; only hashes/structure are public.
+    B-23/H-34 hold the gate and the whitebox-or-release hypothesis.
+
 ## Privacy and redaction
 
 Never commit:

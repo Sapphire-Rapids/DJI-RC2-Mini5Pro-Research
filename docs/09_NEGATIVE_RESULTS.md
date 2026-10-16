@@ -668,3 +668,23 @@ A0602/3/4/5 configuration grouping. RIDInfoOpt/RIDResultState are registration/i
 RemoteIdWorkingState is runtime/error state, and AreaStrategy uses strings. Numeric overlap
 does not assign a record type. The bounded next search needs an actual13-byte-stride consumer
 that handles both the common segment and the second segment of the26-byte body.
+
+
+## N-59 — WA150 STUE encryption key is not in the public corpus (C-320)
+
+`NEGATIVE`：WA150 `01.00.0600/0802`、`/2603`、`01.00.0700/0806` 的 IMaH `enc_key` 均为 `STUE`。pinned 公开
+corpus（o-gs/dji-firmware-tools 及其上游/主流 fork）都没有 `STUE` 条目。以全部16字节公开 key 的派生变体
+（raw、SHA256、MD5、AES-ECB-unwrap）×3 mode（CTR/CBC/ECB）×3 IV 来源（zero、scram_key、header）×header_version
+v1/v2 语义做 brute，对 `2603`（435,382 B）与 `0802`（679,368,036 B）的 `plain_cksum` 零命中。
+
+限定：只覆盖被测试的公开 key 与方案；`STUE` 在公开研究中同为 WA234/WA341 的已知未破项。因此不证明 key 不可得，
+只说明当前简单路径不通，需要 whitebox/TEE 提取或后续公开释放。主体仍作为密文保留（A-065）。
+
+## N-60 — WA150 PRAK header signature absent from the public auth corpus (C-321)
+
+`NEGATIVE`：`0802` header `auth_alg=0x40003`、`signature_size=384`（3072-bit）。唯一公开3072-bit PRAK 为
+PRAK-2021-09；在 PSS 与 PKCS1、SHA256/384/512、salt 0/32/48/64、以及 reserved/reserved2/auth_alg/target_size
+清零变体下，对 header+chunk digest 全部验签失败。
+
+限定：加密走 STUE 而非 PRAK，故该失败不影响 payload 抽取路径；只说明公开 auth corpus 落后于本模块，不证明
+key 家族已轮换到不可用。

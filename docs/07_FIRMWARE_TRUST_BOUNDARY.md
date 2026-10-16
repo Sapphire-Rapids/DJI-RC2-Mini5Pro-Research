@@ -248,3 +248,56 @@ plaintext、hook、签名接受或恢复链。故 CFC 只能作为架构假设�
 - 失败路径应同步登记于 `docs/09_NEGATIVE_RESULTS.md`；未验证解释应只登记于 `docs/10_HYPOTHESES_AND_UNKNOWNS.md`。
 
 本仓库只保留上表身份和独立文字结论。厂商样本、提取分区、共享库、反编译/反汇编正文、Assistant secret、临时修改件和校验失败输出不得提交。
+
+## 11. 本轮固件获取与 RC 侧解密（C-316--C-322）
+
+### 11.1 获取
+
+`OBSERVED`：2026-10-16 通过官方 DJI Assistant 元数据/CDN 路径（`mydjiflight.dji.com/getfile/firmware`，一次 302 到
+`terra-2-g-a.djicdn.com`）取得 6 份当前同版本模块。请求材料在内存中由本机合法安装的 Assistant dylib 重建，不打印不落盘。
+逐份匹配官方 size/MD5，并独立复算 SHA-256 与既有工件登记一致（C-316）：
+
+| 对象 | 版本 | 模块 | 大小 | SHA-256 | 既有 ID |
+| --- | --- | --- | ---: | --- | --- |
+| RC 2 Android OTA | `10.00.0700`（≡ UI `07.00.0100`） | `0205` | `985,959,104` | `f707cf3d…b528cf49ce` | A-004 |
+| RC 2 flyapp | `10.00.0700` | `0200` | `454,223,680` | `d8a8fe5b…8f7481dc7193949` | A-005 |
+| Mini 5 Pro 主系统 | `01.00.0600` | `0802` | `679,368,672` | `c36bcbd1…b2c560386` | — |
+| Mini 5 Pro GNSS | `01.00.0600` | `2603` | `436,000` | `4a573ab9…36410775f274` | — |
+| 通信 dongle（两版同） | `01.00.0700` | `0806` | `12,251,264` | `75bc1b74…12d1dfbc` | — |
+
+`STATIC`：先前已存在的 RC331 `07.00.0100` 全量聚合体（A-029，`1,446,604,800` B，`296cfa63…b0c237ab1ae3`）来自
+第三方 archive，本轮 clone 进同一棵树并复核哈希一致（C-316）；它**不是**本次官方获取。
+
+`STATIC`：`07.00.0100` 的操作界面版本对应 product_version `10.00.0700`，映射依据是既有的 A-004/A-005/A-029 登记串，
+不凭旧线程或字面猜测。
+
+### 11.2 RC331：可解且已解
+
+`STATIC`：`wa150` 的 IMaH header 在 `header_version=2` 下仍使用 PKCS1-v1.5 签名，而 pinned 工具对 `pkgformat>=2018`
+默认 PSS，故既存公开 PRAK 全部验签失败（C-321）。给本地工具副本加一条 PKCS1 回退后：
+
+- RC331 `0205` **无 force 完整解密**：header 验签、encrypted-data checksum、decrypted plaintext checksum 三层全过（C-317）。
+- 明文是 Android 11 A/B OTA（`CrAU`、`payload.bin`、`pre-device rc331`、post-build `V00.01.14.99`）；dump 出 29 个分区。
+- 重新提取的两份 exact target 工件与登记逐字节一致：`adbd`（A-030，`/apex/com.android.adbd/bin/adbd`）与
+  `dpad_fuli.apk`（A-031，`/vendor/app/dpad_fuli/`）（C-318）。
+- RC331 `0200` 与 RC331 聚合体模块 `enc_key` 均为空，直接为明文（C-319）。
+
+`STATIC`：跨产品看，RC331 全部明文、WA150 全部 STUE，因此**遥控器侧现在即可做静态逆向，飞机侧唯一卡点是 STUE**（C-322）。
+
+### 11.3 WA150：STUE 卡点（阴性）
+
+`NEGATIVE`：三份 WA150 模块 `enc_key=STUE`；pinned 公开 corpus 及其上游 fork 都没有 `STUE` 条目（C-320）。
+以全部 16 字节公开 key 的派生变体（raw/SHA256/MD5/AES-ECB-unwrap）×3 mode（CTR/CBC/ECB）×3 IV 来源 ×v1/v2 语义
+做 brute，对 `2603` 与 `0802` 的 plaintext checksum **零命中**。因此主体抽出来仍是密文（A-065）。
+
+`NEGATIVE`：`0802` 的 `auth_alg=0x40003`、384-byte 3072-bit 签名，唯一公开 3072-bit PRAK 在 PSS/PKCS1、
+SHA256/384/512、salt 0/32/48/64 及 reserved/alg 清零变体下均失败（C-321）。加密走 STUE、不走 PRAK，故验签失败
+不影响 payload 抽取，但也说明公开 auth corpus 落后于本模块。
+
+`UNKNOWN`：STUE key 是否可通过 whitebox（TEE/引导链内、非明文存放）或后续公开释放取得；飞行器升级环节在何处
+解密。RC Android 侧、Assistant 应用、DJI Fly native 库均未发现可用的 `STUE` 常量或字符串。
+
+### 11.4 边界
+
+以上全部是 `STATIC`/离线派生。签名只对 RC 侧的 exact 模块成立，且不是 live mounted 事实，也不构成刷写准入。
+第 8 节门禁不变；`0802` 明文仍未得，RID 因果仍未建立。
