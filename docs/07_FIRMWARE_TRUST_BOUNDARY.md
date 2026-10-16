@@ -336,3 +336,15 @@ PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验
 `NEGATIVE`：常量编码使普通 AES 不等于白盒，故该 key 目前只到 HYPOTHESIS。把 key 走普通 AES（多 mode/IV）
 以及把 WAES 扩到 OFB/CFB 均零命中；手搭仿真也未与 WAES 逐字节相等（C-328、N-63）。下一步是抵消常量编码并
 对齐轮结构，或先证明 `shift_mix` 等价形态。
+
+### 11.8 WAES 作用域修正与固件路径 key 字面量（C-329/C-330）
+
+`OBSERVED`：`WAES_encrypt`/`WAES_decrypt` 的**唯一**调用者是 `GetPublicValue`/`GetPrivateValue`。因此 11.7 恢复的
+白盒 key 属于该 QByteArray 值加密，**不必然是 IMaH STUE 的 key**。固件类（`DJIFirmwareUpgrader` /
+`DJIUpgradeMgr` 等）改调 `aesDecode2`/`aesEncode2`/`aesDecode`，key 是 QString；在其中三个调用点附近出现唯一一个
+16 字节 key 型字面量 `1ff6b8ca503b47ad8d04d8686dcb13a0`。
+
+`NEGATIVE`：该字面量当 raw key 及多种派生、多种 mode/IV 试，明文 checksum 零命中（C-330、N-64）。`aesDecode`
+的内层 framing 未反汇编，故未否定。
+
+下一步：反汇编 `aesDecode2` 本体，确认它是否 base64/固定 IV/自定义 KDF，再把字面量放回正确位置。

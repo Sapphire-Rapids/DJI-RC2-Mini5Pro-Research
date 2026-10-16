@@ -690,3 +690,10 @@ including the second segment of the26-byte body. Existing runtime-status enums a
 `OBSERVED`：白盒表已完整分解，候选 key 唯一可复现；`NEGATIVE`：普通 AES 与手搭仿真仍未对齐。
 因此 B-23 现在只剩“常量编码抵消 + 轮结构对齐”。key 派生本身已验证，不再是 blocker 对象；
 RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
+
+## B-23 方向修正（C-329/C-330）
+
+`OBSERVED`：WAES 的唯一调用者是 `GetPublicValue`/`GetPrivateValue`；固件路径走 `aesDecode2` + QString key。
+`NEGATIVE`：找到的唯一16字节字面量在猜测派生/模式下仍零命中。
+
+因此 B-23 现在明确为：**先反汇编 `aesDecode2` 本体拿到 framing，再回填字面量**；白盒 key 降为旁路输入。

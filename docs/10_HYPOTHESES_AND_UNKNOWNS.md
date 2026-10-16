@@ -485,3 +485,16 @@ observation must connect the candidate field to a consumer/branch, including the
 
 `UNKNOWN`：whitebox key 的确切存放位置（boot ROM、引导链、TEE、update engine），以及是否也存在于
 Assistant/DJI Fly native 的可提取常量中。
+
+
+## H-35 — STUE is served by `aesDecode2` with a QString key, not by WAES
+
+`HYPOTHESIS`：`WAES` 只服务 `GetPublicValue`/`GetPrivateValue`（C-329），而 IMaH 固件解密走固件类的
+`aesDecode2`，其 QString key 在三个调用点附近对应唯一16字节字面量 `1ff6b8ca503b47ad8d04d8686dcb13a0`。
+因此 11.7 的白盒不是 STUE cipher，方向应转为 `aesDecode2` 本体。
+
+判别实验：反汇编 `aesDecode2`，说明它是否先 base64 解码、是否用固定/派生 IV、是否对 key 做 KDF；随后按
+其真实 framing 用该字面量解2603 并核 `plain_cksum`。未闭合前不得把字面量称为 STUE key。
+
+`UNKNOWN`：该字面量属于哪个 product/context（另两个调用点也可能是 RC/SDK），以及 `aesDecode` 与 `WAES`
+是否同 key 不同 framing。

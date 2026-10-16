@@ -461,3 +461,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-326 | `NEGATIVE` | Encrypted-checksum ranges validate but the STUE plaintext checksum misses across enumerated whitebox schemes | Only key/mode unresolved; unenumerated modes or another key source remain |
 | C-327 | `OBSERVED` | Whitebox tables decomposed (affine in `InvSbox(x^k)`, coeff1) and a unique candidate key recovered | HYPOTHESIS key; constant encoding means plain AES is not the whitebox |
 | C-328 | `NEGATIVE` | Candidate key via plain AES and a hand-built emulation both still miss the plaintext | Structure/encoding mapping open; key derivation itself validated |
+| C-329 | `OBSERVED` | WAES callers are GetPublic/PrivateValue; firmware path uses `aesDecode2` with a QString key and a16-byte literal is located | Caller identity does not prove module ownership; literal may be RC/SDK or a passphrase |
+| C-330 | `NEGATIVE` | The literal as raw/derived key does not decrypt STUE across schemes | Guessed derivations/modes only; `aesDecode` inner framing not yet reversed |

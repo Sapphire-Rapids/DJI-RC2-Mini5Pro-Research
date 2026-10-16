@@ -719,3 +719,12 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 
 限定：分解出的结构（`InvSbox(x^k)` 加常量编码）本身已验证；未定的是常量编码的抵消方式与轮结构顺序，
 以及“WAES 是否就是 STUE cipher”。key 本身不是本阴性的结论对象。
+
+
+## N-64 — firmware key literal does not yet decrypt STUE (C-330)
+
+`NEGATIVE`：在固件类 `aesDecode2` 调用点附近找到唯一一个16字节 key 型字面量 `1ff6b8ca503b47ad8d04d8686dcb13a0`。
+把它当 raw key，以及当 MD5/SHA256/SHA256-16/UTF-16/base64 派生，配工具方案与 CTR/CBC/CFB/OFB、zero/scram/key IV、
+两个 crypt-key 方向试，明文 checksum 全部零命中。
+
+限定：只覆盖猜测的派生与模式；`aesDecode` 自身的内层 framing（可能 base64 或固定 IV 布局）尚未反汇编，故该字面量未被否定。

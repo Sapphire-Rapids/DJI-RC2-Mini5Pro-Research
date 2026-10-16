@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.39 - 2026-10-16
+
+- Corrected the WAES scope: its only callers are `GetPublicValue`/`GetPrivateValue`, so the recovered
+  whitebox key is that value crypto, not necessarily the IMaH STUE key (C-329).
+- Located the firmware path: firmware classes call `aesDecode2`/`aesEncode2` with QString keys, and a
+  single16-byte key literal `1ff6b8ca503b47ad8d04d8686dcb13a0` sits at three call sites (C-329).
+- NEGATIVE: the literal as raw plus MD5/SHA256/UTF-16/base64 derivations across tool scheme, CTR/CBC/
+  CFB/OFB and several IVs still misses (C-330, N-64). `aesDecode2` inner framing is not yet reversed.
+- H-35 and B-23 now redirect to disassembling `aesDecode2` first.
+
 ## 0.4.38 - 2026-10-16
 
 - Decomposed every `t_box_dec` table: each is affine in128`InvSbox(x^k)` with coeff1 plus a constant
