@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.40 - 2026-10-16
+
+- Reversed the firmware crypto framing: `aesDecode2` builds `CRijndael`, `MakeKey(key, sm_chain0,32,16)`
+  then `Decrypt(len,1)` — AES-256 CBC with a fixed IV, key via `QString::toStdString` (C-331). Callers
+  include the `UpgradeNfzPack` lambdas where the key is the16-byte literal.
+- Made `aesDecode2Ex` ctypes-callable and confirmed keys change output.
+- NEGATIVE: the real helper on the2603 chunk with literal /32-byte pool / zero key stays length-
+  preserving but does not match the plaintext checksum (C-332, N-65). Framing is proven; only the
+  module-key question remains.
+
 ## 0.4.39 - 2026-10-16
 
 - Corrected the WAES scope: its only callers are `GetPublicValue`/`GetPrivateValue`, so the recovered

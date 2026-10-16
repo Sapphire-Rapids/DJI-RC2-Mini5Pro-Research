@@ -348,3 +348,13 @@ PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验
 的内层 framing 未反汇编，故未否定。
 
 下一步：反汇编 `aesDecode2` 本体，确认它是否 base64/固定 IV/自定义 KDF，再把字面量放回正确位置。
+
+### 11.9 CRijndael 真实路径与直接调用（C-331/C-332）
+
+`OBSERVED`：`aesDecode2` 实例化 `CRijndael`，`MakeKey(key, sm_chain0, 0x20, 0x10)` 后 `Decrypt(len, mode1)` —— 即
+AES-256 + CBC、IV `sm_chain0`（`a0898b00000000009236923600000000`），key 来自 `QString::toStdString`。唯一调用者是
+`aesEncode2/aesDecode2/aesDecode2Ex/aesEncode2Ex`；`aesDecode/aesEncode` 的调用者含 `UpgradeNfzPack` lambda，其 key
+参数即16字节字面量。`aesDecode2Ex`（QByteArray key）已可 ctypes 直调且 key 生效。
+
+`NEGATIVE`：用真实 `aesDecode2Ex` 解2603 chunk（字面量 / 32字节池读 / 零 key）长度保持但 checksum 不中（C-332、N-65）。
+framing 已证明，故下一步只查“模块 key 是谁”——即 NfzPack 字面量之外，模块是否另有 key 来源或派生。

@@ -452,13 +452,18 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 ## A-067/A-068：白盒 AES 桥与 STUE 方案探针（C-325/C-326）
 
-- **A-067** `wb_aes_bridge.py`（5,292 B，SHA-256 `3c6db060…70556`）：把 DJI Assistant 内嵌的白盒 AES-128
+- **A-067** `wb_aes_bridge.py`（5,292 B，SHA-256 SHA-256 `3c6db06048ceca4b4fe8a20749502fff5387c7796d1efd482b91726957070556`）：把 DJI Assistant 内嵌的白盒 AES-128
   暴露为可调用的16字节块加/解密原语。各服务 dylib 的 `t_box_enc`/`t_box_dec` 表字节逐一对齐（一个全局 key）。
   用镜像框架树 + ad-hoc 重签解释器在 Rosetta 下 ctypes 加载 x86_64 dylib；另含进程内 `load()`。3 项测试通过。
   状态 `STATIC`，离线helper；只公开源码，镜像/临时目录排除。
-- **A-068** `stue_plaintext_probe.py`（4,661 B，SHA-256 `c2fc27ed…f1d26`）：用 A-067 原语枚举加密方案并只按明文
+- **A-068** `stue_plaintext_probe.py`（4,661 B，SHA-256 SHA-256 `b34667203b331babd38285e52e605372792b10733df342c4106340ef342aa3dd`）：用 A-067 原语枚举加密方案并只按明文
   checksum 判定；先独立验证加密 checksum 字节范围（补码形式）。当前 scheme hits NONE。状态 `STATIC`，只公开源码。
 
 ## A-069：白盒表分解与候选 key 恢复（C-327）
 
 `wb_aes_key_recover.py`（SHA-256 `6ecae7336d0e9707735a31dfa2eaa6b19e07143e273a37569a753d7440847e69`）把 `t_box_dec` 逐表做仿射分解：每表在 `InvSbox(x^k)` 上仿射（coeff1 + 一个常量编码），每表唯一解出一个 `k`，拼出候选 key `5ac8ed5cf0fa5e5d77b5c89599bb87d5`（可重复复现）。状态 `OBSERVED`，但 key 是 HYPOTHESIS：常量编码使普通 AES 不等于白盒。
+
+## A-070：Assistant CRijndael aesDecode2Ex 桥（C-331）
+
+`aes_decode_bridge.py`（2383 B，SHA-256 `77c9c4bd28612bd4df13b58349a177a14ae12de4ea38c69f62bb051c9bc0f548`）在 wb_aes_bridge 的镜像树上 ctypes 直调 Assistant 真实
+`aesDecode2Ex`（AES-256 CBC / IV `sm_chain0`）；key 变化会改变输出。状态 `OBSERVED`，离线 helper，只公开源码。

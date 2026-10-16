@@ -21,8 +21,10 @@ from wb_aes_bridge import build_mirror, decrypt_block, encrypt_block
 def _reexec_under_rosetta(path: str) -> None:
     if platform.machine() == "x86_64":
         return
-    root = build_mirror()
     os.environ["PYTHONHOME"] = sys.base_prefix
+    import site
+    os.environ["PYTHONPATH"] = os.pathsep.join(site.getsitepackages() + [str(Path(__file__).parent)])
+    root = build_mirror()
     os.execv(str(root / "MacOS/Python"), [str(root / "MacOS/Python"), __file__, path])
 
 

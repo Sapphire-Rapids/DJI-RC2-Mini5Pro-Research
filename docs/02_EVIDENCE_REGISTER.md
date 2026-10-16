@@ -463,3 +463,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-328 | `NEGATIVE` | Candidate key via plain AES and a hand-built emulation both still miss the plaintext | Structure/encoding mapping open; key derivation itself validated |
 | C-329 | `OBSERVED` | WAES callers are GetPublic/PrivateValue; firmware path uses `aesDecode2` with a QString key and a16-byte literal is located | Caller identity does not prove module ownership; literal may be RC/SDK or a passphrase |
 | C-330 | `NEGATIVE` | The literal as raw/derived key does not decrypt STUE across schemes | Guessed derivations/modes only; `aesDecode` inner framing not yet reversed |
+| C-331 | `OBSERVED` | Firmware crypto is CRijndael AES-256 CBC with IV sm_chain0 via aesDecode2; real helper callable | NfzPack JSON key, not proven module key |
+| C-332 | `NEGATIVE` | Calling the real aesDecode2Ex with candidate keys still misses the STUE chunk | Only module-key question open; framing proven by real code |

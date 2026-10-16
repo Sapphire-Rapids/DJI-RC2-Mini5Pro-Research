@@ -728,3 +728,12 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 两个 crypt-key 方向试，明文 checksum 全部零命中。
 
 限定：只覆盖猜测的派生与模式；`aesDecode` 自身的内层 framing（可能 base64 或固定 IV 布局）尚未反汇编，故该字面量未被否定。
+
+
+## N-65 — real Assistant decrypt still misses the STUE chunk (C-332)
+
+`NEGATIVE`：`aesDecode2Ex` 已可直接 ctypes 调用且 key 生效（不同 key 出不同结果），但用它解2603 STUE chunk，
+配字面量、32 字节池读值或全零 key，明文 checksum 均不命中（输出长度保持435,392）。
+
+限定：framing（CRijndael AES-256 CBC、IV `sm_chain0`）已由真实代码路径证明，故本阴性只指向“模块 key 是谁”，
+不否定 `aesDecode2` 本身。
