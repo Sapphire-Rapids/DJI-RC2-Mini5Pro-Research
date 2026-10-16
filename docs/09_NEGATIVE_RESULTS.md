@@ -709,3 +709,13 @@ key 家族已轮换到不可用。
 CTR counter 端序/位置 × CBC iv/ECB，明文 checksum 仍 **NONE**。
 
 限定：字节范围已确认，只剩 key/mode 映射未定。未枚举的模式、另一处 key 来源、或“WAES 与 STUE 无关”均未否定。
+
+
+## N-63 — candidate key and whitebox emulation still miss STUE plaintext (C-328)
+
+`NEGATIVE`：`t_box_dec` 已被完整分解，每表唯一解出 key 字节，候选 key `5ac8ed5c…87d5`（C-327、A-069）。
+字节范围此前已 MATCH，但把该 key 走普通 AES（CTR/CBC/ECB、raw 与 derived、多种 IV）以及把 WAES 原语扩到
+OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真与 WAES oracle 也未逐字节相等。
+
+限定：分解出的结构（`InvSbox(x^k)` 加常量编码）本身已验证；未定的是常量编码的抵消方式与轮结构顺序，
+以及“WAES 是否就是 STUE cipher”。key 本身不是本阴性的结论对象。

@@ -325,3 +325,14 @@ PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验
 先独立验证加密 checksum 字节范围（补码形式）MATCH，再枚举 crypt-key 方向 × stream 方向 × CTR 端序/位置 × CBC iv/ECB，
 明文 checksum **NONE**（C-326）。字节范围已对，故只剩 key/mode 映射；未枚举模式、另一处 key 来源、或 WAES 与 STUE
 无关均未否定。
+
+### 11.7 白盒表分解与候选 key（C-327/C-328）
+
+`OBSERVED`：逐表对 `t_box_dec` 做仿射判定，每表在 `InvSbox(x ^ k_i)` 上仿射（系数恒为1 + 一个常量编码），
+每表唯一解出一个 `k`，拼出候选 key `5ac8ed5cf0fa5e5d77b5c89599bb87d5`；固化为
+[wb_aes_key_recover.py](../host-tools/firmware-acquisition/wb_aes_key_recover.py)（A-069），可确定性复现。
+该模型同时确认白盒内部只是 `InvSubBytes + AddRoundKey + 常量编码`，MixColumns 在 `shift_mix` 内。
+
+`NEGATIVE`：常量编码使普通 AES 不等于白盒，故该 key 目前只到 HYPOTHESIS。把 key 走普通 AES（多 mode/IV）
+以及把 WAES 扩到 OFB/CFB 均零命中；手搭仿真也未与 WAES 逐字节相等（C-328、N-63）。下一步是抵消常量编码并
+对齐轮结构，或先证明 `shift_mix` 等价形态。

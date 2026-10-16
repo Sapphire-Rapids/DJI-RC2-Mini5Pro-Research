@@ -459,3 +459,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-324 | `NEGATIVE` | No plain16-byte STUE constant in Assistant dylibs or Fly native data; Assistant embeds four2048-bit plain PRAK each | Plain constants only; whitebox/runtime/device paths remain |
 | C-325 | `OBSERVED` | Assistant whitebox AES pair recovered as a callable Rosetta/ctypes primitive; tables identical across services | Fixed Assistant artifact; not proven as the STUE key, no live fact |
 | C-326 | `NEGATIVE` | Encrypted-checksum ranges validate but the STUE plaintext checksum misses across enumerated whitebox schemes | Only key/mode unresolved; unenumerated modes or another key source remain |
+| C-327 | `OBSERVED` | Whitebox tables decomposed (affine in `InvSbox(x^k)`, coeff1) and a unique candidate key recovered | HYPOTHESIS key; constant encoding means plain AES is not the whitebox |
+| C-328 | `NEGATIVE` | Candidate key via plain AES and a hand-built emulation both still miss the plaintext | Structure/encoding mapping open; key derivation itself validated |

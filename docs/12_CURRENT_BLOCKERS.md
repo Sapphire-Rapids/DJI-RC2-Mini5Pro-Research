@@ -684,3 +684,9 @@ including the second segment of the26-byte body. Existing runtime-status enums a
 
 因此 B-23 从“无 key 材料”细化为“有原语但 key/mode 映射未定”：字节范围已对，下一步是找出正确 mode/mapping，
 或另一处 key 来源（RC2 dylib 表与 Uav 一致，可作交叉确认）。
+
+## B-23 再次细化（C-327/C-328）
+
+`OBSERVED`：白盒表已完整分解，候选 key 唯一可复现；`NEGATIVE`：普通 AES 与手搭仿真仍未对齐。
+因此 B-23 现在只剩“常量编码抵消 + 轮结构对齐”。key 派生本身已验证，不再是 blocker 对象；
+RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。

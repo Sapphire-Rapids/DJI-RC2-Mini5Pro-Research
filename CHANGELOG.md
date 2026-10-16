@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.38 - 2026-10-16
+
+- Decomposed every `t_box_dec` table: each is affine in128`InvSbox(x^k)` with coeff1 plus a constant
+  encoding, giving exactly one key byte per table; candidate key
+  `5ac8ed5cf0fa5e5d77b5c89599bb87d5`, reproducible via `wb_aes_key_recover.py` (C-327, A-069).
+- Confirmed the whitebox interior is only InvSubBytes + AddRoundKey + constant encoding; MixColumns
+  lives in `shift_mix`.
+- NEGATIVE: the constant encoding means plain AES is not the whitebox, so the key stays a hypothesis;
+  plain AES across modes/IVs and an OFB/CFB extension all miss, and a hand-built emulation is not yet
+  byte-equal to the WAES oracle (C-328, N-63). B-23 narrows to encoding cancellation and round order.
+
 ## 0.4.37 - 2026-10-16
 
 - Recovered DJI Assistant's baked whitebox AES-128 as a callable primitive: all six service dylibs

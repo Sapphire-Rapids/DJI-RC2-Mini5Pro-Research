@@ -458,3 +458,7 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
   状态 `STATIC`，离线helper；只公开源码，镜像/临时目录排除。
 - **A-068** `stue_plaintext_probe.py`（4,661 B，SHA-256 `c2fc27ed…f1d26`）：用 A-067 原语枚举加密方案并只按明文
   checksum 判定；先独立验证加密 checksum 字节范围（补码形式）。当前 scheme hits NONE。状态 `STATIC`，只公开源码。
+
+## A-069：白盒表分解与候选 key 恢复（C-327）
+
+`wb_aes_key_recover.py`（SHA-256 `6ecae7336d0e9707735a31dfa2eaa6b19e07143e273a37569a753d7440847e69`）把 `t_box_dec` 逐表做仿射分解：每表在 `InvSbox(x^k)` 上仿射（coeff1 + 一个常量编码），每表唯一解出一个 `k`，拼出候选 key `5ac8ed5cf0fa5e5d77b5c89599bb87d5`（可重复复现）。状态 `OBSERVED`，但 key 是 HYPOTHESIS：常量编码使普通 AES 不等于白盒。
