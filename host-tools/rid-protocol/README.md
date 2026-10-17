@@ -16,7 +16,8 @@
 | `EID_SWITCH_MESSAGE.md` | EID 报文规格（布局表、依据、边界） |
 | `eid_switch_message.py` | EID 发射器（A-071） |
 | `test_eid_switch_message.py` | EID 自检：对反编译 ctor 逐字节断言 |
-| `oid_identifier_message.py` | OIDIdentifier 发射器（A-072，cmd214/sub17，字符串） |
+| `oid_identifier_message.py` | OIDIdentifier 发射器（A-072，RID-005B 对齐：18字节 pack、receiver 0x92） |
+| `OID_IDENTIFIER_MESSAGE.md` | OID 规格（RID-005B 对齐） |
 | `test_oid_identifier_message.py` | OID 自检 + 0x70 上限 |
 | `opid_message.py` | 操作者注册号 set/delete 发射器（A-076） |
 | `test_opid_message.py` | opid 自检 + 16 上限 |

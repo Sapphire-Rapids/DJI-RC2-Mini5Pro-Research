@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.84 - 2026-10-16
+
+- Realigned the OID emitter to the exact repo RID-005B schema (C-411): cmd0x11/0xD6, fixed receiver
+  18/4 (0x92), timeout500, retry3, 18-byte SET pack with 8-byte copy and zero tail, GET mirror with
+  deterministic zeroing. Added OID_IDENTIFIER_MESSAGE.md and re-hashed A-072 to v2.
+
 ## 0.4.83 - 2026-10-16
 
 - Added A-077, a RID broadcast field-control map (C-410) enumerating the writable surface across

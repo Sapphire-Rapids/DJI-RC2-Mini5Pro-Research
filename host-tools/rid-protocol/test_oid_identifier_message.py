@@ -1,27 +1,28 @@
-"""Self-check: OID emitter must mirror the same ctor layout with cmd214/sub17 and string payload.
-
-Anchors are the same uav_cmd_base_req literal writes as the EID test, but with the
-<1,17,214,...> instantiation (cmd 0xD6, sub 0x11, prefix 01 11 D6 02) and the string payload
-appended after the 0x20 header, capped at 0x70.
-"""
+"""Self-check: OID emitter must match RID-005B exactly (18-byte pack, 8-byte copy, zero tail)."""
 import oid_identifier_message as m
 
-msg = m.build(b"ABC", sender=0, receiver=0)
-assert len(msg) == 0x20 + 3, len(msg)
+msg = m.build(b"12345678")
+assert len(msg) == 0x20 + 18, len(msg)
 assert msg[0x00:0x04] == bytes([0x01, 0x11, 0xD6, 0x02])
-assert msg[0x04] == 0x00 and msg[0x05] == 0x02
-assert msg[0x08] == 0x03
-assert msg[0x0C:0x0E] == b"\x00\x00"
 assert msg[0x0E:0x10] == bytes([0x49, 0x57])
 assert msg[0x14:0x18] == (500).to_bytes(4, "little")
-assert msg[0x20:] == b"ABC"
 
-# length cap at 0x70
-try:
-    m.build(b"A" * 0x71)
-    raise AssertionError("cap not enforced")
-except ValueError:
-    pass
-assert len(m.build(b"A" * 0x70)) == 0x20 + 0x70
+pack = msg[0x20:]
+assert len(pack) == 18
+assert pack[0] == 0x01
+assert pack[1] == 0x01                       # non-empty -> 01
+assert pack[2:10] == b"12345678"             # at most first 8 copied
+assert pack[10:] == bytes(8)                 # rest zeroed
 
-print("ok: OID emitter mirrors the ctor layout and enforces the 0x70 cap")
+# empty -> flag 03, no copy
+p2 = m.build(b"")[0x20:]
+assert p2[1] == 0x03 and p2[2:] == bytes(16)
+
+# over-length input copies only 8
+assert m.build(b"A" * 20)[0x20:][2:10] == b"A" * 8
+
+# GET mirror writes prefix [01,02] and a zeroed tail
+g = m.build_get()[0x20:]
+assert g[0:2] == bytes([0x01, 0x02]) and g[2:] == bytes(16)
+
+print("ok: OID emitter matches RID-005B (18-byte pack, 8-copy, zero tail, GET mirror)")

@@ -36,7 +36,7 @@
 
 ## E. 残差
 
-- OID 需按仓库 RID-005B 对齐（receiver 18/4=0x92、18 字节布局、retry 3）；现 A-072 用通用头。
+- ~~OID 对齐 RID-005B~~ 已完成（C-411，A-072 v2）。
 - UE/CE 区域键 `EU_CE_enable_c0_rid_0` 为 observer 绑定（C-405）。
 - receiver 统一来自 Characteristics+0x30，运行期取值。
 - 全部 STATIC；live inventory/键存在性证据待实机。
