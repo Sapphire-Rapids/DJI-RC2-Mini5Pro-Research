@@ -469,3 +469,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-334 | `NEGATIVE` | AES+XOR pipeline with candidate keys still misses | Covered keys are guesses; caller key not identified |
 | C-335 | `OBSERVED` | NfzPack key is derived on the fly as a hex stream of a local buffer via ostringstream | Stream input/format not yet exact |
 | C-336 | `NEGATIVE` | Self-derivation key candidates still miss | Guesses of stream input/format; mechanism not impugned |
+| C-337 | `OBSERVED` | NfzPack key is exactly zero-padded lowercase hex of MD5(data) | Read statically; prefix/zero-pad not byte-verified |
+| C-338 | `OBSERVED` | XOR pad pointer is shifted, alignment not a clean16-byte cycle | Shift source/period unresolved |
+| C-339 | `NEGATIVE` | MD5-derived key candidates still miss | Guesses of format/pad input; md5 mechanism not impugned |

@@ -376,3 +376,11 @@ QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解
 
 `NEGATIVE`：大小写 hex、前16字节 hex、前32字节 raw 作 key 均零命中（C-336、N-67）。下一步是把喂入流的精确缓冲
 （XOR 前/后）与格式（大小写、宽度）对齐——0x68afc2 的 XOR 循环就在流构建之后，二者关系需精确判定。
+
+### 11.12 key 的精确派生与 XOR pad 位移（C-337/C-338）
+
+`OBSERVED`：key 构造链已完整：`MD5(data,len)` 建于 -0x160，`digest()` 的16字节逐字节以 int 写入 ostringstream
+（`orl $0x8` 置 hex 基数、`movl $0x30` 置 fill `0`），`str()` 得32位小写补零 hex 串（-0x1d0），作为 aesDecode2 的 key。
+同时 XOR 循环的 pad 基址按 `subq %rcx, %rsi` 位移，故字面量索引不是干净的0..15 循环。
+
+`NEGATIVE`：按该派生（含自洽变体）仍零命中（C-339、N-68）。剩余是流前缀/格式与位移 pad 的精确对齐。

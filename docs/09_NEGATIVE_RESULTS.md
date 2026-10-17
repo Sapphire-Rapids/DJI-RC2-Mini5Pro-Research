@@ -753,3 +753,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `aesDecode2Ex` 与两种 AES/XOR 顺序，2603 明文 checksum 全零命中。
 
 限定：都只是流输入/格式的猜测；机制（C-335）本身未被否定。
+
+
+## N-68 — MD5-derived key candidates still miss (C-339)
+
+`NEGATIVE`：按 C-337 的精确派生（md5hex/md5HEX/md5raw/md5hex16/hex-of-hex，以及自洽 XOR-then-md5）配真实
+`aesDecode2Ex`，在 pure/xor-first 两序下解2603，明文 checksum 全零命中。
+
+限定：都是流前缀/格式与位移 pad 输入的猜测；md5 机制（C-337）本身未被否定。

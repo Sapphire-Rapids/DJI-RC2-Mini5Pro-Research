@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.43 - 2026-10-16
+
+- Pinned the exact NfzPack key derivation: `MD5(data,len)`, digest()'s16 bytes written as ints to an
+  ostringstream with hex base and `0` fill, `str()` giving32 lowercase zero-padded hex chars passed
+  as aesDecode2's key (C-337).
+- Found the XOR pad pointer is shifted (`subq %rcx, %rsi`), so literal indexing is not a clean16-byte
+  cycle (C-338).
+- NEGATIVE: md5hex/uppercase/raw/truncated/hex-of-hex keys plus self-consistent XOR-then-md5 variants
+  still miss (C-339, N-68). B-23 narrows to stream prefix/zero-padding and the pad shift source.
+
 ## 0.4.42 - 2026-10-16
 
 - Found the NfzPack key derivation: a `std::ostringstream` fed from a local input-buffer copy with

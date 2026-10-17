@@ -707,3 +707,8 @@ RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
 
 `OBSERVED`：key 是 ostringstream+std::hex 的现场派生。`NEGATIVE`：候选自派生 key 仍未命中。
 因此 B-23 只剩“喂入流的缓冲（XOR 前/后）与格式（大小写/宽度）”两个细节，不再有未知来源。
+
+## B-23 再收窄（C-337/C-338）
+
+`OBSERVED`：key = hex(MD5(data)) 已确定；XOR pad 存在位移。`NEGATIVE`：候选仍零命中。
+B-23 现只剩两个纯细节：ostringstream 是否写入前缀/逐字节补零，以及 `subq %rcx` 的位移来源与周期。
