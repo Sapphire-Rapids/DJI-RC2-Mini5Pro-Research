@@ -562,3 +562,14 @@ uav_fc_handle_eid_switch, uav_fc_eid_switch_status>`，包装层调 `SendGetPack
 `*(undefined1 *)(lVar6 + 8)`（C-381）。Get 侧则硬编码 local_48=2。
 
 于是"关 RID"在报文层就是：对该 opcode 下发一个值为0 的 set。
+
+### 11.33 base_req 布局与 receiver/sender 分工（C-383/C-384）
+
+`OBSERVED`：eid_switch 的 `uav_cmd_base_req` 构造函数给出头部布局 —— `this[0..3] = 01 03 77 02`（模板1、模板3、cmd119、0x02），
+`+1..8` 为 `00 00 00 00 02 00 00 03`，`+0xc` 为 `00 00 49 57`（ASCII `'I','W'` 魔数），`+0x14` 超时500，`+0x10/+0x18` 置0，
+`this[6]` 取自 `GlobalPacketStatus::GetGlobalSenderIndex()`，`+0x20` 构造 payload Buffer。
+
+即：**sender index 自动派生**；`SetReceiverIndex` 为外部 thunk（0x0515dc90，经 PTR 解析），由包装层在填好 local_48（Get 为2、
+Set 为值字节）后调用 —— **receiver index 由调用方给**（C-384）。
+
+于是报文 = 该头部 + 载荷字节；关 RID 即 Set、值0、receiver 按调用方取。

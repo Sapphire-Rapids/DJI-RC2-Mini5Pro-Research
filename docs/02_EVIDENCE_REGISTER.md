@@ -515,3 +515,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-380 | `OBSERVED` | eid_switch template decodes to cmd119/sub3/attr0x12, tag uav_fc_handle_eid_switch | First arg/receiver index unbound; no live send yet |
 | C-381 | `OBSERVED` | EID set value is one byte read from the value object at +8 | Typeinfo target not named |
 | C-382 | `OBSERVED` | Dedicated pack type uav::core::eid_switch_pack with an RspType | Field layout beyond the value byte unenumerated |
+| C-383 | `OBSERVED` | base_req ctor gives header layout, auto sender index, payload slot at+0x20 | 0x02 byte and 'IW' magic semantics unproven |
+| C-384 | `OBSERVED` | SetReceiverIndex is external; receiver index is caller-supplied | local_48 role ambiguous; external body unavailable |

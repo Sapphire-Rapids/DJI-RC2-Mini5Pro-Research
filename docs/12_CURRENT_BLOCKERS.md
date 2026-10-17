@@ -781,3 +781,8 @@ B-23 现具体为：把这12 字节相邻局部（-0x1d0 一带）纳入 seed；
 
 `OBSERVED`：opcode（cmd119/sub3/attr0x12）、载荷字节、get/set 标志均已解出。
 未绑定：模板首参1、receiver index 的来源、以及实际发送前置（App 会话/连接）。均为可解细节。
+
+## B-24 更新：仅剩实际发送（C-383/C-384）
+
+`OBSERVED`：头部布局、sender 自动、receiver 调用方给、载荷字节、cmd119/sub3 全部解出。
+未闭合：把接收方具体取值（哪个 receiver index）与真实连接前置定下来，即可拼出可发送字节流。

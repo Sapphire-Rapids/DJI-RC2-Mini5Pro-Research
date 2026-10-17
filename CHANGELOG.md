@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.65 - 2026-10-16
+
+- Decompiled the eid_switch base_req constructor: header layout 01 03 77 02 at this[0..3], 'IW' magic
+  at+0xc, timeout500 at+0x14, sender index auto-derived from GlobalPacketStatus into this[6], payload
+  Buffer at+0x20 (C-383).
+- SetReceiverIndex is an external thunk called by the wrapper after filling local_48, so the receiver
+  index is caller-supplied and the sender is automatic (C-384).
+- B-24 narrows to the concrete receiver value and the real connection preamble.
+
 ## 0.4.64 - 2026-10-16
 
 - Decoded the eid_switch request from the decompiled template instantiation: cmd119 (0x77), sub3,
