@@ -824,3 +824,10 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 调用 —— pack 字节是**原样**进入 crypto。
 
 限定：解码若存在则在更深的 callee 里；有界否定。
+
+
+## N-77 — all seed rotations and reversals still miss (C-358)
+
+`NEGATIVE`：对25字节常量表做全旋转 × 逆序 × raw/变换，作 key，2603 明文 checksum 全零命中。
+
+限定：列表内容（C-349）与对象形状（C-357）未被否定；可能还缺结构体指针字节这一成分。

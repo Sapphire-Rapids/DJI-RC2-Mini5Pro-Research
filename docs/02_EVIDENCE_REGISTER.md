@@ -489,3 +489,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-354 | `NEGATIVE` | UpgradeFirmPack has no direct aes/IMaH calls | Indirect routing not excluded |
 | C-355 | `OBSERVED` | ProcessUpgradeFirmPack routes into UpgradeNfzPack, so the scheme applies to the pack | Websocket/JSON indirection; local chunk is a proxy |
 | C-356 | `NEGATIVE` | No base64/hex decode in the NfzPack chain | Decode may live in a callee |
+| C-357 | `OBSERVED` | XsBuffer vtable mapped; loop reads object bytes at rbx | D0-as-arg unusual; seed may include struct pointer bytes |
+| C-358 | `NEGATIVE` | All seed rotations/reversals still miss | Missing struct-pointer ingredient possible |

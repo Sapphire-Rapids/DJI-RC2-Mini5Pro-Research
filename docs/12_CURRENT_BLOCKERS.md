@@ -751,3 +751,8 @@ B-23 先要判定“本地 .fw.sig 是否真的走 NfzPack 方案”；若否，
 
 `OBSERVED`：FirmPack 路由确认，方案适用，本地 chunk 可代理。`NEGATIVE`：无解码步骤。
 B-23 回到先前唯一残差：setter 链 IMM 的角色与 seed 精确重建。
+
+## B-23 明确为“对象字节构成”（C-357/C-358）
+
+`OBSERVED`：循环读取的是对象字节而非独立缓冲。`NEGATIVE`：列表旋转组合仍零命中。
+B-23 现具体为：把结构体字段字节与追加字符一起纳入 seed 重建。

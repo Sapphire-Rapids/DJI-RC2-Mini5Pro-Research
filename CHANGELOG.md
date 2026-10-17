@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.52 - 2026-10-16
+
+- Mapped the XsBuffer vtable (0x30=append(char) returns this, 0x38=cvPc data); the chain's *0x20 hits
+  D0 and the transform loop indexes the object bytes at rbx, so the seed may include struct pointer
+  bytes rather than only appended chars (C-357).
+- NEGATIVE: all25 rotations x reversal x raw/transformed still miss (C-358, N-77).
+- B-23 is now concretely 'include the struct field bytes in the seed rebuild'.
+
 ## 0.4.51 - 2026-10-16
 
 - Confirmed the FirmPack path routes into the analysed scheme: ProcessUpgradeFirmPack calls

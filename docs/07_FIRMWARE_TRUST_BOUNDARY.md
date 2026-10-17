@@ -451,3 +451,11 @@ data（rsi）始终是 -0x218 密文。
 
 `NEGATIVE`：两条 NfzPack 函数体内无 base64/hex 解码（C-356、N-76），pack 字节原样入 crypto。
 故 B-23 回到 seed/setter 的字节级精确性。
+
+### 11.21 XsBuffer 布局与对象字节读（C-357/C-358）
+
+`OBSERVED`：`__ZTV8XsBufferIcE` 槽位为 0x10=aS 0x18=D1 0x20=D0 0x28=init 0x30=append(char) 0x38=cvPc 0x40=get。
+`append(char)` 返回 `this`，故链上的 `callq *0x20` 落在 D0（实参在 esi），而变换循环的 `movzbl (%rax,%rbx)` 是在
+**对象自身字节**上按 rbx 索引，而非 0x8(this) 的独立缓冲 —— 意味着发射的 seed 可能含结构体指针字节，不只是追加的字符。
+
+`NEGATIVE`：全旋转/逆序组合仍零命中（C-358、N-77）。下一步应把结构体字段字节（0x0/0x8/0x10/0x18 指针低字节）纳入 seed。
