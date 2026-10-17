@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.75 - 2026-10-16
+
+- Added A-074, a consolidated RC-side RID breakthrough document (C-397): the EIDSwitch key, Set-0
+  action, message, full App -> local-socket/logic -> djilink -> bulk/USB path, an evidence table
+  C-373..C-396, artifact index, H-37/B-24 and risks including the RC-mirror case plus the aircraft
+  fallback pointer.
+
 ## 0.4.74 - 2026-10-16
 
 - Recovered `dji_link unix_socket_listen create socket = %s`, so the listen socket name is config/

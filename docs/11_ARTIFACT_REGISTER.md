@@ -482,3 +482,8 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 `VERIFY_RUNBOOK.md`：上手步骤（前置、先 Get 后 Set 0、复 Get、外部嗅探、回滚），失败排查表（含"值改了但广播不停→
 可能是 RC 镜像，需回飞机线"），以及无刷写安全边界。状态 `STATIC`，尚未实机执行。
+
+## A-074：RC 侧 RID 突破口总收口（C-397）
+
+`RC_RID_BREAKTHROUGH.md`：把遥控器侧整条线端到端收拢 —— 开关 key、Set-0 动作、报文、App→local/logic→djilink→bulk/USB
+路径、证据表（C-373..C-396）、产物索引、H-37/B-24 与风险（含 RC 镜像情形与飞机后备指针）。状态 `STATIC`。
