@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.73 - 2026-10-16
+
+- Recovered the vendor dji_link_services route table: the App-facing entry is target whoami, channel
+  local, protocol logic, under a mobile host map; siblings are dummy (USB bulk) and 10 (camera/v1)
+  (C-394).
+- dji_link listens and accepts a local socket to the App (dji_link_init_localsocket_to_app,
+  send_stream_via_localsocket, app-socket-thread log) (C-395).
+- The preamble is now concrete: local socket + logic protocol to djilink, then bulk/USB to the aircraft.
+
 ## 0.4.72 - 2026-10-16
 
 - rc331 corroboration: vendor resource pools name native link daemons djilink and dji_v1_protocol

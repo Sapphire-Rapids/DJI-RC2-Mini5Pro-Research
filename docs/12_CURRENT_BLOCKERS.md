@@ -805,3 +805,8 @@ B-23 现具体为：把这12 字节相邻局部（-0x1d0 一带）纳入 seed；
 
 `OBSERVED`：RC native 侧是 djilink / dji_v1_protocol 守护进程，App 经它们下发。
 未闭合：具体 socket/端口地址；属环境细节。
+
+## B-24 具体化：本地 socket + logic 通道已命名（C-394/C-395）
+
+`OBSERVED`：App→djilink 是本地 socket、`logic` 协议；djilink→飞机是 bulk/USB。
+仅剩抽象 socket 字面名未取（需实机）。

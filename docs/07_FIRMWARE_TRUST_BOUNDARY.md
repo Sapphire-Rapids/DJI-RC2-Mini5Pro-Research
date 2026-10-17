@@ -612,3 +612,15 @@ system.img 日志串显示 `hdvt_lte: inform djilink ...` / `failed to inform dj
 说明开机先起 djilink、再拉起 DJI Fly（C-393）。
 
 这坐实了连接前置的性质：报文最终经 App → djilink/dji_v1_protocol → 链路，而非直连飞机。
+
+### 11.38 dji_link 本地通道与路由表（C-394/C-395）
+
+`OBSERVED`：vendor.img 内嵌 `dji_link_services` → `mb_route_table` JSON。其中 `"dji_link"` 下的 `"00"` 项 status1、
+target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.direct_host=whoami`；同级还有 `dummy`（bulk/UEvent）
+与 `"10"`（camera, bulk, protocol v1）。表头 host 为 `mobile`、index5。
+
+`OBSERVED`：dji_link 串包含 `dji_link_init_localsocket_to_app`、`dji_link_send_stream_via_localsocket`，日志
+`app socket thread start ---- localsock_fd = %d, accept_fd = %d` —— 即 djilink **监听并 accept 来自 App 的本地 socket**。
+
+于是连接前置具体化：App 经本地 socket + `logic` 协议进程内递送到 djilink，再由 djilink 走 bulk/USB 到飞机。
+`SendData` 排入的就是这条链。

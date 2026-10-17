@@ -526,3 +526,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-391 | `OBSERVED` | Operator runbook for the no-flash RID-off verification | Runbook only; not yet executed on hardware |
 | C-392 | `OBSERVED` | rc331 carries native link daemons djilink and dji_v1_protocol | Socket address not recovered |
 | C-393 | `OBSERVED` | system.img launcher JSON starts dji_link and restarts dji.go.v5 | Boot-ordering evidence only |
+| C-394 | `OBSERVED` | Vendor route table defines a local/logic channel to the mobile App | App hop is local+logic, not USB |
+| C-395 | `OBSERVED` | dji_link opens and accepts a local socket to the App | Listen/accept strings only |
