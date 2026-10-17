@@ -662,3 +662,11 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `RETRACTED`：首版发射器把 'IW' 魔数放在 0x0c（应为 0x0e，因 0x57490000 的小端字节是 00 00 49 57），OID 发射器同错；
 两者均已修正，规格偏移表同步修好，A-071/A-072 重新计哈希（C-403）。
+
+### 11.43 OID 自检与 EU_CE 无命名 handler（C-404/C-405）
+
+`OBSERVED`：`test_oid_identifier_message.py` 与 EID 用例镜像，断言 01 11 D6 02 前缀、共享 ctor 偏移、载荷位置，
+并验证 0x70 上限抛错；通过（C-404）。
+
+`NEGATIVE`：`EU_CE_enable_c0_rid_0` 无专属 Get/Set 符号，字面量也不在 EUCeCxV1::CreateCharacteristics/BindKey 引号键里；
+其站点散布于 observer 函数，属 observer 绑定模式（C-405、N-89）。与 EIDSwitch 的显式 handler 注册形态不同。

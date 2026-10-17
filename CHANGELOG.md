@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.79 - 2026-10-16
+
+- Added a mirroring byte-for-byte self-check and 0x70 cap test for the OID emitter (C-404).
+- NEGATIVE: EU_CE_enable_c0_rid_0 has no dedicated Get/Set handler symbol and its literal is absent
+  from the EUCeCxV1 quoted keys; it is bound via an observer pattern instead (C-405, N-89), distinct
+  from EIDSwitch's explicit registration.
+
 ## 0.4.78 - 2026-10-16
 
 - Added test_eid_switch_message.py asserting the emitted header byte-for-byte against the decompiled

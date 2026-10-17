@@ -916,3 +916,11 @@ raw/变换，2603 明文 checksum 全零命中。
 `RETRACTED`：首版 `eid_switch_message.py`（及镜像的 OID 发射器）把 'IW' 魔数写在 0x0c。
 而构造函数在 +0xc 写 `0x57490000`，其小端字节为 `00 00 49 57` —— 魔数应在 **0x0e..0x0f**，0x0c..0x0d 为 0。
 已修正两处发射器与规格偏移表，并重算 A-071/A-072 哈希。由自检用例发现。
+
+
+## N-89 — EU_CE_enable_c0_rid_0 has no named handler (C-405)
+
+`NEGATIVE`：函数名清单里无任何含 `enable_c0` 的名字；该字面量也不出现在 EUCeCxV1::CreateCharacteristics / BindKey
+的引号键中。其50 处站点散布在 observer 函数里 —— 属 observer 绑定模式，而非像 EIDSwitch 那样的显式命名 key handler。
+
+限定：缺失来自函数名清单；匿名 lambda handler 未排除。
