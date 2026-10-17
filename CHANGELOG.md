@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.96 - 2026-10-16
+
+- Decoded SetADSBSwitch: a 1-byte boolean on cmd55/sub17 with adsb_switch_pack, reading value+8
+  (C-435). Added A-079 emitter plus a self-check.
+
 ## 0.4.95 - 2026-10-16
 
 - Found three further adsb opcodes from pack tags: agent on/off get cmd12/sub17 (C-432), agent

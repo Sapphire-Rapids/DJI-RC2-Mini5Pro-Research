@@ -35,7 +35,7 @@
 | 字段 | opcode | claim |
 | --- | --- | --- |
 | ADS-B agent on/off get | cmd12/sub17 | C-432 |
-| ADS-B agent switch set | cmd55/sub17 | C-433 |
+| ADS-B agent switch set | cmd55/sub17，1字节布尔，A-079 | C-433/C-435 |
 | Drone dynamic max height get | cmd80/sub17 | C-434 |
 
 ## D. 数据面（App 自发）

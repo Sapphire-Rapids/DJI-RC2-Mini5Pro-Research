@@ -505,3 +505,8 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 `position_message.py` + 自检：cmd0x43/sub0x11，22字节明文 + AES-256-CBC(0x37 key) + HMAC-SHA256 + 16+16 前缀。
 密钥/iv/blob 均为 Ghidra 解析常量。组合细节为 H-38（近似）。状态 `STATIC`。
+
+## A-079：ADS-B 代理开关发射器（C-435）
+
+`adsb_switch_message.py` + 自检：cmd55/sub17，`adsb_switch_pack`，1 字节布尔（非零归一为 on）。载荷取自
+`SetADSBSwitch` 的 value+8 读取。状态 `STATIC`。

@@ -23,6 +23,8 @@
 | `test_opid_message.py` | opid 自检 + 16 上限 |
 | `position_message.py` | 位置加密发射器（A-078） |
 | `test_position_message.py` | 位置自检 |
+| `adsb_switch_message.py` | ADS-B 代理开关发射器（A-079） |
+| `test_adsb_switch_message.py` | adsb switch 自检 |
 | `VERIFY_RUNBOOK.md` | 上手验证手册（A-073） |
 | `RC_RID_BREAKTHROUGH.md` | 总收口（A-074，含证据表） |
 
