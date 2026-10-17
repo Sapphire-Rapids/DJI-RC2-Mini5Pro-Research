@@ -496,3 +496,7 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 `opid_message.py` + 自检：cmd120(0x78)/sub3 的 set-and-delete 动作，16 字符上限，空载荷=删除候选。
 数据来源 `OperatorRegistrationNumberSet`。状态 `STATIC`。
+
+## A-077：RID 字段控制地图（C-410）
+
+`RID_FIELD_MAP.md`：分 A 已解线路 / B 仅 opcode / C 非 settable / D 数据面 / E 残差，作为后续逐项推进的追踪清单。

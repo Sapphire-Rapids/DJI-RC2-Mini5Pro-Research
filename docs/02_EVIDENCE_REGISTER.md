@@ -542,3 +542,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-407 | `OBSERVED` | Wire decode sits under pre-existing characteristic-level RID claims | Overlap is name-layer only; opcode bytes are new |
 | C-408 | `OBSERVED` | OperatorRegistrationNumberSet is an action at cmd120/sub3, 16-char string payload | Delete likely = empty payload, unproven |
 | C-409 | `OBSERVED` | RidImportModule set/info paths use cmd75/sub17 with a 0x4b sub-field | Japan registration channel |
+| C-410 | `OBSERVED` | RID broadcast field-control map enumerates the writable surface | Map only; C/D sections still open |

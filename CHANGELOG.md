@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.83 - 2026-10-16
+
+- Added A-077, a RID broadcast field-control map (C-410) enumerating the writable surface across
+  five sections, to drive the remaining work item by item.
+
 ## 0.4.82 - 2026-10-16
 
 - Decoded OperatorRegistrationNumberSet as an action: cmd120(0x78)/sub3, tag rid_set_and_delete_opid,
