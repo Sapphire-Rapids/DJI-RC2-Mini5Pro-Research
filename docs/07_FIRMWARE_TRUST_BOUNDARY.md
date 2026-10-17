@@ -467,3 +467,13 @@ data（rsi）始终是 -0x218 密文。
 
 `NEGATIVE`：方向（rol/ror）、pad（mod17/mod16/逆序）、正逆序 seed 组合仍零命中（C-359、N-78）。
 下一步按 C-357 把对象结构字段字节纳入，而非继续改动公式。
+
+### 11.23 seed 实为结构体字节（含运行时指针）（C-361/C-362）
+
+`OBSERVED`：关键修正 —— `XsBuffer::cvPc` 是 `movq (%rdi),%rax; jmpq *0x30(%rax)`，即尾调 append 并返回 `this`；append 本身也
+返回 `this`。所以读写索引的是 **XsBuffer 对象自身字节**（0x0 为 vtable 指针低字节，0x8/0x10/0x18 为指针字段），追加的字符
+其实落在 0x8(this) 的 malloc 块，并未进入被索引的 seed。
+
+即 seed 内嵌**运行时地址低字节**：静态复现需近似或模拟分配；只有前0x20 字节影响 MakeKey。
+
+`NEGATIVE`：粗略指针近似仍零命中（C-362、N-79）。下一步改为模拟分配（固定地址/对齐）生成指针字节。

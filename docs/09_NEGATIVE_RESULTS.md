@@ -838,3 +838,10 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 `NEGATIVE`：rol8/ror8 方向、pad mod17/mod16/逆序、seed 正/逆序的组合，2603 明文 checksum 全零命中。
 
 限定：mod17（C-340）与 ror8（C-343）是结构性推导出的形式；残差更可能在“对象字节成分”而非变换公式。
+
+
+## N-79 — pointer-approximated struct seeds still miss (C-362)
+
+`NEGATIVE`：用 vtable 指针字节+零、+缓冲、裸缓冲、裸 vtable 组 seed（raw/变换），2603 明文 checksum 全零命中。
+
+限定：malloc/栈地址的低字节未知，近似很粗；C-361 未被否定。

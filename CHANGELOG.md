@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.54 - 2026-10-16
+
+- Key correction: cvPc tail-calls append and returns this, and append returns this, so the indexed seed
+  is the XsBuffer struct bytes (vtable low bytes + pointer fields), while appended chars sit in the
+  0x8(this) malloc block and do not enter the seed. The seed therefore embeds runtime address low
+  bytes and a static replay must approximate or emulate allocation (C-361).
+- NEGATIVE: coarse pointer seeds (vtable+zero/+buf/bare) still miss (C-362, N-79).
+- B-23 now requires emulating the allocation addresses, then transforming to a key.
+
 ## 0.4.53 - 2026-10-16
 
 - Confirmed the transform is an in-place, byte-local rewrite (read and write share the object and

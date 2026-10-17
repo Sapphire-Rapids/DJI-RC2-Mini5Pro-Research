@@ -493,3 +493,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-358 | `NEGATIVE` | All seed rotations/reversals still miss | Missing struct-pointer ingredient possible |
 | C-359 | `NEGATIVE` | Transform direction/pad variants still miss | Residual is the object-byte ingredient |
 | C-360 | `OBSERVED` | Transform reads and writes the same object index (in-place, byte-local) | Confirms byte-local formula |
+| C-361 | `OBSERVED` | cvPc/append return this, so the seed is struct bytes incl. runtime pointers | Static replay must approximate/emulate allocation |
+| C-362 | `NEGATIVE` | Pointer-approximated struct seeds still miss | Pointer low bytes unknown; approximation coarse |
