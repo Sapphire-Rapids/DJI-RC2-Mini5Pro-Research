@@ -550,3 +550,15 @@ OIDIdentifier37、IsEuCeEnableC0Rid18、RidWorkingStatusPush2、EU_CE_enable_c0_
 即整套 RID 参数族都在遥控器侧（C-379）。
 
 下一步：解出各常量语义与值字节布局，形成可下发的 set 报文。
+
+### 11.32 eid_switch 请求语义解码（C-380/C-381/C-382）
+
+`OBSERVED`：反编译出的模板实例直接给出常量 —— `uav_cmd_base_req<(unsigned_char)1,(unsigned_char)3,(unsigned_char)119,
+uav_fc_handle_eid_switch, uav_fc_eid_switch_status>`，包装层调 `SendGetPack<uav::core::eid_switch_pack>` /
+`SendSetPack<...>`。即请求 = cmd119、sub3、attr0x12，回复标签 `uav_fc_eid_switch_status`，载荷类型为
+`uav::core::eid_switch_pack`（含 `RspType`）。
+
+`OBSERVED`：EIDSwitchSet 的载荷是**单个启用字节** —— 它对 `shared_ptr<UavValue>` 做 `__dynamic_cast` 后读
+`*(undefined1 *)(lVar6 + 8)`（C-381）。Get 侧则硬编码 local_48=2。
+
+于是"关 RID"在报文层就是：对该 opcode 下发一个值为0 的 set。

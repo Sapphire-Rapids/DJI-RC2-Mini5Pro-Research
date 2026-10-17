@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.64 - 2026-10-16
+
+- Decoded the eid_switch request from the decompiled template instantiation: cmd119 (0x77), sub3,
+  attr0x12, reply tag uav_fc_eid_switch_status, pack type uav::core::eid_switch_pack (C-380).
+- The set value is a single enable byte read from the value object at +8, while Get hardcodes 2
+  (C-381), and the typed pack/RspType pair is recorded (C-382).
+- So 'RID off' at the message layer is a set of that opcode with value 0. B-24 now only lists the
+  template first arg, receiver-index source and the send preamble.
+
 ## 0.4.63 - 2026-10-16
 
 - RC-side breakthrough: Ghidra headless recovered the actual RID/EID enable accessors `EIDSwitchGet`

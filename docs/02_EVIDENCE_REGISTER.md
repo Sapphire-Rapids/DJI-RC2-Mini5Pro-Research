@@ -512,3 +512,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-377 | `OBSERVED` | EIDSwitchGet/EIDSwitchSet are the RC-side RID enable key handlers | Type-checked setter; -6 on mismatch |
 | C-378 | `OBSERVED` | EID handlers build uav_cmd with cmd0x77/attr0x12 and a get/set flag | Constant meanings inferred; value layout unresolved |
 | C-379 | `OBSERVED` | OIDIdentifier and ComplianceSerialNumber are sibling RID handlers | Opcodes not yet read |
+| C-380 | `OBSERVED` | eid_switch template decodes to cmd119/sub3/attr0x12, tag uav_fc_handle_eid_switch | First arg/receiver index unbound; no live send yet |
+| C-381 | `OBSERVED` | EID set value is one byte read from the value object at +8 | Typeinfo target not named |
+| C-382 | `OBSERVED` | Dedicated pack type uav::core::eid_switch_pack with an RspType | Field layout beyond the value byte unenumerated |
