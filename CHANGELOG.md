@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.41 - 2026-10-16
+
+- Established the NfzPack lambda interior: the16-byte literal is a streaming XOR pad (`xorb`), while
+  the `aesDecode2` key is the lambda's `QByteArray const&` parameter, reinterpreted as QString for
+  `toStdString`; decrypt is followed by `pkcs7UnPadding` (C-333).
+- NEGATIVE: the real aesDecode2Ex composed with the literal XOR in both orders, for literal /32-byte
+  pool / zero keys, still misses the plaintext checksum (C-334, N-66).
+- H-36 and B-23 now target backtracking the caller-supplied QByteArray key; framing, XOR pad and
+  padding are settled.
+
 ## 0.4.40 - 2026-10-16
 
 - Reversed the firmware crypto framing: `aesDecode2` builds `CRijndael`, `MakeKey(key, sm_chain0,32,16)`

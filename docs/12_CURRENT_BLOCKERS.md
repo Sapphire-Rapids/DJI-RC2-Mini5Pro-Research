@@ -697,3 +697,8 @@ RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
 `NEGATIVE`：找到的唯一16字节字面量在猜测派生/模式下仍零命中。
 
 因此 B-23 现在明确为：**先反汇编 `aesDecode2` 本体拿到 framing，再回填字面量**；白盒 key 降为旁路输入。
+
+## B-23 进一步收窄（C-333/C-334）
+
+`OBSERVED`：字面量已定性为 XOR pad，AES key 是调用方传入的 QByteArray。`NEGATIVE`：组合管线配候选 key 仍零命中。
+因此 B-23 现只剩“回溯 lambda 调用方的 QByteArray key”。framing、XOR pad、padding 均已确定，不再是不确定项。

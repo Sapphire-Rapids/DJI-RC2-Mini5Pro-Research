@@ -358,3 +358,12 @@ AES-256 + CBC、IV `sm_chain0`（`a0898b00000000009236923600000000`），key 来
 
 `NEGATIVE`：用真实 `aesDecode2Ex` 解2603 chunk（字面量 / 32字节池读 / 零 key）长度保持但 checksum 不中（C-332、N-65）。
 framing 已证明，故下一步只查“模块 key 是谁”——即 NfzPack 字面量之外，模块是否另有 key 来源或派生。
+
+### 11.10 NfzPack lambda 内部：XOR pad 与调用方 key（C-333/C-334）
+
+`OBSERVED`：`UpgradeNfzPack` lambda 内，字面量 `1ff6…13a0` 是逐字节 XOR pad（`xorb (%rsi,%rbx), %r12b` 带索引），
+不是 CRijndael key。`aesDecode2` 的 key 实参是 r14 = rcx = lambda 的 `QByteArray const&` 形参（存于 -0x218，再按
+QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解密后接 `pkcs7UnPadding`。
+
+`NEGATIVE`：按该真实管线（两序）配候选 key，明文 checksum 仍零命中（C-334、N-66）。缺的是调用方传入的模块
+`QByteArray` key。下一步沿 lambda 调用方回溯该 key，或找到其它直接给模块解密的路径。

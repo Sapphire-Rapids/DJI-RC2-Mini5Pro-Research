@@ -737,3 +737,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 
 限定：framing（CRijndael AES-256 CBC、IV `sm_chain0`）已由真实代码路径证明，故本阴性只指向“模块 key 是谁”，
 不否定 `aesDecode2` 本身。
+
+
+## N-66 — AES+XOR pipeline still misses with candidate keys (C-334)
+
+`NEGATIVE`：按反汇编得到的真实管线（先 `aesDecode2Ex` 或先 XOR 字面量，两序）在2603 上试字面量、32字节池读值、
+全零 key，明文 checksum 全零命中。
+
+限定：管线模型本身未被否定；缺的是 lambda 调用方传入的 `QByteArray` 模块 key。

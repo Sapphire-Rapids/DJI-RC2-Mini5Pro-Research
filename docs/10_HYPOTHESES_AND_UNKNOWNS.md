@@ -498,3 +498,14 @@ Assistant/DJI Fly native 的可提取常量中。
 
 `UNKNOWN`：该字面量属于哪个 product/context（另两个调用点也可能是 RC/SDK），以及 `aesDecode` 与 `WAES`
 是否同 key 不同 framing。
+
+
+## H-36 — the module NfzPack key is a caller-supplied QByteArray, not the literal
+
+`HYPOTHESIS`：字面量只是 XOR pad（C-333）；真正喂给 `aesDecode2` 的是 lambda 形参 `QByteArray const&`（rcx→r14→-0x218），
+由 `UpgradeNfzPack` 的调用方提供。
+
+判别实验：回溯 lambda 调用点（`std::function` 间接调用）找出 rcx 的来源，或看调用方是否用模块 id/名字/长度派生；
+拿到后按 `aesDecode2Ex` + XOR 管线解2603 并核 `plain_cksum`。未闭合前不得把任何候选称为 STUE key。
+
+`UNKNOWN`：该 QByteArray 是模块 id、文件名、还是设备/产品派生值；以及 NfzPack 是否为模块本体的正确路径。

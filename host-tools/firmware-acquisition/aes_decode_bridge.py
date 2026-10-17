@@ -44,8 +44,14 @@ print(data_of(out).hex())
 '''
 
 
+_ROOT = None
+
+
 def decode2ex(data: bytes, key: bytes) -> bytes:
-    root = wb_aes_bridge.build_mirror()
+    global _ROOT
+    if _ROOT is None:
+        _ROOT = wb_aes_bridge.build_mirror()
+    root = _ROOT
     out = subprocess.run(
         ["arch", "-x86_64", str(root / "MacOS/Python"), "-c", _WORKER, str(root), data.hex(), key.hex()],
         capture_output=True, text=True, check=True,
