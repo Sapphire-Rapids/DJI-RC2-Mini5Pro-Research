@@ -816,3 +816,11 @@ checksum 全零命中。
 aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 
 限定：可能有 std::function 间接调用或 helper 路由到别处；该扫描是有界否定。
+
+
+## N-76 — no decode step in the NfzPack chain (C-356)
+
+`NEGATIVE`：扫描 UpgradeMgr::UpgradeNfzPack 与 FirmUpgrader1::UpgradeNfzPack 的范围，无 fromBase64/fromHex/toHex/toUtf8
+调用 —— pack 字节是**原样**进入 crypto。
+
+限定：解码若存在则在更深的 callee 里；有界否定。

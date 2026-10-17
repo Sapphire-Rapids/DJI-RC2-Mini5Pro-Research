@@ -487,3 +487,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-352 | `OBSERVED` | aesDecode2 data/key assignment re-verified at the call site | ABI reading only; setter role still assumed |
 | C-353 | `OBSERVED` | UpgradeNfzPack is a URL-fetched pack path reading JSON `url` | Scope note; scheme may still transfer to the module |
 | C-354 | `NEGATIVE` | UpgradeFirmPack has no direct aes/IMaH calls | Indirect routing not excluded |
+| C-355 | `OBSERVED` | ProcessUpgradeFirmPack routes into UpgradeNfzPack, so the scheme applies to the pack | Websocket/JSON indirection; local chunk is a proxy |
+| C-356 | `NEGATIVE` | No base64/hex decode in the NfzPack chain | Decode may live in a callee |

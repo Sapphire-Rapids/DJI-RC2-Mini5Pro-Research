@@ -746,3 +746,8 @@ B-23 现仅剩“该容器的字段序列化顺序/layout”，即把那条 appe
 
 `OBSERVED`：NfzPack 是 URL 抓取包；`NEGATIVE`：FirmPack 无直接 crypto。
 B-23 先要判定“本地 .fw.sig 是否真的走 NfzPack 方案”；若否，则回到工具 IMaH 方案找 STUE key 来源。
+
+## B-23 回到字节级精确性（C-355/C-356）
+
+`OBSERVED`：FirmPack 路由确认，方案适用，本地 chunk 可代理。`NEGATIVE`：无解码步骤。
+B-23 回到先前唯一残差：setter 链 IMM 的角色与 seed 精确重建。

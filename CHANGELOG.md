@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.51 - 2026-10-16
+
+- Confirmed the FirmPack path routes into the analysed scheme: ProcessUpgradeFirmPack calls
+  UpgradeMgr::UpgradeNfzPack via a websocket writer, and the local .fw.sig is exactly such a pack
+  artifact, so the earlier category-mismatch worry is lifted (C-355).
+- NEGATIVE: neither NfzPack function decodes base64/hex, so pack bytes reach the crypto raw
+  (C-356, N-76).
+- B-23 returns to the byte-level residual: setter immediate role and seed rebuild.
+
 ## 0.4.50 - 2026-10-16
 
 - Scoped the analysed scheme: UpgradeNfzPack reads JSON `version`/`code` and `url`, logs strUrl and a

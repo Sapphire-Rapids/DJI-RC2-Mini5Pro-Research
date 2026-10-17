@@ -442,3 +442,12 @@ data（rsi）始终是 -0x218 密文。
 
 `NEGATIVE`：`UpgradeFirmPack`（模块路径）本体没有直接 aes/WAES/CRijndael/Imah 调用（C-354、N-75）。
 下一步应确认 FirmPack 是否经 std::function 间接路由到 NfzPack，或模块另有解密 helper。
+
+### 11.20 FirmPack 确实路由到 nfz 方案（C-355/C-356）
+
+`OBSERVED`：`DJIUpgradeView::ProcessUpgradeFirmPack` 读 JSON VALUE/type/PACKAGE_VERSION/version，并经
+`DJIWebSocketHandler::GetSafeWriter` 调用 `DJIUpgradeMgr::UpgradeNfzPack` —— 模块路径**确实**走到 NfzPack 方案，
+而本地 `.fw.sig` 正是这样一份 pack 产物。故此前的类别错配担忧解除，本地 chunk 可作抓取 pack 的代理。
+
+`NEGATIVE`：两条 NfzPack 函数体内无 base64/hex 解码（C-356、N-76），pack 字节原样入 crypto。
+故 B-23 回到 seed/setter 的字节级精确性。
