@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.62 - 2026-10-16
+
+- Recorded the local headless decompilation toolchain: Ghidra 12.1.2 under /opt/homebrew/Cellar plus
+  openjdk@21, with the working env form (C-376). Note the ~/Library/ghidra dir is only user settings.
+
 ## 0.4.61 - 2026-10-16
 
 - Switched focus to the RC side; found DJI Fly libsdk_jni.so exposes the RID surface: EIDSwitch,

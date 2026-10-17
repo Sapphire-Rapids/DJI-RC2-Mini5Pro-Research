@@ -529,3 +529,9 @@ OIDIdentifier37、IsEuCeEnableC0Rid18、RidWorkingStatusPush2、EU_CE_enable_c0_
 `IsEuCeEnableC0Rid` 与 `RidWorkingStatusPush`。
 
 `NEGATIVE`：`EU_CE_enable_c0_rid_0` 无直接 xref（C-375、N-86），属间接到达。
+
+### 11.30 本机反编译工具链（C-376）
+
+`OBSERVED`：Ghidra 12.1.2 位于 `/opt/homebrew/Cellar/ghidra/12.1.2`（`bin/ghidraRun` 已软链），openjdk@21 位于
+`/opt/homebrew/opt/openjdk@21`。以 `JAVA_HOME=... GHIDRA_INSTALL_DIR=... support/analyzeHeadless ...` 可跑 headless。
+注意 `~/Library/ghidra/ghidra_12.1.2_PUBLIC` 只是用户配置目录（log/osgi/preferences），不是安装本体。
