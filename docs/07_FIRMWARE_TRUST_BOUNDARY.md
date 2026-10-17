@@ -532,6 +532,21 @@ OIDIdentifier37、IsEuCeEnableC0Rid18、RidWorkingStatusPush2、EU_CE_enable_c0_
 
 ### 11.30 本机反编译工具链（C-376）
 
-`OBSERVED`：Ghidra 12.1.2 位于 `/opt/homebrew/Cellar/ghidra/12.1.2`（`bin/ghidraRun` 已软链），openjdk@21 位于
-`/opt/homebrew/opt/openjdk@21`。以 `JAVA_HOME=... GHIDRA_INSTALL_DIR=... support/analyzeHeadless ...` 可跑 headless。
+`OBSERVED`：Ghidra 12.1.2 位于 `/opt/homebrew/Cellar/ghidra/12.1.2`，运行根在 `libexec/`（`support/analyzeHeadless` 在 `libexec/support`），openjdk@21 位于
+`/opt/homebrew/opt/openjdk@21`。以 `JAVA_HOME=... GHIDRA_INSTALL_DIR=...libexec libexec/support/analyzeHeadless ...` 可跑 headless。
 注意 `~/Library/ghidra/ghidra_12.1.2_PUBLIC` 只是用户配置目录（log/osgi/preferences），不是安装本体。
+
+### 11.31 遥控器侧命中 RID 开关处理器（C-377/C-378/C-379）
+
+`OBSERVED`：Ghidra headless 定位到真正的 RID/EID 开关访问器 —— 自由处理器 `EIDSwitchGet`（0x04e12d44）与
+`EIDSwitchSet`（0x04e12f80），签名 (KeyHandlers*, Characteristics const&, shared_ptr<UavValue>, callback)；Set 会
+`__dynamic_cast` 校验类型、不匹配返回 -6。
+
+`OBSERVED`：两者及其 `UAV77FlightControllerAbstraction::GetEIDSwitch/SetEIDSwitch` 包装（0x02d9ad3c / 0x02d9afa0）
+都构造 `uav_cmd_base_req`，置 local_76=0x77、local_74=3、local_71=3 再 local_71=0x12、local_7c=4，并调用
+`uav_cmd_req_header::SetReceiverIndex`；Get 置 local_48=2、get/set 标志0，Set 由值头取 local_48、标志1。
+
+`OBSERVED`：`OIDIdentifierGet/Set`（0x04eabadc / 0x04eac2fc）为同级处理器，`ComplianceSerialNumberInit` 在 0x02e36740，
+即整套 RID 参数族都在遥控器侧（C-379）。
+
+下一步：解出各常量语义与值字节布局，形成可下发的 set 报文。

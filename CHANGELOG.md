@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.63 - 2026-10-16
+
+- RC-side breakthrough: Ghidra headless recovered the actual RID/EID enable accessors `EIDSwitchGet`
+  (0x04e12d44) and `EIDSwitchSet` (0x04e12f80), with the UAV77 abstraction wrappers (C-377).
+- Both build a concrete uav_cmd request: cmd0x77, attr0x12, sub3/3, len4, SetReceiverIndex, and a
+  get/set flag (C-378). OIDIdentifierGet/Set and ComplianceSerialNumberInit are sibling handlers
+  (C-379).
+- New blocker B-24: decode the constant meanings and value byte layout into a sendable set message.
+
 ## 0.4.62 - 2026-10-16
 
 - Recorded the local headless decompilation toolchain: Ghidra 12.1.2 under /opt/homebrew/Cellar plus

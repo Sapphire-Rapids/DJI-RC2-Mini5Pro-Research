@@ -509,3 +509,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-374 | `OBSERVED` | Per-symbol direct xref counts recovered; IsEuCeEnableC0Rid/RidWorkingStatusPush most focused | Counts are direct-ref only |
 | C-375 | `NEGATIVE` | EU_CE_enable_c0_rid_0 has zero direct ADRP+ADD xrefs | Indirect table/computed name not excluded |
 | C-376 | `OBSERVED` | Local Ghidra 12.1.2 + JDK21 headless decompilation is available | The ~/Library/ghidra dir is only user settings |
+| C-377 | `OBSERVED` | EIDSwitchGet/EIDSwitchSet are the RC-side RID enable key handlers | Type-checked setter; -6 on mismatch |
+| C-378 | `OBSERVED` | EID handlers build uav_cmd with cmd0x77/attr0x12 and a get/set flag | Constant meanings inferred; value layout unresolved |
+| C-379 | `OBSERVED` | OIDIdentifier and ComplianceSerialNumber are sibling RID handlers | Opcodes not yet read |
