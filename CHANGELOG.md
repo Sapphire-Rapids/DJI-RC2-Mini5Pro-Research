@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.56 - 2026-10-16
+
+- Dense in-process pointer brute (6144 combos) over the synthetic struct seed still misses (C-365,
+  N-81).
+- Key realisation: the loop bound is the length0x2c, i.e. 12 bytes beyond the32-byte struct, and
+  -0x208+44 lands on the neighbouring -0x1d0 area - so the missing ingredient is those tail bytes.
+- B-23 becomes 'include the 12 tail neighbour bytes' or an address-independent re-read.
+
 ## 0.4.55 - 2026-10-16
 
 - Recorded the XsBuffer field layout: 0x0 vtable, 0x8 malloc data pointer, 0x10 capacity, 0x18 length;

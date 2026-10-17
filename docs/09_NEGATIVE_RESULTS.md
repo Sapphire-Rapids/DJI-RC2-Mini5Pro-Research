@@ -853,3 +853,11 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 checksum 全零命中。
 
 限定：只扫了指针；vtable/cap/len 是固定猜测，可能仍有未建模字段或不同基址前缀。
+
+
+## N-81 — systematic pointer brute still misses (C-365)
+
+`NEGATIVE`：进程内 aesDecode2Ex 扫6144 个合成堆指针（lo 0..0x10000 step16 × hi 0x00/0x7f/0x10，固定 vt/cap/len），
+raw/变换，2603 明文 checksum 全零命中。
+
+限定：指针已密扫；残差是32 字节结构之外的0x2c 尾字节，或字段角色配错。
