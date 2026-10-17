@@ -949,3 +949,11 @@ raw/变换，2603 明文 checksum 全零命中。
 `shift_rows`、`SHA256`）。
 
 正解：provider 是被 strip 的库，而非不存在。白盒本体极可能就在 libsdk_base.so，可用 Ghidra 直接打开分析。
+
+
+## N-93 — keychain entry pointers are zero in-file (C-422)
+
+`NEGATIVE`：表项 0x37 的 qword[0]/qword[2] 在文件中为0，故密钥/名字的字节位置不能靠直接指针读取解析；
+它们是重定位或基址相对量。
+
+限定：只否定"直接指针可读"，不否定表本身存在（C-420）。

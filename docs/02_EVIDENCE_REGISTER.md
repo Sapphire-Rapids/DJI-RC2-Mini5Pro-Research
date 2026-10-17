@@ -552,3 +552,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-417 | `NEGATIVE` | No lib defines or exports GetWhiteBoxKeyChainString | Body unresolved from these libs alone |
 | C-418 | `OBSERVED` | libsdk_base.so embeds the whitebox/crypto symbol-name table | Stripped lib; names not in symtab |
 | C-419 | `RETRACTED` | C-417 absolute no-definition framing is too strong | Provider is stripped, not absent |
+| C-420 | `OBSERVED` | Whitebox keychain is a static pointer table addressed by id | Entry 0x37 -> 0x7daaa0, stride 0x18 |
+| C-421 | `OBSERVED` | Keychain entry 0x37 is a 48-byte key slot with zeroed pointer fields | qword[1]=0x30 length; ptrs 0 |
+| C-422 | `NEGATIVE` | Entry pointer fields are zero in-file | Resolution is relocation/base-relative |

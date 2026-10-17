@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.89 - 2026-10-16
+
+- Decompiled the whitebox providers in libsdk_base: both delegate to a table at 0x7da578 with stride
+  0x18 holding [ptr,len,ptr]; id 0x37 selects 0x7daaa0 (C-420).
+- Entry 0x37 carries qword1=0x30, a 48-byte key length (C-421).
+- NEGATIVE: the pointer fields are zero in-file, so byte resolution is relocation/base-relative
+  (C-422, N-93).
+
 ## 0.4.88 - 2026-10-16
 
 - libsdk_base.so embeds a mangled whitebox/crypto name table (GetWhiteBoxKeyChainString, WAES_*,

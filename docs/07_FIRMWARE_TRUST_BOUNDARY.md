@@ -716,3 +716,15 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `RETRACTED`：C-417 的"无库定义"读法过强（C-419、N-92）—— 真相是**被 strip 的 provider**，不是缺失。
 下一步：用 Ghidra 打开 libsdk_base.so 直接分析白盒 body。
+
+### 11.48 白盒密钥链表位置与 0x37 槽（C-420/C-421/C-422）
+
+`OBSERVED`：`uav::whitebox::GetWhiteBoxKeyChainString` 与 `uav::crypto::GetWhiteBoxKeyChainString` 均转到
+`get_key_chain_info_for_index(_csdk)` —— 先以 `get_key_chain_size()` 做边界检查，再调 `get_key_chain_info`。
+后者读 `0x7da578`、步长 0x18 的表，拷出三个 qword（`[ptr, len, ptr]`）。故 id 0x37 选中表项 `0x7daaa0`。
+
+`OBSERVED`：0x37 表项原始为 `qword1=0x30`（48，密钥长度）、qword0/qword2=0；兄弟项 0x0/0x1/0x2 同形，长度 0x20/0x30/0x20（C-421）。
+
+`NEGATIVE`：表项指针在文件中为0，字节位置需按重定位/基址相对解析（C-422、N-93）。
+
+即：**0x37 是一把 48 字节密钥**，出处已定位；只差把重定位后的指针解出来。
