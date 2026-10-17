@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.92 - 2026-10-16
+
+- Decompiled the AES/HMAC helpers: AES256Encrypt is AES-CBC + PKCS#7-style padding with a caller key
+  length (C-426); HmacEncode writes the full digest over the Buffer, not a truncation (C-427).
+- Fixed the position emitter accordingly (no ljust, full mac, ct inside a 0x100 field) and re-hashed
+  A-078 to v2. H-38 is now CORROBORATED; only the prefix composition stays approximate.
+
 ## 0.4.91 - 2026-10-16
 
 - Added A-078, a position encrypted emitter (C-425): cmd0x43/sub0x11, 22-byte plaintext, AES-256-CBC
