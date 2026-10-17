@@ -483,3 +483,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-348 | `NEGATIVE` | Constant-seed key attempts still miss | Seed extraction approximate; container layout not impugned |
 | C-349 | `OBSERVED` | Seed container begins with a0x22 malloc size and `tY` ASCII prefix | Emitted order from negative map keys not modelled |
 | C-350 | `NEGATIVE` | Seed-shape variants still miss | Emitted order not modelled; shape not impugned |
+| C-351 | `NEGATIVE` | Key-sorted seed orderings still miss | Setter ABI assumed; sorted emission not impugned |
+| C-352 | `OBSERVED` | aesDecode2 data/key assignment re-verified at the call site | ABI reading only; setter role still assumed |

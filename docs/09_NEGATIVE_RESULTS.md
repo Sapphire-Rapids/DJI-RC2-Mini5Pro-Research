@@ -800,3 +800,11 @@ checksum 全零命中。
 `NEGATIVE`：完整常量列表 raw/变换、去掉前导0x22、以及截到34字节，作 key 解密文，2603 明文 checksum 全零命中。
 
 限定：字段是以负偏移作 map key 写入的，其**输出顺序**未建模；C-349 的形状结论未被否定。
+
+
+## N-74 — key-sorted seed orderings still miss (C-351)
+
+`NEGATIVE`：把负 key 字段按升/降序排序，并加/去 0x74 0x59 0x2b 前缀，作 raw 或变换 key 解密文，2603 明文 checksum
+全零命中。
+
+限定：setter 的 ABI（立即数究竟是 key 还是 value）仍是假设；排序发射本身未被否定。

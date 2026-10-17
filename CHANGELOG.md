@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.49 - 2026-10-16
+
+- Re-verified the aesDecode2 call ABI (rdi sret, rdx key, rsi data) and that -0x218 stays untouched by
+  the field chain, so data=ciphertext and key=transformed seed string (C-352).
+- NEGATIVE: ascending/descending key-sorted orderings with/without the 0x22 buffer prefix still miss
+  (C-351, N-74).
+- B-23 narrows to deciding whether the setter immediate is a map key or the emitted value.
+
 ## 0.4.48 - 2026-10-16
 
 - Characterised the seed container shape: a mallocs0x22 fixed byte block with ASCII `74 59` (`tY`) at

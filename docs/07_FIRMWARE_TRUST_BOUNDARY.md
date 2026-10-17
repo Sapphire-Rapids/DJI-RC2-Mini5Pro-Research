@@ -425,3 +425,11 @@ data（rsi）始终是 -0x218 密文。
 带可读头。注意字段是以负 key 写入的，**发射顺序**未必等于列表顺序，这是当前残差。
 
 `NEGATIVE`：各形状变体作 key 仍零命中（C-350、N-73）。下一步是按负 key 排序还原真实发射顺序。
+
+### 11.18 setter ABI 与调用点复核（C-351/C-352）
+
+`OBSERVED`：复核 0x68b109 调用，rdi=-0x310(sret)、rdx=-0x1d0(key)、rsi=-0x218(data)；-0x218 未被字段链触碰（链写的是另一个
+-0x208 对象）。故 data=输入密文、key=变换后的 seed 字符串这一分工成立。
+
+`NEGATIVE`：把负 key 排序并加/去前缀作 seed 仍零命中（C-351、N-74）。残余是 setter 链的 ABI 语义
+（`movl $IMM,%esi` 中 IMM 到底是 map key 还是 value）。
