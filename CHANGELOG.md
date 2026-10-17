@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.80 - 2026-10-16
+
+- Added A-075, a README index for host-tools/rid-protocol (C-406) with usage, self-check command and
+  the runtime-value/socket/RC-mirror boundaries.
+
 ## 0.4.79 - 2026-10-16
 
 - Added a mirroring byte-for-byte self-check and 0x70 cap test for the OID emitter (C-404).

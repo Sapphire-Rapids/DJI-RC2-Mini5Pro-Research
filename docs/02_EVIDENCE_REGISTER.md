@@ -538,3 +538,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-403 | `RETRACTED` | First emitter put the 'IW' magic at 0x0c instead of 0x0e | Corrected both emitters and re-hashed A-071/A-072 |
 | C-404 | `OBSERVED` | OID emitter has a mirroring self-check plus a cap test | Decompilation-anchored |
 | C-405 | `NEGATIVE` | EU_CE_enable_c0_rid_0 has no dedicated Get/Set handler symbol | Bound via observer pattern, not a named handler |
+| C-406 | `OBSERVED` | rid-protocol gained a directory README | Index/usage only |
