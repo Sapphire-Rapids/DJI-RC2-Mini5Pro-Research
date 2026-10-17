@@ -707,3 +707,12 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `NEGATIVE`：全部208 库中**没有**任何库定义/导出该函数（C-417、N-91）。故位置所需的 id 0x37 密钥无法仅凭这些库复现；
 白盒本体可能由未抽取/其它 ABI 或 assets 提供。
+
+### 11.47 libsdk_base 是被 strip 的白盒提供者（C-418/C-419）
+
+`OBSERVED`：`libsdk_base.so` 内嵌 mangled 名表 —— `uav::whitebox::GetWhiteBoxKeyChainString(UAVWhiteBoxKeyChainInfoIndex)`、
+`uav::crypto::GetWhiteBoxKeyChainString(...)`，以及 `WAES_decrypt_real`、`WAES_encrypt_real`、`shift_rows`、`SHA256`。
+该库无 symtab（strip），故名字落在内嵌表而非符号表。
+
+`RETRACTED`：C-417 的"无库定义"读法过强（C-419、N-92）—— 真相是**被 strip 的 provider**，不是缺失。
+下一步：用 Ghidra 打开 libsdk_base.so 直接分析白盒 body。

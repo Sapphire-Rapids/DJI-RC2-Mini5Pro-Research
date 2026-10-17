@@ -550,3 +550,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-415 | `OBSERVED` | One whitebox keychain id 0x37 feeds both the position AES and HMAC | Shared key; derivation body external |
 | C-416 | `OBSERVED` | APK has 208 arm64 libs; whitebox name is only an import | libwaes exposes a JNI whitebox AES entry |
 | C-417 | `NEGATIVE` | No lib defines or exports GetWhiteBoxKeyChainString | Body unresolved from these libs alone |
+| C-418 | `OBSERVED` | libsdk_base.so embeds the whitebox/crypto symbol-name table | Stripped lib; names not in symtab |
+| C-419 | `RETRACTED` | C-417 absolute no-definition framing is too strong | Provider is stripped, not absent |

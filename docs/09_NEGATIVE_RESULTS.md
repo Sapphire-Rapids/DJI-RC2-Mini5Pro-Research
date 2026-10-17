@@ -940,3 +940,12 @@ raw/变换，2603 明文 checksum 全零命中。
 或名字引用。故该 whitebox keychain 本体无法仅凭这些库解析。
 
 限定：只覆盖已抽取库；白盒可能由未抽取/其它 ABI 或 assets 提供。
+
+
+## N-92 / 修正 — C-417 的"无定义"过强（C-418/C-419）
+
+`RETRACTED`：C-417 断言无库定义 `GetWhiteBoxKeyChainString`。该结论只对 nm 可见符号成立；
+`libsdk_base.so` 被 strip，却内嵌了 whitebox/crypto 的 mangled 名表（连同 `WAES_decrypt_real`、`WAES_encrypt_real`、
+`shift_rows`、`SHA256`）。
+
+正解：provider 是被 strip 的库，而非不存在。白盒本体极可能就在 libsdk_base.so，可用 Ghidra 直接打开分析。

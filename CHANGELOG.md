@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.88 - 2026-10-16
+
+- libsdk_base.so embeds a mangled whitebox/crypto name table (GetWhiteBoxKeyChainString, WAES_*,
+  shift_rows, SHA256) while being stripped (C-418).
+- RETRACTED C-417's absolute no-definition framing: the provider is stripped, not absent (C-419, N-92);
+  next step is to open libsdk_base.so in Ghidra directly.
+
 ## 0.4.87 - 2026-10-16
 
 - Extracted the 208 arm64 libs from the official APK and mapped the whitebox name: only imports/
