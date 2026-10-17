@@ -477,3 +477,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-342 | `NEGATIVE` | Period17 pad plus rotate modelling still misses | Residual is rotate pairing and fed buffer |
 | C-343 | `OBSERVED` | Rotate pairing is a single-byte self-rotate `ror8(b,i&7)` | r14-negative framing inferred; not executed |
 | C-344 | `NEGATIVE` | Exact transform and broad md5 keys still miss | Residual is fed buffer; NfzPack may not be the module path |
+| C-345 | `OBSERVED` | aesDecode2 key is the transformed buffer as a C string, not the MD5 hex | -0x208 object identity assumed; NUL truncation data-dependent |
+| C-346 | `NEGATIVE` | C-string transform key still misses | Mechanism not impugned; residual is -0x208 identity/transform direction |

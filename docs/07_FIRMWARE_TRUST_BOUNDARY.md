@@ -401,3 +401,11 @@ QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解
 
 `NEGATIVE`：按此精确变换、以及把 md5/hex-of-md5 施于多种输入当 key 套工具方案，仍零命中（C-344、N-70）。
 残差只剩“哪个缓冲进 aesDecode2”，以及“NfzPack 是否就是模块本体的路径”。
+
+### 11.15 key 实为变换缓冲的 C 字符串（C-345/C-346）
+
+`OBSERVED`：transform 循环后，其 -0x208 对象数据被 memcpy 进 -0x42f 的 std::string，`strlen` 量长后经
+`QString::fromAscii_helper` 存入 -0x1d0 —— 这里 **-0x1d0 被覆盖**，成为 aesDecode2 的 rdx key；rsi 是 -0x218 原始
+QByteArray。此前 -0x1d0 的 MD5-hex 串只是 `nfz before decode md5: %1` 的日志值。key = 变换输出到首个 NUL，前0x20 字节生效。
+
+`NEGATIVE`：按此仍零命中（C-346、N-71）。残差：-0x208 是否逐字节等于密文（它由 XsBuffer append 链构建）与变换方向。

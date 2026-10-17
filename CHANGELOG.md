@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.46 - 2026-10-16
+
+- Corrected the key slot: -0x1d0 is overwritten by the transformed buffer wrapped as a C string
+  (memcpy -> std::string -> strlen -> QString::fromAscii_helper), and it is the aesDecode2 key; the
+  earlier MD5-hex is only the `nfz before decode md5` log value (C-345).
+- NEGATIVE: the C-string transform key (and raw t-32) with optional post-XOR still misses
+  (C-346, N-71).
+- B-23 narrows to confirming whether the -0x208 XsBuffer object carries the ciphertext and the
+  transform direction.
+
 ## 0.4.45 - 2026-10-16
 
 - Pinned the rotate pairing exactly: both loads are the same source byte, and the shifts collapse to

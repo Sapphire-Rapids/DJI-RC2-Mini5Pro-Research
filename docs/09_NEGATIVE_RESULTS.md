@@ -777,3 +777,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 前若干字节当 key，套工具 ck/CTR/ECB 与 CBC 方案，2603 明文 checksum 全零命中。
 
 限定：md5 派生（C-337）与变换（C-343）均为静态得出；残差是喂入哪个缓冲，以及 NfzPack 是否就是模块路径。
+
+
+## N-71 — C-string transform key still misses (C-346)
+
+`NEGATIVE`：按 C-345，key = transform(enc) 截到首个 NUL 再取32字节（以及 t-32 raw），data=enc，含可选 post-XOR，
+2603 明文 checksum 全零命中。
+
+限定：C-345 机制未被否定；残差仅是“-0x208 是否逐字节等于密文”与变换方向。
