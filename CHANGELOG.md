@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.60 - 2026-10-16
+
+- RC-side recon: rc331 partition `rid_enable`/`RID_ENABLE` hits are video-encoder properties and
+  `RemoteId` hits are AOSP/Chromium classes, so neither is Remote ID; the DJI_FLY.apk bytes live in
+  /data/app and are absent from the OTA (C-371, N-85).
+- DJI Fly's package dji.go.v5 is referenced across five partitions, so native/config pieces do sit in
+  the OTA (C-372).
+- Correct route: use the external DJI Fly dump for the RID toggle and treat rc331 partitions as
+  native/config corroboration.
+
 ## 0.4.59 - 2026-10-16
 
 - NEGATIVE: 20000-iteration random struct-seed sweep (random pointer+tail, 3 cap/len, raw/transformed,

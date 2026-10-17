@@ -509,3 +509,11 @@ NUL 之后的属性存区域。
 
 `NEGATIVE`：tail/指针/cap/len 组合仍零命中（C-368、N-83）。下一步按“NUL 后即对象字段”这一事实重排：key 应从 index3 之后
 读取结构体剩余字段，而非把结构体字节当作被 strlen 截断的前缀。
+
+### 11.28 遥控器侧 RID 侦察（C-371/C-372）
+
+`OBSERVED`：rc331 分区裸扫里，`rid_enable`/`RID_ENABLE` 其实是视频编码属性 `layer_wise_rc_enable`；`RemoteId` 是
+AOSP/Chromium 类 —— 都不是 Remote ID。`DJI_FLY.apk` 仅以路径出现（附近4MB 无 `PK` 魔数），故 apk 本体在 /data/app、
+不在 OTA。`NEGATIVE`：分区裸扫不足以拿开关（N-85）。
+
+正解：改用仓外的 DJI Fly dump（同一 App 版本）找 RID 开关/参数，rc331 分区只作 native/config 佐证。

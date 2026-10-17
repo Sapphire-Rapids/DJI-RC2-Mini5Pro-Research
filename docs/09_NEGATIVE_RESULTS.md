@@ -884,3 +884,11 @@ raw/变换，2603 明文 checksum 全零命中。
 2603 明文 checksum 全零命中。
 
 限定：指针与尾已被随机密集覆盖；残差很可能是尚未判定的“`init` 每轮清零”问题 —— 若成立，seed 中段全零，空间彻底改变。
+
+
+## N-85 — rc331 partition RID hits are unrelated, Fly APK absent (C-371)
+
+`NEGATIVE`：`rid_enable`/`RID_ENABLE` 命中的其实是视频编码属性 `layer_wise_rc_enable`；`RemoteId` 命中是 AOSP/Chromium 类。
+且 `DJI_FLY.apk` 只是路径引用（4MB 内无 `PK` 魔数），真实 apk 位于 /data/app、不在 OTA 内。
+
+限定：这只说明分区裸扫不足以拿开关，需改用在仓外的 DJI Fly dump。

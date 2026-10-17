@@ -503,3 +503,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-368 | `NEGATIVE` | Tail/pointer/cap/len seed variants still miss | Tail uninitialised, approximated |
 | C-369 | `OBSERVED` | strlen truncates at the vtable NUL so the key is short and MakeKey reads past it | Byte past NUL is the object tail |
 | C-370 | `NEGATIVE` | 20000-iteration random struct-seed sweep still misses | Residual is the unjudged init-per-iteration question |
+| C-371 | `OBSERVED` | rc331 RID hits are unrelated; Fly APK bytes are absent from the OTA | App lives in /data/app, so use an external Fly dump |
+| C-372 | `OBSERVED` | DJI Fly package dji.go.v5 is referenced across five rc331 partitions | Refs may be incidental; no owner identified |
