@@ -495,3 +495,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-360 | `OBSERVED` | Transform reads and writes the same object index (in-place, byte-local) | Confirms byte-local formula |
 | C-361 | `OBSERVED` | cvPc/append return this, so the seed is struct bytes incl. runtime pointers | Static replay must approximate/emulate allocation |
 | C-362 | `NEGATIVE` | Pointer-approximated struct seeds still miss | Pointer low bytes unknown; approximation coarse |
+| C-363 | `OBSERVED` | XsBuffer field layout is vtable0x0/dataptr0x8/cap0x10/len0x18 | Live 32 bytes exactly the indexed range |
+| C-364 | `NEGATIVE` | Mimicked struct seeds across a heap-pointer sweep still miss | Only pointer swept; other fields are fixed guesses |

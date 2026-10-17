@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.55 - 2026-10-16
+
+- Recorded the XsBuffer field layout: 0x0 vtable, 0x8 malloc data pointer, 0x10 capacity, 0x18 length;
+  the live object is exactly 32 bytes and is the range the transform indexes (C-363).
+- NEGATIVE: structure-mimicked seeds with a 64x16 heap-pointer sweep and fixed cap/len still miss
+  (C-364, N-80).
+- B-23 becomes a multi-dimension address sweep (pointer, cap/len, base prefix) or an
+  address-independent re-read of the loop.
+
 ## 0.4.54 - 2026-10-16
 
 - Key correction: cvPc tail-calls append and returns this, and append returns this, so the indexed seed

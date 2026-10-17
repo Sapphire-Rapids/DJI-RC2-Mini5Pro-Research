@@ -845,3 +845,11 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 `NEGATIVE`：用 vtable 指针字节+零、+缓冲、裸缓冲、裸 vtable 组 seed（raw/变换），2603 明文 checksum 全零命中。
 
 限定：malloc/栈地址的低字节未知，近似很粗；C-361 未被否定。
+
+
+## N-80 — mimicked struct seeds across a heap sweep still miss (C-364)
+
+`NEGATIVE`：按 C-363 布局伪造 seed（vt + 0x7f 前缀堆指针，64×16 扫描 + cap0x2b + len0x2c），raw/变换，2603 明文
+checksum 全零命中。
+
+限定：只扫了指针；vtable/cap/len 是固定猜测，可能仍有未建模字段或不同基址前缀。
