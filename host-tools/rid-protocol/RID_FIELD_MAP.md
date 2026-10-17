@@ -40,5 +40,5 @@
 - ~~OID 对齐 RID-005B~~ 已完成（C-411，A-072 v2）。
 - UE/CE 区域键 `EU_CE_enable_c0_rid_0` 为 observer 绑定（C-405）。
 - receiver 统一来自 Characteristics+0x30，运行期取值。
-- 位置 whitebox 密钥链 = libsdk_base `0x7da578` 表、id 0x37 为48字节槽（C-420/C-421）；表项指针重定位待解（C-422）。
+- 位置 whitebox 密钥链已解析：libsdk_base 表 `0x7da578`，id 0x37 → 48字节密钥，文件 `0x740b30`/`0x73a600`（C-420/C-421/C-423）。
 - 全部 STATIC；live inventory/键存在性证据待实机。

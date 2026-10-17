@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.90 - 2026-10-16
+
+- Resolved keychain id 0x37: Ghidra relocation turns the entry's file zeros into pointers 0x842b30 /
+  0x83c600 with length 0x30; the 48-byte blobs sit at file 0x740b30 / 0x73a600 (C-423).
+- NEGATIVE: a flat base-subtract mapping mismatches the Ghidra read; the delta there is 0x102000, so
+  per-segment mapping is required (C-424, N-94).
+
 ## 0.4.89 - 2026-10-16
 
 - Decompiled the whitebox providers in libsdk_base: both delegate to a table at 0x7da578 with stride

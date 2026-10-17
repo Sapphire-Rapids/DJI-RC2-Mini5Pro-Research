@@ -555,3 +555,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-420 | `OBSERVED` | Whitebox keychain is a static pointer table addressed by id | Entry 0x37 -> 0x7daaa0, stride 0x18 |
 | C-421 | `OBSERVED` | Keychain entry 0x37 is a 48-byte key slot with zeroed pointer fields | qword[1]=0x30 length; ptrs 0 |
 | C-422 | `NEGATIVE` | Entry pointer fields are zero in-file | Resolution is relocation/base-relative |
+| C-423 | `OBSERVED` | Keychain id 0x37 resolves to two 48-byte static blobs | File offs 0x740b30 / 0x73a600 |
+| C-424 | `NEGATIVE` | A flat base-subtract mapping mismatches the Ghidra read | Per-segment delta is 0x102000 there |

@@ -957,3 +957,11 @@ raw/变换，2603 明文 checksum 全零命中。
 它们是重定位或基址相对量。
 
 限定：只否定"直接指针可读"，不否定表本身存在（C-420）。
+
+
+## N-94 — flat base mapping misses the key blobs (C-424)
+
+`NEGATIVE`：用 `Ghidra_va - 0x100000` 的扁平映射读密钥，字节与 Ghidra 内存读不一致；只有对原始文件搜索 Ghidra 的 hex
+才定位到真偏移（`0x740b30` / `0x73a600`，该处 delta 为 `0x102000`）。
+
+限定：这是映射方法学问题，不否定密钥存在（C-423）。
