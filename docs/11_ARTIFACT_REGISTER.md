@@ -491,3 +491,8 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 ## A-075：rid-protocol README（C-406）
 
 `README.md` 索引该目录的规格/发射器/自检/手册/收口，附用法、自检命令与边界（运行期取值、socket、RC 镜像）。
+
+## A-076：opid 发射器（C-408）
+
+`opid_message.py` + 自检：cmd120(0x78)/sub3 的 set-and-delete 动作，16 字符上限，空载荷=删除候选。
+数据来源 `OperatorRegistrationNumberSet`。状态 `STATIC`。

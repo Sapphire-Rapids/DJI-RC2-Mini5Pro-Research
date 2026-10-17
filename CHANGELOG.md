@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.82 - 2026-10-16
+
+- Decoded OperatorRegistrationNumberSet as an action: cmd120(0x78)/sub3, tag rid_set_and_delete_opid,
+  16-char string payload with RemoteIDHelper validation (C-408). Added A-076 emitter plus a self-check.
+- RidImportModule SetRIDReqPack/SetRIDInfo use cmd75/sub17 with a 0x4b sub-field - the Japan
+  registration channel, distinct from opid and the EU/CN keys (C-409).
+
 ## 0.4.81 - 2026-10-16
 
 - Reconciliation: the EIDSwitch characteristic and the EU_CE_enable_c0_rid_0 key were already
