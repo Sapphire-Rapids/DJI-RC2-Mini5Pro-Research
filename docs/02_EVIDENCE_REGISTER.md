@@ -485,3 +485,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-350 | `NEGATIVE` | Seed-shape variants still miss | Emitted order not modelled; shape not impugned |
 | C-351 | `NEGATIVE` | Key-sorted seed orderings still miss | Setter ABI assumed; sorted emission not impugned |
 | C-352 | `OBSERVED` | aesDecode2 data/key assignment re-verified at the call site | ABI reading only; setter role still assumed |
+| C-353 | `OBSERVED` | UpgradeNfzPack is a URL-fetched pack path reading JSON `url` | Scope note; scheme may still transfer to the module |
+| C-354 | `NEGATIVE` | UpgradeFirmPack has no direct aes/IMaH calls | Indirect routing not excluded |

@@ -741,3 +741,8 @@ B-23 现仅剩“该容器的字段序列化顺序/layout”，即把那条 appe
 
 `OBSERVED`：调用点分工复核无误。`NEGATIVE`：排序发射仍零命中。B-23 现仅剩判定 IMM 是 key 还是 value
 （即字段到底发射什么字节），这一步确定后 seed 可精确重建。
+
+## B-23 扩为路径归属问题（C-353/C-354）
+
+`OBSERVED`：NfzPack 是 URL 抓取包；`NEGATIVE`：FirmPack 无直接 crypto。
+B-23 先要判定“本地 .fw.sig 是否真的走 NfzPack 方案”；若否，则回到工具 IMaH 方案找 STUE key 来源。

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.50 - 2026-10-16
+
+- Scoped the analysed scheme: UpgradeNfzPack reads JSON `version`/`code` and `url`, logs strUrl and a
+  fetched size, so the md5/transform/xor key belongs to a remotely fetched nfz pack, not a local
+  .fw.sig (C-353) - applying it to the local chunk is a possible category mismatch.
+- NEGATIVE: UpgradeFirmPack carries no direct aes/WAES/CRijndael/Imah call (C-354, N-75).
+- B-23 first asks whether the local .fw.sig routes through NfzPack at all; otherwise return to the
+  tool IMaH scheme for the STUE key source.
+
 ## 0.4.49 - 2026-10-16
 
 - Re-verified the aesDecode2 call ABI (rdi sret, rdx key, rsi data) and that -0x218 stays untouched by

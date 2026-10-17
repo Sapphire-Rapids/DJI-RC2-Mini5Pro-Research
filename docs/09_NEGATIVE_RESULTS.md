@@ -808,3 +808,11 @@ checksum 全零命中。
 全零命中。
 
 限定：setter 的 ABI（立即数究竟是 key 还是 value）仍是假设；排序发射本身未被否定。
+
+
+## N-75 — UpgradeFirmPack has no direct crypto calls (C-354)
+
+`NEGATIVE`：扫描 DJIFirmUpgrader1::UpgradeFirmPack（0x60c450..+0x1800）只有 `url` 字面量，没有指向
+aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
+
+限定：可能有 std::function 间接调用或 helper 路由到别处；该扫描是有界否定。

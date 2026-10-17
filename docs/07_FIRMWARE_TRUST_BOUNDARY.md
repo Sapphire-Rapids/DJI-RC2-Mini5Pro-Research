@@ -433,3 +433,12 @@ data（rsi）始终是 -0x218 密文。
 
 `NEGATIVE`：把负 key 排序并加/去前缀作 seed 仍零命中（C-351、N-74）。残余是 setter 链的 ABI 语义
 （`movl $IMM,%esi` 中 IMM 到底是 map key 还是 value）。
+
+### 11.19 路径归属：NfzPack 是 URL 抓取包（C-353/C-354）
+
+`OBSERVED`：`DJIFirmUpgrader1::UpgradeNfzPack` 上游读 JSON `version`/`code`、本地读 `url`，并记录 strUrl 与抓取数据大小。
+因此之前分析的 md5/变换/xor key 方案属于一个**远程抓取的 nfz pack**，而非本地 `.fw.sig` —— 用它直接套本地模块 chunk
+可能是**类别错配**。
+
+`NEGATIVE`：`UpgradeFirmPack`（模块路径）本体没有直接 aes/WAES/CRijndael/Imah 调用（C-354、N-75）。
+下一步应确认 FirmPack 是否经 std::function 间接路由到 NfzPack，或模块另有解密 helper。
