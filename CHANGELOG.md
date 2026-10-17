@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.97 - 2026-10-16
+
+- Decompiled the dynamic max height ctor: standard header, cmd0x50/sub0x11, empty payload (C-436).
+  Added A-080 GET emitter plus a self-check.
+- NEGATIVE: no named handler exists for this opcode, so the call site stays unnamed (C-437, N-97).
+
 ## 0.4.96 - 2026-10-16
 
 - Decoded SetADSBSwitch: a 1-byte boolean on cmd55/sub17 with adsb_switch_pack, reading value+8

@@ -764,3 +764,10 @@ RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一
 - `uav_adsb_get_drone_dynamic_max_height_req/rsp` → cmd **80 (0x50)** / sub17（ctor 0x02cb9980）—— 动态最大高度，独立于位置 set
 
 这三条补齐了 B 段：广播代理开关 + 高度由此进入解码队列（载荷待取）。
+
+### 11.53 动态最大高度 ctor 与匿名 handler（C-436/C-437）
+
+`OBSERVED`：反编译 `uav_adsb_get_drone_dynamic_max_height` ctor（0x02cb9980）—— 标准形状：`*this=0x2501101`（字节
+01 11 50 02）、+1 qword、`0x57490000` 魔数、500 超时、0x10/0x18 置零，无额外局部常量。即纯 GET、空载荷。
+
+`NEGATIVE`：无 Get/Set 命名包装 handler（C-437、N-97），调用点匿名。

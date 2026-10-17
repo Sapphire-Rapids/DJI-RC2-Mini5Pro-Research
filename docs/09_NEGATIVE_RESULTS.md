@@ -981,3 +981,10 @@ raw/变换，2603 明文 checksum 全零命中。
 故序列号是身份而非可写面板字段，其派生的 ComplianceSerialNumber 默认同样不可写。
 
 限定：缺失来自函数名清单；上下文级 set 未排除。
+
+
+## N-97 — no named handler for the height opcode (C-437)
+
+`NEGATIVE`：函数名清单只有 `dynamic_max_height` 的 ctor 实例，无 Get/Set 命名包装，故调用点匿名、载荷字段未解。
+
+限定：缺失来自函数名清单；模板内联调用未排除。

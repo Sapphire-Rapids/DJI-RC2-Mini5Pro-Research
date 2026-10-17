@@ -568,3 +568,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-433 | `OBSERVED` | ADS-B agent switch set is cmd55/sub17 | Actual broadcast-agent set |
 | C-434 | `OBSERVED` | Drone dynamic max height get is cmd80/sub17 | Distinct from the position set |
 | C-435 | `OBSERVED` | SetADSBSwitch is a 1-byte boolean set at cmd55/sub17 on adsb_switch_pack | Payload is a single byte |
+| C-436 | `OBSERVED` | Height ctor confirms cmd0x50/sub0x11, standard header, empty payload | Plain GET |
+| C-437 | `NEGATIVE` | No named handler for the height opcode | Call site unnamed |

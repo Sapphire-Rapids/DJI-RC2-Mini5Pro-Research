@@ -510,3 +510,7 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 `adsb_switch_message.py` + 自检：cmd55/sub17，`adsb_switch_pack`，1 字节布尔（非零归一为 on）。载荷取自
 `SetADSBSwitch` 的 value+8 读取。状态 `STATIC`。
+
+## A-080：动态最大高度 GET 发射器（C-436）
+
+`height_message.py` + 自检：cmd0x50/sub0x11 纯 GET、空载荷。状态 `STATIC`。
