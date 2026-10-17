@@ -779,3 +779,11 @@ RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一
 （无 `s_` 符号出现）。
 
 即 ccc 属 **camera 族语义**，非独立 RID 命名 handler（C-438、N-98）；线宽仍不闭合。与既有 C-077/C-078 一致。
+
+### 11.55 RidWorkingStatusPush 载荷解析（C-439/C-440）
+
+`OBSERVED`：`RidImportModule::OnRIDWorkingStatusPush`（0x02cec558）取 response 载荷 `param_1+0x28`，读 byte0 的 bit0/bit1/bit9
+三标志（写入 +0x20/+0x21/+0x22）、byte1 的 bit0（+0x23）、+2 的 int 经 `GetAreaCodeStrByValue`、byte6 写 +0x40/+0x44，
+再以名称 `RidWorkingStatusPush` 与 pack `adsb_push_rid_working_status_pack` 经 `UpdateParamValueProxy` 发布。
+
+`OBSERVED`：该 handler 是 push-only 观察者、无 Send，故**不需发射器**；但其标志位给出实机确认 set 是否生效的读取路径（C-440）。

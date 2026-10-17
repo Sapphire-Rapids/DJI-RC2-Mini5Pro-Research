@@ -571,3 +571,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-436 | `OBSERVED` | Height ctor confirms cmd0x50/sub0x11, standard header, empty payload | Plain GET |
 | C-437 | `NEGATIVE` | No named handler for the height opcode | Call site unnamed |
 | C-438 | `OBSERVED` | ccc is reached via ADRP+LDR inside a large camera registration | 133/29 hits; computed pointers, no s_ symbol |
+| C-439 | `OBSERVED` | WorkingStatusPush payload parses as flags, area code and a value byte | Parse-only observer |
+| C-440 | `OBSERVED` | WorkingStatusPush is push-only, i.e. the verification channel | No emitter needed; confirm sets from it |

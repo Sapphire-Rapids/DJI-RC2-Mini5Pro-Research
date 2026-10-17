@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.99 - 2026-10-16
+
+- Decoded the RidWorkingStatusPush observer payload: three flags on byte0 bits0/1/9, a byte1 bit0,
+  an area-code int at+2 and a value byte at+6, published via UpdateParamValueProxy (C-439).
+- It is push-only, so it needs no emitter and serves as the hardware verification channel (C-440).
+
 ## 0.4.98 - 2026-10-16
 
 - Applied the ADRP+LDR fix to the ccc literals: 133/29 hits, contained in the huge camera registration

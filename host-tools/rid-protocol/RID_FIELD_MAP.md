@@ -38,6 +38,12 @@
 | ADS-B agent switch set | cmd55/sub17，1字节布尔，A-079 | C-433/C-435 |
 | Drone dynamic max height get | cmd80/sub17，空载荷，A-080（handler 匿名 C-437） | C-434/C-436 |
 
+## C2. 观察面（push，用于验证）
+
+| 字段 | 载荷 | claim |
+| --- | --- | --- |
+| RidWorkingStatusPush | byte0 位0/1/9、byte1 位0、+2 区域码、+6 字节 | C-439/C-440 |
+
 ## D. 数据面（App 自发）
 
 | 字段 | 路径 | claim |
