@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.00 - 2026-10-16
+
+- Added A-081, the RID control surface consolidation (C-441): six emitters, path/registration/transport
+  chain, verification channel, non-writable set, residuals, risks and the aircraft fallback.
+
 ## 0.4.99 - 2026-10-16
 
 - Decoded the RidWorkingStatusPush observer payload: three flags on byte0 bits0/1/9, a byte1 bit0,

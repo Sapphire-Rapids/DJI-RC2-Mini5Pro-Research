@@ -514,3 +514,7 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 ## A-080：动态最大高度 GET 发射器（C-436）
 
 `height_message.py` + 自检：cmd0x50/sub0x11 纯 GET、空载荷。状态 `STATIC`。
+
+## A-081：RID 控制面总收口（C-441）
+
+`RID_CONTROL_CONSOLIDATION.md`：六发射器索引、路径/注册/传输链、验证通道、不可写集、残差与风险、飞机后备指针。

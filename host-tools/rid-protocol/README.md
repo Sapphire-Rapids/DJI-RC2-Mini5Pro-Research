@@ -28,7 +28,9 @@
 | `height_message.py` | 动态最大高度 GET 发射器（A-080） |
 | `test_height_message.py` | height 自检 |
 | `VERIFY_RUNBOOK.md` | 上手验证手册（A-073） |
-| `RC_RID_BREAKTHROUGH.md` | 总收口（A-074，含证据表） |
+| `RC_RID_BREAKTHROUGH.md` | RC 线收口（A-074） |
+| `RID_CONTROL_CONSOLIDATION.md` | RID 控制面总收口（A-081） |
+| `RID_FIELD_MAP.md` | 字段控制地图（A-077） |
 
 ## 用法
 
