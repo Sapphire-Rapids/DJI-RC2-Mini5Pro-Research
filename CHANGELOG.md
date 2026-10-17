@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.98 - 2026-10-16
+
+- Applied the ADRP+LDR fix to the ccc literals: 133/29 hits, contained in the huge camera registration
+  FUN_03bfbfe8 and reached via computed pointers with no s_ symbol (C-438, N-98).
+- ccc is thus camera-family semantics with no dedicated named handler; wire width stays open.
+
 ## 0.4.97 - 2026-10-16
 
 - Decompiled the dynamic max height ctor: standard header, cmd0x50/sub0x11, empty payload (C-436).

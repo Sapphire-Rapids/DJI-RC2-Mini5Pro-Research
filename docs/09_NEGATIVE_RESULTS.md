@@ -988,3 +988,11 @@ raw/变换，2603 明文 checksum 全零命中。
 `NEGATIVE`：函数名清单只有 `dynamic_max_height` 的 ctor 实例，无 Get/Set 命名包装，故调用点匿名、载荷字段未解。
 
 限定：缺失来自函数名清单；模板内联调用未排除。
+
+
+## N-98 — ccc resolves to computed pointers, no named handler (C-438)
+
+`NEGATIVE`：对 ccc 字面量补扫 ADRP+LDR（EU_CE 同法）得133/29 处命中，但其所在函数是巨型 camera 注册
+`FUN_03bfbfe8`，且经计算指针到达（无 `s_` 符号出现）。故仍无专属命名 handler，线宽未闭合。
+
+限定：命中已足量，问题在归属层；不排除匿名 lambda。

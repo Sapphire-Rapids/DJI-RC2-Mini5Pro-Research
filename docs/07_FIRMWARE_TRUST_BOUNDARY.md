@@ -771,3 +771,11 @@ RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一
 01 11 50 02）、+1 qword、`0x57490000` 魔数、500 超时、0x10/0x18 置零，无额外局部常量。即纯 GET、空载荷。
 
 `NEGATIVE`：无 Get/Set 命名包装 handler（C-437、N-97），调用点匿名。
+
+### 11.54 ccc 的归属与规模（C-438）
+
+`OBSERVED`：把 EU_CE 用过的 ADRP+LDR 修正同样施于 ccc 字面量 —— `ccc_broadcast_signal_quality_0` 命中133 处、
+`CccBroadcastSignalQuality` 29 处。其所在函数是大到巨型的 camera 注册 `FUN_03bfbfe8`，且经计算指针到达
+（无 `s_` 符号出现）。
+
+即 ccc 属 **camera 族语义**，非独立 RID 命名 handler（C-438、N-98）；线宽仍不闭合。与既有 C-077/C-078 一致。

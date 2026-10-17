@@ -17,7 +17,7 @@
 | 字段 | opcode | 备注 | claim |
 | --- | --- | --- | --- |
 | RidImportModule 注册/导入 | cmd75/sub17（子字段0x4b） | 日本注册通道 | C-409 |
-| CccBroadcastSignalQuality | 待解（handler 未命名，C-413） | 广播质量/位图（C-077） | — |
+| CccBroadcastSignalQuality | camera 族，计算指针到达；仍无命名 handler（C-413/C-438） | 广播质量/位图（C-077） | — |
 | UploadMobileDevicePosition | cmd67/sub17（AES+HMAC，whitebox 0x37） | 22字节明文结构已解；密钥/HMAC 复现待做 | C-412/C-414/C-415 |
 
 ## C. 非 settable（需另寻路径）
