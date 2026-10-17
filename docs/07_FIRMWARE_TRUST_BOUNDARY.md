@@ -688,3 +688,13 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `NEGATIVE`：`CccBroadcastSignalQuality` 无专属 handler 符号（C-413、N-90），其字面量落在通用 FC 注册与静态字符串表中，
 线宽仍不闭合。
+
+### 11.45 位置载荷结构（C-414/C-415）
+
+`OBSERVED`：`UploadMobileDevicePositionSet` 在 `local_78` 构造 22 字节明文并作为 0x16 Buffer 传入 —— 偏移 +8、+0xc 取字节，
++0x10/+0x18 的两个 double 各自截断成 int，+0x20 取 int，+0x28 取时间戳。随后 `AES256Encrypt` 到 0x100 缓冲，再对该密文
+构造 Buffer、append 常量 blob `0x5366cbc`、`HmacEncode`，最终发送 16 字节拷贝头 + 16 字节常量 + 密文/HMAC 尾部。
+
+`OBSERVED`：`GetWhiteBoxKeyChainString(local_c8, 0x37)` 的同一字符串同时供 AES 与 HMAC 使用；长度为0 时以 `-0x1df` 提前返回（C-415）。
+
+即位置不是明文可拼字段，需复现 whitebox 密钥 + AES + HMAC 才能构造。

@@ -546,3 +546,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-411 | `OBSERVED` | OID emitter realigned to exact RID-005B schema | Static; no live ACK |
 | C-412 | `OBSERVED` | UploadMobileDevicePositionSet is an AES-encrypted set at cmd67/sub17 | Whitebox key id 0x37; payload layout not yet decoded |
 | C-413 | `NEGATIVE` | No dedicated CccBroadcastSignalQuality handler symbol found | Literal sits in generic registration/string tables |
+| C-414 | `OBSERVED` | Position plaintext is a 22-byte struct then AES-0x100 + HMAC + constant prefix | Doubles truncated to ints; blob semantics unknown |
+| C-415 | `OBSERVED` | One whitebox keychain id 0x37 feeds both the position AES and HMAC | Shared key; derivation body external |

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.86 - 2026-10-16
+
+- Decoded the position payload structure: a 22-byte plaintext (bytes at +8/+0xc, two truncated
+  doubles at +0x10/+0x18, int at +0x20, timestamp at +0x28), AES256Encrypt into 0x100, HMAC over the
+  ciphertext with a 0x5366cbc constant blob, and a 16+16 prefix before it (C-414).
+- Same whitebox keychain id 0x37 feeds both AES and HMAC; zero-length guard returns -0x1df (C-415).
+
 ## 0.4.85 - 2026-10-16
 
 - Decoded UploadMobileDevicePositionSet: cmd67/sub17 app_update_pos_enc, whitebox key id 0x37,
