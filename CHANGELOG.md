@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.45 - 2026-10-16
+
+- Pinned the rotate pairing exactly: both loads are the same source byte, and the shifts collapse to
+  a single-byte self-rotate `ror8(b, i&7)` before the mod17 pad XOR (C-343).
+- NEGATIVE: the exact transform plus md5/hex-of-md5 keys over enc/scram/header/sig against the tool
+  ck/CTR/ECB and CBC scheme still miss (C-344, N-70).
+- B-23 narrows to two choices: which buffer is fed, and whether NfzPack is the module path at all.
+
 ## 0.4.44 - 2026-10-16
 
 - Resolved the XOR pad shift arithmetic: the index is `rbx mod 17` via a divide-by-17 magic

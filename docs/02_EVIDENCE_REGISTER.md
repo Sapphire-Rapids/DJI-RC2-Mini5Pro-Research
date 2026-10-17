@@ -475,3 +475,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-340 | `OBSERVED` | XOR pad index is modulo17 via a divide-by-17 magic | Replaces C-338 approximation; static only |
 | C-341 | `OBSERVED` | XOR loop is a bit-packed rotate across adjacent bytes | Exact pairing modelled approximately |
 | C-342 | `NEGATIVE` | Period17 pad plus rotate modelling still misses | Residual is rotate pairing and fed buffer |
+| C-343 | `OBSERVED` | Rotate pairing is a single-byte self-rotate `ror8(b,i&7)` | r14-negative framing inferred; not executed |
+| C-344 | `NEGATIVE` | Exact transform and broad md5 keys still miss | Residual is fed buffer; NfzPack may not be the module path |

@@ -769,3 +769,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 两 data、以及整段 post-XOR（le/be），2603 明文 checksum 全零命中。
 
 限定：md5 key（C-337）与 mod17 pad（C-340）都未被否定；残差是精确的旋转配对与到底哪个缓冲进了 aesDecode2。
+
+
+## N-70 — exact rotate transform and broad md5 keys still miss (C-343/C-344)
+
+`NEGATIVE`：按精确公式 `out[i]=ror8(enc[i],i%8)^pad[i%17]` 变换，以及把 md5/hex-of-md5 施于 enc/scram/header/整sig/
+前若干字节当 key，套工具 ck/CTR/ECB 与 CBC 方案，2603 明文 checksum 全零命中。
+
+限定：md5 派生（C-337）与变换（C-343）均为静态得出；残差是喂入哪个缓冲，以及 NfzPack 是否就是模块路径。

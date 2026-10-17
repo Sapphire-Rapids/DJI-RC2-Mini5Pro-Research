@@ -393,3 +393,11 @@ QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解
 
 `NEGATIVE`：按该模型组合各 key/data 与 post-XOR（le/be）仍零命中（C-342、N-69）。
 残差是旋转的精确配对与进入 aesDecode2 的实际缓冲。
+
+### 11.14 旋转配对精确化（C-343/C-344）
+
+`OBSERVED`：两个字节读取（r12/r13）其实是**同一**源字节——两次虚调用落在同一对象的同一 slot0x30、同一索引 rbx。
+配合 `%cl=rbx&7` 与 `%cl=r14&7`（r14 自0递减）得 `b>>(i&7)` 与 `b<<((8-i%8)&7)`，合并即 `ror8(b,i&7)`，随后异或 mod17 pad。
+
+`NEGATIVE`：按此精确变换、以及把 md5/hex-of-md5 施于多种输入当 key 套工具方案，仍零命中（C-344、N-70）。
+残差只剩“哪个缓冲进 aesDecode2”，以及“NfzPack 是否就是模块本体的路径”。
