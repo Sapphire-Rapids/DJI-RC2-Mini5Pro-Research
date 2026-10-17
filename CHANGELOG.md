@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.94 - 2026-10-16
+
+- SerialNumber has164 references and only Get accessors across all abstractions; no SetSerialNumber
+  exists (C-430).
+- NEGATIVE: consequently the serial and its derived ComplianceSerialNumber are identities, not
+  writable panel fields by default (C-431, N-96). Cross-referenced C-128.
+
 ## 0.4.93 - 2026-10-16
 
 - ComplianceSerialNumberInit is only a listener: it reads the SerialNumber characteristic and

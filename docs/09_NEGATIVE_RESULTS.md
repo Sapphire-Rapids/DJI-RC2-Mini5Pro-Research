@@ -973,3 +973,11 @@ raw/变换，2603 明文 checksum 全零命中。
 要改它等于改底层 SerialNumber。
 
 限定：缺失来自函数名清单；匿名 handler 未排除。
+
+
+## N-96 — no SerialNumber setter (C-431)
+
+`NEGATIVE`：`SerialNumber` 字符串164 处引用，跨抽象的具名访问器全是 Get；无 `SetSerialNumber`。
+故序列号是身份而非可写面板字段，其派生的 ComplianceSerialNumber 默认同样不可写。
+
+限定：缺失来自函数名清单；上下文级 set 未排除。

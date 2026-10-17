@@ -746,3 +746,11 @@ KeyHandlers+Characteristics 并交回调派发。即合规值是对普通 SN 的
 
 `NEGATIVE`：无 `ComplianceSerialNumberGet/Set` 符号（C-429、N-95）。故 UAS ID 不直接可写；改它等于改底层 SerialNumber。
 这也解释了 docs/05 的"未找到 SET"。
+
+### 11.51 SerialNumber 是 Get-only 身份键（C-430/C-431）
+
+`OBSERVED`：`SerialNumber` 字面量（0x11d6059）有164 处引用；跨抽象（ActivateMgr/GlassAbstraction/CameraAbstraction/
+RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一色 `GetSerialNumber` / `InternalGetSerialNumber`。
+
+`NEGATIVE`：无任何 `SetSerialNumber`（C-431、N-96）。故序列号是身份而非可写字段，派生的 ComplianceSerialNumber
+（C-428、C-128）默认也不可写。UAS ID 若要改，除非存在上下文级 set。

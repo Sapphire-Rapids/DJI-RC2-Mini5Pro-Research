@@ -562,3 +562,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-427 | `OBSERVED` | HmacEncode writes the full digest over ct+blob | Not truncated to the key length |
 | C-428 | `OBSERVED` | ComplianceSerialNumberInit is a listen registration deriving from SerialNumber | Derived listener, not its own opcode |
 | C-429 | `NEGATIVE` | No ComplianceSerialNumberGet/Set symbol | UAS ID not directly settable via its own key |
+| C-430 | `OBSERVED` | SerialNumber is heavily referenced with Get-only accessors | 164 refs; no SetSerialNumber |
+| C-431 | `NEGATIVE` | No SerialNumber setter exists | Compliance/SN are identities, not writable fields |
