@@ -472,3 +472,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-337 | `OBSERVED` | NfzPack key is exactly zero-padded lowercase hex of MD5(data) | Read statically; prefix/zero-pad not byte-verified |
 | C-338 | `OBSERVED` | XOR pad pointer is shifted, alignment not a clean16-byte cycle | Shift source/period unresolved |
 | C-339 | `NEGATIVE` | MD5-derived key candidates still miss | Guesses of format/pad input; md5 mechanism not impugned |
+| C-340 | `OBSERVED` | XOR pad index is modulo17 via a divide-by-17 magic | Replaces C-338 approximation; static only |
+| C-341 | `OBSERVED` | XOR loop is a bit-packed rotate across adjacent bytes | Exact pairing modelled approximately |
+| C-342 | `NEGATIVE` | Period17 pad plus rotate modelling still misses | Residual is rotate pairing and fed buffer |

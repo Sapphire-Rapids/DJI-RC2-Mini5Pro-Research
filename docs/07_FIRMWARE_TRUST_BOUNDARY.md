@@ -384,3 +384,12 @@ QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解
 同时 XOR 循环的 pad 基址按 `subq %rcx, %rsi` 位移，故字面量索引不是干净的0..15 循环。
 
 `NEGATIVE`：按该派生（含自洽变体）仍零命中（C-339、N-68）。剩余是流前缀/格式与位移 pad 的精确对齐。
+
+### 11.13 pad 位移的数学与位旋转（C-340/C-341）
+
+`OBSERVED`：C-338 的位移不是随意的——索引乘 `0xF0F0F0F0F0F0F0F1`（除17魔数），取高半右移4再乘17，`subq` 后
+有效索引即 `rbx mod 17`；16字节字面量加尾 NUL 构成周期17、index16 为0x00。同一循环还用 `rbx&7`/`r14&7` 的
+`shrq`/`shl`+`orl` 跨相邻字节做位旋转，再与位移 pad 异或。
+
+`NEGATIVE`：按该模型组合各 key/data 与 post-XOR（le/be）仍零命中（C-342、N-69）。
+残差是旋转的精确配对与进入 aesDecode2 的实际缓冲。

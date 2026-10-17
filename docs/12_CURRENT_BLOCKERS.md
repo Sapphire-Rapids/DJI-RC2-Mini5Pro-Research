@@ -712,3 +712,8 @@ RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
 
 `OBSERVED`：key = hex(MD5(data)) 已确定；XOR pad 存在位移。`NEGATIVE`：候选仍零命中。
 B-23 现只剩两个纯细节：ostringstream 是否写入前缀/逐字节补零，以及 `subq %rcx` 的位移来源与周期。
+
+## B-23 只剩一个算术细节（C-340/C-342）
+
+`OBSERVED`：pad 已精确到 `mod 17`（C-340），旋转结构已识别（C-341）；`NEGATIVE`：组合仍零命中。
+B-23 现仅剩“跨字节旋转的精确配对公式”与“哪个缓冲作为 aesDecode2 数据”两点。

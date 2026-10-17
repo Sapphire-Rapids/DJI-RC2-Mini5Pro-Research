@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.44 - 2026-10-16
+
+- Resolved the XOR pad shift arithmetic: the index is `rbx mod 17` via a divide-by-17 magic
+  (0xF0F0F0F0F0F0F0F1), giving a16+NUL byte period with index16 =0x00 (C-340).
+- Identified the same loop as a bit-packed rotate across adjacent bytes (shrq/shl with 7-bit masks)
+  before the pad XOR (C-341).
+- NEGATIVE: md5hex(enc)/md5hex(rotated) keys, enc/rotated data and full-length post-XOR in le/be
+  still miss (C-342, N-69). B-23 narrows to the exact rotate pairing and fed buffer.
+
 ## 0.4.43 - 2026-10-16
 
 - Pinned the exact NfzPack key derivation: `MD5(data,len)`, digest()'s16 bytes written as ints to an

@@ -761,3 +761,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `aesDecode2Ex`，在 pure/xor-first 两序下解2603，明文 checksum 全零命中。
 
 限定：都是流前缀/格式与位移 pad 输入的猜测；md5 机制（C-337）本身未被否定。
+
+
+## N-69 — period17 pad plus rotate modelling still misses (C-342)
+
+`NEGATIVE`：按 C-340 的 mod17 pad 与 C-341 的位移/旋转模型，组合 md5hex(enc)/md5hex(rotated) 两 key、enc/rotated
+两 data、以及整段 post-XOR（le/be），2603 明文 checksum 全零命中。
+
+限定：md5 key（C-337）与 mod17 pad（C-340）都未被否定；残差是精确的旋转配对与到底哪个缓冲进了 aesDecode2。
