@@ -924,3 +924,11 @@ raw/变换，2603 明文 checksum 全零命中。
 的引号键中。其50 处站点散布在 observer 函数里 —— 属 observer 绑定模式，而非像 EIDSwitch 那样的显式命名 key handler。
 
 限定：缺失来自函数名清单；匿名 lambda handler 未排除。
+
+
+## N-90 — no named CccBroadcastSignalQuality handler (C-413)
+
+`NEGATIVE`：函数名清单无 Ccc/BroadcastSignal handler。字面量站点位于大型通用 FC 注册（FUN_02fa5b48）与静态字符串表初始化
+（FUN_02fbb7c0）内。故 Ccc 的线宽仍不闭合，handler 很可能是匿名或位于另一层。
+
+限定：缺失来自函数名清单，不排除匿名 lambda。

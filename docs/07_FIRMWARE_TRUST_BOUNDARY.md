@@ -679,3 +679,12 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `NEGATIVE`：`EU_CE_enable_c0_rid_0` 无专属 Get/Set 符号，字面量也不在 EUCeCxV1::CreateCharacteristics/BindKey 引号键里；
 其站点散布于 observer 函数，属 observer 绑定模式（C-405、N-89）。与 EIDSwitch 的显式 handler 注册形态不同。
+
+### 11.44 位置 setter 与 Ccc 未命名 handler（C-412/C-413）
+
+`OBSERVED`：`UploadMobileDevicePositionSet`（0x04e23260）是 AES 加密的 set：模板 `<1,17,67,uav_adsb_set_app_update_pos_enc_req,...>`
+（cmd 0x43 / sub 0x11，与 docs/05 的 `app_update_pos_enc` 一致），经 `SendSetPack<app_geography_info_upload_pack>`；密钥由
+`uav::whitebox::GetWhiteBoxKeyChainString(local_c8, 0x37)` 派生，随后 `AES256Encrypt`(0x100) + `HmacEncode`。
+
+`NEGATIVE`：`CccBroadcastSignalQuality` 无专属 handler 符号（C-413、N-90），其字面量落在通用 FC 注册与静态字符串表中，
+线宽仍不闭合。

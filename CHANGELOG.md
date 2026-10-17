@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.85 - 2026-10-16
+
+- Decoded UploadMobileDevicePositionSet: cmd67/sub17 app_update_pos_enc, whitebox key id 0x37,
+  AES256Encrypt over 0x100 plus HmacEncode (C-412).
+- NEGATIVE: no dedicated CccBroadcastSignalQuality handler symbol; its literal sits in generic FC
+  registration and static string tables, so the wire width stays unresolved (C-413, N-90).
+
 ## 0.4.84 - 2026-10-16
 
 - Realigned the OID emitter to the exact repo RID-005B schema (C-411): cmd0x11/0xD6, fixed receiver

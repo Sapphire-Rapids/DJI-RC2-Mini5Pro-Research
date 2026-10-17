@@ -544,3 +544,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-409 | `OBSERVED` | RidImportModule set/info paths use cmd75/sub17 with a 0x4b sub-field | Japan registration channel |
 | C-410 | `OBSERVED` | RID broadcast field-control map enumerates the writable surface | Map only; C/D sections still open |
 | C-411 | `OBSERVED` | OID emitter realigned to exact RID-005B schema | Static; no live ACK |
+| C-412 | `OBSERVED` | UploadMobileDevicePositionSet is an AES-encrypted set at cmd67/sub17 | Whitebox key id 0x37; payload layout not yet decoded |
+| C-413 | `NEGATIVE` | No dedicated CccBroadcastSignalQuality handler symbol found | Literal sits in generic registration/string tables |
