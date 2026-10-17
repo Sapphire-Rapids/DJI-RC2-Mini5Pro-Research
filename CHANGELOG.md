@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.77 - 2026-10-16
+
+- Decompiled the EUCeCxV1 registration class: CreateCharacteristics/BindKey insert the EU/CE regulatory
+  family (IsSupportEUCeCx, CeInfoEnable, CeRegulatoryRestrictionEnable, IsCEC0/1/2Support, HeightLimit..)
+  and BindKey uses EU_CE_Reg_120Height_Enable_0 (C-400).
+- EU_CE_enable_c0_rid_0 is a bound key literal across many sites, i.e. a region-dependent RID enable
+  key parallel to EIDSwitch (C-401); added it to the consolidation doc as a regional fallback.
+
 ## 0.4.76 - 2026-10-16
 
 - Found an EU/CE regional family (EU_CE_enable_c0_rid_0, EU_CE_Reg_120Height_Enable_0,

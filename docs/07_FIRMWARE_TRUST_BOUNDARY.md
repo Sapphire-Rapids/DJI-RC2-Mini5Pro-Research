@@ -641,3 +641,15 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `RETRACTED`：C-375 的"0 xref → 间接到达"读法收回（C-399、N-87）—— 真相是活 key，只是重定位形态不同。
 故 `EU_CE_enable_c0_rid_0` 是另一条与区域相关的 RID enable 键，值得后续比对 EIDSwitch。
+
+### 11.41 EUCeCxV1 注册类与区域 RID 键（C-400/C-401）
+
+`OBSERVED`：`uav::sdk::key::EUCeCxV1::CreateCharacteristics`（0x04b20670）与 `BindKey`（0x04b25038）经
+`FunImplBase::InsertCharacteristics` 插入一整套 EU/CE 法规键：`IsSupportEUCeCx`、`CeInfoEnable`、
+`CeRegulatoryRestrictionEnable`、`IsCEC0/1/2Support`、`SyncC0HeightLimitState`、`DroneC0HeightLimitState`、
+`HeightLimitRange`、`HeightLimit`、`StaticDBVersion` 等；BindKey 另用 `EU_CE_Reg_120Height_Enable_0` 字面量。
+
+`OBSERVED`：`EU_CE_enable_c0_rid_0` 的50 处站点散布在大量不同函数中、均构造键值结构 —— 属**已注册的绑定键**，
+而非一次性局部。故它是与 `EIDSwitch` **并列的区域相关 RID enable 键**（C-401）。
+
+含义：若目标区服走 CE 路径，可优先用 `EU_CE_enable_c0_rid_0` 替代 EIDSwitch。属备选路径，不改主结论。

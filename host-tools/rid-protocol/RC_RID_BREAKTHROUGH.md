@@ -40,6 +40,11 @@ Remote ID 的开关在遥控器侧可被定位并（协议上）关闭：
 需实机取：socket 字面名（`ss -x` / `/proc/net/unix`）、sender、receiver。
 取到后按 A-073 执行即可。
 
+## 3b. 区域备选键
+
+`EU_CE_enable_c0_rid_0`（EUCeCxV1 注册类）是与 EIDSwitch 并列的区域 RID enable 键（C-400/C-401）。
+若目标区服走 CE 路径，优先用它。
+
 ## 4. 边界与风险
 
 - 值改了但广播不停 → 可能只是 RC 镜像，需回飞机侧（后备在 `AIRCRAFT_STUE_CHECKPOINT.md`）。

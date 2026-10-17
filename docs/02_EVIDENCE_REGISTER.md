@@ -532,3 +532,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-397 | `OBSERVED` | RC-side breakthrough consolidated into one doc | Consolidation only; open item is hardware values |
 | C-398 | `OBSERVED` | EU_CE_enable_c0_rid_0 has 50 ADRP+LDR references | Key is live, not dead |
 | C-399 | `RETRACTED` | C-375 under-counted by only scanning ADRP+ADD | Correct reading is live key via a different form |
+| C-400 | `OBSERVED` | EUCeCxV1 class registers the EU/CE regulatory key family | Registration via CreateCharacteristics/BindKey |
+| C-401 | `OBSERVED` | EU_CE_enable_c0_rid_0 is a bound key literal across many sites | Region-dependent RID enable key parallel to EIDSwitch |
