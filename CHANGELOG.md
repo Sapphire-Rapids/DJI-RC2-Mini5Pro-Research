@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.76 - 2026-10-16
+
+- Found an EU/CE regional family (EU_CE_enable_c0_rid_0, EU_CE_Reg_120Height_Enable_0,
+  EU_CE_Reg_Level_0), and corrected the scanner to the ADRP+LDR form (C-398).
+- RETRACTED C-375's zero-xref / indirect reading: EU_CE_enable_c0_rid_0 actually has 50 reference
+  sites, so it is a live key reached by a different relocation shape (C-399, N-87).
+- It is a plausible region-dependent sibling of EIDSwitch worth later comparison.
+
 ## 0.4.75 - 2026-10-16
 
 - Added A-074, a consolidated RC-side RID breakthrough document (C-397): the EIDSwitch key, Set-0

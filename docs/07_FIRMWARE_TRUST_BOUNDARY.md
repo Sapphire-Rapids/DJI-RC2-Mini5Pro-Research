@@ -632,3 +632,12 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 `vt_gnd` 是另一虚拟地面主机、用于其它本地路由。
 
 故 App 侧抽象 socket 名很可能就是 `direct_host` 值 `whoami`，而非新常量。
+
+### 11.40 EU/CE 区域法规族与扫描器修正（C-398/C-399）
+
+`OBSERVED`：EU/CE 区域族含 `EU_CE_enable_c0_rid_0`、`EU_CE_Reg_120Height_Enable_0`、`EU_CE_Reg_Level_0`。
+扩展扫描器到 ADRP+LDR（imm）形式后，`EU_CE_enable_c0_rid_0` 命中 **50 处**、`EU_CE_Reg_Level_0` 2 处；这些站点都在
+构造键值结构（伴随 movk 常量）。
+
+`RETRACTED`：C-375 的"0 xref → 间接到达"读法收回（C-399、N-87）—— 真相是活 key，只是重定位形态不同。
+故 `EU_CE_enable_c0_rid_0` 是另一条与区域相关的 RID enable 键，值得后续比对 EIDSwitch。

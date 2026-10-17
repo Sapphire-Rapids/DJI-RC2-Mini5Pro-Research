@@ -530,3 +530,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-395 | `OBSERVED` | dji_link opens and accepts a local socket to the App | Listen/accept strings only |
 | C-396 | `OBSERVED` | dji_link creates a named unix listening socket; whoami denotes self | Name is config/source driven, not a literal |
 | C-397 | `OBSERVED` | RC-side breakthrough consolidated into one doc | Consolidation only; open item is hardware values |
+| C-398 | `OBSERVED` | EU_CE_enable_c0_rid_0 has 50 ADRP+LDR references | Key is live, not dead |
+| C-399 | `RETRACTED` | C-375 under-counted by only scanning ADRP+ADD | Correct reading is live key via a different form |

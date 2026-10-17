@@ -900,3 +900,12 @@ raw/变换，2603 明文 checksum 全零命中。
 而非字面地址加载。
 
 限定：只覆盖直接 ADRP+ADD；指针表/寄存器计算加载未否定。
+
+
+## N-87 / 修正 — ADRP+LDR 形式被漏扫（C-398/C-399）
+
+`RETRACTED`：C-375 记 EU_CE_enable_c0_rid_0 无直接 xref 并读作"间接到达"。该结论只对 ADRP+ADD 成立；
+补扫 ADRP+LDR 后命中 **50 处**（EU_CE_Reg_Level_0 亦有 2 处）。
+
+正解：它是**活 key**，只是用另一种重定位形态到达；先前的"间接表/计算名"读法收回。
+方法学修正：扫描器需同时覆盖 ADRP+ADD 与 ADRP+LDR。
