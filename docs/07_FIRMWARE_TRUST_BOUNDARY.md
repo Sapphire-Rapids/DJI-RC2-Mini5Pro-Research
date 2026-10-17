@@ -592,3 +592,12 @@ receiver 是**特征属性**、不是自由常量。
 并经 `queue<pair<uav_cmd_req, function<void(int)>>>` 排队。
 
 即：发送链 = SendSetPack → slot0x128 SendPack → UavCore SendData → 队列/链路。
+
+### 11.36 EIDSwitch 注册与连接前置（C-390）
+
+`OBSERVED`：`FUN_032ba30c` 构造名为 `"EIDSwitch"` 的 `CharacteristicsElement`，装入 `PTR_EIDSwitchGet_0532e518` /
+`PTR_EIDSwitchSet_0532e520` 的 get/set 函数对，再调 `uav::sdk::key::BaseAbs::InsertCharacteristics(param_1,
+"EIDSwitch", element)`。
+
+即：App 是**按 SDK key 名**访问该开关（不是直接发 opcode）；characteristics 与 receiver 管线由这条 key 路径填充。
+这解释了 receiver（Characteristics+0x30）来自会话环境，而非固定常量 —— 连接前置就是"设备已连、key map 已插入"。

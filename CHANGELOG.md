@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.70 - 2026-10-16
+
+- Found the EIDSwitch registration: FUN_032ba30c builds a CharacteristicsElement named "EIDSwitch",
+  installs the Get/Set pointers and calls BaseAbs::InsertCharacteristics, so the App reaches the
+  switch by SDK key name and the receiver plumbing comes from that path (C-390).
+- Connection preamble is thus qualitative: device connected + key map inserted; no code-side unknowns
+  remain in B-24.
+
 ## 0.4.69 - 2026-10-16
 
 - Characterised OIDIdentifier: a variable-length string payload capped at 0x70 on header 01 11 D6 02,

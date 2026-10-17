@@ -795,3 +795,8 @@ B-23 现具体为：把这12 字节相邻局部（-0x1d0 一带）纳入 seed；
 
 `OBSERVED`：传输链已完整命名（SendPack → SendData → 队列）。
 未闭合：真实连接会话前置（App 是否需先连上 RC/飞机、以及走哪个链路），属环境项而非代码项。
+
+## B-24 收尾：连接前置已定性（C-390）
+
+`OBSERVED`：开关经 SDK key 名 `EIDSwitch` 注册（InsertCharacteristics），receiver 由该 key 路径填充。
+即前置 = 设备已连 + key map 已插入；再无代码向未解项。
