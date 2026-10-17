@@ -500,3 +500,12 @@ data（rsi）始终是 -0x218 密文。
 但 `NEGATIVE`：对四者的原始 payload 直接算 checksum，无一命中 plain_cksum（C-367、N-82）。
 
 故 attrib 位0 在此**不能**读作明文 —— 它是工具侧的加密标志却为0，语义与工具不同；解密仍需执行。
+
+### 11.27 strlen 截断与尾字节近似（C-368/C-369）
+
+`OBSERVED`：key 是对变换缓冲做 `strlen` 得来；变换首字节是 vtable 低字节（40 ba 8f 00…），而 0x00 经 ror8 仍为 0，
+故 strlen 约在 index3 即停。MakeKey 随后从该指针读0x20 字节 —— **越过 NUL 进入对象尾部**，即 key 的实义字节大部分来自
+NUL 之后的属性存区域。
+
+`NEGATIVE`：tail/指针/cap/len 组合仍零命中（C-368、N-83）。下一步按“NUL 后即对象字段”这一事实重排：key 应从 index3 之后
+读取结构体剩余字段，而非把结构体字节当作被 strlen 截断的前缀。

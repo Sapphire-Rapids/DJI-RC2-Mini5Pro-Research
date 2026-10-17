@@ -500,3 +500,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-365 | `NEGATIVE` | Systematic 6144-combo pointer brute still misses | Residual is the0x2c tail bytes or field-role eviction |
 | C-366 | `OBSERVED` | All four wa150 modules are hdr_v2 STUE attrib0x0 yet still encrypted | attrib bit0 role differs; not plaintext |
 | C-367 | `NEGATIVE` | Raw payload checksum matches plain_cksum in none of the four modules | Decryption genuinely required |
+| C-368 | `NEGATIVE` | Tail/pointer/cap/len seed variants still miss | Tail uninitialised, approximated |
+| C-369 | `OBSERVED` | strlen truncates at the vtable NUL so the key is short and MakeKey reads past it | Byte past NUL is the object tail |

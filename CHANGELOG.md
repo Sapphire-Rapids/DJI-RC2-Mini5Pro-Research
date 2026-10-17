@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.58 - 2026-10-16
+
+- NEGATIVE: tail/pointer/cap/len seed variants still miss (C-368, N-83).
+- Realisation: the key comes from strlen on the transformed buffer, whose 0x00 vtable byte stays zero
+  under ror8, so strlen stops ~index3 and MakeKey then reads past the NUL into the object; the
+  effective key bytes are mostly the post-NUL object area (C-369).
+- Next: rebuild so the key is taken from index3 onward across the struct fields rather than treating
+  the struct as a strlen-truncated prefix.
+
 ## 0.4.57 - 2026-10-16
 
 - Scanned all four wa150 modules: uniform header_version2 + STUE + attrib0x0 (C-366).

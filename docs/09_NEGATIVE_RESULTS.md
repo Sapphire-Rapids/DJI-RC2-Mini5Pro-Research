@@ -869,3 +869,10 @@ raw/变换，2603 明文 checksum 全零命中。
 是0，解密仍是必需的。
 
 限定：这只否定“attrib0 清空即明文”的读法，不否定其它 attr 位语义。
+
+
+## N-83 — tail/pointer/cap/len variants still miss (C-368)
+
+`NEGATIVE`：tail 取零/ff/长度优先，三种指针基址，四种 cap 与两种 len，raw/变换，2603 明文 checksum 全零命中。
+
+限定：tail 是未初始化栈、只能近似；seed 模型未被否定。
