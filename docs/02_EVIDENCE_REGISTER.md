@@ -523,3 +523,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-388 | `OBSERVED` | OIDIdentifier handlers use a different opcode pair cmd214/sub17 | Only EID switch decoded so far |
 | C-389 | `OBSERVED` | OIDIdentifier payload is a 0x70-capped string with header 01 11 D6 02 | Variable-length, unlike the EID byte |
 | C-390 | `OBSERVED` | EIDSwitch is registered by name via BaseAbs::InsertCharacteristics | App reaches it by SDK key name, not raw opcode |
+| C-391 | `OBSERVED` | Operator runbook for the no-flash RID-off verification | Runbook only; not yet executed on hardware |

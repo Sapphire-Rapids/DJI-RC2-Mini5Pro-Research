@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.71 - 2026-10-16
+
+- Added A-073, an operator runbook for the no-flash RID-off verification (C-391): prerequisites,
+  read-then-write order, rollback, failure triage including the RC-mirror case, and the no-flash
+  safety boundary.
+
 ## 0.4.70 - 2026-10-16
 
 - Found the EIDSwitch registration: FUN_032ba30c builds a CharacteristicsElement named "EIDSwitch",
