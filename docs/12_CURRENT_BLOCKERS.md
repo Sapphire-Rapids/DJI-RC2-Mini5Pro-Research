@@ -732,3 +732,7 @@ B-23 现仅剩：确认 -0x208 是否确实承载密文（XsBuffer append 链的
 
 `OBSERVED`：变换作用在构建的常量 seed 上，密文只作 aesDecode2 data。`NEGATIVE`：近似 seed 仍零命中。
 B-23 现仅剩“该容器的字段序列化顺序/layout”，即把那条 append+字段链精确还原。
+
+## B-23 只剩字段发射顺序（C-349/C-350）
+
+`OBSERVED`：seed 形状与常量已提取；`NEGATIVE`：变体仍零命中。B-23 现仅剩“按负 map key 排序还原发射顺序”这一确定步骤。

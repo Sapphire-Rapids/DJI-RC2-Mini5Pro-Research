@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.48 - 2026-10-16
+
+- Characterised the seed container shape: a mallocs0x22 fixed byte block with ASCII `74 59` (`tY`) at
+  its head, plus further negative-key map fields; the25-byte constant list is recorded (C-349).
+- Noted the fields are written as negative map keys, so emitted order is not list order - the residual.
+- NEGATIVE: full/prefix-dropped/capped seed variants as key still miss (C-350, N-73).
+
 ## 0.4.47 - 2026-10-16
 
 - Established that the transform source -0x208 is a built seed container (XsBuffer append plus ~20

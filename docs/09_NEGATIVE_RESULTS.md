@@ -793,3 +793,10 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 checksum 全零命中。
 
 限定：seed 提取是近似的（容器自身的 data() 可能重排/补全），C-347 的容器结论未被否定。
+
+
+## N-73 — seed-shape variants still miss (C-350)
+
+`NEGATIVE`：完整常量列表 raw/变换、去掉前导0x22、以及截到34字节，作 key 解密文，2603 明文 checksum 全零命中。
+
+限定：字段是以负偏移作 map key 写入的，其**输出顺序**未建模；C-349 的形状结论未被否定。

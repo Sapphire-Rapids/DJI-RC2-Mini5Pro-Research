@@ -481,3 +481,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-346 | `NEGATIVE` | C-string transform key still misses | Mechanism not impugned; residual is -0x208 identity/transform direction |
 | C-347 | `OBSERVED` | Transform source is a built container of hardcoded constants, not the ciphertext | Serialization order/layout not emulated |
 | C-348 | `NEGATIVE` | Constant-seed key attempts still miss | Seed extraction approximate; container layout not impugned |
+| C-349 | `OBSERVED` | Seed container begins with a0x22 malloc size and `tY` ASCII prefix | Emitted order from negative map keys not modelled |
+| C-350 | `NEGATIVE` | Seed-shape variants still miss | Emitted order not modelled; shape not impugned |

@@ -417,3 +417,11 @@ seed 对象；变换循环随后经 vtable slot0x30/0x38 读它的 data/length�
 data（rsi）始终是 -0x218 密文。
 
 `NEGATIVE`：seed raw / transform(seed) 作 key 仍零命中（C-348、N-72）。残差是容器的序列化顺序与 data() 布局。
+
+### 11.17 seed 形状：0x22 固定块 + 可读前缀（C-349/C-350）
+
+`OBSERVED`：builder 先 `malloc(0x22)` 并写 0x74/0x59（ASCII `tY`），随后以负偏移 map key 继续写字段；提取的25字节
+常量表为 `22 74 59 2b dd d3 6e 81 ec d4 d2 ab e2 d3 d5 dd 7a 66 f8 3a 97 ab 95 3b e0` —— 一个固定0x22 字节块、
+带可读头。注意字段是以负 key 写入的，**发射顺序**未必等于列表顺序，这是当前残差。
+
+`NEGATIVE`：各形状变体作 key 仍零命中（C-350、N-73）。下一步是按负 key 排序还原真实发射顺序。
