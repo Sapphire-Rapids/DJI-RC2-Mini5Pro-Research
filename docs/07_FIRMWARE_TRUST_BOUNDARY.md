@@ -698,3 +698,12 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 `OBSERVED`：`GetWhiteBoxKeyChainString(local_c8, 0x37)` 的同一字符串同时供 AES 与 HMAC 使用；长度为0 时以 `-0x1df` 提前返回（C-415）。
 
 即位置不是明文可拼字段，需复现 whitebox 密钥 + AES + HMAC 才能构造。
+
+### 11.46 白盒密钥链的库分布（C-416/C-417）
+
+`OBSERVED`：官方 Fly APK 的 `lib/arm64-v8a` 有208 项。`libflightrestrictcore.so` **import** 了
+`uav::whitebox::GetWhiteBoxKeyChainString`；`libwaes.so` 导出 `Java_com_uav_tools_security_WhiteBoxAES_decryptFromWhiteBox`；
+其余（libdatajar/libsdk_base/libsdk_common/libsdk_jni/libupgrade_core）只是名字引用。
+
+`NEGATIVE`：全部208 库中**没有**任何库定义/导出该函数（C-417、N-91）。故位置所需的 id 0x37 密钥无法仅凭这些库复现；
+白盒本体可能由未抽取/其它 ABI 或 assets 提供。

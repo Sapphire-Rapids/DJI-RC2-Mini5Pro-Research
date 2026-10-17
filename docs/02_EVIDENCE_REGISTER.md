@@ -548,3 +548,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-413 | `NEGATIVE` | No dedicated CccBroadcastSignalQuality handler symbol found | Literal sits in generic registration/string tables |
 | C-414 | `OBSERVED` | Position plaintext is a 22-byte struct then AES-0x100 + HMAC + constant prefix | Doubles truncated to ints; blob semantics unknown |
 | C-415 | `OBSERVED` | One whitebox keychain id 0x37 feeds both the position AES and HMAC | Shared key; derivation body external |
+| C-416 | `OBSERVED` | APK has 208 arm64 libs; whitebox name is only an import | libwaes exposes a JNI whitebox AES entry |
+| C-417 | `NEGATIVE` | No lib defines or exports GetWhiteBoxKeyChainString | Body unresolved from these libs alone |

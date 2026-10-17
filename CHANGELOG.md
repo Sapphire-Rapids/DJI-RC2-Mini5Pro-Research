@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.87 - 2026-10-16
+
+- Extracted the 208 arm64 libs from the official APK and mapped the whitebox name: only imports/
+  name refs exist, plus a JNI whitebox AES entry in libwaes.so (C-416).
+- NEGATIVE: no lib defines or exports GetWhiteBoxKeyChainString, so the position key body is not
+  resolvable from these libs alone (C-417, N-91).
+
 ## 0.4.86 - 2026-10-16
 
 - Decoded the position payload structure: a 22-byte plaintext (bytes at +8/+0xc, two truncated

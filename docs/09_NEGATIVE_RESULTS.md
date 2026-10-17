@@ -932,3 +932,11 @@ raw/变换，2603 明文 checksum 全零命中。
 （FUN_02fbb7c0）内。故 Ccc 的线宽仍不闭合，handler 很可能是匿名或位于另一层。
 
 限定：缺失来自函数名清单，不排除匿名 lambda。
+
+
+## N-91 — no lib defines GetWhiteBoxKeyChainString (C-417)
+
+`NEGATIVE`：在抽取的全部208 个 arm64 库中，无任何动态或全符号表定义 `GetWhiteBoxKeyChainString` —— 每次出现都是 import
+或名字引用。故该 whitebox keychain 本体无法仅凭这些库解析。
+
+限定：只覆盖已抽取库；白盒可能由未抽取/其它 ABI 或 assets 提供。
