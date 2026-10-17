@@ -515,3 +515,8 @@ Assistant/DJI Fly native 的可提取常量中。
 依据：`unix_socket_listen` 名来自配置，本地路由 direct_host 值就是 `whoami`（本机），且无独立 name 字段。
 推断：App↔djilink 的抽象 socket 名为 `whoami`（或由 direct_host 拼出）。
 待实机以 `ss -x` / `/proc/net/unix` 核对。
+
+## H-38：位置 AES/HMAC/prefix 的组合是近似
+
+依据：C-414/C-415/C-423 给出结构、密钥与调用。具体组合（key=blob[:32]、HMAC 截断到 keylen、prefix 取明文前16）是
+按调用形态推断，未逐字节证明 AES256Encrypt/HmacEncode 的精确语义。待实机或对这两个 helper 反编译核对。

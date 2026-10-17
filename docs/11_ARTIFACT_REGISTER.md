@@ -500,3 +500,8 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 ## A-077：RID 字段控制地图（C-410）
 
 `RID_FIELD_MAP.md`：分 A 已解线路 / B 仅 opcode / C 非 settable / D 数据面 / E 残差，作为后续逐项推进的追踪清单。
+
+## A-078：位置加密发射器（C-425）
+
+`position_message.py` + 自检：cmd0x43/sub0x11，22字节明文 + AES-256-CBC(0x37 key) + HMAC-SHA256 + 16+16 前缀。
+密钥/iv/blob 均为 Ghidra 解析常量。组合细节为 H-38（近似）。状态 `STATIC`。

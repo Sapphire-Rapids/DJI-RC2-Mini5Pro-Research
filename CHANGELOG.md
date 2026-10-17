@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.91 - 2026-10-16
+
+- Added A-078, a position encrypted emitter (C-425): cmd0x43/sub0x11, 22-byte plaintext, AES-256-CBC
+  with the resolved 0x37 key, HMAC-SHA256, 16+16 prefix; self-check passes.
+- H-38 records that the AES/HMAC/prefix combination is an approximation pending helper decompilation.
+
 ## 0.4.90 - 2026-10-16
 
 - Resolved keychain id 0x37: Ghidra relocation turns the entry's file zeros into pointers 0x842b30 /

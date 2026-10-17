@@ -557,3 +557,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-422 | `NEGATIVE` | Entry pointer fields are zero in-file | Resolution is relocation/base-relative |
 | C-423 | `OBSERVED` | Keychain id 0x37 resolves to two 48-byte static blobs | File offs 0x740b30 / 0x73a600 |
 | C-424 | `NEGATIVE` | A flat base-subtract mapping mismatches the Ghidra read | Per-segment delta is 0x102000 there |
+| C-425 | `OBSERVED` | Position emitter with the resolved 0x37 key is added | AES/HMAC/prefix combination is H-38 |
