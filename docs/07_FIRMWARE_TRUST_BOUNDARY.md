@@ -518,6 +518,15 @@ AOSP/Chromium 类 —— 都不是 Remote ID。`DJI_FLY.apk` 仅以路径出现�
 
 正解：改用仓外的 DJI Fly dump（同一 App 版本）找 RID 开关/参数，rc331 分区只作 native/config 佐证。
 
+### 11.28b 与既有记载的关系（C-407）
+
+先前的仓库记载已在**名称/键层**覆盖 RID：`EIDSwitch` 特性（C-133 `RidCaptureV1` 清单）、`EU_CE_enable_c0_rid_0`
+映射（C-071 STATIC → `IsEuCeEnableC0Rid`）、`CccBroadcastSignalQuality`（C-077），并有针对性的负结果 C-072/C-078
+与 setter 搜索负结果 C-109。
+
+本轮新增的是**下层**：opcode 字节、handler 地址与汇编级注册、传输链、receiver 来源、rc331 路径；并**消解了 C-109**
+的"未找到 setter"。故下述 C-373 之后的内容应读作既有 C-071/C-133 之下的展开，而非首次发现。
+
 ### 11.29 遥控器侧：DJI Fly 的 RID 面（C-373/C-374/C-375）
 
 `OBSERVED`：DJI Fly `libsdk_jni.so` 的字符串面直接给出 RID 专用名 —— `IsEuCeEnableC0Rid`、`EIDSwitch`、

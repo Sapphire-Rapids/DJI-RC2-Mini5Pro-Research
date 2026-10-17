@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.81 - 2026-10-16
+
+- Reconciliation: the EIDSwitch characteristic and the EU_CE_enable_c0_rid_0 key were already
+  recorded (C-133, C-071) with metadata negatives C-072/C-078 and the setter-search negative C-109.
+  Added cross-refs from this session's claims to docs/05 and recorded C-407 stating the split: the
+  wire opcode/path layer is new while the name/key layer is prior, and C-109 is now resolved.
+
 ## 0.4.80 - 2026-10-16
 
 - Added A-075, a README index for host-tools/rid-protocol (C-406) with usage, self-check command and
