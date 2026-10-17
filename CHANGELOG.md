@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.66 - 2026-10-16
+
+- Traced the receiver index to Characteristics+0x30 (a characteristic property, not a free constant)
+  and the outward send to BaseAbstraction virtual slot +0x128 (C-385, C-386).
+- With cmd119/sub3/attr0x12, 'IW' magic, timeout, auto sender, receiver and the1-byte payload, every
+  message element is now bound. B-24 narrows to naming the transport and the connection preamble.
+
 ## 0.4.65 - 2026-10-16
 
 - Decompiled the eid_switch base_req constructor: header layout 01 03 77 02 at this[0..3], 'IW' magic

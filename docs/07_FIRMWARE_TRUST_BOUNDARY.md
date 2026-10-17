@@ -573,3 +573,13 @@ uav_fc_handle_eid_switch, uav_fc_eid_switch_status>`，包装层调 `SendGetPack
 Set 为值字节）后调用 —— **receiver index 由调用方给**（C-384）。
 
 于是报文 = 该头部 + 载荷字节；关 RID 即 Set、值0、receiver 按调用方取。
+
+### 11.34 receiver 来源与发送出口（C-385/C-386）
+
+`OBSERVED`：`SendSetPack` 从 Characteristics 参数读 `param_2[0x30]` 作为 receiver index（Get 用自己的槽），说明
+receiver 是**特征属性**、不是自由常量。
+
+`OBSERVED`：两个 Send 都以 `(**(code **)(*(long *)this + 0x128))(this, req, cb, 1)` 收尾 —— 发送走 concrete 抽象的
+虚槽 `0x128`；UAV77 类经 `FlightControllerAbstraction` 成员指针绑定。
+
+故报文全要素已定：cmd119/sub3/attr0x12/'IW'/timeout500/sender 自动/receiver=Characteristics+0x30/载荷1字节。

@@ -517,3 +517,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-382 | `OBSERVED` | Dedicated pack type uav::core::eid_switch_pack with an RspType | Field layout beyond the value byte unenumerated |
 | C-383 | `OBSERVED` | base_req ctor gives header layout, auto sender index, payload slot at+0x20 | 0x02 byte and 'IW' magic semantics unproven |
 | C-384 | `OBSERVED` | SetReceiverIndex is external; receiver index is caller-supplied | local_48 role ambiguous; external body unavailable |
+| C-385 | `OBSERVED` | Receiver index comes from Characteristics+0x30 | It is a characteristic property, not a constant |
+| C-386 | `OBSERVED` | Outward send is BaseAbstraction virtual slot +0x128 | Concrete transport symbol not named |
