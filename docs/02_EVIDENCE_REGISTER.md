@@ -467,3 +467,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-332 | `NEGATIVE` | Calling the real aesDecode2Ex with candidate keys still misses the STUE chunk | Only module-key question open; framing proven by real code |
 | C-333 | `OBSERVED` | The literal is a streaming XOR pad; the AES key is a QByteArray lambda parameter | Key is caller-supplied, origin unknown |
 | C-334 | `NEGATIVE` | AES+XOR pipeline with candidate keys still misses | Covered keys are guesses; caller key not identified |
+| C-335 | `OBSERVED` | NfzPack key is derived on the fly as a hex stream of a local buffer via ostringstream | Stream input/format not yet exact |
+| C-336 | `NEGATIVE` | Self-derivation key candidates still miss | Guesses of stream input/format; mechanism not impugned |

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.42 - 2026-10-16
+
+- Found the NfzPack key derivation: a `std::ostringstream` fed from a local input-buffer copy with
+  `std::hex`, `str()` into a `std::string`, passed as aesDecode2's key and reinterpreted as QString;
+  MakeKey consumes the first0x20 bytes (C-335). The key is therefore derived on the fly, not external.
+- NEGATIVE: lowercase/uppercase hex, first16-byte hex and raw first32 bytes as keys, with the real
+  aesDecode2Ex in both AES/XOR orders, still miss (C-336, N-67).
+- B-23 narrows to the exact fed buffer (pre/post XOR) and format details.
+
 ## 0.4.41 - 2026-10-16
 
 - Established the NfzPack lambda interior: the16-byte literal is a streaming XOR pad (`xorb`), while

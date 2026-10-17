@@ -367,3 +367,12 @@ QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解
 
 `NEGATIVE`：按该真实管线（两序）配候选 key，明文 checksum 仍零命中（C-334、N-66）。缺的是调用方传入的模块
 `QByteArray` key。下一步沿 lambda 调用方回溯该 key，或找到其它直接给模块解密的路径。
+
+### 11.11 NfzPack key 的现场派生（C-335/C-336）
+
+`OBSERVED`：lambda 内建 `std::ostringstream`（-0x878/-0x880），从 -0x160 的输入 QByteArray 副本按 `std::hex` 逐字节喂入，
+`str()` 产出 std::string（-0x1d0），该指针作为 aesDecode2 的 key（rdx）并按 QString 重解释；MakeKey 只吃0x20 字节。
+即 key 是**现场派生的 hex 串**，不是任何外带常量。
+
+`NEGATIVE`：大小写 hex、前16字节 hex、前32字节 raw 作 key 均零命中（C-336、N-67）。下一步是把喂入流的精确缓冲
+（XOR 前/后）与格式（大小写、宽度）对齐——0x68afc2 的 XOR 循环就在流构建之后，二者关系需精确判定。

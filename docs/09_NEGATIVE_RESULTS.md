@@ -745,3 +745,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 全零 key，明文 checksum 全零命中。
 
 限定：管线模型本身未被否定；缺的是 lambda 调用方传入的 `QByteArray` 模块 key。
+
+
+## N-67 — self-derivation key candidates still miss (C-336)
+
+`NEGATIVE`：按 C-335 的派生机制，试小写/大写 hex（密文）、密文前16字节 hex、前32字节 raw 作 key，配真实
+`aesDecode2Ex` 与两种 AES/XOR 顺序，2603 明文 checksum 全零命中。
+
+限定：都只是流输入/格式的猜测；机制（C-335）本身未被否定。

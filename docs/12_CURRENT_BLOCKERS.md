@@ -702,3 +702,8 @@ RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
 
 `OBSERVED`：字面量已定性为 XOR pad，AES key 是调用方传入的 QByteArray。`NEGATIVE`：组合管线配候选 key 仍零命中。
 因此 B-23 现只剩“回溯 lambda 调用方的 QByteArray key”。framing、XOR pad、padding 均已确定，不再是不确定项。
+
+## B-23 收敛到格式细节（C-335/C-336）
+
+`OBSERVED`：key 是 ostringstream+std::hex 的现场派生。`NEGATIVE`：候选自派生 key 仍未命中。
+因此 B-23 只剩“喂入流的缓冲（XOR 前/后）与格式（大小写/宽度）”两个细节，不再有未知来源。
