@@ -502,3 +502,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-367 | `NEGATIVE` | Raw payload checksum matches plain_cksum in none of the four modules | Decryption genuinely required |
 | C-368 | `NEGATIVE` | Tail/pointer/cap/len seed variants still miss | Tail uninitialised, approximated |
 | C-369 | `OBSERVED` | strlen truncates at the vtable NUL so the key is short and MakeKey reads past it | Byte past NUL is the object tail |
+| C-370 | `NEGATIVE` | 20000-iteration random struct-seed sweep still misses | Residual is the unjudged init-per-iteration question |

@@ -876,3 +876,11 @@ raw/变换，2603 明文 checksum 全零命中。
 `NEGATIVE`：tail 取零/ff/长度优先，三种指针基址，四种 cap 与两种 len，raw/变换，2603 明文 checksum 全零命中。
 
 限定：tail 是未初始化栈、只能近似；seed 模型未被否定。
+
+
+## N-84 — 20000-iteration random seed sweep still misses (C-370)
+
+`NEGATIVE`：进程内 2 万随机 seed（随机48位指针 + 随机12字节尾 × 3 种 cap/len），raw/变换共12万次解密尝试，
+2603 明文 checksum 全零命中。
+
+限定：指针与尾已被随机密集覆盖；残差很可能是尚未判定的“`init` 每轮清零”问题 —— 若成立，seed 中段全零，空间彻底改变。

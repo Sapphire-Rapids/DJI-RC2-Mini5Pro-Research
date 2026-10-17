@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.59 - 2026-10-16
+
+- NEGATIVE: 20000-iteration random struct-seed sweep (random pointer+tail, 3 cap/len, raw/transformed,
+  120k attempts) still misses (C-370, N-84).
+- Pointer/tail are thus densely covered; the likely remaining lever is the unjudged init-per-iteration
+  question, which would zero the seed middle and change the search space.
+
 ## 0.4.58 - 2026-10-16
 
 - NEGATIVE: tail/pointer/cap/len seed variants still miss (C-368, N-83).
