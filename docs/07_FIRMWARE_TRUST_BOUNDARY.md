@@ -583,3 +583,12 @@ receiver 是**特征属性**、不是自由常量。
 虚槽 `0x128`；UAV77 类经 `FlightControllerAbstraction` 成员指针绑定。
 
 故报文全要素已定：cmd119/sub3/attr0x12/'IW'/timeout500/sender 自动/receiver=Characteristics+0x30/载荷1字节。
+
+### 11.35 传输出口命名（C-387）
+
+`OBSERVED`：全函数清单把槽0x128对应到 `uav::sdk::BaseAbstraction::SendPack`（两个重载 0x02618fc4 / 0x02619118），
+另有 `uav::sdk::key::BaseAbs::SendPack`（0x028bfee0）。更底层核心传输是
+`uav::core::UavCoreCancelation::SendData(string const&, unsigned_short, uav_cmd_req const&, rsp cb, cancel cb, bool)`，
+并经 `queue<pair<uav_cmd_req, function<void(int)>>>` 排队。
+
+即：发送链 = SendSetPack → slot0x128 SendPack → UavCore SendData → 队列/链路。

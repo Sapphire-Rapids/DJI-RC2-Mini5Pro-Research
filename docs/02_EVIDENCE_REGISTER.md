@@ -519,3 +519,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-384 | `OBSERVED` | SetReceiverIndex is external; receiver index is caller-supplied | local_48 role ambiguous; external body unavailable |
 | C-385 | `OBSERVED` | Receiver index comes from Characteristics+0x30 | It is a characteristic property, not a constant |
 | C-386 | `OBSERVED` | Outward send is BaseAbstraction virtual slot +0x128 | Concrete transport symbol not named |
+| C-387 | `OBSERVED` | Slot0x128 is BaseAbstraction::SendPack; core transport is UavCoreCancelation::SendData | Inventory naming only; no live call |

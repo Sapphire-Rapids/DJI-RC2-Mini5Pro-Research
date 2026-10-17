@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.67 - 2026-10-16
+
+- Named the transport chain: slot0x128 is BaseAbstraction::SendPack (two overloads) with
+  uav::core::UavCoreCancelation::SendData and a req queue underneath (C-387).
+- Send path is thus SendSetPack -> SendPack -> SendData -> queue/link. B-24 now only needs the real
+  connection preamble, which is an environment item rather than code.
+
 ## 0.4.66 - 2026-10-16
 
 - Traced the receiver index to Characteristics+0x30 (a characteristic property, not a free constant)
