@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.74 - 2026-10-16
+
+- Recovered `dji_link unix_socket_listen create socket = %s`, so the listen socket name is config/
+  source driven; the local route direct_host is `whoami` with source file dji_whoami.c (self), while
+  vt_gnd is another virtual host (C-396).
+- H-37: the App-facing abstract socket name is plausibly the direct_host value `whoami`; verify on
+  hardware via ss -x / /proc/net/unix.
+
 ## 0.4.73 - 2026-10-16
 
 - Recovered the vendor dji_link_services route table: the App-facing entry is target whoami, channel

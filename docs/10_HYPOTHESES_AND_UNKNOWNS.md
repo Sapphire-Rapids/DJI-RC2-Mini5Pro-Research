@@ -509,3 +509,9 @@ Assistant/DJI Fly native 的可提取常量中。
 拿到后按 `aesDecode2Ex` + XOR 管线解2603 并核 `plain_cksum`。未闭合前不得把任何候选称为 STUE key。
 
 `UNKNOWN`：该 QByteArray 是模块 id、文件名、还是设备/产品派生值；以及 NfzPack 是否为模块本体的正确路径。
+
+## H-37：App 侧 socket 名即 direct_host `whoami`
+
+依据：`unix_socket_listen` 名来自配置，本地路由 direct_host 值就是 `whoami`（本机），且无独立 name 字段。
+推断：App↔djilink 的抽象 socket 名为 `whoami`（或由 direct_host 拼出）。
+待实机以 `ss -x` / `/proc/net/unix` 核对。

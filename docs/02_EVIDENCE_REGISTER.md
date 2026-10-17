@@ -528,3 +528,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-393 | `OBSERVED` | system.img launcher JSON starts dji_link and restarts dji.go.v5 | Boot-ordering evidence only |
 | C-394 | `OBSERVED` | Vendor route table defines a local/logic channel to the mobile App | App hop is local+logic, not USB |
 | C-395 | `OBSERVED` | dji_link opens and accepts a local socket to the App | Listen/accept strings only |
+| C-396 | `OBSERVED` | dji_link creates a named unix listening socket; whoami denotes self | Name is config/source driven, not a literal |

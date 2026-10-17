@@ -624,3 +624,11 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 于是连接前置具体化：App 经本地 socket + `logic` 协议进程内递送到 djilink，再由 djilink 走 bulk/USB 到飞机。
 `SendData` 排入的就是这条链。
+
+### 11.39 unix socket 命名与 whoami 语义（C-396）
+
+`OBSERVED`：dji_link 串含 `dji_link unix_socket_listen create socket = %s` —— 监听 socket 名由配置/源码提供，不是写死字面量。
+本地路由的 `direct_host` 为 `whoami`，同树源文件为 `hardware/dji/service/dji_link/src/dji_whoami.c`（即"本机自身"）；
+`vt_gnd` 是另一虚拟地面主机、用于其它本地路由。
+
+故 App 侧抽象 socket 名很可能就是 `direct_host` 值 `whoami`，而非新常量。
