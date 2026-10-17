@@ -22,3 +22,12 @@ The pinned out-of-repo tool is unmodified upstream; a local copy carries one PKC
 because wa150 signs PKCS1 while header_version2 makes the tool assume PSS. The patch is outside this
 repository. Downloaded firmware, decrypted output, partitions and reports are all gitignored here.
 See `firmware/EXTRACTION_NOTES.md` for the local layout. Nothing is returned to a device.
+
+## 飞机侧 STUE 续跑检查点
+
+飞机侧（wa150）STUE 破解仍在进行，完整坐标/证据编号/下一步/勿重做清单见
+[AIRCRAFT_STUE_CHECKPOINT.md](AIRCRAFT_STUE_CHECKPOINT.md)。
+
+- 遥控器侧（rc331）enc_key 为空、已明文解出，无阻碍。
+- 飞机侧四份模块（0802/1200/2603/0806）全部 STUE 加密，卡点即 STUE key 的 seed 运行时地址字节。
+- 当前残留三项：结构体指针字节、12 字节未初始化尾、`init` 是否每轮清零（先判后者）。
