@@ -8,7 +8,7 @@ uav_fc_handle_eid_switch,uav_fc_eid_switch_status>` constructor in DJI Fly's lib
     +0x06  <sender>           GlobalPacketStatus::GetGlobalSenderIndex(), auto in-process
     +0x07  00
     +0x08  03
-    +0x0c  00 00 49 57        'I','W' magic
+    +0x0c  00 00 49 57        'I','W' magic at 0x0e..0x0f
     +0x10  00 00
     +0x14  f4 01 00 00        timeout 500
     +0x18  00 00
@@ -39,8 +39,9 @@ def build(sender: int = 0, receiver: int = 0, value: int = 0) -> bytes:
     h[0x02] = CMD
     h[0x03] = TEMPLATE2
     h[0x06] = sender & 0xFF
+    h[0x05] = 0x02
     h[0x08] = 0x03
-    h[0x0C:0x0E] = MAGIC
+    h[0x0E:0x10] = MAGIC
     h[0x14:0x18] = TIMEOUT.to_bytes(4, "little")
     return bytes(h) + bytes([value & 0xFF])
 

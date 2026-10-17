@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.78 - 2026-10-16
+
+- Added test_eid_switch_message.py asserting the emitted header byte-for-byte against the decompiled
+  uav_cmd_base_req ctor; passes (C-402). Decompilation-anchored self-check, not a device test.
+- RETRACTED the first emitter's magic offset: 'IW' sits at 0x0e..0x0f (from the little-endian
+  0x57490000 at +0xc), not 0x0c. Fixed both emitters and the spec table, re-hashed A-071/A-072
+  (C-403, N-88).
+
 ## 0.4.77 - 2026-10-16
 
 - Decompiled the EUCeCxV1 registration class: CreateCharacteristics/BindKey insert the EU/CE regulatory

@@ -653,3 +653,12 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 而非一次性局部。故它是与 `EIDSwitch` **并列的区域相关 RID enable 键**（C-401）。
 
 含义：若目标区服走 CE 路径，可优先用 `EU_CE_enable_c0_rid_0` 替代 EIDSwitch。属备选路径，不改主结论。
+
+### 11.42 发射器静态验证与偏移修正（C-402/C-403）
+
+`OBSERVED`：新增 `test_eid_switch_message.py`，对发射头部的每个偏移与 `uav_cmd_base_req` 构造函数的字面写入逐条断言
+（0=0x02770301、+1=0x0300000200000000、+0xc=0x57490000、+0x14=500、+0x10/+0x18=0、this[6]=sender），并校验 value/sender 槽，
+通过（C-402）。这是**对反编译的自检**，不是对设备的验证。
+
+`RETRACTED`：首版发射器把 'IW' 魔数放在 0x0c（应为 0x0e，因 0x57490000 的小端字节是 00 00 49 57），OID 发射器同错；
+两者均已修正，规格偏移表同步修好，A-071/A-072 重新计哈希（C-403）。

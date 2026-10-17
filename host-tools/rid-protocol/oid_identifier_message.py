@@ -32,8 +32,9 @@ def build(payload: bytes, sender: int = 0, receiver: int = 0) -> bytes:
     h[0x02] = CMD
     h[0x03] = TEMPLATE2
     h[0x06] = sender & 0xFF
+    h[0x05] = 0x02
     h[0x08] = 0x03
-    h[0x0C:0x0E] = MAGIC
+    h[0x0E:0x10] = MAGIC
     h[0x14:0x18] = TIMEOUT.to_bytes(4, "little")
     return bytes(h) + payload
 

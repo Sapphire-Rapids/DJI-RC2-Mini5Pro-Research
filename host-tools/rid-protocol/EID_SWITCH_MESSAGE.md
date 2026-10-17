@@ -21,11 +21,13 @@ uav_cmd_base_req<(uchar)1, (uchar)3, (uchar)119, uav_fc_handle_eid_switch, uav_f
 | 0x01 | 03 | 子命令 sub |
 | 0x02 | 77 | cmd 119 |
 | 0x03 | 02 | 构造常量 |
-| 0x04..05 | 00 00 | — |
+| 0x04 | 00 | — |
+| 0x05 | 02 | 构造常量 |
 | 0x06 | sender | `GlobalPacketStatus::GetGlobalSenderIndex()`，进程内自动 |
 | 0x07 | 00 | — |
 | 0x08 | 03 | — |
-| 0x0c..0d | 00 00 49 57 | ASCII `'I','W'` 魔数 |
+| 0x0c..0d | 00 00 | — |
+| 0x0e..0f | 49 57 | ASCII `'I','W'` 魔数 |
 | 0x10..11 | 00 00 | — |
 | 0x14..17 | f4 01 00 00 | 超时 500 |
 | 0x18..19 | 00 00 | — |
