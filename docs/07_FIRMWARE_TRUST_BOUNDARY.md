@@ -754,3 +754,13 @@ RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一
 
 `NEGATIVE`：无任何 `SetSerialNumber`（C-431、N-96）。故序列号是身份而非可写字段，派生的 ComplianceSerialNumber
 （C-428、C-128）默认也不可写。UAS ID 若要改，除非存在上下文级 set。
+
+### 11.52 ADS-B 广播代理与高度 opcode（C-432/C-433/C-434）
+
+在 pack 模板标签层面另找到三个此前未记的 opcode：
+
+- `uav_adsb_get_adsb_on_off_req/rsp` → cmd **12 (0x0C)** / sub17（ctor 0x02d6f14c）—— 广播代理开关查询
+- `uav_adsb_set_set_adsb_agent_switch_req/rsp` → cmd **55 (0x37)** / sub17（ctor 0x02da5140）—— 真正的广播代理 set
+- `uav_adsb_get_drone_dynamic_max_height_req/rsp` → cmd **80 (0x50)** / sub17（ctor 0x02cb9980）—— 动态最大高度，独立于位置 set
+
+这三条补齐了 B 段：广播代理开关 + 高度由此进入解码队列（载荷待取）。

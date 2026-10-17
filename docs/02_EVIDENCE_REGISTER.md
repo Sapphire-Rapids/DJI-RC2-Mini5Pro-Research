@@ -564,3 +564,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-429 | `NEGATIVE` | No ComplianceSerialNumberGet/Set symbol | UAS ID not directly settable via its own key |
 | C-430 | `OBSERVED` | SerialNumber is heavily referenced with Get-only accessors | 164 refs; no SetSerialNumber |
 | C-431 | `NEGATIVE` | No SerialNumber setter exists | Compliance/SN are identities, not writable fields |
+| C-432 | `OBSERVED` | ADS-B agent on/off get is cmd12/sub17 | Query only; payload not decoded |
+| C-433 | `OBSERVED` | ADS-B agent switch set is cmd55/sub17 | Actual broadcast-agent set |
+| C-434 | `OBSERVED` | Drone dynamic max height get is cmd80/sub17 | Distinct from the position set |

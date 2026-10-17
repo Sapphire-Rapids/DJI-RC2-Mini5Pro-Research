@@ -30,6 +30,14 @@
 | RIDRegistedInfo | action | C-133 |
 | RIDImportResult | getter | C-133 |
 
+## B2. ADS-B 代理与高度（仅 opcode）
+
+| 字段 | opcode | claim |
+| --- | --- | --- |
+| ADS-B agent on/off get | cmd12/sub17 | C-432 |
+| ADS-B agent switch set | cmd55/sub17 | C-433 |
+| Drone dynamic max height get | cmd80/sub17 | C-434 |
+
 ## D. 数据面（App 自发）
 
 | 字段 | 路径 | claim |

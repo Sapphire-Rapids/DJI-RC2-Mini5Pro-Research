@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.95 - 2026-10-16
+
+- Found three further adsb opcodes from pack tags: agent on/off get cmd12/sub17 (C-432), agent
+  switch set cmd55/sub17 (C-433) and drone dynamic max height get cmd80/sub17 (C-434), added to the
+  field map under a new B2 section.
+
 ## 0.4.94 - 2026-10-16
 
 - SerialNumber has164 references and only Get accessors across all abstractions; no SetSerialNumber
