@@ -24,7 +24,7 @@
 
 | 字段 | 现状 | claim |
 | --- | --- | --- |
-| ComplianceSerialNumber（飞机/UAS ID） | get/listen-only，无 SET；由 SN 派生 | docs/05 |
+| ComplianceSerialNumber（飞机/UAS ID） | 派生 listener（C-428）；无 Get/Set（C-429）→ 改 SN 才改它 | docs/05；C-428/C-429 |
 | 四 capability flag（Cloud/EU/FR/JP） | listen-only | C-133 |
 | RIDRegistedInfo | action | C-133 |
 | RIDImportResult | getter | C-133 |

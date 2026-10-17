@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.93 - 2026-10-16
+
+- ComplianceSerialNumberInit is only a listener: it reads the SerialNumber characteristic and
+  registers a 0x48 lambda, so compliance is derived, not independently addressable (C-428).
+- NEGATIVE: no ComplianceSerialNumberGet/Set symbol, so the UAS ID is not directly settable via its
+  own key - changing it means changing the underlying SerialNumber (C-429, N-95).
+
 ## 0.4.92 - 2026-10-16
 
 - Decompiled the AES/HMAC helpers: AES256Encrypt is AES-CBC + PKCS#7-style padding with a caller key

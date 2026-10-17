@@ -965,3 +965,11 @@ raw/变换，2603 明文 checksum 全零命中。
 才定位到真偏移（`0x740b30` / `0x73a600`，该处 delta 为 `0x102000`）。
 
 限定：这是映射方法学问题，不否定密钥存在（C-423）。
+
+
+## N-95 — no ComplianceSerialNumber Get/Set (C-429)
+
+`NEGATIVE`：函数名清单只有 `ComplianceSerialNumberInit`，无 Get/Set 对。故飞机/UAS 合规 ID 不通过自身 key 直接可写；
+要改它等于改底层 SerialNumber。
+
+限定：缺失来自函数名清单；匿名 handler 未排除。

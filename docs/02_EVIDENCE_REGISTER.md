@@ -560,3 +560,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-425 | `OBSERVED` | Position emitter with the resolved 0x37 key is added | AES/HMAC/prefix combination is H-38 |
 | C-426 | `OBSERVED` | AES256Encrypt is AES-CBC with PKCS#7-style padding | Key length caller-supplied; confirmed not assumed |
 | C-427 | `OBSERVED` | HmacEncode writes the full digest over ct+blob | Not truncated to the key length |
+| C-428 | `OBSERVED` | ComplianceSerialNumberInit is a listen registration deriving from SerialNumber | Derived listener, not its own opcode |
+| C-429 | `NEGATIVE` | No ComplianceSerialNumberGet/Set symbol | UAS ID not directly settable via its own key |

@@ -738,3 +738,11 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 `NEGATIVE`：扁平 base 相减映射会错位（C-424、N-94），需按段映射。
 
 即：**id 0x37 密钥已取到**，位置载荷自此可完整复现（48 字节，两段）。
+
+### 11.50 ComplianceSerialNumber 是派生 listener（C-428/C-429）
+
+`OBSERVED`：`ComplianceSerialNumberInit` 只做注册 —— 组装字面量 `SerialNumber`、经 handler 读取，再堆分配 0x48 lambda 捕获
+KeyHandlers+Characteristics 并交回调派发。即合规值是对普通 SN 的**派生 listener**，没有自己的 opcode。
+
+`NEGATIVE`：无 `ComplianceSerialNumberGet/Set` 符号（C-429、N-95）。故 UAS ID 不直接可写；改它等于改底层 SerialNumber。
+这也解释了 docs/05 的"未找到 SET"。
