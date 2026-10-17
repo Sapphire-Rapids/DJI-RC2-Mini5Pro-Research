@@ -892,3 +892,11 @@ raw/变换，2603 明文 checksum 全零命中。
 且 `DJI_FLY.apk` 只是路径引用（4MB 内无 `PK` 魔数），真实 apk 位于 /data/app、不在 OTA 内。
 
 限定：这只说明分区裸扫不足以拿开关，需改用在仓外的 DJI Fly dump。
+
+
+## N-86 — EU_CE_enable_c0_rid_0 has no direct xref (C-375)
+
+`NEGATIVE`：`EU_CE_enable_c0_rid_0` 字符串既无直接 ADRP+ADD 引用、也无指针表项，说明是间接到达（表或计算名），
+而非字面地址加载。
+
+限定：只覆盖直接 ADRP+ADD；指针表/寄存器计算加载未否定。

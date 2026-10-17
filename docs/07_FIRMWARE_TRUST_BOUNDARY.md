@@ -517,3 +517,15 @@ AOSP/Chromium 类 —— 都不是 Remote ID。`DJI_FLY.apk` 仅以路径出现�
 不在 OTA。`NEGATIVE`：分区裸扫不足以拿开关（N-85）。
 
 正解：改用仓外的 DJI Fly dump（同一 App 版本）找 RID 开关/参数，rc331 分区只作 native/config 佐证。
+
+### 11.29 遥控器侧：DJI Fly 的 RID 面（C-373/C-374/C-375）
+
+`OBSERVED`：DJI Fly `libsdk_jni.so` 的字符串面直接给出 RID 专用名 —— `IsEuCeEnableC0Rid`、`EIDSwitch`、
+`RidWorkingStatusPush`、`CccBroadcastSignalQuality`、`OIDIdentifier`、`ComplianceSerialNumber`、`EU_CE_enable_c0_rid_0`，
+以及 `RIDRegistedInfoReq`/`ActionRIDRegistedInfo` 与 `rid_len=`/`rid_data_packet` 日志文本。前人工具已列同一批名。
+
+`OBSERVED`：直接 ADRP+ADD 引用计数已量出（EIDSwitch68、ComplianceSerialNumber64、CccBroadcastSignalQuality51、
+OIDIdentifier37、IsEuCeEnableC0Rid18、RidWorkingStatusPush2、EU_CE_enable_c0_rid_0 0）。聚焦点取
+`IsEuCeEnableC0Rid` 与 `RidWorkingStatusPush`。
+
+`NEGATIVE`：`EU_CE_enable_c0_rid_0` 无直接 xref（C-375、N-86），属间接到达。

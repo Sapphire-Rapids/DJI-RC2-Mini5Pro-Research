@@ -505,3 +505,6 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-370 | `NEGATIVE` | 20000-iteration random struct-seed sweep still misses | Residual is the unjudged init-per-iteration question |
 | C-371 | `OBSERVED` | rc331 RID hits are unrelated; Fly APK bytes are absent from the OTA | App lives in /data/app, so use an external Fly dump |
 | C-372 | `OBSERVED` | DJI Fly package dji.go.v5 is referenced across five rc331 partitions | Refs may be incidental; no owner identified |
+| C-373 | `OBSERVED` | DJI Fly libsdk_jni.so exposes the RID surface (EIDSwitch, IsEuCeEnableC0Rid, handler names) | Prior repo tooling lists the same names |
+| C-374 | `OBSERVED` | Per-symbol direct xref counts recovered; IsEuCeEnableC0Rid/RidWorkingStatusPush most focused | Counts are direct-ref only |
+| C-375 | `NEGATIVE` | EU_CE_enable_c0_rid_0 has zero direct ADRP+ADD xrefs | Indirect table/computed name not excluded |

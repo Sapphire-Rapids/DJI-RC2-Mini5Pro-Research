@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.61 - 2026-10-16
+
+- Switched focus to the RC side; found DJI Fly libsdk_jni.so exposes the RID surface: EIDSwitch,
+  IsEuCeEnableC0Rid, RidWorkingStatusPush, CccBroadcastSignalQuality, OIDIdentifier,
+  ComplianceSerialNumber, EU_CE_enable_c0_rid_0 plus RIDRegistedInfoReq/ActionRIDRegistedInfo
+  (C-373).
+- Counted direct ADRP+ADD xrefs per symbol (C-374); focused on IsEuCeEnableC0Rid and
+  RidWorkingStatusPush.
+- NEGATIVE: EU_CE_enable_c0_rid_0 has no direct xref, so it is reached indirectly
+  (C-375, N-86).
+
 ## 0.4.60 - 2026-10-16
 
 - RC-side recon: rc331 partition `rid_enable`/`RID_ENABLE` hits are video-encoder properties and
