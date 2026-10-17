@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.72 - 2026-10-16
+
+- rc331 corroboration: vendor resource pools name native link daemons djilink and dji_v1_protocol
+  (C-392), and a system.img launcher JSON starts dji_link before restarting dji.go.v5 (C-393).
+- This confirms the message path is App -> djilink/dji_v1_protocol -> link rather than a direct
+  aircraft connection; only the socket address stays open.
+
 ## 0.4.71 - 2026-10-16
 
 - Added A-073, an operator runbook for the no-flash RID-off verification (C-391): prerequisites,

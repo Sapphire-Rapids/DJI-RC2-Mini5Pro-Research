@@ -601,3 +601,14 @@ receiver 是**特征属性**、不是自由常量。
 
 即：App 是**按 SDK key 名**访问该开关（不是直接发 opcode）；characteristics 与 receiver 管线由这条 key 路径填充。
 这解释了 receiver（Characteristics+0x30）来自会话环境，而非固定常量 —— 连接前置就是"设备已连、key map 已插入"。
+
+### 11.37 rc331 侧 native 佐证（C-392/C-393）
+
+`OBSERVED`：vendor.img 的名称池列出 `dji.go.v4`、`dji.go.v5`、`dji.prof.mg2`、`dji_logs`、`dji_v1_protocol`、`djilink`；
+system.img 日志串显示 `hdvt_lte: inform djilink ...` / `failed to inform djilink`，并有 `dji_link` 的 stream_conf 条目 ——
+即 RC 上存在 **native 链路守护进程**，App 的协议路径有其对端。
+
+`OBSERVED`：system.img 的 launcher JSON 里有 `start dji_link` 与 `pkill -9 dji.go.v5`（在 download pretender 下），
+说明开机先起 djilink、再拉起 DJI Fly（C-393）。
+
+这坐实了连接前置的性质：报文最终经 App → djilink/dji_v1_protocol → 链路，而非直连飞机。

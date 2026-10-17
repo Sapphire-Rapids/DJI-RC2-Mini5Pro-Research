@@ -800,3 +800,8 @@ B-23 现具体为：把这12 字节相邻局部（-0x1d0 一带）纳入 seed；
 
 `OBSERVED`：开关经 SDK key 名 `EIDSwitch` 注册（InsertCharacteristics），receiver 由该 key 路径填充。
 即前置 = 设备已连 + key map 已插入；再无代码向未解项。
+
+## B-24 补：native 对端已命名（C-392/C-393）
+
+`OBSERVED`：RC native 侧是 djilink / dji_v1_protocol 守护进程，App 经它们下发。
+未闭合：具体 socket/端口地址；属环境细节。
