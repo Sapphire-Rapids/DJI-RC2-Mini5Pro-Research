@@ -727,3 +727,8 @@ B-23 现仅剩两个判定：喂入缓冲是 enc 还是 transform 结果；以�
 
 `OBSERVED`：key 机制已确定（变换缓冲的 C 字符串）。`NEGATIVE`：仍零命中。
 B-23 现仅剩：确认 -0x208 是否确实承载密文（XsBuffer append 链的来源），以及变换方向。
+
+## B-23 只剩容器序列化（C-347/C-348）
+
+`OBSERVED`：变换作用在构建的常量 seed 上，密文只作 aesDecode2 data。`NEGATIVE`：近似 seed 仍零命中。
+B-23 现仅剩“该容器的字段序列化顺序/layout”，即把那条 append+字段链精确还原。

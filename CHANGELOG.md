@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.47 - 2026-10-16
+
+- Established that the transform source -0x208 is a built seed container (XsBuffer append plus ~20
+  virtual immediate-byte field sets), not the ciphertext; the derived key is over the seed while
+  aesDecode2's data stays the ciphertext (C-347).
+- NEGATIVE: extracted constant seed raw/transformed as key with optional post-XOR still misses
+  (C-348, N-72).
+- B-23 narrows to the container's field serialization order/layout.
+
 ## 0.4.46 - 2026-10-16
 
 - Corrected the key slot: -0x1d0 is overwritten by the transformed buffer wrapped as a C string

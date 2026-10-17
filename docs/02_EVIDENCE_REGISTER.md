@@ -479,3 +479,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-344 | `NEGATIVE` | Exact transform and broad md5 keys still miss | Residual is fed buffer; NfzPack may not be the module path |
 | C-345 | `OBSERVED` | aesDecode2 key is the transformed buffer as a C string, not the MD5 hex | -0x208 object identity assumed; NUL truncation data-dependent |
 | C-346 | `NEGATIVE` | C-string transform key still misses | Mechanism not impugned; residual is -0x208 identity/transform direction |
+| C-347 | `OBSERVED` | Transform source is a built container of hardcoded constants, not the ciphertext | Serialization order/layout not emulated |
+| C-348 | `NEGATIVE` | Constant-seed key attempts still miss | Seed extraction approximate; container layout not impugned |

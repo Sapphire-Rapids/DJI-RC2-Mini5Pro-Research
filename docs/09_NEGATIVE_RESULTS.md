@@ -785,3 +785,11 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 2603 明文 checksum 全零命中。
 
 限定：C-345 机制未被否定；残差仅是“-0x208 是否逐字节等于密文”与变换方向。
+
+
+## N-72 — constant-seed key attempts still miss (C-348)
+
+`NEGATIVE`：按 C-347 提取的21字节常量 seed 作 raw 或经 transform，data=密文，含可选 post-XOR，2603 明文
+checksum 全零命中。
+
+限定：seed 提取是近似的（容器自身的 data() 可能重排/补全），C-347 的容器结论未被否定。

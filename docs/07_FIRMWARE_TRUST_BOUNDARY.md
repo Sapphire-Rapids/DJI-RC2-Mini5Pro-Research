@@ -409,3 +409,11 @@ QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解
 QByteArray。此前 -0x1d0 的 MD5-hex 串只是 `nfz before decode md5: %1` 的日志值。key = 变换输出到首个 NUL，前0x20 字节生效。
 
 `NEGATIVE`：按此仍零命中（C-346、N-71）。残差：-0x208 是否逐字节等于密文（它由 XsBuffer append 链构建）与变换方向。
+
+### 11.16 变换源是构建的常量容器（C-347/C-348）
+
+`OBSERVED`：-0x208 并非密文，而是由 `XsBuffer::append` 加约20 个虚字段写入（立即数字节 dd d3 6e 81 …）构建出的
+seed 对象；变换循环随后经 vtable slot0x30/0x38 读它的 data/length。故派生 key 作用在 seed 上，而 aesDecode2 的
+data（rsi）始终是 -0x218 密文。
+
+`NEGATIVE`：seed raw / transform(seed) 作 key 仍零命中（C-348、N-72）。残差是容器的序列化顺序与 data() 布局。
