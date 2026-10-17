@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.53 - 2026-10-16
+
+- Confirmed the transform is an in-place, byte-local rewrite (read and write share the object and
+  index rbx; both accumulator loads are the current byte before the write), excluding a streaming
+  interpretation (C-360).
+- NEGATIVE: rol/ror direction, mod17/mod16/reversed pad, forward/reversed seed all miss
+  (C-359, N-78).
+- B-23 is now a single action: include the object struct field low bytes with the appended chars to
+  rebuild the seed.
+
 ## 0.4.52 - 2026-10-16
 
 - Mapped the XsBuffer vtable (0x30=append(char) returns this, 0x38=cvPc data); the chain's *0x20 hits

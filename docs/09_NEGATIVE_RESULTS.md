@@ -831,3 +831,10 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 `NEGATIVE`：对25字节常量表做全旋转 × 逆序 × raw/变换，作 key，2603 明文 checksum 全零命中。
 
 限定：列表内容（C-349）与对象形状（C-357）未被否定；可能还缺结构体指针字节这一成分。
+
+
+## N-78 — transform direction and pad variants still miss (C-359)
+
+`NEGATIVE`：rol8/ror8 方向、pad mod17/mod16/逆序、seed 正/逆序的组合，2603 明文 checksum 全零命中。
+
+限定：mod17（C-340）与 ror8（C-343）是结构性推导出的形式；残差更可能在“对象字节成分”而非变换公式。

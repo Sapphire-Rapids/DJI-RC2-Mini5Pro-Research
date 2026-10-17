@@ -491,3 +491,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-356 | `NEGATIVE` | No base64/hex decode in the NfzPack chain | Decode may live in a callee |
 | C-357 | `OBSERVED` | XsBuffer vtable mapped; loop reads object bytes at rbx | D0-as-arg unusual; seed may include struct pointer bytes |
 | C-358 | `NEGATIVE` | All seed rotations/reversals still miss | Missing struct-pointer ingredient possible |
+| C-359 | `NEGATIVE` | Transform direction/pad variants still miss | Residual is the object-byte ingredient |
+| C-360 | `OBSERVED` | Transform reads and writes the same object index (in-place, byte-local) | Confirms byte-local formula |
