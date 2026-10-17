@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.68 - 2026-10-16
+
+- Noted OIDIdentifier uses a distinct opcode pair cmd214/sub17 (C-388).
+- Added the eid_switch message specification and emitter under host-tools/rid-protocol: a 33-byte
+  static reconstruction (cmd119/sub3, 'IW' magic, timeout500, 1-byte payload, 0=off) with receiver
+  slot noted as caller-supplied (A-071).
+
 ## 0.4.67 - 2026-10-16
 
 - Named the transport chain: slot0x128 is BaseAbstraction::SendPack (two overloads) with

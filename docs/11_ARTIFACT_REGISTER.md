@@ -467,3 +467,8 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 `aes_decode_bridge.py`（2383 B，SHA-256 `77c9c4bd28612bd4df13b58349a177a14ae12de4ea38c69f62bb051c9bc0f548`）在 wb_aes_bridge 的镜像树上 ctypes 直调 Assistant 真实
 `aesDecode2Ex`（AES-256 CBC / IV `sm_chain0`）；key 变化会改变输出。状态 `OBSERVED`，离线 helper，只公开源码。
+
+## A-071：eid_switch 报文发射器（C-380/C-381/C-387/C-388）
+
+`eid_switch_message.py`（SHA-256 见 CSV，33 字节报文）静态重建 RID/EID 开关 set 报文：cmd119/sub3、'IW' 魔数、
+超时500、1 字节载荷（0=关）。配套规格见 `host-tools/rid-protocol/EID_SWITCH_MESSAGE.md`。状态 `STATIC`，未实发。
