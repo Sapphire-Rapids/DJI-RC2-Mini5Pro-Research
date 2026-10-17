@@ -472,3 +472,8 @@ A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fd
 
 `eid_switch_message.py`（SHA-256 见 CSV，33 字节报文）静态重建 RID/EID 开关 set 报文：cmd119/sub3、'IW' 魔数、
 超时500、1 字节载荷（0=关）。配套规格见 `host-tools/rid-protocol/EID_SWITCH_MESSAGE.md`。状态 `STATIC`，未实发。
+
+## A-072：OIDIdentifier 报文发射器（C-388/C-389）
+
+`oid_identifier_message.py`：RID 参数族的字符串成员，cmd214(0xD6)/sub17，头部前缀 01 11 D6 02，载荷为上限 0x70
+的字符串。状态 `STATIC`，未实发。

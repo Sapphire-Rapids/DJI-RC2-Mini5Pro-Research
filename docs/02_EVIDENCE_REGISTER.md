@@ -521,3 +521,4 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-386 | `OBSERVED` | Outward send is BaseAbstraction virtual slot +0x128 | Concrete transport symbol not named |
 | C-387 | `OBSERVED` | Slot0x128 is BaseAbstraction::SendPack; core transport is UavCoreCancelation::SendData | Inventory naming only; no live call |
 | C-388 | `OBSERVED` | OIDIdentifier handlers use a different opcode pair cmd214/sub17 | Only EID switch decoded so far |
+| C-389 | `OBSERVED` | OIDIdentifier payload is a 0x70-capped string with header 01 11 D6 02 | Variable-length, unlike the EID byte |

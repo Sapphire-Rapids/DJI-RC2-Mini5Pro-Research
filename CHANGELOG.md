@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.69 - 2026-10-16
+
+- Characterised OIDIdentifier: a variable-length string payload capped at 0x70 on header 01 11 D6 02,
+  with Get filling a 0x16 marker (C-389).
+- Added the matching emitter A-072 so the RID parameter family now has both the EID switch byte and
+  the OID string.
+
 ## 0.4.68 - 2026-10-16
 
 - Noted OIDIdentifier uses a distinct opcode pair cmd214/sub17 (C-388).
