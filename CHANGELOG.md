@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.57 - 2026-10-16
+
+- Scanned all four wa150 modules: uniform header_version2 + STUE + attrib0x0 (C-366).
+- NEGATIVE: raw payload checksum matches plain_cksum in none of them, so a clear attrib bit0 does not
+  mean plaintext and decryption is genuinely required (C-367, N-82).
+
 ## 0.4.56 - 2026-10-16
 
 - Dense in-process pointer brute (6144 combos) over the synthetic struct seed still misses (C-365,

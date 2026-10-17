@@ -498,3 +498,5 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-363 | `OBSERVED` | XsBuffer field layout is vtable0x0/dataptr0x8/cap0x10/len0x18 | Live 32 bytes exactly the indexed range |
 | C-364 | `NEGATIVE` | Mimicked struct seeds across a heap-pointer sweep still miss | Only pointer swept; other fields are fixed guesses |
 | C-365 | `NEGATIVE` | Systematic 6144-combo pointer brute still misses | Residual is the0x2c tail bytes or field-role eviction |
+| C-366 | `OBSERVED` | All four wa150 modules are hdr_v2 STUE attrib0x0 yet still encrypted | attrib bit0 role differs; not plaintext |
+| C-367 | `NEGATIVE` | Raw payload checksum matches plain_cksum in none of the four modules | Decryption genuinely required |

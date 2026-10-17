@@ -861,3 +861,11 @@ checksum 全零命中。
 raw/变换，2603 明文 checksum 全零命中。
 
 限定：指针已密扫；残差是32 字节结构之外的0x2c 尾字节，或字段角色配错。
+
+
+## N-82 — raw payload checksum matches no module (C-367)
+
+`NEGATIVE`：对0802/1200/2603/0806 的未处理 payload 直接算加性 checksum，**无一**等于 plain_cksum —— 尽管 attrib 位0
+是0，解密仍是必需的。
+
+限定：这只否定“attrib0 清空即明文”的读法，不否定其它 attr 位语义。
