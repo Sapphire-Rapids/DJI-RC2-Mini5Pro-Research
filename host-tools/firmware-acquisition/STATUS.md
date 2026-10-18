@@ -85,3 +85,14 @@ scopes. The control-panel objective retains full per-control device/RF acceptanc
 
 The2026-10-18 status-parser validation is a separate36-host-test run (C-463); together with4 position tests this batch
 has40 host tests. The earlier59 firmware tests (C-450) were not rerun or merged into a single larger run.
+
+## Current bounded inputs after C-466--C-470
+
+A-090 Android upgrade selected bodies do not expose a concreteSTUE consumer; this is not a whole-SDK conclusion.
+Location producer/type/provider/epoch-second and conditionalHostID/payload fixes are independent offline work,not
+STUE plaintext or real control-panel success. Existing C-126 scales remain valid; altitude source unit/reference
+and the exact Java supplier remain unclosed.
+
+Official1200 reacquisition matches existing A-066/C-323 bytes. Only A-092 smallest1100 wa140bat is a new distinct
+container. Both areSTUE with payload/encrypted integrity checks; neither was RSA-verified,key-tried or decrypted.
+Five other1100 variants remain uninspected; wa140bat is a compatibility entry,not nativeWA150 hardware evidence.

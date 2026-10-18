@@ -2,7 +2,13 @@
 
 ## Start here
 
-Latest continuation (2026-10-18, C-463--C-465): both status parsers accept a7-byte minimum prefix with private tails;
+Latest continuation (2026-10-18,C-466--C-470): selected Android upgrade paths yield no STUE consumer; exact upstream
+location type/provider/epoch seconds refine C-126 and correct invalid-coordinate dropping. Conditional HostID routes
+and five payload-only CLIs are verified within their offline scopes. A-0661200 is reverified; only A-092 wa140bat1100
+is a new distinct container,both stillSTUE with five other1100 variants uninspected. No device,actual control-panel
+operation,STUE plaintext or RF success. The final continuation sections carry exact boundaries.
+
+Prior continuation (2026-10-18,C-463--C-465): both status parsers accept a7-byte minimum prefix with private tails;
 36 host tests pass. Exact JNI bytes establish22-byte marshalling/84-byte success payload, and A-078 v3 is corrected
 with explicit inputs; its4 tests and controlled native components/fragments pass. No complete handler, transport,
 APK deployment or RF validation occurred. The control-panel goal and unavailable-device condition remain unchanged.
@@ -794,10 +800,48 @@ The Java parser/timeline15 tests and Python21 tests pass; no APK build/install o
 A-089 matches the official APK member. Exact function bytes, mapped dynamic calls and original HMAC-map init show
 22-byte marshalling,256 AES key bits,32-byte ciphertext and a final84-byte payload: LE32(80), ct32, originalIV16,
 SHA256-HMAC32 over ct+IV. C-464 corrects C-414; C-415/C-426/C-427 helper facts are retained with key-bit units clarified.
-Raw coordinate units remain unknown. This SDK fixed-IV path is separate from the QSEE random-IV branch.
+C-467 clarifies pre-scaled lat/lon/alt inputs and epoch seconds; original altitude unit/reference and exact Java
+supplier remain unknown. This SDK fixed-IV path is separate from the QSEE random-IV branch.
 
 C-465/A-078 v3 now accepts serialized22/key32/IV16 explicitly, removes v2's stored-key prefix, fake headers and256-byte
 ct field, and passes4 independent/synthetic host tests. Original marshalling/packing instruction fragments and official
 AES/HMAC helpers were separately checked under controlled buffers/registers/map input. No full handler, SendSetPack,
 Android constructor or transport ran. Continue from concrete full-path/field-semantics evidence; an offline encoder is
 not a device editor. Total host tests for this batch are36+4; C-450's59 tests are prior independent evidence.
+
+## 2026-10-18 bounded Android upgrade continuation (C-466)
+
+A-090 matches the existing official APK member and has not been executed. The inspected config extractor copies
+chunk0; its helper returns pointers. The observed slot0x0b whitebox caller signs a version/timestamp request.
+DeCrypt returns1 without callees. File-transfer bodies read/copy supplied data while updating MD5; the directly
+inspected base header verifier uses a literal256-byte signature. None supplies a concrete target STUE consumer.
+
+Preserve this selected-function scope. It does not establish WA150 runtime use, missing authentication throughout
+the SDK, all-APK decoder absence or a new firmware key. Evidence/function identities are in firmware topic16;
+raw vendor code, snapshots and local paths stay excluded. Existing STUE/root/RF gaps remain open.
+
+## 2026-10-18 scoped routing and codec continuation (C-468/C-469)
+
+C-385 is retracted: Characteristics+0x30 is callback-captured, not receiver. Conditional single/multiple HostID
+selection feeds the actual SetReceiverIndex at base ELF0x2ec25c (req+0x19, flags+0x0a OR2). Free EID/position
+KeyHandlers templates use virtual+0x10; preserve C-386's+0x128 only for the separate BaseAbstraction EID overload.
+Six original-prefix/helper cases passed without a full SendSetPack/callback/initializer/transport or live owner.
+
+The five legacy CLIs now emit payloads only; sender/receiver arguments and fake32-byte object headers are removed.
+France EID,18B UOM,OPID GET02/DELETE01/SET0010+exact16,AirSense1B and empty height GET keep distinct business scope.
+Eight schema tests/nine valid CLI cases/five obsolete-argument rejections are host-only results. OPID full20-character
+validation is outside the codec; UOM GETzero tail is a local choice. No device, UI write or RF capability is established.
+
+## 2026-10-18 exact location semantics and small-module continuation (C-467/C-470)
+
+C-126 already supplied latitude/longitude×1e6 and altitude×100; C-467 closes the exact MobileDevicePositionMsg
+constructor/40-byte SDK serialization,Java clientLocation():byte[] boundary and libc epoch-second timestamp.
+Invalid finite coordinates clear the second field but continue scaling/time/queue construction. Do not call this
+upload rejection or reinterpret the field as a proved receiver/GPS-quality enum. Altitude source unit/reference and
+exact Java/platform supplier remain unknown. No new typed position editor or BroadcastRID/aircraft-navigation setter
+is established; A-078 remains explicit22-byte input.
+
+C-306's seven missing small entries was historical. C-323 already acquired A-0661200; C-470 reacquires the same hash
+and inspects new A-092 smallest1100 wa140bat. Two containers are now checked,with five other1100 variants uninspected.
+Both are STUE/PRAK with384-byte signature and verified outer digest/checksum,but no RSA verification,key trial,
+plaintext or inner consumer. There is no duplicate artifact for1200 and no native-battery hardware inference.

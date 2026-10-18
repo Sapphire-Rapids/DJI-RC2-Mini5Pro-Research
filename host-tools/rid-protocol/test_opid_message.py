@@ -1,16 +1,19 @@
-"""Self-check: opid emitter must mirror the ctor layout (cmd120/sub3) and enforce the 16 cap."""
+"""RID-005 action schema; fixture is synthetic and is not a valid OPID."""
+import unittest
 import opid_message as m
 
-msg = m.build(b"CHN12345678")
-assert len(msg) == 0x20 + 11, len(msg)
-assert msg[0x00:0x04] == bytes([0x01, 0x03, 0x78, 0x02])
-assert msg[0x05] == 0x02 and msg[0x08] == 0x03
-assert msg[0x0E:0x10] == bytes([0x49, 0x57])
-assert msg[0x14:0x18] == (500).to_bytes(4, "little")
-assert msg[0x20:] == b"CHN12345678"
-assert m.build(b"")[0x20:] == b""          # delete
-try:
-    m.build(b"A" * 17); raise AssertionError("cap not enforced")
-except ValueError:
-    pass
-print("ok: opid emitter mirrors the ctor layout and enforces the 16 cap")
+
+class OpidPayloadTest(unittest.TestCase):
+    def test_distinct_get_delete_and_set(self):
+        self.assertEqual(m.build_get(), b"\x02")
+        self.assertEqual(m.build(b""), b"\x01")
+        self.assertEqual(m.build(b"TESTONLY00000000"), b"\x00\x10TESTONLY00000000")
+
+    def test_rejects_incomplete_or_full_registration_input(self):
+        for size in (1, 15, 17, 20):
+            with self.subTest(size=size), self.assertRaises(ValueError):
+                m.build(b"T" * size)
+
+
+if __name__ == "__main__":
+    unittest.main()

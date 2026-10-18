@@ -490,17 +490,17 @@ France EID 是法国专用，ADSBSwitch 是 AirSense/ADS-B；位置组合仍有�
 
 | Artifact | 当前对象/版本 | 大小 | SHA-256 | 状态/使用 | 处置 |
 | --- | --- | --- | --- | --- | --- |
-| A-071 | `eid_switch_message.py` / eid-switch-message-v1 | 1981 B | `d998e9078992e19442d76e25ebc765780fc58bfd8468ab105d03dbd52c249868` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-072 | `oid_identifier_message.py` / oid-identifier-message-v2 | 2338 B | `d53fb2aa3af242b6d9e84fb0511399a393e6ce860b843a01b5661f87ed791b0e` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-073 | `VERIFY_RUNBOOK.md` / verify-runbook-v2 | 1508 B | `34d7cc63d1a58be70af1883cd1e6b356ad510a1623112b0da4ba817c0fed6b10` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-071 | `eid_switch_message.py` / eid-switch-message-v2 | 961 B | `1b5cea202053b42e6e42f79928aa80e41891dccb0110c350299ef5cb53d8473c` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
+| A-072 | `oid_identifier_message.py` / oid-identifier-message-v3 | 1056 B | `c35744f4974a814a1775acb24c8b6f1eaffd5f3c742f00852563ed3a7962d35b` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
+| A-073 | `VERIFY_RUNBOOK.md` / verify-runbook-v3 | 2025 B | `4e9625ab6042fcfb113f1d15c80e8e369e4fee3f5d35308f48bbc3aeb8d0f063` | `STATIC`；offline-doc-current-producer-routing-payload-scope | source-local-only |
 | A-074 | `RC_RID_BREAKTHROUGH.md` / rc-rid-breakthrough-v2 | 1696 B | `56f93678169a08d8fdb3bb4c6c5b11eb80a1b15b42d33193b1878fa84e175022` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
-| A-075 | `README.md` / rid-protocol-readme-v4 | 3461 B | `5252592de70c992fbbb8cd7d18b94d54d44f5368fc58fc98624c7a7e6cd8da5a` | `STATIC`；offline-doc-current84byte-payload-no-device | source-local-only |
-| A-076 | `opid_message.py` / opid-message-v1 | 1711 B | `627a655d88da0a66ede42d15af9f73b34e51ec6e73acad01aa8a84de6b38048e` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-077 | `RID_FIELD_MAP.md` / rid-field-map-v4 | 2217 B | `6e56f74249cd07495e8db1f9aa674ddc7136d06237602b172b4acd1927620c83` | `STATIC`；offline-doc-current84byte-payload-no-device | source-local-only |
+| A-075 | `README.md` / rid-protocol-readme-v5 | 4306 B | `83d21fab168dd0a34e98643be30f4e946582deb3e525ff9cb9e95305739aff79` | `STATIC`；offline-doc-current-producer-routing-payload-scope | source-local-only |
+| A-076 | `opid_message.py` / opid-message-v2 | 1527 B | `ae8cad428d28cc6cd3570337af02781bf7d2a4c6bd00f7c2450ec1ddc8f6965e` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
+| A-077 | `RID_FIELD_MAP.md` / rid-field-map-v5 | 2639 B | `cc6aaebdb00f0c1d0062e2aa05b1019a3c623a3819439cac3b70d3aada7f5b79` | `STATIC`；offline-doc-current-producer-routing-payload-scope | source-local-only |
 | A-078 | `position_message.py` / position-message-v3 | 1886 B | `43b410778c3dfa3d0346fcf27fc7fc6df8ddcff1fddf91208289e8159ae9f635` | `OBSERVED`；offline-payload-model-native-components-checked-no-device | source-local-only |
-| A-079 | `adsb_switch_message.py` / adsb-switch-message-v1 | 1374 B | `9303eeab3191a12ff45049574b3e75e95590bac91e175b0022e82abbd4f04bad` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-080 | `height_message.py` / height-message-v1 | 1107 B | `5bb042d00559bd32ff1a0b5e0da611ee016f95c4758430710ce375c60d110f24` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-081 | `RID_CONTROL_CONSOLIDATION.md` / rid-control-consolidation-v4 | 2429 B | `4cee8108f990da41c6c0e1ca4d5197260f18335fcbf6ebb5913a50123771a4db` | `STATIC`；offline-doc-current84byte-payload-no-device | source-local-only |
+| A-079 | `adsb_switch_message.py` / adsb-switch-message-v2 | 627 B | `00a4eaf1006bb011d11203cebee98304fc4a11786219e4330bfadf4a1922081c` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
+| A-080 | `height_message.py` / height-message-v2 | 457 B | `8b27398917ba5d39f73804c61f9974e2d6666b08cf8c436757a482e5d178a51b` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
+| A-081 | `RID_CONTROL_CONSOLIDATION.md` / rid-control-consolidation-v5 | 2928 B | `53a40308d96cd22d5e2a822c14f3a6e26eb00bee2bc4406aaa0d3d726f37da37` | `STATIC`；offline-doc-current-producer-routing-payload-scope | source-local-only |
 
 A-073 替换了不能执行的 RID-off 手册；A-074/A-075/A-077/A-081 撤回完整控制/真实发射/全条件成立的表述。
 A-072 的 product-139 UOM 语义为 18 字节 pack、最多复制 8 字节；其本地零尾 GET 不是已验证的官方逐字节行为。
@@ -573,3 +573,52 @@ requirements.txt 为 35 B，SHA-256 `a6f5e2b352c22076eac35f9fd82126e49843a1d46cc
 A-089 与已有 official Fly1.21.10 APK 的 arm64 member 流式 hash 一致；只公开哈希和高层结构。
 选定函数原始 2,356 B 的 SHA-256 为 `afa49f1b9c7c050bac1a065336be9b30d686e75604a7469756e7205d1e9656b9`。
 厂商 listing、模拟输入/脚本和 key bytes 保持仓外。C-463 的四份 parser 源码直接按源文件/报告登记，没有新的 APK artifact。
+
+## A-090：Android upgrade 静态输入（C-466）
+
+`libupgrade_core.so` / `DJI-Fly-1.21.10-arm64-libupgrade_core`：6,557,136 B，SHA-256
+`9b2c0cc2a95b3de94dd74dbc6781cbc780590b1439b4ffca56aeb68243b6f629`。
+状态 `STATIC`，使用状态 `offline-selected-function-static-analysis-never-run`，处置 `excluded-do-not-distribute`，隐私 `public-hash-only`。
+
+样本与已有官方 Fly 1.21.10 APK 的 `lib/arm64-v8a/libupgrade_core.so` 成员逐字节一致。APK 为 719,464,897 B，
+SHA-256 `0312228ad536381509c09dbfdf1c7e3d4c825c5936199f444058b112985deb3a`。正确 PT_LOAD-mapped dynamic table
+恢复 7,343 个动态符号；没有 section 表不能解释为没有实现。直接 image helper 复用已登记 A-086，不另建 artifact。
+
+只读取所选函数并保存私有 evidence/snapshot，没有执行厂商代码、下载新固件或使用设备。C-466 的未命中范围是这些
+配置复制、request signing、文件 transfer 和旧 image verifier；不代表整个 SDK 都没有 STUE consumer。
+
+## Five payload-only codec revisions（C-469）
+
+A-071/A-072/A-076/A-079/A-080 的当前版本与 hash/size 已在上表更新。它们只输出业务 payload，移除伪32 B SDK对象头、
+无效 sender/receiver 参数和 receiver 打印；不实现传输。8项schema/9个有效CLI/5个旧参数拒绝独立通过。
+旧 constructor 镜像测试观察保留，但有效wire或sender解释撤回；以下旧源码身份只作历史：
+
+| Artifact | 旧版本 | 旧大小 | 旧 SHA-256 |
+| --- | --- | --- | --- |
+| A-071 | eid-switch-message-v1 | 1981 B | `d998e9078992e19442d76e25ebc765780fc58bfd8468ab105d03dbd52c249868` |
+| A-072 | oid-identifier-message-v2 | 2338 B | `d53fb2aa3af242b6d9e84fb0511399a393e6ce860b843a01b5661f87ed791b0e` |
+| A-076 | opid-message-v1 | 1711 B | `627a655d88da0a66ede42d15af9f73b34e51ec6e73acad01aa8a84de6b38048e` |
+| A-079 | adsb-switch-message-v1 | 1374 B | `9303eeab3191a12ff45049574b3e75e95590bac91e175b0022e82abbd4f04bad` |
+| A-080 | height-message-v1 | 1107 B | `5bb042d00559bd32ff1a0b5e0da611ee016f95c4758430710ce375c60d110f24` |
+
+EID只France；UOM GET零tail不是byte-exact vendor行为；OPID只编码预先验证的exact16 wire field，不做完整20字符校验；
+AirSense不是RID；height GET是empty payload。当前测试不建立厂商整条handler、owner/route、设备/RF或面板实际控制。
+
+## A-091：MobileDevicePositionMsg exact SDK input（C-467/C-468）
+
+`libsdk_key_value.so` / `DJI-Fly-1.21.10-arm64-libsdk_key_value`：12,684,576 B，SHA-256
+`09f4aa8aef65f720da09a1dad79c8851e05d619affaf73708bf6747341208336`。
+状态 `STATIC`，使用状态 `offline-static-and-isolated-helper-scope-no-android-or-device`，处置 `excluded-do-not-distribute`，隐私 `public-hash-only`。
+与已有 official APK member hash 一致。C-467 仅作 type/serializer/provider 静态追踪；C-468 另有极小 HostID helpers 的隔离模拟，
+没有 Android loader/OS/device 执行。厂商输入、RTTI/code listing 不入仓，没有新的 typed位置编辑器。
+
+## A-066 本轮复核与 A-092 新兼容电池容器（C-470）
+
+A-066 身份、版本和既有状态不变：本轮官方重新获取的 1200 与 C-323 的 67,744 B / SHA-256
+`fb802d4d8ca04d0c14b4c6f9be9cada9b18cceef915a1658279a954ba5ab5feb` 相同，只增加来源/完整性复核引用，不建立重复 ID。
+
+A-092：`WA150-01.00.0600-1100-v22.75.00.17-wa140bat`，94,336 B，SHA-256
+`82bb350a2b229c03cf282322a7463047082b5135780dab510c9e3307882f6dc5`，MD5 `be3245b4373fdee82470dd2fe6d66882`。
+状态 `STATIC`，使用状态 `official-download-integrity-checked-ciphertext-only-no-device`，处置 `excluded-do-not-distribute`，隐私 `public-metadata-and-hash`。
+这是 manifest 中最小的 1100 兼容变体，不证明 WA150 原装电池硬件；其与 A-066 的 payload digest/encrypted checksum 均匹配，
+但二者仍为 STUE 密文，未验 RSA/试 key/解密或识别内层 consumer。当前新增独立容器只有 A-092，剩余五个 1100 未检查。

@@ -1,8 +1,9 @@
 # Current blockers and dependency gates
 
-2026-10-18 current state: there is no device for this work. C-463--C-465 complete the minimum-prefix parser fixes and
+2026-10-18 current state: there is no device for this work. C-466--C-470 add bounded Android-upgrade/producer/routing/
+payload and small-container evidence; none establishes STUE plaintext or an actual device/RF control panel. C-463--C-465 complete the minimum-prefix parser fixes and
 84-byte offline payload model with36+4 host tests and controlled native-component checks; full handler/transport/RF
-and coordinate units remain unverified. C-454--C-457 distinguish RC331 0200's encrypted inner layer
+remain unverified; C-467 clarifies producer pre-scaling/epoch seconds,while altitude source unit/reference and Java body remain unclosed. C-454--C-457 distinguish RC331 0200's encrypted inner layer
 from the readable OTA components and recover a static TBIE/QSEE/RPMB-root/HUK dependency. Root input and STUE's own
 owner/derivation remain unresolved. C-450--C-453 record the three-candidate and bounded method-4/public-source checks. C-442--C-449 correct the Assistant/STUE premises and
 RID capability claims. Use the final current B-23/B-24 section and the corrected STUE checkpoint; earlier live records
@@ -927,6 +928,16 @@ bw_secure 的位置分支未执行，算法枚举与 SDK/TEE key 对应未知。
 最小 7 B parser 修复和 A-078 v3 的 84 B payload 实现已完成，不再列为待修。36 项 parser 与 4 项 position 主机测试通过，
 原始 JNI 片段/helper 对照支持已登记的模型；没有构建/部署 APK或执行完整 handler/SendSetPack/transport/RF。
 
-剩余位置控制缺口是 typed values 的单位/业务语义、真实 runtime owner 与完整发送/应用/恢复/RF 对应。
+C-467已明确typed输入为上游预缩放double及epoch秒。剩余位置控制缺口是原高度单位/基准、Java来源/字段正式语义、
+真实runtime owner与完整发送/应用/恢复/RF对应。
 界面可以按已证实的范围实现，但不能把 offline payload model 标成已验证坐标编辑器。STUE owner/derivation 与
 RC331 TBIE root input 没有被本次位置验证解决。当前无设备，独立离线工作继续，真实 RF 验收不降低。
+
+## 2026-10-18 current scope after C-466--C-470
+
+旧CLI伪对象头、OPID action和receiver来源误读已修正，不再列为待办。现在只能证明pure payload、条件HostID片段和
+上游位置构造语义；完整handler/transport、live owner、应用读回/恢复与独立RF仍缺。位置来源的精确Java body与高度原单位/基准未闭合。
+
+Android upgrade所检查函数没有给出具体STUE consumer，不是SDK全域否定。小模块已检查A-0661200和A-092最小wa140bat1100，
+其他五个1100未检查；1200是已有字节复核，新增独立容器只有一个。STUE owner/derivation和RC331 TBIE root input仍未知，
+不将容器完整性当作RSA/key/decrypt成功。用户没有设备，面板目标仍需实际控制与RF验收。

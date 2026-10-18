@@ -9,7 +9,7 @@
 | 中国 UOM 标签 | `0x11/0xD6`，A-072 | product-139 为 18 字节 pack、最多复制 8 字节；不是旧 C-389 的 0x70 字符串上限 |
 | EASA OPID | `0x03/0x78`，A-076 | operator registration 身份面；不等于位置或 Basic/UAS ID |
 | Japan DIPS | `0x11/0x4B` | 注册凭据 action；与 EID/UOM/OPID 分开 |
-| App location | `0x11/0x43`，A-078 v3 | 84 B 离线 payload 模型；raw units、完整 handler/transport 与 WA150 Broadcast RID 对应未验证 |
+| App location | `0x11/0x43`，A-078 v3 | 84 B 离线 payload 模型；上游预缩放/epoch秒已知；高度原单位/基准、Java来源及完整handler/transport/RF对应未验证 |
 | AirSense/ADS-B | `0x11/0x0C`、`0x11/0x37`，A-079 | 接收/配置业务，不是 RID 总开关 |
 | 动态最大高度 | GET `0x11/0x50`，A-080 | 查询结构候选；不提供 RID 高度写入 |
 | `EU_CE_enable_c0_rid_0` | 静态地区策略映射 | 所测 direct USB 正对照会话未暴露，不作为可用开关 |
@@ -23,3 +23,7 @@ C-465 的原始 JNI 片段和 helper 对照支持此模型，未执行完整 han
 当前没有设备可验证 owner、baseline/readback/restore、持久性或独立 RF 效果。
 
 历史 claim 地址与调用点继续保留；C-448/C-449 和 docs/05 的较早实机正对照优先于后来“完整控制”的汇总措辞。
+
+C-468 更正 receiver 来源：Characteristics+0x30 是 callback capture；实际覆盖取决于 single/multiple HostID 条件。
+free EID/position 用 virtual+0x10，BaseAbstraction EID 重载才用+0x128。六个受控 prefix/helper cases 未执行完整 route。
+C-469 将五个旧 CLI 改为纯 payload；OPID GET02/DELETE01/SET0010+exact16，UOM的零GETtail仍是本地选择。

@@ -6,8 +6,8 @@
 
 状态标签遵循 [AGENTS.md](../AGENTS.md)。后续记录与本文冲突时，较新的精确工件审计和带恢复读回的实机证据优先；相邻版本静态证据不能自动升级为当前设备事实。
 
-最新进展见第 15 节（2026-10-18，C-463--C-465）：双端状态 parser 最小长度修复，A-078 v3 为 84 B 离线 payload encoder；
-36+4 项主机测试及分段/helper 对照通过，完整 handler、transport 与 RF 未验证。第 14 节保留 SDK keychain 更正来源。
+最新进展见第16--19节（C-466--C-470）：Android upgrade限定负结果、位置producer语义、条件HostID/纯payload修复，以及
+A-0661200复核/A-0921100新检查。没有STUE明文、实际控制面板或RF成功。第15节保留36+4项parser/payload主机验证。
 RC331 固件支线见第 13 节（C-454--C-457）：0200 内层 TBIE/FLYA 仍加密；已从现有 0205 OTA 验证并提取三个 QSEE 组件，
 静态链指向受保护 RPMB root/HUK 输入，尚未恢复 key。第 12 节的三个 v2 候选均未命中，STUE 仍未解密。
 
@@ -569,35 +569,24 @@ uav_fc_handle_eid_switch, uav_fc_eid_switch_status>`，包装层调 `SendGetPack
 
 值 0 属于 France EID 的候选 SET 语义；它不是 FAA/global RID 关闭命令（RID-003、C-448）。
 
-### 11.33 base_req 布局与 receiver/sender 分工（C-383/C-384）
+### 11.33 base_req 是内存对象，不是 wire header（C-383/C-384/C-468）
 
-`OBSERVED`：eid_switch 的 `uav_cmd_base_req` 构造函数给出头部布局 —— `this[0..3] = 01 03 77 02`（模板1、模板3、cmd119、0x02），
-`+1..8` 为 `00 00 00 00 02 00 00 03`，`+0xc` 为 `00 00 49 57`（ASCII `'I','W'` 魔数），`+0x14` 超时500，`+0x10/+0x18` 置0，
-`this[6]` 取自 `GlobalPacketStatus::GetGlobalSenderIndex()`，`+0x20` 构造 payload Buffer。
+`STATIC`：C-383 的 constructor 写入描述进程内 request 对象及其 Buffer，不能序列化照抄为 32 B wire header。
+C-384 的外部 helper 缺口已在 A-086 闭合：SetReceiverIndex 把 index byte 写入 req+0x19，并对 req+0x0a OR 2。
+free EID/position templates 是否覆盖 receiver 取决于 single/multiple HostID descriptor 条件，见 C-468。
 
-即：**sender index 自动派生**；`SetReceiverIndex` 为外部 thunk（0x0515dc90，经 PTR 解析），由包装层在填好 local_48（Get 为2、
-Set 为值字节）后调用 —— **receiver index 由调用方给**（C-384）。
+### 11.34 receiver 来源与发送出口更正（C-385/C-386/C-468）
 
-这里恢复的是进程内请求结构线索，不证明该结构可直接当作 USB/socket 上的最终线包。离线 hex 生成不构成发送能力。
+`RETRACTED`：C-385 的 Characteristics+0x30=receiver 推论错误；该字段在所检查函数中复制进 callback capture。
+只有 multiple-host list 为空且 single descriptor 非空时，descriptor[0] 写 req+7，descriptor[1] 调 SetReceiverIndex。
 
-### 11.34 receiver 来源与发送出口（C-385/C-386）
+`STATIC`：C-386 的 virtual+0x128 保留，但仅限 BaseAbstraction EID Set 重载；free KeyHandlers EID 和 app-position
+SendSetPack 使用 first-pointee virtual+0x10。六个原始 prefix/helper 受控 case 通过，不等于完整 send 或设备路径已执行。
 
-`OBSERVED`：`SendSetPack` 从 Characteristics 参数读 `param_2[0x30]` 作为 receiver index（Get 用自己的槽），说明
-receiver 是**特征属性**、不是自由常量。
+### 11.35 传输名称不能合并不同重载（C-387）
 
-`OBSERVED`：两个 Send 都以 `(**(code **)(*(long *)this + 0x128))(this, req, cb, 1)` 收尾 —— 发送走 concrete 抽象的
-虚槽 `0x128`；UAV77 类经 `FlightControllerAbstraction` 成员指针绑定。
-
-这些字段与发送出口仍是静态记录；不能据此宣称运行期路由、最终线包、ACK 或 RF 效果已定。
-
-### 11.35 传输出口命名（C-387）
-
-`OBSERVED`：全函数清单把槽0x128对应到 `uav::sdk::BaseAbstraction::SendPack`（两个重载 0x02618fc4 / 0x02619118），
-另有 `uav::sdk::key::BaseAbs::SendPack`（0x028bfee0）。更底层核心传输是
-`uav::core::UavCoreCancelation::SendData(string const&, unsigned_short, uav_cmd_req const&, rsp cb, cancel cb, bool)`，
-并经 `queue<pair<uav_cmd_req, function<void(int)>>>` 排队。
-
-即：发送链 = SendSetPack → slot0x128 SendPack → UavCore SendData → 队列/链路。
+C-387 的 SendPack/SendData 名称清单保留为 `STATIC` 库存；不能把所有 SendSetPack 自动接成同一个 virtual+0x128 链。
+C-468 已分别记录 free KeyHandlers 与 BaseAbstraction EID 重载，实际 owner、runtime HostID、完整 callback/transport 仍未验证。
 
 ### 11.36 EIDSwitch 注册与连接前置（C-390）
 
@@ -659,22 +648,18 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `RETRACTED`：不能据此建议以该键替代 EIDSwitch。RID-009/C-227--C-229 已记录所测 direct USB 的参数缺失与成功正对照；当前仍没有可用 RID 控制路径（C-448）。
 
-### 11.42 离线生成器静态验证与偏移修正（C-402/C-403）
+### 11.42 旧 constructor 镜像自检的边界（C-402/C-403/C-469）
 
-`OBSERVED`：新增 `test_eid_switch_message.py`，对发射头部的每个偏移与 `uav_cmd_base_req` 构造函数的字面写入逐条断言
-（0=0x02770301、+1=0x0300000200000000、+0xc=0x57490000、+0x14=500、+0x10/+0x18=0、this[6]=sender），并校验 value/sender 槽，
-通过（C-402）。这是**对反编译的自检**，不是对设备的验证。
-
-`RETRACTED`：首版发射器把 'IW' 魔数放在 0x0c（应为 0x0e，因 0x57490000 的小端字节是 00 00 49 57），OID 发射器同错；
-两者均已修正，规格偏移表同步修好，A-071/A-072 重新计哈希（C-403）。
+`OBSERVED`：C-402 记录旧 EID 自检通过；它只镜像进程内 constructor 写入，不能证明 wire frame 或发送能力。
+C-403 曾修正其 'IW' 内存偏移。`RETRACTED`：这些自检支持有效 wire header 的解释撤回；C-469 删除整个伪对象头，
+改用 payload-only schema tests。旧通过记录不追认当前 codec 或设备行为。
 
 ### 11.43 OID 自检与 EU_CE 无命名 handler（C-404/C-405）
 
-`OBSERVED`：`test_oid_identifier_message.py` 与 EID 用例镜像，断言 01 11 D6 02 前缀、共享 ctor 偏移、载荷位置，
-并验证 0x70 上限抛错；通过（C-404）。
+`OBSERVED`：C-404 的旧对象头/0x70 cap 自检通过记录保留；它既不是产品139的正确 cap 证明，也不是 wire 验证。
+C-123/C-389/C-411 已分清 18 B payload 与 8 B copy，C-469 删除 fake header；GET 零 tail 仍只是本地确定性选择。
 
-`NEGATIVE`：`EU_CE_enable_c0_rid_0` 无专属 Get/Set 符号，字面量也不在 EUCeCxV1::CreateCharacteristics/BindKey 引号键里；
-其站点散布于 observer 函数，属 observer 绑定模式（C-405、N-89）。与 EIDSwitch 的显式 handler 注册形态不同。
+`NEGATIVE`：C-405 的 EU_CE 命名 handler 搜索范围不变；C-469 不把该参数或 France EID 变成可用 global RID switch。
 
 ### 11.44 位置 setter 与 Ccc 未命名 handler（C-412/C-413）
 
@@ -1045,7 +1030,8 @@ A-089 为 87,313,856 B，SHA-256 `5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188
 | success payload | resize `macLen+0x34`=84 B；写 LE32(`macLen+0x30`)=80，ct32 在 +4，原始 IV16 在 +36，digest32 在 +52 |
 
 没有额外 plaintext16 prefix、伪 SDK request32 header 或补到 256 B 的 ciphertext 字段。
-坐标单位尚未确定，不把这些 raw typed 值称为经纬度 degrees。SDK 使用原始 constant IV，不能与 C-460 的 QSEE random IV 路径混同。
+C-467后续确认 raw typed 值已在上游预缩放：lat/lon×1e6、alt×100，不能把handler输入当作未缩放degrees。
+原高度物理单位/基准和Java来源仍未知。SDK使用原始constant IV，不能与C-460的QSEE random-IV路径混同。
 
 ### 15.3 分段模拟与原生 helper 对照（C-465）
 
@@ -1077,3 +1063,137 @@ Java 测试日志 SHA-256 `b9259c995adfae127fac5cda5e2b16cd83b7f70560ec282a38e13
 私有 helper/packing 实验脚本 SHA-256 分别为 `0cd2185a45424e32c97236cbf88590b8365414a7f260f06d343d423240a78266`、
 `3e0132129e8bb0b601362e7f059105ee84878e709cc32a708573c9858be11b3e`。
 厂商 listing、输入样本、key bytes 和这些原生实验脚本保持仓外；仓库只保留自写 encoder/tests 和高层证据。
+
+## 16. Android upgrade 的限定静态负结果（C-466）
+
+本轮选定官方 Fly 1.21.10 的 A-090 `libupgrade_core.so` 与直接调用的 A-086 image helpers；没有运行厂商代码或设备。
+A-090 为 6,557,136 B，SHA-256 `9b2c0cc2a95b3de94dd74dbc6781cbc780590b1439b4ffca56aeb68243b6f629`，
+已与原 APK 的 arm64 成员逐字节比对一致。该 sectionless ELF 的正确 mapped dynamic table 有 7,343 个符号。
+
+| 已检查入口（ELF VA） | 静态结果与边界 |
+| --- | --- |
+| VerifySignCfgData `0x5933cc` → get_chunk_by_index `0x31b2c8` | 前者取得 index0 chunk.size 和 payload 指针并复制到输出 string；后者仅计算 header/signature/chunk 偏移。这一 extraction pair 未做签名验证或解密，不外推所有配置路由跳过认证 |
+| DatabaseServerCfgRequest::GetRequestBody `0x363c08` | 选 whitebox slot `0x0b`，组合 version/timestamp 后调用 CreateSignatureWithSHA256，写 request signature/timestamp；所见流不连接固件 payload decode。直接 B/BL 扫描仅覆盖具名 defined-symbol ranges |
+| OfflineUpgradeManager::DeCrypt `0x383154` | 8 B 函数恒返回 1、没有 callee；名称不能证明解密实现 |
+| CheckFirmwareFile `0x4f23f0` / SendPackForIndex `0x4f4478` | 检查 supplied path/name/size、打开文件，seek/fread、更新 MD5、复制原缓冲到 transfer packet 并派发；所检查 body 未出现 payload 解密或 key selection。caller 的文件和动态目的端未确定 |
+| base image-header verifier `0x31afbc` | 只从 auth_key 选择 RRAK/PRAK，对 header_size 求 SHA256，UAV_RSA_verify 的签名长度写死为 `0x100`/256 B、digest 32 B；init 拷贝两个 public-key structures，verify/update/final 处理摘要，未选择 STUE 或解密 content |
+
+`NEGATIVE`：这些 selected bodies 中没有闭合 file-read→IMaH/FourCC→STUE key-selection→decrypt 的具体调用链。
+256 B 签名 helper 不提供当前 WA150 384 B signature 的匹配 PRAK，也不能据此断言 SDK 的所有 crypto 只支持 256 B。
+未知的 indirect/unnamed caller、其他库/方法/版本/设备路径不在结论范围；没有建立 WA150 runtime/product gate。
+slot `0x0b` 的 request signing 也不能当作新的 STUE key 来源。
+
+### 16.1 证据身份
+
+仓外 `android-upgrade/report.json` 为 17,872 B，SHA-256
+`7c845b5adcd97ff6661d370b55238700bf91299ca153abc4ac4e812107bbd623`。
+core evidence（8 records）SHA-256 `13a21d53e4b561cf55b3399749d80bcd21b2fad266767aa8fb811c6c19dd2ef9`；
+base evidence（18 records，含 17 条先前 SDK 记录）SHA-256 `0215e5e95a17f92416a7e4c12d0373959960944244b1889a33ae8a6e4b4e55ea`。
+快照及厂商 listing 不入仓；只公开身份、偏移、高层结果和以下 Evidence IDs：
+
+- DeCrypt：`ev_dcc5b26af6894527dd646cd0611dc79887b4c105fb3df1a32543c839b54a2312`
+- config extraction：`ev_fdacd61961c63efa5d5b37178a3fcf77d959dc6a876ecc96e8e617d6112dad1d`
+- chunk pointer helper：`ev_b605faffd49dd9c938b707d4a1753f5cd6bb6ae9ac5b8c533588a3975e89a045`
+- request signing：`ev_8e1d18a9719941f4ba702fa7852e19014caa8472cca052773c1a9284af8aa528`
+- file buffer helper：`ev_039ad137d26f7bf6553ed498af4a374016af837630f2af7cfd186b1669f11f69`
+- file check：`ev_93f7435ba5877093e17aa7468346232386bb6b5bf591c8fb4d91110000ba0c5c`
+- transfer copy：`ev_52495294244449e0935f47fddda1a10ba073ad03cf517a40d16f63742f2dc5f3`
+
+base verifier 的有界原始函数范围 372 B，SHA-256
+`62aa8ccab375e2dc7c7d8c9be21a7a60525c1a84cc83abf477f65e8f35c1f1e3`，其余 raw-function identity 由上述私有报告保存。
+这一范围有静态 bytes 证据，不捏造不存在的 REA function Evidence ID。
+
+## 17. 精确 HostID 条件与 payload-only CLI（C-468/C-469）
+
+### 17.1 路由原始片段与 helper（C-468）
+
+输入为 A-089 JNI、A-086 base，以及固定 libsdk_key_value.so SHA-256
+`09f4aa8aef65f720da09a1dad79c8851e05d619affaf73708bf6747341208336`。
+free KeyHandlers 的 EID 与 position templates 都读取 single HostID 和 multiple HostIDs。仅当后者为空且前者非空，
+才以 descriptor[0] 写 req+7、descriptor[1] 调用 SetReceiverIndex。实际 helper 写 req+0x19，OR req+0x0a bit1。
+Characteristics+0x30 只是进入 callback capture，C-385 的 receiver 解释撤回。
+
+| 函数/ELF VA | 长度 | 原始函数 SHA-256 |
+| --- | --- | --- |
+| free position SendSetPack `0x4d23c08` | 912 B | `d11e77ee74eb1227707822d506a0e0f3a920c7eae74ebf47c4024b366e2585f4` |
+| position callback `0x4d24778` | 1,092 B | `b7a5dcc5d266bb356753d871bb400c94472977cb86fd4683624952611b13c403` |
+| free EID SendSetPack `0x4d139d8` | 912 B | `8a0dd89c22bc914b6e5935710879c8b2563817ba1a77953edec893ef6740c1a5` |
+| BaseAbstraction EID Set `0x2ca4c2c` | 836 B | `fe0605a6df1f634b7ce154cbfb606256b7a7000fd8a1e5aa1f841cf8e2b1f4c6` |
+| base SetReceiverIndex `0x2ec25c` | 24 B | `db3b39de95ce3302b757dfdf9539dad662a3e08c55f15be1ca9d374579bb555e` |
+
+free templates 发送用 first-pointee virtual+0x10；只有上表 BaseAbstraction EID 重载证明 virtual+0x128。
+原始 prefix 与实际 SetReceiverIndex/GetSendPackHostID(s) helper 在六个受控 case 下通过：EID/position 各检查
+single-only、no-single、multiple-present 三种状态。GetExtraParam hook 返回 synthetic descriptor container。
+没有执行完整 SendSetPack、callback、Android initializer、transport 或设备/RF，runtime Characteristics/HostID 与 owner 未知。
+
+### 17.2 五个 CLI 只编码 payload（C-469）
+
+五个旧 CLI 删除伪 32 B SDK 对象头、无效 sender/receiver 参数和 receiver 提示；内存对象布局不再混作 wire framing。
+
+| Codec | 当前 payload 范围 |
+| --- | --- |
+| France EID | GET `[02]`；SET `[00]`/`[01]`，非法启用值拒绝；法国专用 |
+| 中国 UOM | 18 B，SET 最多复制前 8 B；GET `[01,02]` 后本地零 tail，不复制 vendor undefined tail |
+| EASA OPID | GET `[02]`、DELETE `[01]`、SET `[00,10]+exact16`；CLI 显式 payload-file/delete/get，不校验完整20字符登记输入/country/checksum |
+| AirSense | Boolean-normalized 1 B；不是 RID broadcast switch |
+| 动态最大高度 GET | empty payload，CLI 输出空 hex 行；不是高度写入 |
+
+8 项 host schema tests 与 9 个有效 CLI case 通过，5 个旧 sender/receiver 参数调用被拒绝。它们只验证 synthetic offline
+payload 和 CLI 行为，没有 whole-handler 对照、真实路由、UI 设备写入或 RF。旧 constructor 镜像测试的历史不构成 wire 证据。
+
+### 17.3 证据处置
+
+仓外 routing report.json（4,549 B）SHA-256 `ecbe67708bcc1b0abab8e47ec3c9afb805b0007f99e5e5767b2ab64aeadd0ee6`；
+payload-codec-check.json（1,064 B）SHA-256 `35f3477300367b79d0eb07aff86dac734ea01a4308005eda1e0c90c3044e5923`。
+原始 listing/受控模拟留仓外；这里只发布函数身份、条件和自写 payload sources。测试结果不扩大到设备控制面板可用性。
+
+## 18. 精确 MobileDevicePositionMsg 上游语义（C-467）
+
+C-126 已记录 lat/lon×1e6 和 alt×100，本节不将它们作为首次发现。新结果闭合 exact type、40 B SDK serialization、
+Java byte[] provider 边界与 epoch-second timestamp，并纠正“无效坐标直接丢弃”的解读。没有执行 Android、设备或再次运行 crypto。
+
+A-091 `libsdk_key_value.so` 为 12,684,576 B，SHA-256
+`09f4aa8aef65f720da09a1dad79c8851e05d619affaf73708bf6747341208336`，已与相同官方 APK arm64 member hash 核对。
+其 RTTI/vtable 定义 `MobileDevicePositionMsg`，constructor `0xaa56cc`（36 B）签名为
+`(int,int,double,double,double,long)`，写入 object+8/+0xc/+0x10/+0x18/+0x20/+0x28，不自行缩放。
+serialization `0xaa5840`（68 B）/deserialization `0xaa5884`（252 B）对应 40 B；它不同于 handler22 B 和 encrypted payload84 B。
+
+JNI producer `SendEncryptAppGeographyInfoToDevice` 位于 `0x209e6b0`（3,296 B）。首字段在这条路径恒为 0；
+第二字段默认 1。有限纬度超出 [-90,90]、经度超出 [-180,180]，或两者 abs 都小于 1e-6 时，它把第二字段置 0，
+仍继续预缩放、赋 timestamp、捕获对象并排队。这里仅称 validity-like field，不把它绑定为已验证 GPS-quality/receiver enum；
+NaN/nonfinite 规则不扩成验证契约。lat/lon 上游各×1e6，alt×100，handler 收到 pre-scaled doubles 后再转整数。
+
+location 经 ClientStateMgr 的 GetClientLocation（`0x2099db8`）取得；其 native provider（`0x1c5cf24`）调用同版本
+`uav.sdk.provider.jni.JNIProviderManagerForCPP.clientLocation():byte[]` 并反序列化为 LocationCoordinate3D。
+相关 provider-valid/foreground/location-service checks 是静态门禁，不是 live GPS fix/permission 观察。
+精确 Java body/platform supplier 未恢复；不能借另一版本补齐它。
+
+`GetCurTimestamp` 在 A-086 ELF `0x2ec618`（36 B）调用 libc `time()`，是消息构造时 Unix epoch 秒，不是毫秒、
+monotonic、GPS fix timestamp 或 RF receive time。经纬范围/缩放已知，但高度原物理单位与基准、Java supplier 和 geodetic
+reference 仍未闭合，不能仅由×100称高度为厘米。A-078 保持显式22 B序列化输入，没有新增 typed坐标编辑API。
+
+仓外 position_semantics_findings.json（14,606 B）SHA-256
+`72238bf86728ea49087f88219ef5763c280a1ba31ac4a8bd722d3f358f8f4781`。
+输入身份、RTTI/relocation、constructor/serializer/producer/provider/time 范围由该报告及私有原始 listing 支持；
+此轮没有 REA Evidence ID，不复制厂商 listing。以上不是 Broadcast RID、飞机导航位置、应用读回/恢复或 RF 控制证明。
+
+## 19. 小模块范围更新：复核 A-066 与新增 A-092（C-470）
+
+官方 `mydjiflight.dji.com/getfile/firmware` 经一次受约束 CDN 跳转取得两份当前清单条目，大小/MD5 及独立 SHA-256 匹配。
+其中 1200 与历史 A-066/C-323 完全同字节，只登记重新获取/复核，不创建重复 artifact。新增独立容器仅为最小 1100 wa140bat 变体。
+
+| Artifact | 清单条目 | 文件大小 / MD5 | SHA-256 |
+| --- | --- | --- | --- |
+| A-066（复核） | 1200 / 01.52.00.61 / mc01 | 67,744 B / `8fda0e65105ec628beee13108d175f60` | `fb802d4d8ca04d0c14b4c6f9be9cada9b18cceef915a1658279a954ba5ab5feb` |
+| A-092（新增） | 1100 / 22.75.00.17 / wa140bat | 94,336 B / `be3245b4373fdee82470dd2fe6d66882` | `82bb350a2b229c03cf282322a7463047082b5135780dab510c9e3307882f6dc5` |
+
+两者在 `01.00.0600`/`01.00.0700` 清单中相同，均为 IMaH v2、STUE/PRAK、384 B signature、单 chunk offset608，
+attrib0/compression0。1200 stored/logical payload 为 67,136/67,129 B，1100 为 93,728/93,704 B；payload SHA-256 与 encrypted
+checksum 均匹配。原始 payload checksum 不匹配 plain field，不是明文；arch_field0 也不能识别指令集或内层格式。
+
+没有 RSA 签名验证、key trial、解密、升级或设备访问。wa140bat 是该 manifest 的兼容变体，不是 WA150 原装电池型号判据。
+C-306 的七个小条目无本地原件是历史状态：C-323 已取得过 1200，本轮重新取得同字节并补查一个 1100；其余五个 1100 变体未检查。
+
+仓外 wa150-small-modules/report.json（8,470 B）SHA-256
+`166305a7c3a72161c95af58cff6f8199d883b281e9e707dc45c2983eaf183515`。
+请求密钥、签名查询与不透明 CDN 路径只在内存中使用，报告保留有限身份/校验结果；样本只读保存在仓外。

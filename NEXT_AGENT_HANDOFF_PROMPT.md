@@ -1,7 +1,7 @@
 # Current next-agent handoff
 
 Continue the complete DJI RC 2 / Mini 5 Pro Remote ID research objective from the reviewed repository state.
-This handoff is based on HEAD `449961d` with committed claims through C-457; the working record now includes C-458--C-465 through2026-10-18. Inspect current HEAD
+This handoff is based on HEAD `94dfd51` with committed claims through C-465; the working record now includes C-466--C-470 through2026-10-18. Inspect current HEAD
 and the working tree first; if newer work exists, preserve it and use the later evidence. Do not reset to this hash.
 
 ## Objective and current operating context
@@ -23,11 +23,11 @@ work instead of treating an old session or old mounted identity as current.
 ## Read first
 
 1. [AGENTS.md](AGENTS.md), especially the current corrections and evidence/distribution rules.
-2. The current opening and C-442--C-465 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
+2. The current opening and C-442--C-470 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
 3. [AIRCRAFT_STUE_CHECKPOINT.md](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md).
-4. Claims C-442--C-465 in [evidence/claims.csv](evidence/claims.csv), mirrored in
+4. Claims C-442--C-470 in [evidence/claims.csv](evidence/claims.csv), mirrored in
    [docs/02_EVIDENCE_REGISTER.md](docs/02_EVIDENCE_REGISTER.md).
-5. Sections 12--15 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
+5. Sections 12--19 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
    [negative results](docs/09_NEGATIVE_RESULTS.md), [unknowns](docs/10_HYPOTHESES_AND_UNKNOWNS.md) and
    [current blockers](docs/12_CURRENT_BLOCKERS.md).
 6. Verify each selected sample/tool in [evidence/artifacts.csv](evidence/artifacts.csv) and
@@ -38,14 +38,32 @@ The current unavailable-device condition and later retractions govern the next a
 [docs/03_TIMELINE.md](docs/03_TIMELINE.md) and [docs/23_RC2_LIVE_RUNTIME.md](docs/23_RC2_LIVE_RUNTIME.md) for history,
 not as a queue of unfinished operator instructions.
 
-## Latest parser/position continuation (2026-10-18, C-463--C-465)
+## Latest continuation (2026-10-18,C-466--C-470)
+
+C-466 is a bounded Android upgrade negative over exact config/signature/transfer/image-helper bodies,not the whole
+SDK. C-467 refines the already known C-126 scales: exact MobileDevicePositionMsg/sdk40→handler22,Java byte[] provider,
+message-construction epoch seconds,and a validity-like flag cleared for invalid finite coordinates without dropping
+the queued message. Latitude/longitude ranges and pre-scaling are known; source altitude unit/reference and the exact
+Java supplier body remain unknown. A-078 stays the explicit22-byte payload codec; no typed coordinate editor is added.
+
+C-468 retracts Characteristics+0x30 as receiver; actual HostID override is conditional. Free KeyHandlers EID/position
+use virtual+0x10,while+0x128 remains only the BaseAbstraction EID overload. Six prefix/helper cases do not run a full
+SendSetPack or runtime route. C-469 removes five fake object headers/route CLI arguments and corrects OPID actions;
+eight schema tests,nine valid CLI cases and five obsolete-argument rejections are offline payload evidence only.
+
+C-470 officially reacquires the existing A-0661200 bytes and adds only A-092,the smallest1100 wa140bat compatibility
+container. Both remain STUE with outer integrity checks; no RSA/key/decrypt/device attempt. Five other1100 variants
+remain uninspected; do not label wa140bat as native WA150 battery hardware or1200 as a first-ever new sample.
+
+## Prior parser/position continuation (C-463--C-465)
 
 Java and Python status parsers now accept a minimum7-byte prefix and preserve unknown trailing bytes privately;
 known fields, summaries, routes and sender gates are unchanged. C-147 is the length evidence;36 host tests pass,
 with no APK build or deployment. Do not treat C-148's license semantics as length evidence.
 
 A-089's exact JNI bytes show22-byte typed marshalling and the84-byte success payload. AES0x100 is256 key bits,
-not output bytes; HMAC algorithm0 maps to SHA256 in original initialization instructions. A-078 v3 now accepts
+not output bytes; HMAC algorithm0 maps to SHA256 in original initialization instructions. C-467 subsequently maps
+the upstream pre-scaling and epoch seconds,with altitude/source limits stated above. A-078 v3 now accepts
 explicit serialized22/key32/IV16 inputs and emits LE32(80)+ct32+IV16+HMAC32, with no guessed coordinate units,
 internal request header or transport frame. Four position tests and isolated original-fragment/helper comparisons
 pass. The controlled SHA256 map node did not execute the Android global constructor. No complete handler,
@@ -84,8 +102,8 @@ keep structural observations, model hypotheses, candidate failures and actual pl
 
 ## RID semantics and completion evidence
 
-The six `rid-protocol` CLIs are offline hex generators without device transport. The current position tool validates an offline payload model only; coordinate units and full device/RF behavior
-remain unknown. France EID is France-specific, ADSBSwitch/AirSense is not a global RID switch, and the tested direct-USB
+The six `rid-protocol` CLIs are offline hex generators without device transport. The current position tool validates an offline payload model only. The producer pre-scales coordinates as C-126/C-467
+describe; altitude source units/reference,Java body and full device/RF behavior remain unknown. France EID is France-specific, ADSBSwitch/AirSense is not a global RID switch, and the tested direct-USB
 FLYC surface has positive-controlled absence for the two known RID parameter candidates (C-227--C-230).
 Do not reopen those variants without materially new owner/handler/version evidence. WorkingStatusPush has no active
 GET or established SET-to-applied/RF correspondence; ACK, UI, cache and an absent callback are not RF proof.

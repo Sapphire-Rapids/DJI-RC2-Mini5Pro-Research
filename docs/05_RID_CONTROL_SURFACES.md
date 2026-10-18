@@ -307,11 +307,15 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ### RID-005C：位置、UAS ID 与电话必须分面解释
 
-- **证据状态：STATIC / NEGATIVE**（C-126--C-128）
-- **操作手位置：** exact `AppLocationUploadLogic` 约每 500 ms 取 client location，拒绝越界和
-  `(0,0)`，按 lat/lon × 1e6、alt × 100 和 timestamp 编码，经 `0x11/0x43`
-  `app_update_pos_enc` 送往设备。它证明 app-location -> device 数据面，但尚不能证明字段最终进入
-  WA150 Broadcast RID RF。
+- **证据状态：STATIC / NEGATIVE**（C-126--C-128；C-467 精化）
+- **操作手位置：** exact `AppLocationUploadLogic` 约每 500 ms 取 client location，原 C-126 已记录
+  lat/lon × 1e6、alt × 100。C-467 更正“拒绝越界/(0,0)”：对于有限坐标，越过 ±90/±180 或两者绝对值
+  都小于 1e-6 时，producer 将第二字段置 0，但仍量化、填 timestamp 并排队；不能解释为丢弃 upload。
+  `MobileDevicePositionMsg(int,int,double,double,double,long)` 的 SDK serialization 是 40 B，handler
+  接收已预缩放的 double 并压为 22 B，随后形成 84 B encrypted payload。timestamp 是构造时 libc time() 的
+  Unix epoch 秒，不是已证明的 GPS fix time。Java 边界为 `JNIProviderManagerForCPP.clientLocation():byte[]`，
+  精确方法体/platform supplier 未恢复；高度只闭合 ×100，原物理单位和高度基准仍未知。
+  该 `0x11/0x43` app-location -> device 数据面不证明飞机导航位置可编辑或字段最终进入 WA150 Broadcast RID RF。
 - **飞机/UAS ID：** current `ComplianceSerialNumber` 是 get/listen-only characteristic，未找到 SET；
   当普通 SerialNumber 恰为 14 字符时，exact 逻辑派生 `1581F + 14-char SN + 0` 的 20 字符
   compliance form，否则沿用原值。该格式高度符合 compliance Basic-ID candidate，但是否等同 WA150

@@ -1,6 +1,6 @@
 # 中国 UOM OIDIdentifier 离线请求结构
 
-状态：`STATIC`，当前无设备、未发送。A-072 只生成候选 hex；它不是实际发送器，也不是通用 Basic/UAS ID 编辑器。
+状态：`STATIC`，当前无设备、未发送。A-072 当前只生成 18 B payload hex，不含旧 SDK 对象头或 sender/receiver 参数；它不是实际发送器，也不是通用 Basic/UAS ID 编辑器。
 依据：[RID 控制面](../../docs/05_RID_CONTROL_SURFACES.md) RID-005B。
 
 - command `0x11/0xD6` 为 `china_uom_realname_tag`；`0x11/0xD5` 是 publish push。
@@ -16,4 +16,5 @@ SET/GET reply result 在 byte 1；成功 GET 的值位于 bytes 2--9，独立 pa
 python3 oid_identifier_message.py --get
 ```
 
-输出只有候选 hex；当前没有 canonical live readback、restore 或 RF 对应证据。
+C-469 的 payload tests 不把确定性零 GET tail 变成官方逐字节事实；receiver/timeout/retry 是另行记录的 native schema，
+不由本 CLI 编码或验证。当前没有 canonical live readback、restore 或 RF 对应证据。

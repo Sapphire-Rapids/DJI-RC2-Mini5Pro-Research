@@ -1074,3 +1074,39 @@ A-078 v2 取 `ciphertext[:32]` 的做法已被证伪；该历史负结论保留�
 
 限定：C-465 验证离线 encoder 和原生组件/指令片段，未执行完整 handler、SendSetPack、transport 或 RF。
 不能把修复称为实机位置编辑器，不能自行赋予 raw fields 经纬度单位。
+
+## N-110 — selected Android upgrade paths do not establish STUE decoding (C-466)
+
+`NEGATIVE`：A-090 的 config chunk extraction、slot0x0b request signing、恒返回1的 DeCrypt、file-transfer copy，
+以及 A-086 直接 image helpers，没有给出具体 STUE key-selection/decrypt 链。
+旧 header verifier 的 literal signature length 为 256 B，不提供 WA150 384 B signature 的匹配实现。
+
+限定：只覆盖已列函数/具名直接调用范围。配置 extraction pair 不验签不等于所有配置路径无认证；request-signature key
+不等于固件 key；静态 body 没有 decoder 不等于全 SDK/APK 不存在。没有执行厂商代码或设备，没有新增 STUE 候选命中。
+
+## N-111 — receiver-field and universal-send-slot interpretations corrected (C-468)
+
+`RETRACTED`：Characteristics+0x30=receiver 的 C-385 推论错误；它在已检查路径进入 callback capture。
+receiver 覆盖依赖 single/multiple HostID 条件，真实 SetReceiverIndex 写 req+0x19。
+C-386 的+0x128 只保留给 BaseAbstraction EID 重载，free EID/position 使用+0x10，不能全撤也不能全局推广。
+
+限定：六个受控 prefix/helper cases 不执行完整 send/callback/transport，未证明运行期 HostID 或 owner。
+
+## N-112 — old object-header self-checks are not wire evidence (C-469)
+
+旧 C-402/C-404 自检通过的观察保留，但其 fake32-byte object header 和 product cap 并未建立正确 wire frame。
+当前五个 CLI 已改纯 payload，并修正 OPID action bytes；8+9+5 项结果分别是 schema通过、有效CLI通过、旧参数拒绝，
+不能合并称为厂商整条发送路径验证。UOM GET零tail和OPID预先验证的16B输入仍保留各自边界。
+
+## N-113 — invalid location is flagged,not shown to be discarded (C-126/C-467)
+
+`RETRACTED`：把 producer 的 finite越界/近零检查读成直接丢弃 upload，证据不成立。第二字段置0后仍继续缩放、赋 epoch秒
+并排队。lat/lon×1e6、alt×100 是 C-126 已有结果；本次闭合类型/provider/time，不是首次发现缩放。
+
+限定：没有执行设备；flag的正式enum/receiver解释、Java supplier、原高度单位/基准与 RF 对应未闭合。不能将标记0解释为飞机接受/拒绝状态。
+
+## N-114 — checked small containers remain protected (C-470)
+
+A-0661200 重新获取复核与新增 A-092最小1100 wa140bat 都通过外层 size/MD5/payload SHA/encrypted checksum，仍为 STUE。
+没有 key trial、解密或 RSA 签名验证，因此不是“测试所有 key 失败”。仅新增一个独立容器；1200早有同字节 A-066/C-323。
+其他五个1100变体未检查，wa140bat不证明原装电池型号，arch_field0不证明CPU或inner format。

@@ -44,7 +44,7 @@ TBIE CMAC 派生使用受保护 RPMB root；存储 root 的解封/认证依赖 H
 
 C-458/C-459 已恢复固定 SDK 的真实动态符号，并以 A-087 完整 Get(0x37) 隔离模拟得到 32 B 返回值；
 roundtrip/重封装一致只验证 keychain。A-078 v2 的错误已由 C-464/C-465 后续修为 v3：22 B 显式输入生成 84 B payload，
-原始片段/helper 与 4 项测试支持模型；完整 handler/transport/RF 和坐标单位仍未闭合。C-460 的 TEE 位置 envelope 是另一静态路径，算法 enum 与 SDK/TEE key 对应未确认。
+原始片段/helper与4项测试支持模型；C-467后续确认预缩放与epoch秒，完整handler/transport/RF、原高度单位/基准和Java来源仍未闭合。C-460 的 TEE 位置 envelope 是另一静态路径，算法 enum 与 SDK/TEE key 对应未确认。
 A-088 GPS updater 的已检查 transfer 路径和独立公开调查没有新增 STUE consumer，不覆盖所有输入 producer 或全网。
 这些结果服务于 Remote ID 开关及广播参数控制面板目标，不代表 STUE 解密或设备控制成功。
 
@@ -60,3 +60,12 @@ chunk 连续，明文 chunk 与 gap 不推进 counter。plain checksum 包括解
 （对应字段清零）加 payload，不含 RSA signature。先核 payload SHA-256/encrypted checksum；命中后仍需独立结构佐证。
 
 只公开候选来源、长度、哈希和校验结果，不公开 key、私有样本或厂商反汇编；当前不连接或修改设备。
+
+## 本批完成项与范围（C-466--C-470）
+
+Android upgrade配置/签名/transfer所检查函数未给出STUE consumer；不扩大到整个SDK。
+C-467保留C-126既有缩放并补齐类型、40 B SDK序列化、Java byte[]边界和epoch秒；invalid有限坐标仅flag0仍排队。
+C-468/C-469已纠正receiver/重载和五个CLI，只有离线片段/payload证据，没有设备/RF。
+
+小模块当前是A-0661200重新获取复核及新A-092最小wa140bat1100，两者STUE完整性通过但未试key/解密/验RSA；
+余五个1100未检查。STUE owner/derivation和TBIE root input缺口不变，不因为下载更多密文称解密进展完成。

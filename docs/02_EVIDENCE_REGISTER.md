@@ -59,7 +59,7 @@ Details: [07_FIRMWARE_TRUST_BOUNDARY.md](07_FIRMWARE_TRUST_BOUNDARY.md),
 | C-123 | `STATIC` | Product-139 China `OIDIdentifier` Get/Set uses `0x11/0xD6`, fixed receiver `0x92`, 500 ms / retry 3, and 18-byte requests | GET tail bytes are not visibly initialized; live acceptance, restore, persistence, and RF mapping remain open |
 | C-124 | `STATIC` | Product-139 EASA OPID has current `0x03/0x78` GET/SET/DELETE schema | Dynamic HostID, live acceptance, persistence, restore, and RF remain open |
 | C-125 | `STATIC` | Product-139 Japan DIPS uses three-stage `0x11/0x4B` credential SET/QUERY | Non-atomic sensitive managed data; no live Mini 5 Pro closure |
-| C-126 | `STATIC` | Current app periodically sends validated client location through encrypted `0x11/0x43` | App-to-device does not prove WA150 RF operator-location use |
+| C-126 | `STATIC` | Client location is pre-scaled and queued; C-467 refines type/provider/time | Invalid finite coordinates clear a flag,not drop; altitude source unit/reference and RF remain unknown |
 | C-127 | `NEGATIVE` | The current LTE phone path is set-only LTE HYBRID business state, not Remote ID | Proprietary detector phone source remains unknown |
 | C-128 | `STATIC` | `ComplianceSerialNumber` is get/listen-only and derives a compliance-form identity; no setter was found | Static candidate is not proof of RF Basic ID use |
 | C-130 | `STATIC` | China `OIDIdentifier` replies put result at byte 1 and an eight-byte GET value at bytes 2--9 | Byte 0/result enum and live ACK remain unknown; defensive minimum lengths are 2/10 |
@@ -430,7 +430,7 @@ Details: [RC 2 runtime record](23_RC2_LIVE_RUNTIME.md).
 | C-303 | `OBSERVED` |20-byte header +13-byte body +64-byte trailer; body first byte1 versus0 | Width/name/enable interpretations remain H-33 |
 | C-304 | `CORROBORATED` | Both originals verify as P-256/SHA-256 over their33-byte header/body with one common verification key | Device trust anchor and field semantics remain separate |
 | C-305 | `NEGATIVE` | Bounded exact/adjacent plaintext searches found no matching inner parser or verification-key owner | Aircraft00/DD handler remains the next target |
-| C-306 | `STATIC` | Two WA150 manifests identify the missing1200/1100 ESC/battery families; all five available original IMaH modules have encrypted outer chunks and matching complete digests | Missing module containers remain uninspected;0802/E3 remains the receiver candidate |
+| C-306 | `STATIC` | Historical ten-entry manifest/local-availability record | C-323/C-470 update it: A-0661200 and A-092 wa140bat1100 checked; five1100 variants uninspected |
 | C-307 | `STATIC` | MSDK5.18 CloudControlVersion belongs to WA345 and command0x50/0x20; the named interface is absent from the exact Fly1.19.4 inventory | Separate from WA15000/DD policy transport; no query executed |
 | C-308 | `STATIC` | A060/L5/B6 whole-policy-set capture is built and tested; one MMKV decode, one ProductType cache read, zero CloudControlData queries/SET | Preparation record; A060 execution pending and global policy bodies private |
 | C-309 | `OBSERVED` | A060/L5/B6 SD回读全部匹配，B5 STOP/CLOSED STOP及正常会话轮换完成，B6启动命令已给出 | B6尚未确认启动，A060采集未执行；原历史/回执保留 |
@@ -515,11 +515,11 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-380 | `OBSERVED` | eid_switch template decodes to cmd119/sub3/attr0x12, tag uav_fc_handle_eid_switch | First arg/receiver index unbound; no live send yet |
 | C-381 | `OBSERVED` | EID set value is one byte read from the value object at +8 | Typeinfo target not named |
 | C-382 | `OBSERVED` | Dedicated pack type uav::core::eid_switch_pack with an RspType | Field layout beyond the value byte unenumerated |
-| C-383 | `OBSERVED` | base_req ctor gives header layout, auto sender index, payload slot at+0x20 | 0x02 byte and 'IW' magic semantics unproven |
-| C-384 | `OBSERVED` | SetReceiverIndex is external; receiver index is caller-supplied | local_48 role ambiguous; external body unavailable |
-| C-385 | `OBSERVED` | Receiver index comes from Characteristics+0x30 | It is a characteristic property, not a constant |
-| C-386 | `OBSERVED` | Outward send is BaseAbstraction virtual slot +0x128 | Concrete transport symbol not named |
-| C-387 | `OBSERVED` | Slot0x128 is BaseAbstraction::SendPack; core transport is UavCoreCancelation::SendData | Inventory naming only; no live call |
+| C-383 | `STATIC` | SDK constructor describes in-memory request-object fields | Not a wire header; fake CLI headers removed by C-469 |
+| C-384 | `STATIC` | Actual base SetReceiverIndex writes req+0x19 and ORs req+0x0a with2 | Conditional HostID override; no live descriptor or route proof |
+| C-385 | `RETRACTED` | Characteristics+0x30 receiver interpretation withdrawn | It is callback-captured; actual HostID logic is C-468 |
+| C-386 | `STATIC` | BaseAbstraction EID overload retains virtual+0x128 | Free KeyHandlers EID/position templates instead use+0x10 |
+| C-387 | `STATIC` | Transport function names remain an inventory observation | Not a generic complete route; overload distinctions in C-468 |
 | C-388 | `OBSERVED` | OIDIdentifier handlers use a different opcode pair cmd214/sub17 | Only EID switch decoded so far |
 | C-389 | `RETRACTED` | OID 0x70 length interpretation retracted | Product-139 has an 18-byte pack and at most 8 copied bytes |
 | C-390 | `OBSERVED` | EIDSwitch is registered by name via BaseAbs::InsertCharacteristics | App reaches it by SDK key name, not raw opcode |
@@ -534,16 +534,16 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-399 | `RETRACTED` | C-375 under-counted by only scanning ADRP+ADD | Correct reading is live key via a different form |
 | C-400 | `OBSERVED` | EUCeCxV1 class registers the EU/CE regulatory key family | Registration via CreateCharacteristics/BindKey |
 | C-401 | `STATIC` | EU_CE key has static registration/binding evidence | Not a usable alternative; tested direct USB target absence remains |
-| C-402 | `OBSERVED` | EID emitter statically verified byte-for-byte against the ctor | Decompilation-anchored, not device-anchored |
-| C-403 | `RETRACTED` | First emitter put the 'IW' magic at 0x0c instead of 0x0e | Corrected both emitters and re-hashed A-071/A-072 |
-| C-404 | `OBSERVED` | OID emitter has a mirroring self-check plus a cap test | Decompilation-anchored |
+| C-402 | `OBSERVED` | Historical EID object-mirroring self-check passed | Wire-validity implication withdrawn; current payload checks C-469 |
+| C-403 | `RETRACTED` | Old fake-object magic-offset error was corrected historically | Entire fake header later removed; no wire validity |
+| C-404 | `OBSERVED` | Historical OID object/cap self-check passed | Wire/cap implications withdrawn; corrected payload tests C-469 |
 | C-405 | `NEGATIVE` | EU_CE_enable_c0_rid_0 has no dedicated Get/Set handler symbol | Bound via observer pattern, not a named handler |
 | C-406 | `OBSERVED` | rid-protocol gained a directory README | Index/usage only |
 | C-407 | `RETRACTED` | Claim to resolve global-RID setter absence is retracted | France EID was already known and is separate from C-109 |
-| C-408 | `OBSERVED` | OperatorRegistrationNumberSet is an action at cmd120/sub3, 16-char string payload | Delete likely = empty payload, unproven |
+| C-408 | `STATIC` | OPID is a separate registration action with16 wire bytes | GET02/DELETE01/SET0010+16 per C-124, not a raw string or empty delete wire body |
 | C-409 | `OBSERVED` | RidImportModule set/info paths use cmd75/sub17 with a 0x4b sub-field | Japan registration channel |
 | C-410 | `OBSERVED` | RID broadcast field-control map enumerates the writable surface | Map only; C/D sections still open |
-| C-411 | `OBSERVED` | OID emitter realigned to exact RID-005B schema | Static; no live ACK |
+| C-411 | `STATIC` | UOM18-byte payload retains first8-byte copy and local zero GET tail | No SDK object header, encoded route or byte-exact undefined vendor tail |
 | C-412 | `STATIC` | App-location0x11/0x43 calls keychain, AES and HMAC | C-464 corrects0x100 to256 key bits, not an output buffer length |
 | C-413 | `NEGATIVE` | No dedicated CccBroadcastSignalQuality handler symbol found | Literal sits in generic registration/string tables |
 | C-414 | `RETRACTED` | Old position layout/output-size interpretation withdrawn | C-464:22-byte serialized input,256 key bits,84-byte payload; third numeric value also double |
@@ -621,5 +621,30 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | Claim | Status | Result | Boundary |
 | --- | --- | --- | --- |
 | C-463 | `OBSERVED` | Java/Python status parsers preserve a7-byte minimum prefix and private unknown tail;36 host tests pass | C-147 is the source; routes/gates/display unchanged; no APK or deployment |
-| C-464 | `STATIC` | Exact JNI bytes show22-byte marshalling and84-byte success payload; HMAC0 is SHA256 | Typed values' units unknown; raw-byte/static call evidence, no full handler or transport |
+| C-464 | `STATIC` | Exact JNI bytes show22-byte marshalling and84-byte payload; HMAC0 is SHA256 | Pre-scaled inputs clarified by C-467; not full handler/transport/RF |
 | C-465 | `OBSERVED` | A-078 v3's4 tests and isolated native helper/packing comparisons pass | Offline payload model only;40 host tests in this batch, prior59 firmware tests separate |
+
+## 2026-10-18 bounded Android upgrade inspection
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-466 | `NEGATIVE` | Selected Android upgrade/config/request-signature/image-verifier functions supply no concrete STUE consumer | Exact A-090/A-086 only; not the whole SDK/APK, all authentication paths or live WA150 selection |
+
+## 2026-10-18 exact upstream app-location semantics
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-467 | `STATIC` | MobileDevicePositionMsg/sdk40→handler22,Java byte[] boundary and epoch seconds resolved; prior C-126 scaling refined | Invalid finite coordinates flag0 yet continue; altitude unit/reference,Java body and RF unknown |
+
+## 2026-10-18 route-prefix and payload-only repairs
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-468 | `OBSERVED` | Conditional HostID override and distinct+0x10/+0x128 overloads confirmed;6 prefix/helper cases pass | No full SendSetPack, callback, runtime descriptor or transport/RF |
+| C-469 | `OBSERVED` | Five CLIs now emit payloads only;8 schema tests/9 valid CLI cases pass,5 obsolete route-argument calls reject | No wire framing or device; OPID validation and UOM undefined GET tail remain scoped |
+
+## 2026-10-18 small-module integrity coverage
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-470 | `OBSERVED` | Official1200 bytes reverify A-066; one new smallest1100 wa140bat container is A-092; integrity matches | Both remain STUE; no key/RSA/decrypt/device test; five1100 variants uninspected,not native battery proof |

@@ -8,7 +8,7 @@ C-448/C-449 撤回旧版“完整控制 Remote ID”“路径全无条件成立�
 | France EID | `EIDSwitch` / `0x03/0x77` | A-071；法国专用，不是 global RID |
 | 中国 UOM 标签 | `OIDIdentifier` / `0x11/0xD6` | A-072；18 字节 pack，不等于 Basic/UAS ID |
 | EASA registration | `OperatorRegistrationNumber` / `0x03/0x78` | A-076；身份面，不是 RF 开关 |
-| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078 v3 修为 84 B 离线 payload；单位、完整 handler/transport/RF 未验证，不是坐标编辑器 |
+| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078 v3 修为 84 B 离线 payload；预缩放/epoch秒已知，高度原单位/基准和完整handler/transport/RF未验证，不是typed坐标编辑器 |
 | AirSense/ADS-B | `ADSBSwitch` / `0x11/0x37`，receive enable `0x11/0x0C` | A-079；不能作 RID 总开关 |
 | 动态最大高度 | GET `0x11/0x50` | A-080；静态结构候选，不是 RID 高度写入 |
 
@@ -26,3 +26,8 @@ App→local/logic→djilink→bulk/USB 是静态组件线索。注册成功、�
 
 依据：[RID 控制面](../../docs/05_RID_CONTROL_SURFACES.md) RID-002B、RID-003、RID-005B、RID-005C、RID-009、RID-011C；
 [字段地图](RID_FIELD_MAP.md)；[离线验证说明](VERIFY_RUNBOOK.md)；[STUE 检查点](../firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md)。
+
+C-468/C-469 后，SDK request 内存头不再由任何 payload CLI 输出；旧 sender/receiver 参数均删除。
+Characteristics+0x30=receiver 已撤回，free KeyHandlers+0x10 与 BaseAbstraction EID+0x128 分开。实际 runtime route 未验证。
+五个修正 CLI 通过8项schema/9个有效调用并拒绝5个旧路由参数调用；OPID action按C-124、UOM GETtail保持本地选择，
+这些结果不构成 full-handler/transport/RF 验证。

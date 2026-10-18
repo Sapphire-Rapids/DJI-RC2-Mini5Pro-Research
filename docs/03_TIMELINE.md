@@ -1068,3 +1068,24 @@ work when a report did not contain a more precise timestamp.
   A-078 v3 移除错误 key、fake header/prefix/256 B field，4 项 synthetic/OpenSSL 对照测试通过（C-465）。
 - 本批为 36+4 项主机测试，已有 C-450 的 59 项 firmware tests 未重跑或合并。未执行完整 handler、SendSetPack、
   Android global constructor、transport 或 RF；坐标单位、实机控制与 STUE 问题仍未闭合。
+
+### 2026-10-18 bounded Android upgrade inspection
+
+- `STATIC`：A-090 libupgrade_core 的 size/hash 与已有官方 APK arm64 member 逐字节一致，读取其所选配置/request-signing/
+  file-transfer 函数和直接 A-086 image helpers。动态表恢复 7,343 个符号，私有 evidence 已保存（C-466）。
+- `NEGATIVE`：配置 chunk 直拷、slot0x0b 请求签名、256 B signature 旧 helper 与 DeCrypt 恒1未形成具体 STUE consumer。
+  不外推整个 SDK/APK、全部配置认证或 live WA150；无厂商执行、设备操作或新固件下载。
+
+### 2026-10-18 exact HostID prefix and payload-only CLI repair
+
+- `OBSERVED`：精确 sender templates/base helper 核对并完成 6 个原始 prefix/helper 受控 case。C-385 撤回，C-386
+  收窄为 BaseAbstraction EID+0x128，free EID/position 为+0x10；完整 SendSetPack/transport 未执行（C-468）。
+- `OBSERVED`：五个旧 CLI 删除伪对象头与 sender/receiver 参数，OPID 修为 C-124 action；8 个 schema、9 个有效CLI通过，
+  5 个旧参数调用拒绝（C-469）。只改源码/既有tests，不发送请求或做 UI/设备写入。
+
+### 2026-10-18 upstream location semantics and small-module coverage
+
+- `STATIC`：A-091与official APK member hash一致，闭合MobileDevicePositionMsg类型、40 B SDK serialization、Java byte[] provider和epoch秒。
+  C-126已有×1e6/×100不作首次发现；修正invalid finite coordinates仅清flag仍量化/排队的边界（C-467）。
+- `OBSERVED`：官方重新获取1200，与历史A-066/C-323逐字节身份相同；另取最小1100 wa140bat兼容项为A-092。
+  size/MD5/payloadSHA/encrypted checksum均匹配，未验RSA/试key/解密或接设备（C-470）。只新增一个独立容器，余五个1100未检查。

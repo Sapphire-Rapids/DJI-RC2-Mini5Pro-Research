@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.06 - 2026-10-18
+
+- Refined existing C-126 location scaling with exact MobileDevicePositionMsg/sdk40/provider/epoch-second evidence; invalid finite coordinates clear a flag but remain queued (C-467,A-091). Altitude source unit/reference and Java body remain unknown.
+- Reacquired and verified existing A-0661200 bytes, adding only one new STUE container A-092 for the smallest1100 wa140bat compatibility entry; no RSA/key/decrypt/device test and five1100 variants remain uninspected (C-470).
+
+- Corrected HostID receiver attribution and send-overload scope with six controlled prefix/helper cases (C-468).
+- Removed fake object headers and route arguments from five payload CLIs, correcting OPID action schema; eight host schema tests/nine valid cases/five obsolete-argument rejections pass, with no device/transport claims (C-469).
+- Registered exact A-090 Android upgrade input and a bounded no-STUE-consumer result over selected config, request-signing, transfer and old image-verifier functions (C-466); no whole-SDK, authentication or live-device extrapolation.
+
 ## 0.5.05 - 2026-10-18
 
 - Fixed the Java/Python minimum7-byte RID status parsers with private unknown tails;36 host tests pass and routes/gates/display stay unchanged, without APK build/deployment (C-463).

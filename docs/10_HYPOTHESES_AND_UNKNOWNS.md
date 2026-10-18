@@ -533,7 +533,8 @@ Assistant/DJI Fly native 的可提取常量中。
 `RETRACTED`：旧 ciphertext-prefix key、额外 plaintext prefix 和 256 B ciphertext 解释已撤回。
 C-464 静态恢复了 22 B typed marshalling 和 84 B payload；C-465 的原始片段/helper 对照及 v3 synthetic tests 支持这个离线模型。
 
-`UNKNOWN`：typed values 的坐标单位、完整 handler/runtime 选择、transport 和真实广播字段对应仍未验证。
+`UNKNOWN`：完整 handler/runtime、transport 和真实广播对应仍未验证。C-467已解释上游lat/lon×1e6与alt×100的pre-scaled输入；
+仍未知的是原高度物理单位/基准与精确Java来源，不能继续笼统称全部坐标单位未知。
 不能把正确离线 payload 解释为已可编辑飞机/操作者位置；每个字段仍需独立 owner/readback/restore/RF 证据。
 
 ## H-39 — public IMaH-v2 model applicability to STUE
@@ -571,3 +572,21 @@ QSEE mode 常数的语义仍需独立确认，不能从数值 1/2 猜成已证�
 
 `UNKNOWN`：完整 handler、SendSetPack、Android 初始化/owner、传输 frame 与 RF 行为没有执行。HMAC lookup node 是受控输入，
 不能写成完成了全局 constructor。C-460 的 TEE random-IV envelope 与 SDK constant-IV 路径保持独立；key/owner 对应仍未知。
+
+## Android upgrade search boundary after C-466
+
+`UNKNOWN`：STUE consumer 仍未定位。所检查 Android upgrade bodies 负责配置复制、request signature 或原文件 transfer；
+DeCrypt 名字和 slot0x0b key 不能建立 payload 解密归属。A-086 的旧 256 B signature helper 也不定位目标 STUE/PRAK。
+
+后续需要新的明确输入/consumer/product 调用边；本次结果没有穷尽 SDK、未命名/间接调用或其他版本。不要因函数名
+重新启动 NFZ/keychain 枚举，也不把有界静态阴性写成整个 SDK 的否定。
+
+## Position-provider semantics remaining after C-467
+
+已知部分：原 C-126 的 lat/lon×1e6、alt×100，MobileDevicePositionMsg 的 typed字段/40 B SDK serialization、22 B handler输入，
+Java `clientLocation():byte[]` 边界和构造时 epoch秒。finite越界/abs双小于1e-6只清 validity-like flag，仍继续排队。
+
+`UNKNOWN`：同版本 Java方法体/platform supplier、原高度物理单位与高度基准、geodetic reference，以及该数据最终是否进入
+WA150 Broadcast RID。不能把所有 units 都说成未知，也不能由×100自行补出 meters/centimeters。A-078仍只接收显式22 B，不新增typed坐标API。
+
+C-470仅更新容器可用性：A-0661200复核、A-092 wa140bat1100新检查，剩余五个1100未知。没有新明文或STUE consumer，不改变owner/derivation缺口。
