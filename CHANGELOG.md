@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.09 - 2026-10-18
+
+- Registered the user-supplied RedFly installer and nested modified Fly APK (A-104/A-105), checked 32 DEX headers and traced selected code paths (C-476).
+- Located default-on RID cloud guards, legacy DroneID/EID calls and the missing restore/readback behavior (C-477). No standard RID RF or device capability is established.
+- Recorded installer access prerequisites, unchanged A-031 Fuli, limited APK restoration, separate host/aircraft GPS paths and flight-record UI-map export (C-478/C-479).
+- Kept vendor bytes outside the repository and GitHub synchronization paused; no APK execution, installation, device action or firmware decrypt result.
+
 ## 0.5.08 - 2026-10-18
 
 - Recorded exact Fly1.21.10 selected RID DeviceId input and caller18/4 with a new analysis-only A-099 view and13 independently located methods whose code offsets match JADX (C-474). Kept Fly1.19.4 C-286/C-287/C-291 unchanged; numeric equivalence and runtime binding remain unknown.

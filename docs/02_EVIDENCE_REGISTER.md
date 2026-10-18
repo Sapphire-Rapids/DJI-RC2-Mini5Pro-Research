@@ -663,3 +663,14 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | --- | --- | --- | --- |
 | C-474 | `STATIC` | Fly1.21.10 selected DeviceId supplier/selector and exact caller18/4 resolved; A-099 view checked;13 independently located methods have code offsets matching JADX | C-286/C-287/C-291 Fly1.19.4 evidence retained; DeviceId/ProductType equivalence and actual binding unknown; no body parser/readback/RF |
 | C-475 | `STATIC` | RC331 packaged sec_type2 maps through full APS2 decode to dji_verify; selected mode hashes/copies outer payload, RSA length256 | Config path/live selection unknown; separate from dji_decrypt/QSEE; no STUE/key/runtime/RF result or whole-process absence |
+
+## 2026-10-18 RedFly supplied-package analysis
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-476 | `STATIC` | A-104/A-105 identities and signatures checked;32 regular DEX members pass header integrity; selected readable modified Java is available | Third-party build,not official A-006 equivalence;cross-ABI native comparison cannot identify patches;no launch/device |
+| C-477 | `STATIC` | Default-on RID guards skip cloud paths and repeat legacy03/DA mask plus EID;native EID constructor/pack remains03/77 | No saved-state restore,matched readback,request quiescence or standard RID RF;hooks do not prove execution |
+| C-478 | `STATIC` | Installer requires RC2 root ADB,uses unchanged A-031,and implements APK hash backup/restore and UI-media seeding | Property permissions/root/persistence unverified;package restore excludes data and device settings;outer-only negative |
+| C-479 | `STATIC` | Host location_mode,aircraft FCGPSEnabled and FR UIMap parser/export are distinct;RC2 GPS sender does not await ACK | No aircraft/RF or real-log decrypt result;FR map export does not establish TBIE/STUE capability |
+
+Detailed source boundaries and offsets: [RedFly review](24_REDFLY_BUILD245_STATIC_REVIEW.md).

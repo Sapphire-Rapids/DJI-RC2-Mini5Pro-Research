@@ -955,3 +955,10 @@ Android upgrade所检查函数没有给出具体STUE consumer，不是SDK全域�
 位置链还缺运行期选择、altitude 有效性和来源时间。default 方法没有 hasAltitude 检查，还可保留 newer network 坐标/时间
 并换入 older GPS altitude。按需缓存和消息 epoch 秒均不能代替 fresh-fix 证据。实际 owner、读回/恢复、持久性和独立 RF
 仍须逐项建立；当前没有设备，历史采集/启动指令不重开，实机/RF 验收要求不降低。
+
+## RedFly input after C-476--C-479
+
+The new [RedFly sample](24_REDFLY_BUILD245_STATIC_REVIEW.md) supplies32 ordinary DEX files and concrete modified
+Java entry points. It reduces the cost of targeted comparison; it does not replace exact official-version evidence.
+The default-on RID option has no original-state restore or standard RF result, and installer property/root success
+is unobserved. Aircraft ownership/readback/restore and RC331 TBIE/WA150 STUE gaps remain. No deployment was performed.

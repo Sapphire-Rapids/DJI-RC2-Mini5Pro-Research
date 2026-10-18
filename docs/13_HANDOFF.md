@@ -889,3 +889,16 @@ service's system path, whose exact member is absent in the inspected image listi
 PATH resolution is also unobserved. Selected same-name dji_verify uses dynamic header+signature payload offset but a
 fixed256-byte RSA call and digest/copy mode. Product-entry negatives stay bounded. C-456/C-457, STUE/root gaps and full
 per-control readback/restore/persistence/RF requirements remain unchanged; no vendor execution or new device instruction. In continuing this work, use a new concrete input or call edge rather than repeating this closed static inspection.
+
+## 2026-10-18 RedFly new-input checkpoint (C-476--C-479)
+
+The supplied installer A-104 and embedded modified Fly A-105 are a new concrete input. See the
+[focused review](24_REDFLY_BUILD245_STATIC_REVIEW.md) and [independent locations](../evidence/redfly-build245-static.json).
+The32 regular DEX files make selected modified Java available; do not silently substitute it for official A-006.
+RID guards, legacy mask/EID work, default-on behavior and missing original-state restore are now located.
+Installer root/property success, aircraft acceptance and standard RID RF remain unobserved. Host location settings,
+aircraft GPS parameters and flight-record UI-map export are separate; the latter does not close firmware decryption.
+
+Use these exact classes for targeted comparisons with unresolved original methods. Do not repeat the completed
+inventory or reopen closed legacy senders from names alone. No app installation or modified-app deployment was requested
+or performed. Vendor inputs/derived source stay outside the repository; GitHub synchronization remains paused.

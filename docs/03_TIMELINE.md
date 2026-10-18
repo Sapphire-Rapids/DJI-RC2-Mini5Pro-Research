@@ -1107,3 +1107,10 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：A-100--A-103 来自 C-455 已核验 system image；988 B APS2/144 relocation 解析将包内 type2 指向 dji_verify 命令。
   所查同名实现固定 RSA256、动态 payload offset、摘要/复制模式；配置路径和 live/PATH 绑定保留未知（C-475）。
 - 保存25条 REA evidence/四份 snapshots，session全部关闭；未执行厂商/Android、RSA、key trial 或设备，无 STUE/控制/RF 成功。
+
+### 2026-10-18 RedFly build-245 用户样本
+
+- `STATIC`：固定 A-104/A-105 的 hash/签名/包身份；32个DEX的长度、SHA-1与Adler-32匹配。格式化引用扫描后选取相关类，19个RID方法独立定位，18个外层方法offset与JADX一致（C-476）。
+- `STATIC`：核实默认开启的云控guard、连接hook、legacy mask/EID调用和缺失的原值恢复；同包ARM EID setter的PLT/GOT绑定确认03/77（C-477）。
+- `STATIC`：核实外层root/property前提、A-031同一性与APK恢复范围；分开RC定位、飞机GPS和FR MapDetailData导出（C-478/C-479）。
+- 保存独立文字/hash/offset索引，原始APK/DEX/SO及反编译代码留在仓库外。未安装、启动、连接设备或调用native；没有TBIE/STUE明文或标准RID RF结果。

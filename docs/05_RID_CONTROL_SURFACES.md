@@ -1033,3 +1033,10 @@ one is26; the latter can be split into two aligned13-byte candidates. The first 
 an unnamed0/1 candidate, and values2/3/4/5 at the following LE16 position are a new discriminator
 for enum/consumer lookup. Keep the byte3/4 field-width alternatives in H-33; this capture does
 not change the existing aircraft command allow-list.
+
+## RedFly comparison note (C-477)
+
+The [build245 review](24_REDFLY_BUILD245_STATIC_REVIEW.md) locates default-on guards in both cloud-control paths,
+plus periodic legacy DroneID mask and France EID calls. Its first mask reads are logged without validation;
+disabling the option stops queued work but does not restore baseline or close in-flight requests. This is a
+third-party static comparison, not an admitted standard RID control or a change to historical negative results.

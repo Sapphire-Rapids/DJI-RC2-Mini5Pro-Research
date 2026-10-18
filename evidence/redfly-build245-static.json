@@ -1,0 +1,630 @@
+{
+  "schema": "redfly-build245-static-evidence/v1",
+  "status": "STATIC",
+  "date": "2026-10-18",
+  "source": "user-supplied local third-party APK; no official provenance asserted",
+  "scope": "package metadata; formatted DEX reference inventory; selected RID, installer, GPS and flight-record paths; selected native EID symbols only",
+  "artifacts": [
+    {
+      "package": "app.redfly.installer",
+      "version_code": 245,
+      "version_name": "RedFly Test Installer | build-245 | RC2 + RC Pro Enterprise | v6 alongside | wizard r16 / desktop r6 RC2-only / i18n19 r7 / boot ADB r2 RC2 / RC2 media r1 / shell ADB r3 persistent / utilities repair r1",
+      "bytes": 487007201,
+      "sha256": "49e5d5c93851baf377bd7a288ec013d2e632f5c81738d133deb379fe7ba8ebe7",
+      "certificate_sha256": "4e1971daed82fe2025dd7f3e3bd5a493c9d79c00c1fb70845d623ee63a17e781"
+    },
+    {
+      "package": "com.android.packageinstaller",
+      "version_code": 30,
+      "version_name": "11",
+      "bytes": 3274224,
+      "sha256": "523361acbe62587fa61e00a92369e87daa0d812232b8942deba67771ccf2633a",
+      "certificate_sha256": "a4aa1cdd2ea580cbbe67486b5f6f3cfea83f488889995afa70793daa516687da"
+    },
+    {
+      "package": "com.android.documentsui",
+      "version_code": 121,
+      "version_name": "0.20.12.23-7ab9a2e1",
+      "bytes": 5595319,
+      "sha256": "b7a943cf1af7351da9135eeabfa3554f4ca5c9174ebcfb547e21bca030011b69",
+      "certificate_sha256": "a4aa1cdd2ea580cbbe67486b5f6f3cfea83f488889995afa70793daa516687da"
+    },
+    {
+      "package": "com.dpad.fuli",
+      "version_code": 155,
+      "version_name": "1.0.08.29-5e7f0af3",
+      "bytes": 8849471,
+      "sha256": "58b176eb1e17cacb7522914d282a69a677603ea9026993fc143c6a390211e44f",
+      "certificate_sha256": "a4aa1cdd2ea580cbbe67486b5f6f3cfea83f488889995afa70793daa516687da"
+    },
+    {
+      "package": "dji.go.v6",
+      "version_code": 3116079,
+      "version_name_scope": "RedFly 1.21.10 dev-56/build-236 self-declared",
+      "bytes": 467603237,
+      "sha256": "94a85f5d2099b19d9241de37739a6e7fe163a113a06552b7190e205cf201acae",
+      "certificate_sha256": "4e1971daed82fe2025dd7f3e3bd5a493c9d79c00c1fb70845d623ee63a17e781"
+    }
+  ],
+  "parent_archive_evidence_ids": [
+    "ev_90b311b344b353decd96a82ff08f075f4262ae62d5b6cba057281af8f0505ac7",
+    "ev_69cf3083157ce178c4cbd98db549b5341dd326e8a2b7939816d18e2744e07de1"
+  ],
+  "dex_integrity": [
+    {
+      "member": "classes.dex",
+      "bytes": 17324,
+      "sha256": "cc778512648bf322a4b9da269565c0236647e04168e1983c1a2bdb25d8e6a798",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes10.dex",
+      "bytes": 7683092,
+      "sha256": "86837a2df7690c519f29ac102789820d2f9abf1b2d1434926951b833644d1470",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes11.dex",
+      "bytes": 8252088,
+      "sha256": "6a0954c740c252e7194065456e8e8792ec0f96f52afaf0b3999e4ad9157b5247",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes12.dex",
+      "bytes": 7545116,
+      "sha256": "de28a206cb90b40e9df8b2c4523880a71311db7497fd85f20e07ce1c07cda845",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes13.dex",
+      "bytes": 7266964,
+      "sha256": "c0f8b7dd886cced4da6d70ae54699b982cdcb943f7985d69903d34bd07173957",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes14.dex",
+      "bytes": 12372104,
+      "sha256": "b65e5e0eafa366e4e0b50a7894aad8f8f847de60daf622e5df21471f0bf61046",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes15.dex",
+      "bytes": 2100100,
+      "sha256": "c81a052580e0b5e693a3cca0d43f23138bbd6839b04f34436ca2daa75d8ff6f5",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes16.dex",
+      "bytes": 11602956,
+      "sha256": "15d942653503546b1fe8c5df4d3e6c46cf4feeff67d7a6214ae5b9fd6f594e1e",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes17.dex",
+      "bytes": 8617372,
+      "sha256": "5c731066abec88d3b34fa1e1f693fbf0fff807781680097caa4e5ce24cabe99e",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes18.dex",
+      "bytes": 9363376,
+      "sha256": "823cbf9893a03276f9ac45bb5051a4445b6b9a75fb45ccc24e2580a1aed29fac",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes19.dex",
+      "bytes": 11877748,
+      "sha256": "8df16c580964eaf910527e0fee65154ead24b3bf10c4feb206c923ac5fffd20a",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes2.dex",
+      "bytes": 13410632,
+      "sha256": "227c9aea4dd8c9f83725a2ad9ff668fe2d14eb74194e1a15a2933fba61c82e32",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes20.dex",
+      "bytes": 8005568,
+      "sha256": "52c3687e942aa3e9363d9ef53374cc964aa0b109ac3d2188db9d2642cd3846d6",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes21.dex",
+      "bytes": 7642260,
+      "sha256": "41a3cf59c35ec3b8f17ed69e5c26d2ee414e6821c71e0c675866d282e55cc37e",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes22.dex",
+      "bytes": 10089812,
+      "sha256": "ad0b41ebb968c6fd56c6b48b36ea41e53e24da6df4234f2d7744efdec062aaa2",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes23.dex",
+      "bytes": 273180,
+      "sha256": "7621cc018aa6ebe68685cc53f6304f5ee20f8fa640a54db95711d11c7ba7acfe",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes24.dex",
+      "bytes": 31324,
+      "sha256": "00a74e85659a27613456294804d3ec477532604ad3b5449fe0f35ce267241004",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes25.dex",
+      "bytes": 75524,
+      "sha256": "4d5d367bc5ade026ef91dc945b4ed6212fa630bc2a722aca129df1f895cec415",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes26.dex",
+      "bytes": 4044,
+      "sha256": "0a6d546ff46b240556cb1fc8ffd77284cb20c73b4ea1c4c82f6df3219d034134",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes27.dex",
+      "bytes": 7470624,
+      "sha256": "2732a7632827fbdfe4cc6b452b0ad086484835f48e1577e61a1aec844cd84d16",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes28.dex",
+      "bytes": 210152,
+      "sha256": "b5ba0c81f8f4aa987297472faa3ae831fb700d45a79b61a45583079640a1832c",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes29.dex",
+      "bytes": 4476,
+      "sha256": "b212358e4808c69d19b8b34a0c749b6502be2e9e5eb37783af5876319a2b2370",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes3.dex",
+      "bytes": 289436,
+      "sha256": "388e16d278f381970ea45e29c2d8edd805a2138ada87e211579b3c256d5cb4b9",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes30.dex",
+      "bytes": 83084,
+      "sha256": "c42a21711d3d1b3121f028db816cfee38b0b65b1d0c909e1831d76146c6bf0be",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes4.dex",
+      "bytes": 7888444,
+      "sha256": "535cf545a454c323cb256bcb2c1f208451509c8abfceb8b5c76a8dd54d17aa6e",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes5.dex",
+      "bytes": 11557208,
+      "sha256": "d410613e76fa9e5a327b4af0f3f1dc3e1e0cdbd9efd961f18b45e4da1d766217",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes6.dex",
+      "bytes": 10869812,
+      "sha256": "6ff737bd56e430c9289b2e533fa24ea3992302e62cf2b8cd64091c96adb1f2ea",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes7.dex",
+      "bytes": 13471988,
+      "sha256": "352553a89c0ffc506caccd0694661862bb59b08dd23a89f2a5482e79f7204259",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes8.dex",
+      "bytes": 11677748,
+      "sha256": "2b5855520f49df3796c7e0b6136b18656e45ce8391ea3ec68c0db83be7c4165d",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes9.dex",
+      "bytes": 8018280,
+      "sha256": "2846ee46e972cbb617e6276212267310981248a57e20140b0129beea94aab640",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes31.dex",
+      "bytes": 89108,
+      "sha256": "d0b63628d4d4dd98dfafb9085c8cf7d5046432e7ccbc1b73a18937e09bbbf94d",
+      "header_checksum_sha1": "match"
+    },
+    {
+      "member": "classes32.dex",
+      "bytes": 25936,
+      "sha256": "ee4a1c8a6c386bd8b6c1b1b7cad85132b654307e6b582141b1b6c5194162c7ac",
+      "header_checksum_sha1": "match"
+    }
+  ],
+  "reference_scan": {
+    "dex_members": 32,
+    "class_defs": 176976,
+    "method_bodies": 1063288,
+    "limitation": "formatted instruction references and selected literal class names; no reflection/native/runtime completeness"
+  },
+  "selected_rid_methods": [
+    {
+      "dex": "classes12.dex",
+      "class": "Luav/midware/data/model/P3/DataFlycDetection;",
+      "method": "doPack",
+      "prototype": "()V",
+      "method_id": 26359,
+      "code_item_offset": "0x462bb4",
+      "instruction_bytes": 1344,
+      "instructions_sha256": "457121108daa2e847c026cc2eeba89f9342f74bffd8078e3d841a2b37baa6073"
+    },
+    {
+      "dex": "classes12.dex",
+      "class": "Luav/midware/data/model/P3/DataFlycDetection;",
+      "method": "setEnable",
+      "prototype": "([Z)Luav/midware/data/model/P3/DataFlycDetection;",
+      "method_id": 26392,
+      "code_item_offset": "0x463aa8",
+      "instruction_bytes": 6,
+      "instructions_sha256": "78903dfd428054db82f3afc616ecd472650fd10e8ac38798882418be94f14e16"
+    },
+    {
+      "dex": "classes12.dex",
+      "class": "Luav/midware/data/model/P3/DataFlycDetection;",
+      "method": "start",
+      "prototype": "(Luav/midware/interfaces/UAVDataCallBack;)V",
+      "method_id": 26398,
+      "code_item_offset": "0x463b98",
+      "instruction_bytes": 142,
+      "instructions_sha256": "437154aaaa880ee51d866fd0980c5f0a2a86f3152b8943a822058ceb1c338bf2"
+    },
+    {
+      "dex": "classes20.dex",
+      "class": "Lcom/uav/component/bglogic/UAVRidBroadcastEffectCloudControlLogic;",
+      "method": "x",
+      "prototype": "(I)V",
+      "method_id": 20899,
+      "code_item_offset": "0x517c40",
+      "instruction_bytes": 120,
+      "instructions_sha256": "51343b12ee090c935693b52827d27745778b59e0307098954e91e75ccecdbd18"
+    },
+    {
+      "dex": "classes20.dex",
+      "class": "Lcom/uav/component/bglogic/UAVRidBroadcastEffectCloudControlLogic;",
+      "method": "N",
+      "prototype": "()V",
+      "method_id": 20872,
+      "code_item_offset": "0x517d34",
+      "instruction_bytes": 188,
+      "instructions_sha256": "4988fac9632e6b4ec24dc77073d7bd3b13cdaae27f877332922d7f1d0dbf2313"
+    },
+    {
+      "dex": "classes20.dex",
+      "class": "Lcom/uav/component/bglogic/UAVRidBroadcastEffectCloudControlLogic;",
+      "method": "U",
+      "prototype": "()V",
+      "method_id": 20879,
+      "code_item_offset": "0x517e00",
+      "instruction_bytes": 32,
+      "instructions_sha256": "40e1a454ae88c46b8727f2bb4bcdeff82d596d0c41ebd51f88d988ae444ba2e7"
+    },
+    {
+      "dex": "classes20.dex",
+      "class": "Lcom/uav/component/bglogic/UAVRidCloudControlLogic;",
+      "method": "M",
+      "prototype": "(Ljava/lang/String;)V",
+      "method_id": 20933,
+      "code_item_offset": "0x518548",
+      "instruction_bytes": 118,
+      "instructions_sha256": "387e4c7b2819140f8c6127e847060039645fef62d3b5a5585701c8e7dc1453bd"
+    },
+    {
+      "dex": "classes20.dex",
+      "class": "Lcom/uav/component/bglogic/UAVRidCloudControlLogic;",
+      "method": "E",
+      "prototype": "()V",
+      "method_id": 20925,
+      "code_item_offset": "0x518950",
+      "instruction_bytes": 190,
+      "instructions_sha256": "a3138b811f10685ca00e7a71df4f9a058766a508c81ebfdebf0f4ed9278c4ce2"
+    },
+    {
+      "dex": "classes27.dex",
+      "class": "Lflysettings/S;",
+      "method": "qFlag",
+      "prototype": "(Ljava/lang/String;Z)Z",
+      "method_id": 1011,
+      "code_item_offset": "0x6669b4",
+      "instruction_bytes": 26,
+      "instructions_sha256": "426ec864ea12060fab00221f7cb283423928013d3fb860513a3fd5f358952b02"
+    },
+    {
+      "dex": "classes27.dex",
+      "class": "Lflysettings/S;",
+      "method": "ridKill",
+      "prototype": "()Z",
+      "method_id": 1016,
+      "code_item_offset": "0x666c40",
+      "instruction_bytes": 16,
+      "instructions_sha256": "3e97ac32ef08be3830deea12151a0912802b74d03b6882cd1a06cba9d07db90c"
+    },
+    {
+      "dex": "classes27.dex",
+      "class": "Lflysettings/S;",
+      "method": "setRidKill",
+      "prototype": "(Z)V",
+      "method_id": 1027,
+      "code_item_offset": "0x667010",
+      "instruction_bytes": 60,
+      "instructions_sha256": "659a163edcc007ac9f3cc41173fd16d3109a674cb33ee70e6444115ca24536cc"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid$1;",
+      "method": "run",
+      "prototype": "()V",
+      "method_id": 1458,
+      "code_item_offset": "0x2b618",
+      "instruction_bytes": 184,
+      "instructions_sha256": "f3afcf70fb5cf19e8c769e15decf2555099605221977ca7429249679b012d5fe"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "droneIdCycle",
+      "prototype": "()V",
+      "method_id": 1470,
+      "code_item_offset": "0x2ba28",
+      "instruction_bytes": 288,
+      "instructions_sha256": "ba3a10abc52459c8880154e825c307029b8588fac3b140a8b2e694f00209514d"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "eidOff",
+      "prototype": "()V",
+      "method_id": 1471,
+      "code_item_offset": "0x2bb58",
+      "instruction_bytes": 460,
+      "instructions_sha256": "741d7a9b4d09f85e3cab50682cdfe92f2ee0266df62b6128c19cba64691d0aae"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "enabled",
+      "prototype": "()Z",
+      "method_id": 1472,
+      "code_item_offset": "0x2bd34",
+      "instruction_bytes": 110,
+      "instructions_sha256": "49c8a15305d6f81372e1be75eafdfef36adcf7db0d81d51770ff43b94977d832"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "onConnect",
+      "prototype": "()V",
+      "method_id": 1475,
+      "code_item_offset": "0x2be80",
+      "instruction_bytes": 90,
+      "instructions_sha256": "770b3f810c4d9ff315cbaa8430cd2b1529cc989279ca7c3fcc9c090723b4b397"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "onDisconnect",
+      "prototype": "()V",
+      "method_id": 1476,
+      "code_item_offset": "0x2bf00",
+      "instruction_bytes": 40,
+      "instructions_sha256": "539597c1fba458f56188a72077f6334cdeb4329cfd62ce6a80d8c37b9166428d"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "onSettingChanged",
+      "prototype": "()V",
+      "method_id": 1477,
+      "code_item_offset": "0x2bf38",
+      "instruction_bytes": 82,
+      "instructions_sha256": "840d39a70511d6c91c4120a528d19e596c61c0d2ab129d038ca9cea4cafb7044"
+    },
+    {
+      "dex": "classes28.dex",
+      "class": "Lridkill/Rid;",
+      "method": "send",
+      "prototype": "(Ljava/lang/Object;)Ljava/lang/Object;",
+      "method_id": 1478,
+      "code_item_offset": "0x2bf9c",
+      "instruction_bytes": 260,
+      "instructions_sha256": "4ac6d60f2c10dd475836b50a672cca5b8232317779c1e2aa5f7553da25c349f6"
+    }
+  ],
+  "method_validation": {
+    "located_methods": 19,
+    "jadx_api_offset_matches": 18,
+    "inner_run": "direct class_data/instruction reference; grouped in parent decompilation; standalone JADX lookup not resolved",
+    "whole_dex_integrity_checked": 32,
+    "runtime_or_art_validation": false
+  },
+  "native_eid": {
+    "member": "lib/armeabi-v7a/libsdk_jni.so",
+    "bytes": 81761860,
+    "sha256": "efab27f8acf9f98b060439d064c991f04f559cb64ad4cfc88e7d87203bd44991",
+    "symbols": [
+      {
+        "library": "libsdk_jni.so",
+        "section": ".dynsym",
+        "symbol": "_Z12EIDSwitchGetPN3uav3sdk3key11KeyHandlersERKNS0_15CharacteristicsERKNSt6__ndk18functionIFviNS7_10shared_ptrIKNS0_8UavValueEEEEEE",
+        "address": "0x489d44c",
+        "size": 568,
+        "type": "STT_FUNC",
+        "shndx": 13,
+        "file_offset": "0x489d44c",
+        "code_sha256": "72f7866e88e90b43b5894dd08d51f8c4fea942936da245b7c84df8bdacb57e88",
+        "decoded_bytes": 568
+      },
+      {
+        "library": "libsdk_jni.so",
+        "section": ".dynsym",
+        "symbol": "_Z12EIDSwitchSetPN3uav3sdk3key11KeyHandlersERKNS0_15CharacteristicsERKNSt6__ndk110shared_ptrIKNS0_8UavValueEEERKNS7_8functionIFviEEE",
+        "address": "0x489d684",
+        "size": 932,
+        "type": "STT_FUNC",
+        "shndx": 13,
+        "file_offset": "0x489d684",
+        "code_sha256": "e9ed3b3564fe1a9e123d5cdea077887df1320a77300aa7ac8ff5a050078caf11",
+        "decoded_bytes": 932
+      }
+    ],
+    "plt_bindings": [
+      {
+        "call_target": "0x4c0ac70",
+        "got_slot": "0x4d218ac",
+        "symbol": "__dynamic_cast"
+      },
+      {
+        "call_target": "0x4c32290",
+        "got_slot": "0x4d2b634",
+        "symbol": "_ZN3uav4core16uav_cmd_base_reqILh1ELh3ELh119E24uav_fc_handle_eid_switch24uav_fc_eid_switch_statusEC2Ev"
+      },
+      {
+        "call_target": "0x4c0abe0",
+        "got_slot": "0x4d21888",
+        "symbol": "_ZN3uav6common6Buffer6assignEPKhj"
+      },
+      {
+        "call_target": "0x4c0cda0",
+        "got_slot": "0x4d220f8",
+        "symbol": "_ZN3uav4core18uav_cmd_req_header16SetReceiverIndexERKh"
+      },
+      {
+        "call_target": "0x4c47c70",
+        "got_slot": "0x4d30cac",
+        "symbol": "_Z11SendSetPackIN3uav4core15eid_switch_packEEiPNS0_3sdk3key11KeyHandlersERNS1_11uav_cmd_reqERKNS3_15CharacteristicsENSt6__ndk110shared_ptrIKNS3_8UavValueEEERKNSC_8functionIFviEEEbNSH_IFiPKNT_7RspTypeEjEEENSH_IFiiEEE"
+      }
+    ],
+    "scope": "ARM symbol extents and PLT/GOT relocation binding; symbol extent may include literal pools; no execution or runtime key-binding proof"
+  },
+  "flight_record_bridge": {
+    "sha256": "a338baab36e8e492e0bc163de53c460282474bdd34f8bb8b5c589c3737651dce",
+    "size": 22508,
+    "elf_machine": 40,
+    "class": "ELF32",
+    "symbols": [
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUIMapConvertor_parseWithFilePath",
+        "value": "0x1b24",
+        "size": 280,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUiListViewConvertor_getRecordPreviewData",
+        "value": "0x2280",
+        "size": 420,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUiListViewConvertor_nativeInit",
+        "value": "0x1ce4",
+        "size": 72,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUtilityParser_release",
+        "value": "0x2828",
+        "size": 16,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUIMapConvertor_release",
+        "value": "0x1cc4",
+        "size": 32,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUiListViewConvertor_parseWithFolderPath",
+        "value": "0x1d2c",
+        "size": 944,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUtilityParser_getFileImages",
+        "value": "0x2684",
+        "size": 420,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUtilityParser_getFileMD5",
+        "value": "0x24e0",
+        "size": 420,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUiListViewConvertor_getRecordListData",
+        "value": "0x20dc",
+        "size": 420,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUiListViewConvertor_release",
+        "value": "0x24a8",
+        "size": 32,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUtilityParser_nativeInit",
+        "value": "0x24c8",
+        "size": 24,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUIMapConvertor_nativeInit",
+        "value": "0x1aec",
+        "size": 56,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUIMapConvertor_parserFrUIMapData",
+        "value": "0x1c3c",
+        "size": 136,
+        "section_index": 13
+      },
+      {
+        "symbol": "Java_uav_fr_natives_UavJNIFlightRecordUiListViewConvertor_getDeviceListData",
+        "value": "0x2424",
+        "size": 132,
+        "section_index": 13
+      }
+    ],
+    "zip_entry": "lib/armeabi-v7a/libuavfr.so"
+  },
+  "flight_record_format_check": {
+    "input": "invented protobuf bytes only; no user logs",
+    "apk_code_executed": false,
+    "native_code_executed": false,
+    "network_or_device_used": false,
+    "single_point_wire_sha256": "6be3bd8e2617e0e8d19b4d86cade2a59863b2ba781959098b7e45e313b1413d5",
+    "single_point_json_shape": "object",
+    "two_points_json_shape": "array[2]",
+    "nested_userLatLng_preserved": true,
+    "satellites_varint_preserved": true,
+    "enum_linkMode_varint_omitted": true,
+    "scope": "valid synthetic wire format and modeled exporter behavior only; not decryption validation",
+    "status": "passed"
+  },
+  "device_connected": false,
+  "apk_installed_or_launched": false,
+  "vendor_code_executed": false,
+  "raw_user_logs_consumed": false,
+  "limitations": [
+    "No Standard Broadcast RID RF, device acceptance, baseline/restore or persistence result",
+    "No RC331 TBIE or WA150 STUE decrypt result",
+    "Modified ARMv7 app is not the official ARM64 A-006; no native patch attribution from cross-ABI comparison",
+    "Selected paths only, not a complete app security, cryptography or capability audit"
+  ],
+  "disposition": "Only independent metadata, symbol/method locations and hashes in repository; all APK, DEX, SO, decompiled source and raw analysis files remain private outside repository",
+  "document": "docs/24_REDFLY_BUILD245_STATIC_REVIEW.md"
+}

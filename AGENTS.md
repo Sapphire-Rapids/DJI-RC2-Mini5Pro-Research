@@ -500,6 +500,15 @@ Later retractions override earlier progress summaries.
     payload offset is dynamic, but RSA length is fixed256 and selected crypto mode only digests/copies. Do not infer WA150
     STUE support or CPU from rk3399 symbols. Keep C-456/C-457 dji_decrypt/QSEE separate and product-entry negatives bounded.
 
+69. C-476--C-479 cover only the supplied RedFly build245/embedded build236. Its32 ordinary DEX members expose
+    modified Java, not official A-006 equivalence; ARMv7 versus ARM64 prevents native patch attribution by byte diff.
+    ridKill defaults true and guards cloud subscriptions/writes while repeating legacy03/DA mask and03/77 EID work.
+    It does not save/restore the original state or verify standard RID RF. Host GPS, aircraft GPS and flight-record
+    UI-map export are separate. RC2 GPS local-state updates/true returns without ACK are not aircraft confirmation.
+    Installer root/property assumptions are unverified and its Fuli is unchanged A-031; package restore omits device
+    state/data restoration. Do not turn these STATIC paths into deployment instructions or reopen closed routes
+    without new owner/baseline/readback/restore evidence. No new firmware key/decrypt or RF result is established.
+
 ## Privacy and redaction
 
 Never commit:

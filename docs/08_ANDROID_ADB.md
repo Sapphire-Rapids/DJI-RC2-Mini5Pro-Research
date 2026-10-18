@@ -347,3 +347,10 @@ eFuse/firmware flash。`/system/bin/adbd` 是错误 path，禁止把它带回 pr
 
 原始 ADB/USB 抓包、device authorization key、vendor `adbd`、patched binary、APK/DEX、
 init/SELinux 文件和反汇编日志均不进入本仓库。
+
+## RedFly installer comparison (C-478)
+
+The supplied build245 installer uses local ADB and requires root for its RC2 route. Its own-process property
+commands do not establish permission to set them; no new adbd patch or Binder escalation was found in the outer DEX.
+The Utilities payload is unchanged A-031. APK backup/restore does not restore all device state or app data.
+See the [bounded static review](24_REDFLY_BUILD245_STATIC_REVIEW.md); no new live access route was tested.

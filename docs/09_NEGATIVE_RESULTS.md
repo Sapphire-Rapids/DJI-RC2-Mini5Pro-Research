@@ -1137,3 +1137,11 @@ C-286/C-287 或 C-291 实机 ProductType139，也不能把旧模型默认为新�
 所查同名 dji_verify 的固定模式做摘要与复制，RSA signature length256；动态 payload offset 不证明 WA150384 B签名/STUE支持。
 vendor 配置不等于 init 所指的 system 路径，实际配置/挂载/PATH 绑定未知。Product pre/misc/post 入口没有恢复覆写边，只是限定静态阴性。
 该链不替代 C-456/C-457 的 dji_decrypt/QSEE/TBIE，也没有新的 key/RSA/解密或设备试验。
+
+## RedFly build245: bounded capability gaps (C-477--C-479)
+
+The [selected-path review](24_REDFLY_BUILD245_STATIC_REVIEW.md) found no original-mask/EID restore or validated
+RF readback in the RID option, and no new privilege-escalation implementation in the outer installer. These are
+code-scope findings, not failed device trials or whole-app absence claims. Its flight-record module exports UI-map
+data through native parsers; it does not establish a firmware decoder. Unrelated native internals and full main-app
+behavior remain outside the review. No new send,install,root,key or decrypt trial was performed.

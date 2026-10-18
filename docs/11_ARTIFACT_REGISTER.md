@@ -655,3 +655,14 @@ A-099 由未改动的 A-094 从 A-093 生成；40,790 strings 通过结构/编�
 它是含 synthetic header 假设的派生分析输入，不是原始 DEX 或解密成果；仅此新 view 用于 C-474，不登记额外名称候选为成果。
 A-100/A-101 复用已提取成员，A-102/A-103 从 C-455 同一已核验 system image 提取；均未执行。配置来自此前已核验 vendor image。
 两镜像与配置身份、静态调用范围见固件记录第22节；没有 live 配置选择、RSA/key trial 或 WA150 STUE 解密。全部厂商字节/listing 排除不分发。
+
+## A-104/A-105：用户提供的 RedFly 样本（C-476--C-479）
+
+| ID | Name / kind / subject_version | Size | SHA-256 | audit_state / device_use_state / disposition / privacy |
+| --- | --- | ---: | --- | --- |
+| A-104 | RedFly Test Installer build245 user input / input-sample / RedFly-Installer-build245 | 487007201 B | `49e5d5c93851baf377bd7a288ec013d2e632f5c81738d133deb379fe7ba8ebe7` | `STATIC` / offline-static-never-installed-or-launched / excluded-do-not-distribute / public-hash-only |
+| A-105 | RedFly v6 modified Fly nested APK / input-sample / RedFly-main-build236-self-declared-Fly1.21.10 | 467603237 B | `94a85f5d2099b19d9241de37739a6e7fe163a113a06552b7190e205cf201acae` | `STATIC` / offline-extracted-static-never-installed-or-launched / excluded-derived-do-not-distribute / public-hash-only |
+
+内嵌 utilities 与已有 A-031 相同，不重复登记。其他辅助包、32个DEX及所查native成员的摘要见
+[独立证据索引](../evidence/redfly-build245-static.json)。改版身份与官方来源、版本标签与运行效果分开；
+原 APK 未改动，全部厂商字节及反编译输出留在仓库外。没有设备部署或固件解密。

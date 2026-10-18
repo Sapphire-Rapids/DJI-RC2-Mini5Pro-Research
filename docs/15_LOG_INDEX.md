@@ -292,3 +292,11 @@ records public synthetic parser tests and private synthetic capture/analysis hel
 C-315 adds a private bounded named-enum comparison note for exact Fly1.19.4 and MSDK5.18,
 using only existing inputs. Decompiled enum bodies and configuration-country associations remain
 excluded; the public record distinguishes registration/runtime state from an unnamed policy type.
+
+## RedFly supplied-package static evidence
+
+C-476--C-479 use a private family of archive inventories,signer outputs,DEX integrity/class/method/reference maps,
+selected JADX source and ARM ELF symbol/PLT observations. Installer and GPS/flight-record reviews have separate
+local evidence files. No actual flight logs,device traffic or execution output were collected. Only independently
+written findings and redacted artifact/method metadata enter [the public index](../evidence/redfly-build245-static.json);
+all vendor APK/DEX/SO,raw decompilation and local paths remain excluded.
