@@ -634,7 +634,7 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 
 | Claim | Status | Result | Boundary |
 | --- | --- | --- | --- |
-| C-467 | `STATIC` | MobileDevicePositionMsg/sdk40→handler22,Java byte[] boundary and epoch seconds resolved; prior C-126 scaling refined | Invalid finite coordinates flag0 yet continue; altitude unit/reference,Java body and RF unknown |
+| C-467 | `STATIC` | MobileDevicePositionMsg/sdk40→handler22,Java byte[] boundary and epoch seconds resolved; prior C-126 scaling refined | Invalid finite coordinates flag0 yet continue; C-473 later advances selected Java/conditional units; actual provider/valid altitude/RF unknown |
 
 ## 2026-10-18 route-prefix and payload-only repairs
 
@@ -648,3 +648,11 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | Claim | Status | Result | Boundary |
 | --- | --- | --- | --- |
 | C-470 | `OBSERVED` | Official1200 bytes reverify A-066; one new smallest1100 wa140bat container is A-092; integrity matches | Both remain STUE; no key/RSA/decrypt/device test; five1100 variants uninspected,not native battery proof |
+
+## 2026-10-18 carrier views and selected Java location semantics
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-471 | `STATIC` | Exact carrier has 22 BE directory entries matching independent DEX maps and page-rounded storage | Unknown metadata/protection; no original header, loader, device or STUE recovery |
+| C-472 | `OBSERVED` | Four analysis-only views pass string/table/suffix/unchanged-byte checks; public CLI default digest reproduced; 30 method mappings independently checked | Synthetic header assumptions; five protected-type segments unrecovered; no original DEX identity, ART/Android or all-app decode |
+| C-473 | `STATIC` | Selected Java provider/cache chain reaches native location; default Android valid-altitude contract is conditional | No hasAltitude guard; possible mixed GPS altitude/network time; on-demand caches do not bound fix age; actual provider/validity/device/RF unknown |

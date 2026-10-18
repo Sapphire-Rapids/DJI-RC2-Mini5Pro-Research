@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.07 - 2026-10-18
+
+- Registered the pinned Fly carrier and22 directory/map matches (C-471, A-093).
+- Added A-094 offline analysis-view tooling and four excluded derived views with constrained header/string-index reconstruction and unchanged later bytes; five protected-type segments remain unrecovered. Independent review checks30 selected method mappings/offsets (C-472, A-095--A-098).
+- Connected selected Java client-location/cache bodies to native input. Default Android altitude units are conditional on valid altitude; the inspected path has no hasAltitude guard and can mix older GPS altitude with newer network coordinates/time. Caches and new message timestamps do not prove fresh fixes (C-473).
+- Kept original DEX identity, ART/runtime behavior, actual provider/altitude validity, STUE decryption and device/RF control unverified. A-078 remains an explicit22-byte offline payload encoder.
+
 ## 0.5.06 - 2026-10-18
 
 - Refined existing C-126 location scaling with exact MobileDevicePositionMsg/sdk40/provider/epoch-second evidence; invalid finite coordinates clear a flag but remain queued (C-467,A-091). Altitude source unit/reference and Java body remain unknown.

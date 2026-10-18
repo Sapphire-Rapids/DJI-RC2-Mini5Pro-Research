@@ -90,9 +90,17 @@ has40 host tests. The earlier59 firmware tests (C-450) were not rerun or merged 
 
 A-090 Android upgrade selected bodies do not expose a concreteSTUE consumer; this is not a whole-SDK conclusion.
 Location producer/type/provider/epoch-second and conditionalHostID/payload fixes are independent offline work,not
-STUE plaintext or real control-panel success. Existing C-126 scales remain valid; altitude source unit/reference
-and the exact Java supplier remain unclosed.
+STUE plaintext or real control-panel success. Existing C-126 scales remain valid; C-473 later advances selected
+Java/default-provider semantics while actual provider/altitude validity/reference and device/RF correspondence remain open.
 
 Official1200 reacquisition matches existing A-066/C-323 bytes. Only A-092 smallest1100 wa140bat is a new distinct
 container. Both areSTUE with payload/encrypted integrity checks; neither was RSA-verified,key-tried or decrypted.
 Five other1100 variants remain uninspected; wa140bat is a compatibility entry,not nativeWA150 hardware evidence.
+
+## Separate carrier/Java continuation (C-471--C-473)
+
+22 carrier directory/map records and four analysis-only views are checked. Selected Java provider/cache bodies
+connect to the native position boundary; valid Android/default altitude has a conditional meters/WGS84 contract.
+The inspected method has no hasAltitude check and can mix newer network coordinates/time with older GPS altitude.
+New message timestamps do not prove fresh fixes. This is static app-location evidence, not original DEX/firmware
+recovery, STUE decryption or actual device/RF control. Existing firmware/root-input blockers are unchanged.

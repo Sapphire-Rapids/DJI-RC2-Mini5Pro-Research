@@ -1,7 +1,7 @@
 # Current next-agent handoff
 
 Continue the complete DJI RC 2 / Mini 5 Pro Remote ID research objective from the reviewed repository state.
-This handoff is based on HEAD `94dfd51` with committed claims through C-465; the working record now includes C-466--C-470 through2026-10-18. Inspect current HEAD
+This handoff is based on HEAD `6e0f9a9` with committed claims through C-470; the working record now includes C-471--C-473 through 2026-10-18. Inspect current HEAD
 and the working tree first; if newer work exists, preserve it and use the later evidence. Do not reset to this hash.
 
 ## Objective and current operating context
@@ -23,11 +23,11 @@ work instead of treating an old session or old mounted identity as current.
 ## Read first
 
 1. [AGENTS.md](AGENTS.md), especially the current corrections and evidence/distribution rules.
-2. The current opening and C-442--C-470 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
+2. The current opening and C-442--C-473 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
 3. [AIRCRAFT_STUE_CHECKPOINT.md](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md).
-4. Claims C-442--C-470 in [evidence/claims.csv](evidence/claims.csv), mirrored in
+4. Claims C-442--C-473 in [evidence/claims.csv](evidence/claims.csv), mirrored in
    [docs/02_EVIDENCE_REGISTER.md](docs/02_EVIDENCE_REGISTER.md).
-5. Sections 12--19 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
+5. Sections 12--20 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
    [negative results](docs/09_NEGATIVE_RESULTS.md), [unknowns](docs/10_HYPOTHESES_AND_UNKNOWNS.md) and
    [current blockers](docs/12_CURRENT_BLOCKERS.md).
 6. Verify each selected sample/tool in [evidence/artifacts.csv](evidence/artifacts.csv) and
@@ -38,13 +38,30 @@ The current unavailable-device condition and later retractions govern the next a
 [docs/03_TIMELINE.md](docs/03_TIMELINE.md) and [docs/23_RC2_LIVE_RUNTIME.md](docs/23_RC2_LIVE_RUNTIME.md) for history,
 not as a queue of unfinished operator instructions.
 
-## Latest continuation (2026-10-18,C-466--C-470)
+## Latest continuation (2026-10-18, C-471--C-473)
+
+A-093 is the exact Fly1.21.10 carrier. Its22 directory entries match independent DEX maps and page-rounded storage.
+A-094 generates one analysis-only view per explicit invocation; four checked views A-095--A-098 change only relative
+header[0,0x70) and string_ids[0x70,0x20000). Later bytes are identical. DEX035/link fields/new checksums are synthetic
+assumptions. Five protected-type-table segments remain unrecovered. Do not claim original DEX identity, decryption,
+all-app unpacking or ART verification. Carrier, derived views and vendor listings stay excluded.
+
+C-473 connects selected Java registration/cache/clientLocation bodies to native serialization. For valid Android/default
+altitude only, the API's meters/WGS84-ellipsoid contract explains a centimeters-scale x100 value. The inspected method
+has no hasAltitude check and can combine newer network coordinates/time with older GPS altitude. AMap's reference
+contract/runtime choice and separate GPS/barometric IClientAltitudeProvider remain distinct. Two on-demand caches
+and newly sampled message epoch seconds do not bound fix age or prove fresh fixes. A-078 remains explicit22-byte input;
+no typed editor or actual device/RF control is admitted. Independent review checked30 selected method mappings/offsets;
+no Android/vendor Java, full ART verifier or native message path was executed in this Java pass.
+
+## Prior continuation (2026-10-18, C-466--C-470)
 
 C-466 is a bounded Android upgrade negative over exact config/signature/transfer/image-helper bodies,not the whole
 SDK. C-467 refines the already known C-126 scales: exact MobileDevicePositionMsg/sdk40→handler22,Java byte[] provider,
 message-construction epoch seconds,and a validity-like flag cleared for invalid finite coordinates without dropping
-the queued message. Latitude/longitude ranges and pre-scaling are known; source altitude unit/reference and the exact
-Java supplier body remain unknown. A-078 stays the explicit22-byte payload codec; no typed coordinate editor is added.
+the queued message. Latitude/longitude ranges and pre-scaling are known; C-473 later advances selected Java/default
+provider semantics. Actual provider/altitude validity/reference and RF correspondence remain open. A-078 stays the
+explicit22-byte payload codec; no typed coordinate editor is added.
 
 C-468 retracts Characteristics+0x30 as receiver; actual HostID override is conditional. Free KeyHandlers EID/position
 use virtual+0x10,while+0x128 remains only the BaseAbstraction EID overload. Six prefix/helper cases do not run a full
@@ -103,7 +120,7 @@ keep structural observations, model hypotheses, candidate failures and actual pl
 ## RID semantics and completion evidence
 
 The six `rid-protocol` CLIs are offline hex generators without device transport. The current position tool validates an offline payload model only. The producer pre-scales coordinates as C-126/C-467
-describe; altitude source units/reference,Java body and full device/RF behavior remain unknown. France EID is France-specific, ADSBSwitch/AirSense is not a global RID switch, and the tested direct-USB
+describe; C-473 adds selected Java/default-provider semantics without proving actual altitude validity, runtime provider or full device/RF behavior. France EID is France-specific, ADSBSwitch/AirSense is not a global RID switch, and the tested direct-USB
 FLYC surface has positive-controlled absence for the two known RID parameter candidates (C-227--C-230).
 Do not reopen those variants without materially new owner/handler/version evidence. WorkingStatusPush has no active
 GET or established SET-to-applied/RF correspondence; ACK, UI, cache and an absent callback are not RF proof.

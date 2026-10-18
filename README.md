@@ -10,7 +10,7 @@
 档案中的产品名称只用于说明研究对象。项目不是 DJI 官方产品，无隶属或背书关系；实验室的
 授权声明与非官方产品身份分开记录。
 
-最新工作记录为 **C-442--C-470**，本次接手基线 HEAD 为 `94dfd51`。当前用户没有设备，研究继续使用已有样本和离线工具；
+最新工作记录为 **C-442--C-473**，本次接手基线 HEAD 为 `6e0f9a9`。当前用户没有设备，研究继续使用已有样本和离线工具；
 WA150 STUE 尚未解密，未实现经真实 RF 验收的控制。先读[当前接手说明](docs/13_HANDOFF.md)和
 [STUE 检查点](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md)；历史动作见[时间线](docs/03_TIMELINE.md)。
 GitHub 推送仍暂停；本地更新、验证和提交按当前授权继续。
@@ -26,8 +26,13 @@ Operator ID 单独记录。面板功能必须连接经过独立验证的真实�
 
 ## 当前进展
 
+- C-471/C-472 核对固定 Fly 1.21.10 carrier 的 22 条目录/map，得到四个限定的 DEX 分析视图。
+  新工具 A-094 只重建 header/string index、保留后续字节；不是原始 DEX 身份恢复、STUE 解密或全包解壳。
+- C-473 接通选定 Java client-location provider 和缓存链。Android/default 分支只有在高度有效时，才支持米/WGS84 椭球
+  与后续 ×100 的条件解释；所查方法没有 hasAltitude 检查，还可能混用不同 fix 的坐标/时间和高度。
+  新消息 epoch 秒不能证明 fresh fix。实际 provider、owner、读回/恢复和 RF 对应仍未知。
 - C-466--C-470 补齐了有限Android upgrade检查、位置producer类型/provider/epoch秒、条件HostID路由与五个纯payload CLI修复。
-  lat/lon×1e6和alt×100是既有结果；高度原单位/基准与Java来源仍未知，flag0也不代表丢弃upload或设备拒绝。
+  lat/lon×1e6 和 alt×100 是既有结果；Java 来源的后续限定进展见 C-473，flag0 不代表丢弃 upload 或设备拒绝。
 - 小模块当前已复核A-0661200，并新增A-092最小wa140bat1100兼容项；两者仍STUE，其他五个1100未检查。本轮没有key trial或解密。
 
 - C-463--C-465（2026-10-18）修复 Java/Python 状态 parser 的至少 7 B 前缀，并把 A-078 v3 修为 84 B 离线位置 payload encoder。
@@ -73,7 +78,7 @@ Operator ID 单独记录。面板功能必须连接经过独立验证的真实�
 
 以下保留既有研究摘要供追溯，措辞中的“当前”或“下一步”属于当时记录，不是本轮设备操作指令。
 历史事实和后续更正以[时间线](docs/03_TIMELINE.md)、[实机主题](docs/23_RC2_LIVE_RUNTIME.md)及 claim 登记为准；
-本轮从上面的 C-442--C-470 接续。
+本轮从上面的 C-442--C-473 接续。
 
 - **标准 RID 已观察（C-207）**：操作者用已验证的标准 Remote ID 检测装置 + FindUAS 上位机确认，
   Mini 5 Pro 起桨时广播明文标准 Remote ID，Basic ID 可读。确切 BLE/Wi-Fi bearer 与电机

@@ -1103,10 +1103,26 @@ C-386 的+0x128 只保留给 BaseAbstraction EID 重载，free EID/position 使�
 `RETRACTED`：把 producer 的 finite越界/近零检查读成直接丢弃 upload，证据不成立。第二字段置0后仍继续缩放、赋 epoch秒
 并排队。lat/lon×1e6、alt×100 是 C-126 已有结果；本次闭合类型/provider/time，不是首次发现缩放。
 
-限定：没有执行设备；flag的正式enum/receiver解释、Java supplier、原高度单位/基准与 RF 对应未闭合。不能将标记0解释为飞机接受/拒绝状态。
+限定：没有执行设备；flag 的正式 enum/receiver 解释与 RF 对应未闭合。C-473 后续只推进选定 Java/default-provider
+语义，未证明实际 provider 或有效 altitude。不能将标记0解释为飞机接受/拒绝状态。
 
 ## N-114 — checked small containers remain protected (C-470)
 
 A-0661200 重新获取复核与新增 A-092最小1100 wa140bat 都通过外层 size/MD5/payload SHA/encrypted checksum，仍为 STUE。
 没有 key trial、解密或 RSA 签名验证，因此不是“测试所有 key 失败”。仅新增一个独立容器；1200早有同字节 A-066/C-323。
 其他五个1100变体未检查，wa140bat不证明原装电池型号，arch_field0不证明CPU或inner format。
+
+## N-115 — selected views do not recover protected type tables or original headers (C-471/C-472)
+
+四个选定视图满足结构约束；五个覆盖 type 表的 protected-prefix 段未恢复，实际 `0xcba00c` 调用被拒绝。
+synthetic DEX035/link fields、新 SHA-1/Adler-32 和解析成功均不建立原始 DEX 身份、保护算法恢复、全包解壳、ART verifier
+或 Android loader 行为。没有 key trial 或 STUE 解密；22 条目录/map 验证不等于 22 段均可解码。
+
+## N-116 — newly stamped location does not establish a fresh or altitude-valid fix (C-473)
+
+选定 default 方法未调用 hasAltitude；last-known 输入和两层按需 cache 没有 fix-age 上限。它可把较旧 GPS 高度放入
+较新 network 坐标对象，保留所选 time/elapsedRealtimeNanos；NaN 不进入近零补值分支。native 收到三标量后重新填 epoch 秒，
+未收到 source-fix time/accuracy。因此新消息、1000 ms cache 配置或非零 altitude 都不证明有效且同时刻的 fresh fix。
+
+这是选定静态方法边界，不是实机出现 stale/mixed/invalid fix 的观察，也不否定所有 provider。实际选择、权限、高度有效性、
+AMap 基准及 Broadcast RID 对应仍未知。

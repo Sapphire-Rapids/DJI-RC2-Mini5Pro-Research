@@ -1089,3 +1089,13 @@ work when a report did not contain a more precise timestamp.
   C-126已有×1e6/×100不作首次发现；修正invalid finite coordinates仅清flag仍量化/排队的边界（C-467）。
 - `OBSERVED`：官方重新获取1200，与历史A-066/C-323逐字节身份相同；另取最小1100 wa140bat兼容项为A-092。
   size/MD5/payloadSHA/encrypted checksum均匹配，未验RSA/试key/解密或接设备（C-470）。只新增一个独立容器，余五个1100未检查。
+
+### 2026-10-18 carrier views and selected Java provider semantics
+
+- `STATIC`：A-093 carrier 的 22 条 BE 目录与独立 DEX map 的 base/size、页对齐 storage 全部对应；未知 metadata 未解释（C-471）。
+- `OBSERVED`：A-094 复现默认 view digest，并生成 mapkit view；四份限定视图只替换 header/string index，保留其后全部字节。
+  独立结构检查与 30 个目标方法 ID/prototype/code offset 核对通过；五个 protected-type 段未恢复，实际拒绝 0xcba00c（C-472）。
+- `STATIC`：现有 JADX1.5.6 单类解码与原始 bytecode 接通 Java provider/cache/序列化链。Android/default 有效 altitude 的
+  单位是条件结论；方法无 hasAltitude guard，可混用不同 fix 高度/时间，cache 与新 epoch 秒不证明 fresh fix（C-473）。
+- 未运行 Android/vendor Java、ART verifier 或设备；没有原始 DEX 身份恢复、STUE 明文、实际控制面板操作或 RF 成功。
+  A-093/A-095--A-098 排除不分发，A-078 保持显式 22 B 输入；旧测试不重复运行。

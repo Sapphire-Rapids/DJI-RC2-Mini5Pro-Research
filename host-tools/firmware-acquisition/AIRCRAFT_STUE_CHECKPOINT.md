@@ -44,7 +44,8 @@ TBIE CMAC 派生使用受保护 RPMB root；存储 root 的解封/认证依赖 H
 
 C-458/C-459 已恢复固定 SDK 的真实动态符号，并以 A-087 完整 Get(0x37) 隔离模拟得到 32 B 返回值；
 roundtrip/重封装一致只验证 keychain。A-078 v2 的错误已由 C-464/C-465 后续修为 v3：22 B 显式输入生成 84 B payload，
-原始片段/helper与4项测试支持模型；C-467后续确认预缩放与epoch秒，完整handler/transport/RF、原高度单位/基准和Java来源仍未闭合。C-460 的 TEE 位置 envelope 是另一静态路径，算法 enum 与 SDK/TEE key 对应未确认。
+原始片段/helper与4项测试支持模型；C-467 后续确认预缩放与 epoch 秒，C-473 接通选定 Java/default-provider 链。
+高度契约以该来源且 altitude 有效为条件；实际 provider/有效性、完整 handler/transport/RF 未闭合。C-460 的 TEE 位置 envelope 是另一静态路径，算法 enum 与 SDK/TEE key 对应未确认。
 A-088 GPS updater 的已检查 transfer 路径和独立公开调查没有新增 STUE consumer，不覆盖所有输入 producer 或全网。
 这些结果服务于 Remote ID 开关及广播参数控制面板目标，不代表 STUE 解密或设备控制成功。
 
@@ -69,3 +70,11 @@ C-468/C-469已纠正receiver/重载和五个CLI，只有离线片段/payload证�
 
 小模块当前是A-0661200重新获取复核及新A-092最小wa140bat1100，两者STUE完整性通过但未试key/解密/验RSA；
 余五个1100未检查。STUE owner/derivation和TBIE root input缺口不变，不因为下载更多密文称解密进展完成。
+
+## Java 位置来源的独立进展（C-471--C-473）
+
+固定 Fly carrier 的 22 条目录/map 和四个分析视图已核对；只重建 header/string index，保留后续字节。
+这不等于原始 DEX/header 解密；五个受保护 type 表段未恢复，也未提供 STUE key 或固件明文。
+选定 Java 链连上两层缓存和 native 三标量接口。Android/default 的米/WGS84 椭球契约以 altitude 有效为条件；
+所查方法不检查 hasAltitude，还可混合较新 network 坐标/时间和较旧 GPS 高度，新消息不证明 fresh fix。
+实际 provider、owner、读回/恢复和 RF 仍未验证，STUE/TBIE 缺口不变。

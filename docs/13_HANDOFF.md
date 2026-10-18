@@ -2,7 +2,13 @@
 
 ## Start here
 
-Latest continuation (2026-10-18,C-466--C-470): selected Android upgrade paths yield no STUE consumer; exact upstream
+Latest continuation (2026-10-18, C-471--C-473): 22 carrier directory/map records and four analysis-only views are
+checked. Selected Java bodies connect cached client-location to native serialization; valid Android/default altitude
+has a conditional meters/WGS84 contract. The inspected branch has no hasAltitude check and can mix newer network
+coordinates/time with older GPS altitude. New message times do not prove fresh fixes. Actual provider/valid altitude,
+owner/readback/restore/RF, original DEX identity and STUE plaintext remain unestablished.
+
+Prior continuation (2026-10-18,C-466--C-470): selected Android upgrade paths yield no STUE consumer; exact upstream
 location type/provider/epoch seconds refine C-126 and correct invalid-coordinate dropping. Conditional HostID routes
 and five payload-only CLIs are verified within their offline scopes. A-0661200 is reverified; only A-092 wa140bat1100
 is a new distinct container,both stillSTUE with five other1100 variants uninspected. No device,actual control-panel
@@ -800,8 +806,8 @@ The Java parser/timeline15 tests and Python21 tests pass; no APK build/install o
 A-089 matches the official APK member. Exact function bytes, mapped dynamic calls and original HMAC-map init show
 22-byte marshalling,256 AES key bits,32-byte ciphertext and a final84-byte payload: LE32(80), ct32, originalIV16,
 SHA256-HMAC32 over ct+IV. C-464 corrects C-414; C-415/C-426/C-427 helper facts are retained with key-bit units clarified.
-C-467 clarifies pre-scaled lat/lon/alt inputs and epoch seconds; original altitude unit/reference and exact Java
-supplier remain unknown. This SDK fixed-IV path is separate from the QSEE random-IV branch.
+C-467 clarifies pre-scaled lat/lon/alt inputs and epoch seconds; original altitude unit/reference and exact Java supplier
+were unknown at that stage. C-473 later advances the selected Java/default-provider path with conditional units. This SDK fixed-IV path is separate from the QSEE random-IV branch.
 
 C-465/A-078 v3 now accepts serialized22/key32/IV16 explicitly, removes v2's stored-key prefix, fake headers and256-byte
 ct field, and passes4 independent/synthetic host tests. Original marshalling/packing instruction fragments and official
@@ -837,11 +843,30 @@ validation is outside the codec; UOM GETzero tail is a local choice. No device, 
 C-126 already supplied latitude/longitude×1e6 and altitude×100; C-467 closes the exact MobileDevicePositionMsg
 constructor/40-byte SDK serialization,Java clientLocation():byte[] boundary and libc epoch-second timestamp.
 Invalid finite coordinates clear the second field but continue scaling/time/queue construction. Do not call this
-upload rejection or reinterpret the field as a proved receiver/GPS-quality enum. Altitude source unit/reference and
-exact Java/platform supplier remain unknown. No new typed position editor or BroadcastRID/aircraft-navigation setter
+upload rejection or reinterpret the field as a proved receiver/GPS-quality enum. C-473 later advances the selected
+Java/default-provider chain; actual provider/valid altitude/reference remain open. No new typed position editor or BroadcastRID/aircraft-navigation setter
 is established; A-078 remains explicit22-byte input.
 
 C-306's seven missing small entries was historical. C-323 already acquired A-0661200; C-470 reacquires the same hash
 and inspects new A-092 smallest1100 wa140bat. Two containers are now checked,with five other1100 variants uninspected.
 Both are STUE/PRAK with384-byte signature and verified outer digest/checksum,but no RSA verification,key trial,
 plaintext or inner consumer. There is no duplicate artifact for1200 and no native-battery hardware inference.
+
+## 2026-10-18 carrier views and selected Java location continuation (C-471--C-473)
+
+A-093's22 BE directory entries match independent DEX maps. Four A-095--A-098 views preserve every byte after relative
+0x20000; A-094 rebuilds only the header and protected string_ids from surviving constraints. DEX035/link fields and new
+checksums do not establish original DEX identity, decryption, all-app unpacking or ART verification. Five segments with
+protected type tables remain unknown. Tool input is explicit and fixed; output directory must be new and private.
+
+Independent review confirmed four-view structure/code preservation and30 selected method IDs/prototypes/code offsets.
+The Java chain reaches lifecycle registration, two caches, LocationCoordinate3D and JNI clientLocation. Valid Android/default
+altitude has a conditional meters/WGS84-ellipsoid contract, but the method has no hasAltitude guard and can retain newer
+network coordinates/time while copying older GPS altitude. NaN does not take its near-zero fallback. AMap/runtime choice
+and separate GPS/barometric IClientAltitudeProvider remain distinct. Source-fix time/accuracy is not carried with the three
+scalars; C-467's native message-construction epoch seconds do not prove fix freshness. Caches refresh on demand, not at1Hz.
+
+Existing JADX1.5.6 performed selected static decoding/API reads; the Java review did not re-review native wire/clock behavior.
+A-078 remains explicit22-byte input. Continue only from new concrete provider, owner or field/RF evidence; these static paths
+do not admit device controls. Carrier/views/vendor code remain excluded. No device, STUE plaintext, actual control-panel
+operation or RF success occurred; GitHub synchronization stays paused. Detailed offsets and limits are in firmware topic20.

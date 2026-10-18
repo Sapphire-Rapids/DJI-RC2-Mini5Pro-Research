@@ -10,6 +10,7 @@ C-448/C-449 撤回此前“RID 关闭路径”“全条件成立”和“完整�
 | `opid_message.py` | A-076；OPID GET02/DELETE01/SET0010+exact16，完整20字符验证由 caller 负责 |
 | `position_message.py` | A-078 v3；显式 plaintext22/key32/IV16 输入，生成 84 B 离线 payload，不提供typed坐标API或transport frame |
 | `sdk_keychain_probe.py` | A-087；固定 SDK Get(0x37) 的隔离模拟与重封装检查，只输出长度/哈希 |
+| `fly_dex_view.py` | A-094；固定 carrier 的单段离线分析视图，只重建 header/string index，不恢复原始 DEX 身份 |
 | `adsb_switch_message.py` | A-079；AirSense Boolean1 B payload，不是 RID 总开关 |
 | `height_message.py` | A-080；动态最大高度 GET empty payload，输出空hex行，不是 RID 高度编辑器 |
 | `test_*_message.py` | 合成结构/确定性自检，不能替代官方输出或设备对照 |
@@ -49,7 +50,8 @@ python3 position_message.py --plaintext-file path/to/plain22.bin --key-file path
 python3 -m unittest -v test_position_message
 ```
 
-输出为 `LE32(80) + AES-256-CBC ct32 + IV16 + HMAC-SHA256(ct+IV)32`。输入必须已序列化；上游lat/lon×1e6和alt×100见C-126/C-467，高度原单位/基准与Java来源仍未知，
+输出为 `LE32(80) + AES-256-CBC ct32 + IV16 + HMAC-SHA256(ct+IV)32`。输入必须已序列化；上游 lat/lon×1e6 和 alt×100 见 C-126/C-467。
+C-473 补充选定 Java/default-provider 的条件高度契约，未证明实际 provider、altitude 有效性或 RF 基准。
 不内置厂商 key/IV，也不加内部 request/DUML header。4 项主机测试含独立 OpenSSL synthetic fixture。
 C-465 的 helper/片段对照不是完整官方 handler 输出、设备发送或 RF 验证；本批 36 项状态 parser 测试另行登记为 C-463。
 
@@ -59,3 +61,23 @@ OPID 用法选择 `--get`、`--delete` 或 `--payload-file path/to/validated16.b
 
 C-467区分40 B SDK MobileDevicePositionMsg、handler22 B和encrypted84 B。producer时间是构造时epoch秒；
 有限越界/近零坐标会清flag仍排队，不等于设备接受/拒绝或GPS fix。当前编码器保持显式22 B输入，不新增typed位置编辑器。
+
+固定 Fly carrier 的分析视图复现（仅 Python 标准库；不使用 `python -O`）：
+
+```sh
+python3 fly_dex_view.py path/to/libdatajar.so --output-dir path/to/new-private-view
+python3 fly_dex_view.py path/to/libdatajar.so --base 0xd0100c --output-dir path/to/another-new-private-view
+```
+
+输入必须匹配 A-093 的 SHA-256，输出目录必须不存在。默认 base 是 `0x689f00c`；工具验证 22 条目录/map 后只生成
+选定的一份 `.analysis_only.dex` 与 reconstruction manifest，carrier 原样保留。manifest 会含本地路径和原始 header，
+与生成 view 一起放在仓外，不上传或提交。公开 CLI 默认输出复现 A-095 digest，非默认 mapkit 输出为 A-098。
+
+只重建相对 `[0,0x70)` header 和 `[0x70,0x20000)` string_ids，之后字节完全保留。DEX035/link 字段和新 checksums
+是分析假设；四份 A-095--A-098 不是原始 DEX 身份、全包解壳、ART 验证或 STUE 解密。五个受保护 type 表段未恢复，
+实际 `0xcba00c` 调用明确拒绝。工具本身不做 Java 语义分析；单类 JADX/原始 bytecode 核对另记 C-473，详见
+[固件记录第20节](../../docs/07_FIRMWARE_TRUST_BOUNDARY.md)。
+
+C-473 的 Java provider 可读缓存和 last-known 位置。Android/default 方法没有 hasAltitude 检查，可保留 newer network
+坐标/时间而换入 older GPS 高度；AMap 基准和实际 runtime 选择未验证。来源 time/accuracy 未随三标量传入 native，
+构造时 epoch 秒不等于 fix age。A-078 继续要求显式 22 B，没有新增坐标编辑 API 或设备传输。

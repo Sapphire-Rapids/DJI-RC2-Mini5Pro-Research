@@ -581,12 +581,17 @@ DeCrypt 名字和 slot0x0b key 不能建立 payload 解密归属。A-086 的旧 
 后续需要新的明确输入/consumer/product 调用边；本次结果没有穷尽 SDK、未命名/间接调用或其他版本。不要因函数名
 重新启动 NFZ/keychain 枚举，也不把有界静态阴性写成整个 SDK 的否定。
 
-## Position-provider semantics remaining after C-467
+## Position-provider semantics after C-467/C-473
 
 已知部分：原 C-126 的 lat/lon×1e6、alt×100，MobileDevicePositionMsg 的 typed字段/40 B SDK serialization、22 B handler输入，
 Java `clientLocation():byte[]` 边界和构造时 epoch秒。finite越界/abs双小于1e-6只清 validity-like flag，仍继续排队。
 
-`UNKNOWN`：同版本 Java方法体/platform supplier、原高度物理单位与高度基准、geodetic reference，以及该数据最终是否进入
-WA150 Broadcast RID。不能把所有 units 都说成未知，也不能由×100自行补出 meters/centimeters。A-078仍只接收显式22 B，不新增typed坐标API。
+`STATIC`：C-473 接通选定 Java provider/cache/序列化链。Android/default 的有效 altitude 有米/WGS84 椭球契约，只支持此条件下
+×100 后的厘米量级值。所查方法没有 hasAltitude 检查，且可混用较旧 GPS 高度和较新 network 坐标/时间；NaN 不走近零补值。
+两层按需缓存与消息 epoch 秒不能证明 fresh fix、给出 fix-age 上限或建立 1 Hz producer。
+
+`UNKNOWN`：实际 runtime provider、权限/有效高度、AMap 基准、实机 geodetic reference，以及数据是否进入 WA150 Broadcast RID。
+独立 GPS/barometric altitude provider 不补齐这条 scalar 链。A-078 仍只接收显式 22 B，不新增 typed 坐标 API。
+四个结构一致的分析视图也不等于原始 DEX 身份、原始 header 解密或 ART 执行；五个受保护 type 表段未恢复。
 
 C-470仅更新容器可用性：A-0661200复核、A-092 wa140bat1100新检查，剩余五个1100未知。没有新明文或STUE consumer，不改变owner/derivation缺口。

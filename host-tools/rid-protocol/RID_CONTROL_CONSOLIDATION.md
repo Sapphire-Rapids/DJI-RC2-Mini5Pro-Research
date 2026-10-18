@@ -8,7 +8,7 @@ C-448/C-449 撤回旧版“完整控制 Remote ID”“路径全无条件成立�
 | France EID | `EIDSwitch` / `0x03/0x77` | A-071；法国专用，不是 global RID |
 | 中国 UOM 标签 | `OIDIdentifier` / `0x11/0xD6` | A-072；18 字节 pack，不等于 Basic/UAS ID |
 | EASA registration | `OperatorRegistrationNumber` / `0x03/0x78` | A-076；身份面，不是 RF 开关 |
-| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078 v3 修为 84 B 离线 payload；预缩放/epoch秒已知，高度原单位/基准和完整handler/transport/RF未验证，不是typed坐标编辑器 |
+| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078 v3 为 84 B 离线 payload；选定 Java/cache 与条件 default 高度语义见 C-473；实际 provider/有效高度/fix age 和 transport/RF 未验证 |
 | AirSense/ADS-B | `ADSBSwitch` / `0x11/0x37`，receive enable `0x11/0x0C` | A-079；不能作 RID 总开关 |
 | 动态最大高度 | GET `0x11/0x50` | A-080；静态结构候选，不是 RID 高度写入 |
 
@@ -31,3 +31,8 @@ C-468/C-469 后，SDK request 内存头不再由任何 payload CLI 输出；旧 
 Characteristics+0x30=receiver 已撤回，free KeyHandlers+0x10 与 BaseAbstraction EID+0x128 分开。实际 runtime route 未验证。
 五个修正 CLI 通过8项schema/9个有效调用并拒绝5个旧路由参数调用；OPID action按C-124、UOM GETtail保持本地选择，
 这些结果不构成 full-handler/transport/RF 验证。
+
+C-471/C-472 的四份视图是限定结构分析输入，不恢复原始 DEX 身份。C-473 的 Android/default 分支直接复制
+last-known altitude，米/WGS84 椭球契约以高度有效为条件，所查方法没有 hasAltitude 检查。它可混用 newer network
+坐标/时间和 older GPS 高度；两层按需缓存与消息 epoch 秒不证明 fresh fix 或 1 Hz producer。AMap 的基准/runtime
+选择、独立 altitude provider 和真实设备/RF 保持分开。A-078 的显式 22 B 接口不变。

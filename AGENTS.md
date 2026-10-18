@@ -464,12 +464,12 @@ Later retractions override earlier progress summaries.
     input, decoded key32 and IV16. AES0x100 is256 key bits; no fake request header, plaintext prefix or256-byte ct.
     Native comparisons cover helper calls and controlled original instruction fragments, not the complete handler,
     SendSetPack, Android constructors, transport or RF. C-467 clarifies pre-scaled lat/lon/alt and epoch seconds;
-    altitude source unit/reference and the exact Java supplier remain unknown. This batch has36 parser plus4
+    C-473 later advances selected Java/default-provider semantics; actual provider/altitude validity and RF reference remain unknown. This batch has36 parser plus4
     position host tests; C-450's59 firmware tests are an earlier separate run, not a combined99-test claim.
 
 62. C-466 is a selected-function Android-upgrade negative,not an all-SDK authentication/decrypt conclusion. C-467
     refines existing C-126 scaling: invalid finite coordinates clear a validity-like field but still queue; SDK40,
-    handler22 and encrypted84 bytes differ. Do not infer altitude units/reference,Java body or RF correspondence.
+    handler22 and encrypted84 bytes differ. C-473 adds selected Java bodies and conditional altitude units; actual provider/valid altitude/RF remain unproven.
 63. C-468 retracts Characteristics+0x30 as receiver. Conditional HostID descriptors and req+0x19 SetReceiverIndex
     are distinct from callback capture. Keep free KeyHandlers+0x10 separate from the BaseAbstraction EID+0x128
     overload. C-469 payload-only codecs contain no object header or route arguments; OPID exact16 wire input still
@@ -477,6 +477,18 @@ Later retractions override earlier progress summaries.
 64. C-470 rechecks existing A-0661200 and adds only A-092 smallest1100 wa140bat. Do not create a duplicate1200 artifact,
     call it a first fetch,or label wa140bat as nativeWA150 hardware. Five other1100 variants remain uninspected.
     Payload integrity/header signature length are not RSA verification,key trials,decryption or inner-consumer proof.
+
+65. C-471/C-472 validate22 carrier directory/map records and four analysis-only views. A-094 changes only relative
+    header[0,0x70) and string_ids[0x70,0x20000); later bytes are unchanged. DEX035/link fields and new checksums are
+    synthetic assumptions, not recovered originals. Five protected-type-table segments remain unknown. Keep A-093
+    and derived A-095--A-098 excluded; do not claim original DEX identity, decryption, all-app unpacking, ART/loader
+    verification or STUE recovery. Independent review checks30 selected method mappings, not a full provider graph.
+66. C-473 connects selected Java registration/cache/clientLocation bodies to C-467. Android/default altitude has a
+    meters/WGS84-ellipsoid contract only when valid; the inspected method does not call hasAltitude. Its fallback
+    can retain newer network coordinates/time while copying older GPS altitude; NaN does not take that fallback.
+    AMap reference/runtime choice and separate GPS/barometric altitude provider remain distinct. On-demand caches
+    and new message epoch seconds do not bound source-fix age or establish a1Hz producer. Actual provider, altitude
+    validity, owner/readback/restore/persistence/RF remain unproven; A-078 stays explicit22-byte input without a new editor.
 
 ## Privacy and redaction
 

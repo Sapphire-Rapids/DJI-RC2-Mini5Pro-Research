@@ -6,7 +6,7 @@
 
 状态标签遵循 [AGENTS.md](../AGENTS.md)。后续记录与本文冲突时，较新的精确工件审计和带恢复读回的实机证据优先；相邻版本静态证据不能自动升级为当前设备事实。
 
-最新进展见第16--19节（C-466--C-470）：Android upgrade限定负结果、位置producer语义、条件HostID/纯payload修复，以及
+最新进展见第16--20节（C-466--C-473）：Android upgrade限定负结果、位置producer语义、条件HostID/纯payload修复，以及
 A-0661200复核/A-0921100新检查。没有STUE明文、实际控制面板或RF成功。第15节保留36+4项parser/payload主机验证。
 RC331 固件支线见第 13 节（C-454--C-457）：0200 内层 TBIE/FLYA 仍加密；已从现有 0205 OTA 验证并提取三个 QSEE 组件，
 静态链指向受保护 RPMB root/HUK 输入，尚未恢复 key。第 12 节的三个 v2 候选均未命中，STUE 仍未解密。
@@ -1031,7 +1031,7 @@ A-089 为 87,313,856 B，SHA-256 `5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188
 
 没有额外 plaintext16 prefix、伪 SDK request32 header 或补到 256 B 的 ciphertext 字段。
 C-467后续确认 raw typed 值已在上游预缩放：lat/lon×1e6、alt×100，不能把handler输入当作未缩放degrees。
-原高度物理单位/基准和Java来源仍未知。SDK使用原始constant IV，不能与C-460的QSEE random-IV路径混同。
+C-473 后续推进选定 Java/default-provider 的条件高度语义，实际 provider/有效性/RF 参考仍未知。SDK使用原始constant IV，不能与C-460的QSEE random-IV路径混同。
 
 ### 15.3 分段模拟与原生 helper 对照（C-465）
 
@@ -1166,11 +1166,11 @@ NaN/nonfinite 规则不扩成验证契约。lat/lon 上游各×1e6，alt×100，
 location 经 ClientStateMgr 的 GetClientLocation（`0x2099db8`）取得；其 native provider（`0x1c5cf24`）调用同版本
 `uav.sdk.provider.jni.JNIProviderManagerForCPP.clientLocation():byte[]` 并反序列化为 LocationCoordinate3D。
 相关 provider-valid/foreground/location-service checks 是静态门禁，不是 live GPS fix/permission 观察。
-精确 Java body/platform supplier 未恢复；不能借另一版本补齐它。
+本节分析当时未恢复精确 Java body；同版本后续选定方法体与 provider 结果见第20节 C-473，不借另一版本补齐。
 
 `GetCurTimestamp` 在 A-086 ELF `0x2ec618`（36 B）调用 libc `time()`，是消息构造时 Unix epoch 秒，不是毫秒、
-monotonic、GPS fix timestamp 或 RF receive time。经纬范围/缩放已知，但高度原物理单位与基准、Java supplier 和 geodetic
-reference 仍未闭合，不能仅由×100称高度为厘米。A-078 保持显式22 B序列化输入，没有新增 typed坐标编辑API。
+monotonic、GPS fix timestamp 或 RF receive time。仅凭 ×100 不能确定高度单位；C-473 后续在有效 Android/default-provider
+条件下建立米/WGS84 椭球契约，实际 provider/有效性/设备 RF 参考仍未知。A-078 保持显式22 B序列化输入，没有新增 typed坐标编辑API。
 
 仓外 position_semantics_findings.json（14,606 B）SHA-256
 `72238bf86728ea49087f88219ef5763c280a1ba31ac4a8bd722d3f358f8f4781`。
@@ -1197,3 +1197,106 @@ C-306 的七个小条目无本地原件是历史状态：C-323 已取得过 1200
 仓外 wa150-small-modules/report.json（8,470 B）SHA-256
 `166305a7c3a72161c95af58cff6f8199d883b281e9e707dc45c2983eaf183515`。
 请求密钥、签名查询与不透明 CDN 路径只在内存中使用，报告保留有限身份/校验结果；样本只读保存在仓外。
+
+## 20. 固定 carrier 分析视图与 Java location 来源（C-471--C-473）
+
+本批从已有官方 Fly 1.21.10 的 A-093 `libdatajar.so` 继续，未运行 Android 或厂商 Java。
+A-094 是独立编写的离线工具，为静态分析器构造受约束的视图；它未恢复原始 header 或证明解密。
+carrier、四个视图、含原始 header 的 manifest 和全部厂商代码/listing 保持仓外。A-078 的显式 22 B 接口不变。
+
+### 20.1 目录与 map 的双重约束（C-471）
+
+A-093 为 205,458,768 B，SHA-256 `5a62603110efe22bbaed35ed34bdc8a292bf0fc657b4790fb0df086e497d1b22`。
+blob 是文件半开区间 `[0x4008,0xc3ef00c)`；首个 BE u32 为 payload size `0xc3eb000`，payload 从 `0x400c` 开始。
+第一个 segment 位于 `0x500c`；前方 0x1000 B metadata 页的最后 352 B，即 `[0x4eac,0x500c)`，包含 22 条各 16 B 的目录。
+每条由 BE u32 的相对首段 offset、logical size 和两个观察值为零的 u32 组成。
+
+22 条目录的 base/size 均与独立定位的 DEX map 对应；storage length 是 logical size 向上对齐 4096，最后一段 storage end
+等于 blob end。独立复核反过来从目录推导 base/size，再找 terminal map，结论一致。`[0x400c,0x4eac)` metadata 和两个
+零字段没有进一步解释；没有据此命名保护算法、推断 loader 行为或声称恢复密钥。
+
+### 20.2 四个限定的分析视图（C-472）
+
+A-094 固定输入 digest，要求显式 carrier 路径和新的私有输出目录。每次只生成选定的一份 view 与 manifest；默认 base 为
+`0x689f00c`。它不修改 carrier、尝试 key 或连接设备；所用 Python 模块均为标准库。
+
+| View / 内容 | Carrier base | Bytes | Strings / 原始明文 string_id 尾项 |
+| --- | --- | ---: | ---: |
+| A-095 JNI/provider | `0x689f00c` | 9,135,872 | 34,033 / 1,293 |
+| A-096 value/cache | `0x5eea00c` | 10,174,556 | 39,624 / 6,884 |
+| A-097 app provider | `0xa3cf00c` | 10,817,208 | 54,798 / 22,058 |
+| A-098 mapkit | `0xd0100c` | 10,595,776 | 48,519 / 15,779 |
+
+四份视图只替换相对 header `[0,0x70)` 和 string_ids `[0x70,0x20000)`；从 `0x20000` 到 logical end 的字节全部原样保留，
+包括所选 code_items 和 exception data。严格 MUTF-8、声明 UTF-16 长度、唯一 UTF-16 排序、padding 和重建索引检查均通过，
+全部原始明文 index 尾项吻合。type/proto shorty/field/method/class 引用约束也通过。默认段为 10,934 type_ids、10,637 protos、
+24,434 field_ids、61,119 method_ids、8,155 class_defs；不要把 method_ids 数与 defined-method inventory 混用。
+
+`dex035` magic、header_size `0x70`、little-endian marker 和零 link_size/link_off 是分析假设；新 SHA-1/Adler-32 只描述视图。
+原始版本、link 字段、checksum 和 DEX 身份均未恢复。公开工具复现默认 view digest，并成功生成非默认 mapkit view；另两份
+选定视图由此前私有原型生成。现有 JADX 1.5.6 只做单类静态解码/只读 API inventory，默认段得到 8,155 classes、58,041 methods、
+1,047,528 instructions；没有执行这些指令或全包反编译。所有 view 的完整身份见 [artifact register](11_ARTIFACT_REGISTER.md)。
+
+独立复核重建四份 string index，并额外核对 proto/field/method key 的有序唯一性；22 条目录/map、各 view 的完整 post-prefix
+字节和公开默认输出均吻合。30 个目标及直接支持方法的 class_data、method IDs、prototypes、code_item offsets 独立匹配
+JADX API。没有发现阻塞这四个固定输入视图的 ID mapping 或 code-preservation 缺陷；工具不因此成为通用 malformed-DEX verifier。
+
+五个 base `0xcba00c`、`0x221f00c`、`0x571300c`、`0x7b3e00c`、`0xc12a00c` 的受保护前缀覆盖 type 表，未恢复；
+实际 `0xcba00c` 调用明确拒绝。不能说 22 段均已解码、原始 DEX 还原、全包解壳、ART verifier 通过或 STUE/固件解密。
+结构依据为 [Android DEX format](https://source.android.com/docs/core/runtime/dex-format)。
+
+### 20.3 选定 Java provider 与高度语义（C-473）
+
+`LocationProviderLogic.s` 的 lifecycle-start 注册将 `Caches.a(k,w3(this))` 包入 `IClientLocationProvider x3`。
+`x3.a` 经 `LocationProviderLogic.f/u` 读 cache；supplier `w3` 经 `j/t/n` 调 `UAVAppLocationUtils.c`，实际 manager 在 callback
+时读取。`t` 对 null 来源使用全零坐标对象，再从 latitude/longitude/altitude 三个 getter 构造 `LocationCoordinate3D`。
+`JNIProviderManagerForCPP.clientLocation` 读取 manager 中的 provider，null 则返回 null，否则取接口结果并 `toBytes()`。
+这接上 C-467 的 native 边界；后续 ×1e6/×100 仍是 C-126 已有结果，不代表生命周期已运行或设备实际选择 x3。
+
+Android/default 分支由 `UAVAppLocationManager.d` 经具体 LocationProvider、dispatcher/default 实现到 helper，读取 Android
+`LocationManager.getLastKnownLocation(network/gps)`。所查返回链直接复制 `Location.getAltitude()`，没有单位转换。
+只有 altitude 有效时，Android 的米/WGS84 椭球契约才支持后续 ×100 的厘米量级数值；该契约不是 AGL/RID height，也不能
+推广为实机或 RF 的高度语义。来源：[Android Location.getAltitude](https://developer.android.com/reference/android/location/Location#getAltitude())。
+
+原始 bytecode 确认：两个对象都存在时，GPS 的 `elapsedRealtimeNanos` 严格更大才替换 network；相等时保留 network。
+若所选高度绝对值 ≤1e-6，则可复制 GPS 高度，却保留所选对象的 `time/elapsedRealtimeNanos`。因而较新的 network 经纬度/时间
+可以搭配较旧 GPS 高度，三个标量不一定来自同一 fix。carrier `0x13cea3c` 的比较是 `cmpg-double`，NaN 不进入此补值分支。
+所查 `DefaultLocationProvider.o` 没有 `hasAltitude()` 调用；全零来源或非零高度都不证明 altitude 有效。
+
+AMap 分支复制 `AMapLocation.getAltitude()`，其转换 helper 在条件经纬度转换时保留 altitude；AMap 的高度基准契约与真实运行期
+选择未在本批建立。另行注册的 `IClientAltitudeProvider` 构造 GPS/barometric 字段，是另一数据面，不补齐这条 scalar 链。
+
+| Selected method | Carrier code_item start |
+| --- | --- |
+| `JNIProviderManagerForCPP.clientLocation` | `0x6f42d60` |
+| `LocationProviderLogic.s` | `0xaba4604` |
+| `LocationProviderLogic.t` | `0xaba443c` |
+| `LocationProviderLogic.u` | `0xaba44ac` |
+| `DefaultLocationProvider.o` | `0x13ce96c` |
+| `UAVAppLocationUtils.c` | `0x13cc6cc` |
+
+表内为 code_item 起点，首指令另加 16 B。JADX 高层 Default.o 的异常重建出现看似未初始化局部，不能当可编译源码；FALLBACK
+核对明确 network-fetch exception 将 network 置 null，GPS-fetch exception 保留 network。结论依据原始分支/寄存器，未替换常量。
+
+### 20.4 缓存、新鲜度和剩余缺口
+
+`isDpadRcDevice` 在类初始化时为真才取 cache duration 1000 ms，否则 -1；`Caches.a` 只有正时长选 TimerCache，否则选
+InstantValue。TimerCache 在调用时以 uptime delta 大于 duration 触发刷新。`UAVAppLocationUtils.c` 另有 1000 ms 缓存：manager
+存在，且（缓存为 null 或 elapsed 大于 1000）才读取来源，先记 cache time 再调用 manager，null 结果允许下次重试。
+这两处都不是 1 Hz producer，也不能限制 last-known sensor fix 的年龄。default 选择方法本身没有 age cutoff。
+
+`LocationCoordinate3D` 构造/序列化只遍历三标量，未携带来源 time/accuracy；C-467 已证明 native 在消息构造时重新采样 epoch 秒。
+本批独立 Java review 未重跑 native/helper wire 实现，字节数和 timestamp 来源仍引用 C-467。新消息不能证明 fresh fix，1 秒缓存
+不意味着 fix 至多 1 秒旧。实际权限、provider/altitude 有效性、owner/transport、应用读回/恢复、持久性及独立 RF 仍未验证。
+没有新增 typed 位置编辑器，也没有降低控制面板逐项实机/RF 验收要求。
+
+复现入口见 [rid-protocol](../host-tools/rid-protocol/README.md)。REA Android 工具缺少其 JADX MCP JAR，未提供本批证据；
+已用现有 JADX CLI 完成限定解码，没有新 dependency install。Native AppGuard 分析未用于上述结论。
+
+仓外证据身份（只登记摘要；原始 header/code/local paths 不入仓）：
+
+- `container_layout_summary.json`：1,055 B；SHA-256 `18e7b28036653a913d2878b1961a34345f677695fca4a601cdf6ca02098eede2`。
+- `dex_map_candidates.json`：54,083 B；SHA-256 `c9f83ca33b232f0cfc7a3635328ababd602a19406b9aa7c1a2f7eafb234527d4`。
+- `target_segment_reconstruction.json`：6,882 B；SHA-256 `1cb4720b2fcc26566923f9350e2686b8a77b5491eb12b71119dba6f61be87533`。
+- `report.txt`：8,448 B；SHA-256 `82c7808c7b007f68c3c73a439dac107cc47c884ddddc7602696772326a7e5f6c`。
+- `findings.json`：7,533 B；SHA-256 `c9ba314da61b934dd616a95fdfe95c78ec66e1b4b1a342738c5e21ca7a10010f`。
