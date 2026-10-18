@@ -471,11 +471,13 @@ the type hypothesis without mapping equal runtime-state integers onto it. The ne
 observation must connect the candidate field to a consumer/branch, including the dual-segment case.
 
 
-## H-34 — STUE is a rotated aircraft-only key family recoverable by whitebox or later release
+## H-34 — STUE key 来源仍未知，旧跨产品类推撤回
 
-`HYPOTHESIS`：`STUE` 是 DJI 在 PRAK/enc-key 轮换后新增的飞机侧加密标识，公开 corpus 尚未收录（C-320），
-而 RC331 全系仍明文（C-322）。可验证的取得路径有两条：(a) 从设备引导链/TEE 的 whitebox（key 不存明文）中提取，
-(b) 等待公开研究释放。
+`RETRACTED`：旧 H-34 用“RC331 全系明文”支持 aircraft-only 类推；C-454 已确认 RC331 0200 的 TBIE/FLYA 保护内层，
+C-322 的整体推论撤回。C-457 的 RC331 TBIE root/HUK 依赖也不能自动迁移到 STUE。
+
+`HYPOTHESIS`：whitebox/受保护存储或未来公开材料可能提供 STUE 线索，但它们不是已经确定的存放位置或仅有的两条路径。
+C-453 只证明本轮筛选的公开源码无新增映射。
 
 `HYPOTHESIS`：一旦取得 `STUE`，`0802` 明文即可解出，届时可按 RID 字符串/route/xref 定位广播 owner、enable
 参数与其消费分支，把当前 H-33 的盲结构推进为具名语义，并给出无刷写协议验证目标。
@@ -487,7 +489,12 @@ observation must connect the candidate field to a consumer/branch, including the
 Assistant/DJI Fly native 的可提取常量中。
 
 
-## H-35 — STUE is served by `aesDecode2` with a QString key, not by WAES
+## H-35 — NFZ helper 到 STUE 的归属未证明
+
+`RETRACTED`（C-445）：下述旧推论不能作为当前路径事实。`ProcessUpgradeFirmPack` 的 NFZ 只是 type 1 分支；
+普通固件是 type 0，本地固件是 type 8。修正 NFZ key+零 IV 的一次直接试算已失败；仍需追踪普通固件的实际数据流。
+
+历史假设：STUE is served by `aesDecode2` with a QString key, not by WAES
 
 `HYPOTHESIS`：`WAES` 只服务 `GetPublicValue`/`GetPrivateValue`（C-329），而 IMaH 固件解密走固件类的
 `aesDecode2`，其 QString key 在三个调用点附近对应唯一16字节字面量 `1ff6b8ca503b47ad8d04d8686dcb13a0`。
@@ -500,7 +507,12 @@ Assistant/DJI Fly native 的可提取常量中。
 是否同 key 不同 framing。
 
 
-## H-36 — the module NfzPack key is a caller-supplied QByteArray, not the literal
+## H-36 — caller-supplied NFZ key 模型已撤回
+
+`RETRACTED`（C-444）：下述旧 key 来源推论错误。NFZ key 是独立常量容器变换的确定 32 字节输出，输入 QByteArray
+是待解码数据；MD5 用于日志。不得再按模块 id/文件名/地址猜测这个 callback 的 key。
+
+历史假设：the module NfzPack key is a caller-supplied QByteArray, not the literal
 
 `HYPOTHESIS`：字面量只是 XOR pad（C-333）；真正喂给 `aesDecode2` 的是 lambda 形参 `QByteArray const&`（rcx→r14→-0x218），
 由 `UpgradeNfzPack` 的调用方提供。
@@ -516,7 +528,37 @@ Assistant/DJI Fly native 的可提取常量中。
 推断：App↔djilink 的抽象 socket 名为 `whoami`（或由 direct_host 拼出）。
 待实机以 `ss -x` / `/proc/net/unix` 核对。
 
-## H-38：位置 AES/HMAC/prefix 的组合是近似 — 已 `CORROBORATED`
+## H-38：位置编码组合仍未验证（C-425/C-449）
 
-依据：C-414/C-415/C-423 给出结构、密钥与调用。具体组合（key=blob[:32]、HMAC 截断到 keylen、prefix 取明文前16）是
-按调用形态推断，未逐字节证明 AES256Encrypt/HmacEncode 的精确语义。已由 C-426/C-427 的反编译核对击实（AES=CBC+PKCS#7、HMAC=全摘要）；仅 prefix 组合仍属近似（C-425 边界）。
+`HYPOTHESIS`：位置编码器的字段、prefix、ciphertext 缓冲和 key/HMAC 组合仍需逐字节验证。
+C-426/C-427 只提供 helper 的 AES-CBC/padding 与完整 HMAC 摘要语义，不能把整个组合提升为 `CORROBORATED`。
+当前源码还保留近似 prefix、固定缓冲填充和坐标整数截断；自检只验证自身结构与确定性。
+没有官方输入/输出对照，也没有证明 app location 对应 WA150 广播中的操作手或飞机位置，因此不能称为坐标编辑器。
+
+## H-39 — public IMaH-v2 model applicability to STUE
+
+`HYPOTHESIS`：STUE 可能沿用公开 v2 的 KEK→scram unwrap→AES-128-CTR 模型。C-450/A-082 已验证实现、CTR 连续性和
+checksum 范围，C-451 只排除了三个有来源的候选；这些结果不确认或否定 STUE 的实际算法。
+
+判别需要新的独立 key/consumer 证据，随后用单候选校验器核对 checksum 与结构；不能用更多无来源枚举代替路径证据。
+即使 checksum 命中，也不建立签名有效、可刷写或 RID owner。
+
+## H-40 — ordinary-firmware decryption owner remains unknown
+
+`UNKNOWN`：C-452 的 method-4/register-upgrader 静态路径保持输入/缓存字节，没有定位 STUE decoder。
+这约束了本条 Assistant 分支，不能证明 WA150 选择它，也不能把缺失的 decoder 自动归给 RC2、飞机、TEE 或另一 helper。
+后续只沿新的明确调用边或已有离线接收方样本寻找 consumer；当前没有设备。
+
+C-453 的公开检索仅覆盖 25 份筛选后的 IMaH 源码。H-34 中 whitebox/未来公开材料仍是可能来源，不能当作仅有的两条路径；
+本轮未找到新 key，未完成全网或所有 fork 检索。
+
+## H-41 — RC331 TBIE root input and WA150 STUE ownership remain separate
+
+`STATIC`：C-456/C-457 已定位 RC331 QSEE client、trusted-app dispatcher 和 TBIE CMAC 派生上下文；
+无需再把“找到 bw_secure”列为下一步。0200 的 TBIE/FLYA 密文与 OTA 中可读的系统组件也必须分开。
+
+`UNKNOWN`：RC331 这一条派生链需要的 RPMB root input/HUK 结果仍未取得；WA150 STUE 是否由同一类 consumer
+处理、使用什么 root/label/context/mode 仍没有证据。不能用 RC331 TBIE 的发现替代 STUE 的独立调用边。
+
+若后续出现可选离线样本或新的明确调用边，应检查其 owner 和 key 输入；此处不预设设备访问或认定所有离线路径已穷尽。
+QSEE mode 常数的语义仍需独立确认，不能从数值 1/2 猜成已证明的 AES 模式。

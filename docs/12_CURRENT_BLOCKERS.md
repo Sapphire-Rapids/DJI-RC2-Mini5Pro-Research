@@ -1,5 +1,11 @@
 # Current blockers and dependency gates
 
+2026-10-17 current state: there is no device for this work. C-454--C-457 distinguish RC331 0200's encrypted inner layer
+from the readable OTA components and recover a static TBIE/QSEE/RPMB-root/HUK dependency. Root input and STUE's own
+owner/derivation remain unresolved. C-450--C-453 record the three-candidate and bounded method-4/public-source checks. C-442--C-449 correct the Assistant/STUE premises and
+RID capability claims. Use the final current B-23/B-24 section and the corrected STUE checkpoint; earlier live records
+are historical evidence, not instructions to reconnect or repeat device actions.
+
 This document lists missing evidence. It does not assert that the missing work will produce a RID
 control.
 
@@ -660,6 +666,8 @@ including the second segment of the26-byte body. Existing runtime-status enums a
 
 ## B-23 — WA150 STUE plaintext gate
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `STATIC`：RC331 侧已可解（C-317--C-319）;飞机侧 `01.00.0600/0802`、`/2603`、`01.00.0700/0806` 的 IMaH
 `enc_key=STUE`，公开 corpus 无该 key，brute 零命中（C-320）。主体已抽出但为密文（A-065）。
 
@@ -679,6 +687,8 @@ including the second segment of the26-byte body. Existing runtime-status enums a
 
 ## B-23 更新（C-325/C-326）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`/`NEGATIVE`：Assistant 白盒 AES-128 已可作为调用原语（六个服务表逐字节一致，Rosetta/ctypes 打通，A-067）。
 探针独立验证加密 checksum 字节范围 MATCH，但枚举 ck/stream 方向、CTR 端序/位置、CBC iv、ECB 后明文 checksum 仍 NONE。
 
@@ -687,11 +697,15 @@ including the second segment of the26-byte body. Existing runtime-status enums a
 
 ## B-23 再次细化（C-327/C-328）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：白盒表已完整分解，候选 key 唯一可复现；`NEGATIVE`：普通 AES 与手搭仿真仍未对齐。
 因此 B-23 现在只剩“常量编码抵消 + 轮结构对齐”。key 派生本身已验证，不再是 blocker 对象；
 RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
 
 ## B-23 方向修正（C-329/C-330）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：WAES 的唯一调用者是 `GetPublicValue`/`GetPrivateValue`；固件路径走 `aesDecode2` + QString key。
 `NEGATIVE`：找到的唯一16字节字面量在猜测派生/模式下仍零命中。
@@ -700,113 +714,196 @@ RC2 dylib 表与 Uav 逐字节一致，可作交叉确认。
 
 ## B-23 进一步收窄（C-333/C-334）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：字面量已定性为 XOR pad，AES key 是调用方传入的 QByteArray。`NEGATIVE`：组合管线配候选 key 仍零命中。
 因此 B-23 现只剩“回溯 lambda 调用方的 QByteArray key”。framing、XOR pad、padding 均已确定，不再是不确定项。
 
 ## B-23 收敛到格式细节（C-335/C-336）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：key 是 ostringstream+std::hex 的现场派生。`NEGATIVE`：候选自派生 key 仍未命中。
 因此 B-23 只剩“喂入流的缓冲（XOR 前/后）与格式（大小写/宽度）”两个细节，不再有未知来源。
 
 ## B-23 再收窄（C-337/C-338）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：key = hex(MD5(data)) 已确定；XOR pad 存在位移。`NEGATIVE`：候选仍零命中。
 B-23 现只剩两个纯细节：ostringstream 是否写入前缀/逐字节补零，以及 `subq %rcx` 的位移来源与周期。
 
 ## B-23 只剩一个算术细节（C-340/C-342）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：pad 已精确到 `mod 17`（C-340），旋转结构已识别（C-341）；`NEGATIVE`：组合仍零命中。
 B-23 现仅剩“跨字节旋转的精确配对公式”与“哪个缓冲作为 aesDecode2 数据”两点。
 
 ## B-23 到两选一（C-343/C-344）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：变换公式已精确（C-343）。`NEGATIVE`：组合仍零命中。
 B-23 现仅剩两个判定：喂入缓冲是 enc 还是 transform 结果；以及 NfzPack 路径是否对应模块本体（否则需回到工具方案）。
 
 ## B-23 收窄到 -0x208 身份（C-345/C-346）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：key 机制已确定（变换缓冲的 C 字符串）。`NEGATIVE`：仍零命中。
 B-23 现仅剩：确认 -0x208 是否确实承载密文（XsBuffer append 链的来源），以及变换方向。
 
 ## B-23 只剩容器序列化（C-347/C-348）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：变换作用在构建的常量 seed 上，密文只作 aesDecode2 data。`NEGATIVE`：近似 seed 仍零命中。
 B-23 现仅剩“该容器的字段序列化顺序/layout”，即把那条 append+字段链精确还原。
 
 ## B-23 只剩字段发射顺序（C-349/C-350）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：seed 形状与常量已提取；`NEGATIVE`：变体仍零命中。B-23 现仅剩“按负 map key 排序还原发射顺序”这一确定步骤。
 
 ## B-23 只剩 setter ABI 语义（C-351/C-352）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：调用点分工复核无误。`NEGATIVE`：排序发射仍零命中。B-23 现仅剩判定 IMM 是 key 还是 value
 （即字段到底发射什么字节），这一步确定后 seed 可精确重建。
 
 ## B-23 扩为路径归属问题（C-353/C-354）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：NfzPack 是 URL 抓取包；`NEGATIVE`：FirmPack 无直接 crypto。
 B-23 先要判定“本地 .fw.sig 是否真的走 NfzPack 方案”；若否，则回到工具 IMaH 方案找 STUE key 来源。
 
 ## B-23 回到字节级精确性（C-355/C-356）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：FirmPack 路由确认，方案适用，本地 chunk 可代理。`NEGATIVE`：无解码步骤。
 B-23 回到先前唯一残差：setter 链 IMM 的角色与 seed 精确重建。
 
 ## B-23 明确为“对象字节构成”（C-357/C-358）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：循环读取的是对象字节而非独立缓冲。`NEGATIVE`：列表旋转组合仍零命中。
 B-23 现具体为：把结构体字段字节与追加字符一起纳入 seed 重建。
 
 ## B-23 收为单一动作（C-359/C-360）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：变换为原地字节局部，公式排除项已穷尽。`NEGATIVE`：公式变体全 NONE。
 B-23 现只剩一个动作：按 C-357 把对象-0x0/0x8/0x10/0x18 字段低字节与追加字符一起重建 seed。
 
 ## B-23 需模拟地址（C-361/C-362）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：seed 含运行时指针低字节，追加字符不在其中。`NEGATIVE`：粗略近似 NONE。
 B-23 现要求模拟 XsBuffer 的分配地址（对齐/固定）以生成结构体指针字节，再变换成 key。
 
 ## B-23 转为多维地址扫描（C-363/C-364）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：字段布局与活对象32字节范围已定。`NEGATIVE`：单扫指针 NONE。
 B-23 现为多维扫描：指针、cap/len、基址前缀；或改用地址无关读法。
 
 ## B-23 转为尾字节成分（C-365）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：循环上界0x2c 超出32 字节结构，seed 含12 字节相邻局部。`NEGATIVE`：指针密扫 NONE。
 B-23 现具体为：把这12 字节相邻局部（-0x1d0 一带）纳入 seed；或地址无关重读。
 
 ## B-24 更新：剩下绑定项（C-380/C-381）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：opcode（cmd119/sub3/attr0x12）、载荷字节、get/set 标志均已解出。
 未绑定：模板首参1、receiver index 的来源、以及实际发送前置（App 会话/连接）。均为可解细节。
 
 ## B-24 更新：仅剩实际发送（C-383/C-384）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：头部布局、sender 自动、receiver 调用方给、载荷字节、cmd119/sub3 全部解出。
 未闭合：把接收方具体取值（哪个 receiver index）与真实连接前置定下来，即可拼出可发送字节流。
 
 ## B-24 仅剩传输实现命名（C-385/C-386）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：receiver 来源与发送虚槽均已定位。未闭合：槽0x128 的具体传输函数名，以及长连接前置。属可解收尾。
 
 ## B-24 收尾：仅剩连接前置（C-387）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：传输链已完整命名（SendPack → SendData → 队列）。
 未闭合：真实连接会话前置（App 是否需先连上 RC/飞机、以及走哪个链路），属环境项而非代码项。
 
 ## B-24 收尾：连接前置已定性（C-390）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：开关经 SDK key 名 `EIDSwitch` 注册（InsertCharacteristics），receiver 由该 key 路径填充。
 即前置 = 设备已连 + key map 已插入；再无代码向未解项。
 
 ## B-24 补：native 对端已命名（C-392/C-393）
+
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
 
 `OBSERVED`：RC native 侧是 djilink / dji_v1_protocol 守护进程，App 经它们下发。
 未闭合：具体 socket/端口地址；属环境细节。
 
 ## B-24 具体化：本地 socket + logic 通道已命名（C-394/C-395）
 
+> 历史状态，已由 2026-10-17 审计更正（C-442--C-449）替代；以下收敛判断不作为当前执行依据。
+
 `OBSERVED`：App→djilink 是本地 socket、`logic` 协议；djilink→飞机是 bulk/USB。
 仅剩抽象 socket 字面名未取（需实机）。
+
+## 2026-10-17 当前 B-23/B-24（C-442--C-449）
+
+B-23：WA150 STUE 尚未解开。NFZ 常量 key、零 IV 和容器数据区已确定，原 MD5/指针/栈尾/每轮 init 模型撤回。
+现在缺的是普通固件输入实际进入哪条处理链、该链的 key/mode，以及可独立校验的明文；不是继续补齐 NFZ seed。
+修正 NFZ key+零 IV 的一次直接 2603 尝试只得到 checksum 不匹配。旧探针缺陷和修复后验证必须分开登记。
+
+B-24：当前无设备，六个 rid-protocol CLI 都是离线 hex 生成器。France EID 与 AirSense 不是 global RID 开关；
+`EU_CE_enable_c0_rid_0` 在所测 direct USB 正对照会话中未暴露。位置编码器仍有近似，未与官方输出逐字节匹配。
+静态 key 注册、进程内结构或 socket 名称线索不能代替 owner、真实路由、baseline/readback/restore、持久性和独立 RF 证据。
+`RidWorkingStatusPush` 没有主动 GET，且不能单独确认任何 SET 的 applied/RF 效果。
+
+## 2026-10-17 B-23 continuation after C-450--C-453
+
+A-082 的 public-v2 实现和校验范围已通过 6 项新增测试，firmware-acquisition 总计 59/59。
+真实 2603 的三个有来源候选均不匹配；这不是失败的无限 key 搜索，也不能判定整个模型无效。
+
+Assistant method 4 的已检查路径传递输入/缓存字节，未恢复出 STUE decoder。缺口是当前 WA150 实际方法选择和
+具体 consumer/key 来源；不能只因本条路径复制密文，就认定整个 Assistant 不解密或下游某设备一定持有 key。
+有界公开检索检查了 25 份源码，无新增 STUE 实现；未检查来源仍未知。
+
+下一步应由新的明确调用边或已有接收方离线样本引出证据，再决定有来源的单候选测试。当前没有设备，B-24 的离线
+生成器、位置近似及 RF/readback 边界不变。已撤回的 MD5/指针/栈尾模型不恢复。
+
+## 2026-10-17 current RC331/STUE dependency after C-454--C-457
+
+已完成：A-005 两层完整性复核、A-004 OTA/property/partition 复核、A-083 bw_secure 与 A-084/A-085 的提取，
+以及 dji_decrypt→libtee_util→QSEE dispatcher→TBIE 派生链的静态定位。未运行这些厂商二进制，不需要再找 bw_secure。
+
+具体缺口分开记录：
+
+- RC331 0200：内层 TBIE/FLYA 仍加密，C-319 仅为外层观察；该静态派生链的 RPMB root input/HUK 输出未取得。
+- WA150 STUE：三个 public-v2 候选未命中，实际 owner/derivation 仍未知。RC331 的 TBIE label/context 不是 STUE 的证明。
+- QSEE 模式：只确认常数先 1 后 2、16 B key、zero IV；enum 名称未独立核对。现成 client 固定 480 B 起点，不能直接用于 608 B 的 WA150 布局。
+
+现有固件可支持继续定向静态分析，但无设备 RPMB 数据或 HUK 结果。不能宣称恢复了 root key，也不能泛称所有离线方法不可能。
+后续判断应来自新的具体输入或调用边；RID 的真实控制、readback/restore 与 RF 证据仍未建立。

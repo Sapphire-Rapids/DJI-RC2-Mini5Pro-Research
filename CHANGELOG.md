@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.5.03 - 2026-10-17
+
+- Corrected RC331 0200 outer/inner scope: C-319 is outer-only and C-322 is retracted; nested TBIE/FLYA remains encrypted (C-454).
+- Rechecked existing OTA/property/partition integrity and extracted local-only A-083 bw_secure, A-084 libtee_util and A-085 dji_decrypt; no new download, vendor execution or RSA recheck (C-455).
+- Recovered the static fixed-header QSEE command chain and TBIE protected RPMB-root/HUK derivation dependency (C-456/C-457). No root/payload key or STUE plaintext recovered; QSEE mode names and STUE shared ownership remain unproven.
+
+## 0.5.02 - 2026-10-17
+
+- Added A-082, an independent single-candidate public IMaH-v2 checker; six new tests and the full 59-test firmware-acquisition suite passed (C-450).
+- Recorded three named v2 candidate misses on real 2603, separately from direct CBC and fixed-WAES negatives (C-451). STUE remains unresolved.
+- Traced only Assistant method 4 through download/cache, size/MD5, tar copy and FTP; no STUE decoder recovered within that path, with no live method selection established (C-452).
+- Refreshed public sources within a bounded selection: 25 IMaH files after screening 517 fork metadata rows, all matching pinned upstream without STUE (C-453).
+
+## 0.5.01 - 2026-10-17
+
+- Corrected the audited Assistant ABI, IV, MD5 and NFZ dispatch errors (C-442--C-445); preserved earlier claims as retracted history.
+- Separated old synthetic-pointer/MD5 negative attempts from the invalid models, and withdrew C-326's reproducibility claim for the original probe defects (C-446). Corrected-source verification is separate (C-447).
+- Replaced the STUE restart plan with ordinary-firmware data-flow tracing. One corrected NFZ key + zero-IV direct 2603 attempt failed checksum; STUE remains unresolved.
+- Corrected France EID/AirSense semantics and withdrew complete RID control claims. The six protocol tools are offline hex generators; position encoding and RF correspondence remain unverified (C-448/C-449).
+- Historical entries below preserve what was reported at the time; later retractions override their completeness and execution wording.
+
 ## 0.5.00 - 2026-10-16
 
 - Added A-081, the RID control surface consolidation (C-441): six emitters, path/registration/transport
@@ -517,8 +538,8 @@
   header_version2). RC331 `0205` then decrypted with no force, all three layers passed, plaintext is
   an Android11 A/B OTA with29 dumped partitions (C-317); recovered `adbd` (A-030) and
   `dpad_fuli.apk` (A-031) are byte-identical to their identities (C-318).
-- Recorded that RC331 `0200` and all RC331 aggregate modules are plaintext, while every WA150 module
-  is `enc_key=STUE` (C-319/C-322). `STUE` is absent from the public corpus and its forks; a brute over
+- Historical correction: C-319 records empty enc_key only in examined RC331 outer headers; C-322's all-RC-plaintext
+  inference was later retracted by C-454 because 0200 retains encrypted inner TBIE/FLYA. WA150 samples are STUE. `STUE` is absent from the public corpus and its forks; a brute over
   all16-byte keys with derived variants/3 modes/3 IVs/v1-v2 semantics gave zero plaintext-checksum
   hits on2603/0802 (C-320). The3072-bit wa150 PRAK is also absent (C-321).
 - New artifacts A-063 (decrypted0205), A-064 (OTA payload) and A-065 (0802 STUE ciphertext);

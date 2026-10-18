@@ -450,71 +450,90 @@ A-030/A-031 未变：本轮从 A-063 解密产物中重新得到 `adbd` 与 `dpa
 
 A-066 是为 STUE 暴力匹配准备的 67,744 字节小模块，官方 MD5 `8fda0e65105ec628beee13108d175f60` 与 SHA-256 `fb802d4d…ab5feb` 均匹配。经同一官方 API 手动注入 LockedTarget 取得（C-323）。它只作 oracle，不改变工具编译锁；状态 `STATIC`，排除、不分发。
 
-## A-067/A-068：白盒 AES 桥与 STUE 方案探针（C-325/C-326）
+## A-067/A-068：修复后的白盒桥与固定 WAES 假设探针（C-446/C-447）
 
-- **A-067** `wb_aes_bridge.py`（5,292 B，SHA-256 SHA-256 `3c6db06048ceca4b4fe8a20749502fff5387c7796d1efd482b91726957070556`）：把 DJI Assistant 内嵌的白盒 AES-128
-  暴露为可调用的16字节块加/解密原语。各服务 dylib 的 `t_box_enc`/`t_box_dec` 表字节逐一对齐（一个全局 key）。
-  用镜像框架树 + ad-hoc 重签解释器在 Rosetta 下 ctypes 加载 x86_64 dylib；另含进程内 `load()`。3 项测试通过。
-  状态 `STATIC`，离线helper；只公开源码，镜像/临时目录排除。
-- **A-068** `stue_plaintext_probe.py`（4,661 B，SHA-256 SHA-256 `b34667203b331babd38285e52e605372792b10733df342c4106340ef342aa3dd`）：用 A-067 原语枚举加密方案并只按明文
-  checksum 判定；先独立验证加密 checksum 字节范围（补码形式）。当前 scheme hits NONE。状态 `STATIC`，只公开源码。
+A-067 v2 明确选择 Rosetta x86_64 运行本机 helper。A-068 v2 正确处理非整字 checksum，去掉未实际作用的
+crypt-key 方向枚举，并覆盖独立 ECB 方向；它只测试十个明确命名的 fixed-WAES 假设，不声称枚举派生 STUE key。
+目录测试 53/53 通过；普通 arm64 启动的真实 2603 运行正常退出，加密 checksum MATCH，十个候选均 NONE。
+这是离线实现/候选结果，不是 STUE 解密成功或旧 C-326 枚举的追认。
+
+| Artifact | 当前大小 | 当前 SHA-256 | 状态/使用 | 处置 |
+| --- | --- | --- | --- | --- |
+| A-067 v2 | 5463 B | `17ce44eaab38c623b52f82a4712eec1f6a70e86ac5468bc22b2bda94c576d6b2` | `OBSERVED`；offline-v2-53-suite-pass-no-stue-proof | source-local-only-mirror-and-temp-excluded |
+| A-068 v2 | 4965 B | `6a5ed24f3dd0c76b9504a1f76ba65af9bc8c33b2353b6e3dc7bf25f7b972552e` | `OBSERVED`；offline-v2-real-2603-ten-fixed-waes-candidates-none | source-local-only |
+
+审计提交中的 A-067 v1 为 5,292 B，SHA-256 `3c6db06048ceca4b4fe8a20749502fff5387c7796d1efd482b91726957070556`；
+A-068 v1 为 4,881 B，SHA-256 `b34667203b331babd38285e52e605372792b10733df342c4106340ef342aa3dd`。
+旧 Markdown 的 A-068 大小 4,661 B 记载错误；以上旧身份由审计提交源码复算。旧代码缺陷见 C-446。
+镜像树、厂商库和私有样本继续排除。
 
 ## A-069：白盒表分解与候选 key 恢复（C-327）
 
 `wb_aes_key_recover.py`（SHA-256 `6ecae7336d0e9707735a31dfa2eaa6b19e07143e273a37569a753d7440847e69`）把 `t_box_dec` 逐表做仿射分解：每表在 `InvSbox(x^k)` 上仿射（coeff1 + 一个常量编码），每表唯一解出一个 `k`，拼出候选 key `5ac8ed5cf0fa5e5d77b5c89599bb87d5`（可重复复现）。状态 `OBSERVED`，但 key 是 HYPOTHESIS：常量编码使普通 AES 不等于白盒。
 
-## A-070：Assistant CRijndael aesDecode2Ex 桥（C-331）
+## A-070：修复后的 Assistant aesDecode2Ex 桥（C-443/C-447）
 
-`aes_decode_bridge.py`（2383 B，SHA-256 `77c9c4bd28612bd4df13b58349a177a14ae12de4ea38c69f62bb051c9bc0f548`）在 wb_aes_bridge 的镜像树上 ctypes 直调 Assistant 真实
-`aesDecode2Ex`（AES-256 CBC / IV `sm_chain0`）；key 变化会改变输出。状态 `OBSERVED`，离线 helper，只公开源码。
+v2 以 stdin 传递 bulk 输入，显式选择 x86_64；当前源码 3098 B，SHA-256
+`532fbf984a5e4d1f7986bb5f49122189222adb36f68377560e11af3e711893f2`。状态 `OBSERVED`，使用状态 `offline-v2-native-kat-stdin-and-length-checks-pass`，
+处置 `source-local-only`。本机真实 helper 的 AES-256 FIPS-197/零 IV 已知答案检查、600,000 B stdin 传输，
+以及合成 32 字节零 key 的 435,392 B 2603 填充块同长返回通过。后者只验证调用管线，不证明候选明文。
 
-## A-071：eid_switch 报文发射器（C-380/C-381/C-387/C-388）
+审计提交中的 v1 为 2,459 B，SHA-256 `d7241e67dba74fece23a5fcfb5cc661496a5dcfca2f827521574b05c3ee18f82`；
+旧 Markdown 的 2,383 B / `77c9c4bd28612bd4df13b58349a177a14ae12de4ea38c69f62bb051c9bc0f548` 是过期身份，
+由审计提交源码复算更正。真正 IV 是 `sm_chain0` 指向的零数据，不能把其指针存储当作 IV。
 
-`eid_switch_message.py`（SHA-256 见 CSV，33 字节报文）静态重建 RID/EID 开关 set 报文：cmd119/sub3、'IW' 魔数、
-超时500、1 字节载荷（0=关）。配套规格见 `host-tools/rid-protocol/EID_SWITCH_MESSAGE.md`。状态 `STATIC`，未实发。
+## A-071--A-081：离线协议生成器与更正文档（C-448/C-449）
 
-## A-072：OIDIdentifier 报文发射器（C-388/C-389）
+六个 Python 工具没有设备 transport，只打印候选 hex；自检不建立 wire 等价、实机支持或 RF 效果。
+France EID 是法国专用，ADSBSwitch 是 AirSense/ADS-B；位置组合仍有近似。
+本轮只更正业务语义与成熟度文档，没有修改这些生成器的 Python 代码。
 
-`oid_identifier_message.py`：RID 参数族的字符串成员，cmd214(0xD6)/sub17，头部前缀 01 11 D6 02，载荷为上限 0x70
-的字符串。状态 `STATIC`，未实发。
+| Artifact | 当前对象/版本 | 大小 | SHA-256 | 状态/使用 | 处置 |
+| --- | --- | --- | --- | --- | --- |
+| A-071 | `eid_switch_message.py` / eid-switch-message-v1 | 1981 B | `d998e9078992e19442d76e25ebc765780fc58bfd8468ab105d03dbd52c249868` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
+| A-072 | `oid_identifier_message.py` / oid-identifier-message-v2 | 2338 B | `d53fb2aa3af242b6d9e84fb0511399a393e6ce860b843a01b5661f87ed791b0e` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
+| A-073 | `VERIFY_RUNBOOK.md` / verify-runbook-v2 | 1508 B | `34d7cc63d1a58be70af1883cd1e6b356ad510a1623112b0da4ba817c0fed6b10` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-074 | `RC_RID_BREAKTHROUGH.md` / rc-rid-breakthrough-v2 | 1696 B | `56f93678169a08d8fdb3bb4c6c5b11eb80a1b15b42d33193b1878fa84e175022` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-075 | `README.md` / rid-protocol-readme-v2 | 2071 B | `df94fd4108ae4ab5ca0dd226cbe2d77396f5f84d34b9a3268f588caf9fffe1a7` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-076 | `opid_message.py` / opid-message-v1 | 1711 B | `627a655d88da0a66ede42d15af9f73b34e51ec6e73acad01aa8a84de6b38048e` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
+| A-077 | `RID_FIELD_MAP.md` / rid-field-map-v2 | 2061 B | `8a0bf8a40952fc78bfca643f23acac5f2aa45837e7e603027f81dbfda53a4b25` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-078 | `position_message.py` / position-message-v2 | 3708 B | `7ad3489788f01e06cf0859d28e9f0a3254492ec9bfa817933c0c408f4fec1fd3` | `STATIC`；offline-hex-only-approximate-no-official-byte-match | source-published-static-reconstruction |
+| A-079 | `adsb_switch_message.py` / adsb-switch-message-v1 | 1374 B | `9303eeab3191a12ff45049574b3e75e95590bac91e175b0022e82abbd4f04bad` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
+| A-080 | `height_message.py` / height-message-v1 | 1107 B | `5bb042d00559bd32ff1a0b5e0da611ee016f95c4758430710ce375c60d110f24` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
+| A-081 | `RID_CONTROL_CONSOLIDATION.md` / rid-control-consolidation-v2 | 2144 B | `56f12d975e496bf900e80312a44696576d436cb11c9076befc3071b30f28c696` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
 
-## A-073：无刷写验证手册（C-391）
+A-073 替换了不能执行的 RID-off 手册；A-074/A-075/A-077/A-081 撤回完整控制/真实发射/全条件成立的表述。
+A-072 的 product-139 UOM 语义为 18 字节 pack、最多复制 8 字节；其本地零尾 GET 不是已验证的官方逐字节行为。
+A-076 是 EASA 身份面，A-078 不是可用坐标编辑器，A-080 仅为动态最大高度 GET 结构候选。
+旧说明的历史由 C-391/C-397/C-407/C-440/C-441 及更正记录保留；当前无设备、无 ACK/readback/restore/RF 新证据。
 
-`VERIFY_RUNBOOK.md`：上手步骤（前置、先 Get 后 Set 0、复 Get、外部嗅探、回滚），失败排查表（含"值改了但广播不停→
-可能是 RC 镜像，需回飞机线"），以及无刷写安全边界。状态 `STATIC`，尚未实机执行。
+## A-082：公开 IMaH-v2 单候选校验器（C-450/C-451）
 
-## A-074：RC 侧 RID 突破口总收口（C-397）
+`imah_v2_key_probe.py` / `imah-v2-key-probe-v1`：5724 B，SHA-256 `f0eb445290c89226661475c9e15e7fc78cda228a9e2d5de40ee7e08fdd50a63f`。
+状态 `OBSERVED`，使用状态 `offline-only-three-candidates-none-suite59-pass`，处置 `source-local-only`。
+macOS CommonCrypto 实现，不新增第三方 Python 依赖；raw key 仅从 stdin 读取，输出哈希、范围与 checksum，不导出 key 或明文。
 
-`RC_RID_BREAKTHROUGH.md`：把遥控器侧整条线端到端收拢 —— 开关 key、Set-0 动作、报文、App→local/logic→djilink→bulk/USB
-路径、证据表（C-373..C-396）、产物索引、H-37/B-24 与风险（含 RC 镜像情形与飞机后备指针）。状态 `STATIC`。
+工具先验证 payload SHA-256 与加密 checksum，再按[固定上游模型](https://github.com/o-gs/dji-firmware-tools/blob/195692263c2684cf1ddc4995f2736be6c0fb135e/dji_imah_fwsig.py)进行一次 KEK/content-key 假设检查。
+CTR 跨加密 chunk 连续，明文 chunk/文件 gap 不推进计数；plain checksum 包括解密 padding。它不验证 RSA 签名，
+也不证明该模型适用于 STUE。真实 2603 的三个候选均未命中（C-451）。
 
-## A-075：rid-protocol README（C-406）
+配套 `test_imah_v2_key_probe.py` 为 5,529 B，SHA-256 `686757273dc5e2fedd4d9373b6f91dda413fbfc2ab4beca350d992ce22d93862`。
+6 项新增测试包含独立 OpenSSL 固定混合 chunk、gap 和非零 padding 对照；已有日志记录整个 firmware-acquisition suite
+59/59 通过。源码未再变化，本次登记未重跑测试。厂商样本、候选 key、实验输出及 REA 证据保持仓外。
 
-`README.md` 索引该目录的规格/发射器/自检/手册/收口，附用法、自检命令与边界（运行期取值、socket、RC 镜像）。
+## A-083--A-085：RC331 OTA 中的 QSEE 解密组件（C-455--C-457）
 
-## A-076：opid 发射器（C-408）
+来自已在本地的 A-004/0205 OTA；无新下载。system/vendor 的完整哈希与 OTA manifest 一致，payload.bin 的 FILE_HASH/
+METADATA_HASH 与 properties 一致。此轮是完整性复核和离线提取，没有重跑 RSA 验签、没有运行厂商二进制。
+三份均为 ELF64/AArch64；只公开名称、大小、哈希与高层分析，不把样本放入仓库。
 
-`opid_message.py` + 自检：cmd120(0x78)/sub3 的 set-and-delete 动作，16 字符上限，空载荷=删除候选。
-数据来源 `OperatorRegistrationNumberSet`。状态 `STATIC`。
+| Artifact | 对象 | 大小 | SHA-256 | 状态/使用 | 处置 |
+| --- | --- | --- | --- | --- | --- |
+| A-083 | RC331 bw_secure QSEE trusted-app image / RC331-10.00.0700-0205-bw_secure | 172032 B | `ddae8ddd83efbc63480807e014a53fe1e660f8fb6eb49b5ed8d898f3ecbb7201` | `STATIC`；offline-extracted-static-analysis-never-run | excluded-derived-do-not-distribute；public-hash-only |
+| A-084 | RC331 libtee_util QSEE bridge library / RC331-10.00.0700-0205-libtee_util | 15552 B | `3bd85d7417ac67ca8075f086890d76f3f4956dfae0dee08937a822c313969798` | `STATIC`；offline-extracted-static-analysis-never-run | excluded-derived-do-not-distribute；public-hash-only |
+| A-085 | RC331 dji_decrypt fixed-layout QSEE client / RC331-10.00.0700-0205-dji_decrypt | 11544 B | `2b07eff6dda02d156fae2d39ae0d4f3293800f587301d09dcf39593f31034dda` | `STATIC`；offline-extracted-static-analysis-never-run | excluded-derived-do-not-distribute；public-hash-only |
 
-## A-077：RID 字段控制地图（C-410）
-
-`RID_FIELD_MAP.md`：分 A 已解线路 / B 仅 opcode / C 非 settable / D 数据面 / E 残差，作为后续逐项推进的追踪清单。
-
-## A-078：位置加密发射器（C-425）
-
-`position_message.py` + 自检：cmd0x43/sub0x11，22字节明文 + AES-256-CBC(0x37 key) + HMAC-SHA256 + 16+16 前缀。
-密钥/iv/blob 均为 Ghidra 解析常量。组合细节为 H-38（近似）。状态 `STATIC`。
-
-## A-079：ADS-B 代理开关发射器（C-435）
-
-`adsb_switch_message.py` + 自检：cmd55/sub17，`adsb_switch_pack`，1 字节布尔（非零归一为 on）。载荷取自
-`SetADSBSwitch` 的 value+8 读取。状态 `STATIC`。
-
-## A-080：动态最大高度 GET 发射器（C-436）
-
-`height_message.py` + 自检：cmd0x50/sub0x11 纯 GET、空载荷。状态 `STATIC`。
-
-## A-081：RID 控制面总收口（C-441）
-
-`RID_CONTROL_CONSOLIDATION.md`：六发射器索引、路径/注册/传输链、验证通道、不可写集、残差与风险、飞机后备指针。
+A-083 从独立 `bw_secure` 分区的一个 REPLACE_XZ operation 得到：压缩 blob 为 58,300 B，SHA-256
+`70a579f9f1b32df61d7b0c51716e6f8b38cad69c51461bb041555b0f53705094`，blob 与最终分区哈希均匹配清单。
+A-084/A-085 来自 system 中的 `libtee_util.so` 与 `dji_decrypt`。这只闭合来源与静态调用链，不恢复 RPMB root/HUK 输入，
+也不证明 STUE 使用这些组件。A-005 身份不变：其外层完整性可验证，但内层 TBIE/FLYA 仍为密文（C-454）。

@@ -6,6 +6,43 @@
 
 状态标签遵循 [AGENTS.md](../AGENTS.md)。后续记录与本文冲突时，较新的精确工件审计和带恢复读回的实机证据优先；相邻版本静态证据不能自动升级为当前设备事实。
 
+最新进展见第 13 节（C-454--C-457）：0200 内层 TBIE/FLYA 仍加密；已从现有 0205 OTA 验证并提取三个 QSEE 组件，
+静态链指向受保护 RPMB root/HUK 输入，尚未恢复 key。第 12 节的三个 v2 候选均未命中，STUE 仍未解密。
+
+## 2026-10-17 审计更正与当前边界（C-442--C-449）
+
+审计对象为 `DeepSeek-Harness` 提交 `5d761a1e31c65ab3cec4d1d8caa2bbe5ac23c76e`。
+该轮没有飞机或遥控器，所有结果均为离线代码、文件或本机 helper 验证；未解开 WA150 STUE。
+
+| 更正 | 已验证结果 | 不能据此推出 |
+| --- | --- | --- |
+| C-442 / F01 | vptr 比 vtable 符号多 16 字节；get 返回数据区。撤回 C-357/C-361/C-369 及其堆指针、栈尾、每轮 init 推论 | STUE key 依赖地址或未初始化数据 |
+| C-443 / F02 | NFZ helper 的实际 IV 是 16 字节零；旧记录误读指针存储 | 所有直接 native 调用都使用了错误 IV |
+| C-444 / F03 | MD5 仅供 before/after 日志；NFZ key 是确定的 32 字节常量变换结果，无内嵌 NUL | MD5(data) 是 KDF，或该常量就是 STUE key |
+| C-445 / F04 | type 0/1/8 分别分派普通固件/NFZ/本地固件；修正 NFZ key+零 IV 直接试 2603 一次，checksum 不符 | NFZ 是普通固件必经路径，或 STUE 不可解 |
+| C-446 / F05--F10 | 旧探针存在非整字 checksum、未使用 ck、ECB 方向、架构重启、argv 容量和依赖缺陷 | 旧公开版本已完成所声称的全枚举 |
+| C-447 | v2 修复后 53 项测试通过；真实 2603 的十个 fixed-WAES 候选均未命中；本机 KAT/stdin/同长调用通过 | 旧枚举被追认、派生 key 已测试或 STUE 已解密 |
+| C-448/C-449 | France EID、AirSense、地区策略与 app location 是不同表面；六个 CLI 仅生成离线 hex | global RID 开关、完整控制、实际发射或可用坐标编辑器 |
+
+NFZ key 只登记长度 32 与 SHA-256 `7dc2f9655b6ccf792d92e6d241e8c8d612ccd327f285e238e99f35d93e300b71`。
+精确 Assistant 库 SHA-256 为 `c55da41265f925f64c2d704deb68f65fcff44435c9681839cc8545cd07dd76a5`。
+2603 样本 SHA-256 为 `4a573ab95316de69137deb71249ead09c23325a28acbf9ee305a36410775f274`，逻辑 chunk
+435,382 B、填充范围 435,392 B；checksum 在裁剪逻辑长度前覆盖完整解密填充范围。一次直接尝试的 checksum 为 `0x6cbf5644`，期望为 `0xd2f782ff`。
+
+审计来源保持仓外，不新增公开 artifact：`deepseek-audit.json` SHA-256
+`35b24b6ff7556fa186ce61892e871cf8477f04e709da1d73624e3c015ba89516`；
+`assistant-native-verification.json` SHA-256 `f65d8174a7dfcd5d28f4e4d748c020ae64fdd9972405d2332825efc5863a5f1c`；
+`probe-verification.json` SHA-256 `93c0d150c39582989b4eb842d9a70ce3d58ae2b6201a27a92358e17782878827`。
+原生证据引用包括 `ev_2fe1b77dee86b6359672e2d60a908dfd876793445bdc7a5248d5dcdf7ba6f7ca`、
+`ev_081c76375d6dc9e91d0f091f920dc284b3e8ae9cab7099b7e485a6a45d18f842`、
+`ev_7f3d7686035793dde67df56fc27f40c4860ea1a31e3ba444f3337397d95ff360`、
+`ev_06ccdf81ac1df517edf2b5bec4db8aa8475155a214ceadb9b891a46723d2ff67` 与
+`ev_2ceab34530c05ef4a306f832970b373e20bfef4929bac7efab25de35256584f2`。
+不公开 key 字节、厂商反汇编或私有样本。
+
+下文保留历史研究序列。较早的“唯一残差”“完整复现”“仅剩实机取值”均不能覆盖本节更正；修复后源码验证见 C-447
+及[工件登记](11_ARTIFACT_REGISTER.md)，不自动追认旧枚举或提供设备控制能力。
+
 ## 2. 版本边界
 
 | 对象 | 状态 | 已知事实 | 不成立的外推 | 公开处置 |
@@ -260,7 +297,7 @@ plaintext、hook、签名接受或恢复链。故 CFC 只能作为架构假设�
 | 对象 | 版本 | 模块 | 大小 | SHA-256 | 既有 ID |
 | --- | --- | --- | ---: | --- | --- |
 | RC 2 Android OTA | `10.00.0700`（≡ UI `07.00.0100`） | `0205` | `985,959,104` | `f707cf3d…b528cf49ce` | A-004 |
-| RC 2 flyapp | `10.00.0700` | `0200` | `454,223,680` | `d8a8fe5b…8f7481dc7193949` | A-005 |
+| RC 2 flyapp | `10.00.0700` | `0200` | `454,223,680` | `d8a8fe5b418ee6461f6971d9dfad77bc4491d15160d47d5cf8f7481dc7113949` | A-005 |
 | Mini 5 Pro 主系统 | `01.00.0600` | `0802` | `679,368,672` | `c36bcbd1…b2c560386` | — |
 | Mini 5 Pro GNSS | `01.00.0600` | `2603` | `436,000` | `4a573ab9…36410775f274` | — |
 | 通信 dongle（两版同） | `01.00.0700` | `0806` | `12,251,264` | `75bc1b74…12d1dfbc` | — |
@@ -271,7 +308,7 @@ plaintext、hook、签名接受或恢复链。故 CFC 只能作为架构假设�
 `STATIC`：`07.00.0100` 的操作界面版本对应 product_version `10.00.0700`，映射依据是既有的 A-004/A-005/A-029 登记串，
 不凭旧线程或字面猜测。
 
-### 11.2 RC331：可解且已解
+### 11.2 RC331：0205 可读，0200 内层仍受保护
 
 `STATIC`：`wa150` 的 IMaH header 在 `header_version=2` 下仍使用 PKCS1-v1.5 签名，而 pinned 工具对 `pkgformat>=2018`
 默认 PSS，故既存公开 PRAK 全部验签失败（C-321）。给本地工具副本加一条 PKCS1 回退后：
@@ -280,9 +317,11 @@ plaintext、hook、签名接受或恢复链。故 CFC 只能作为架构假设�
 - 明文是 Android 11 A/B OTA（`CrAU`、`payload.bin`、`pre-device rc331`、post-build `V00.01.14.99`）；dump 出 29 个分区。
 - 重新提取的两份 exact target 工件与登记逐字节一致：`adbd`（A-030，`/apex/com.android.adbd/bin/adbd`）与
   `dpad_fuli.apk`（A-031，`/vendor/app/dpad_fuli/`）（C-318）。
-- RC331 `0200` 与 RC331 聚合体模块 `enc_key` 均为空，直接为明文（C-319）。
+- C-319 仅记录所检查 RC331 外层 header 的空 `enc_key`；不代表嵌套内容已经解密。C-454 确认 A-005/0200
+  的外层 payload 内还有 TBIE/FLYA 容器，内层密文从原文件 offset 960 开始，尚未得到明文。
 
-`STATIC`：跨产品看，RC331 全部明文、WA150 全部 STUE，因此**遥控器侧现在即可做静态逆向，飞机侧唯一卡点是 STUE**（C-322）。
+`RETRACTED`：C-322 原称“RC331 全部明文、仅飞机侧受阻”，把外层与内层混为一谈。0205 平台样本可用于静态研究，
+0200 的受保护内层仍未解开；不能把这两者或 TBIE 与 WA150 STUE 视作同一密钥边界。
 
 ### 11.3 WA150：STUE 卡点（阴性）
 
@@ -321,10 +360,10 @@ PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验
 加载 x86_64 dylib，encrypt/decrypt roundtrip 通过；已固化为 [wb_aes_bridge.py](../host-tools/firmware-acquisition/wb_aes_bridge.py)
 （进程内 `load()` + 三测）。这给了 STUE 一个可调用的候选原语。
 
-`NEGATIVE`：以该原语撰写 [stue_plaintext_probe.py](../host-tools/firmware-acquisition/stue_plaintext_probe.py)，
-先独立验证加密 checksum 字节范围（补码形式）MATCH，再枚举 crypt-key 方向 × stream 方向 × CTR 端序/位置 × CBC iv/ECB，
-明文 checksum **NONE**（C-326）。字节范围已对，故只剩 key/mode 映射；未枚举模式、另一处 key 来源、或 WAES 与 STUE
-无关均未否定。
+`RETRACTED`：C-326 的“公开探针完成方向/模式枚举且零命中”不能由审计提交复现（C-446）。真实 2603 逻辑长度为
+435,382，旧 NumPy checksum 在首个裁剪候选上报错；派生 `ck` 未用于候选明文，ECB 又漏掉 encrypt 方向。
+加密 checksum MATCH 与白盒 primitive roundtrip 的观察保留，但不证明枚举完整或“只剩 key/mode”。
+仓外是否另有修订脚本未被本次审计判定。
 
 ### 11.7 白盒表分解与候选 key（C-327/C-328）
 
@@ -349,166 +388,123 @@ PRAK-2017-12/-08 逐字节一致），说明 Assistant 本地做 IMaH 解析/验
 
 下一步：反汇编 `aesDecode2` 本体，确认它是否 base64/固定 IV/自定义 KDF，再把字面量放回正确位置。
 
-### 11.9 CRijndael 真实路径与直接调用（C-331/C-332）
+### 11.9 CRijndael 路径与 IV 解引用更正（C-331/C-332/C-443）
 
-`OBSERVED`：`aesDecode2` 实例化 `CRijndael`，`MakeKey(key, sm_chain0, 0x20, 0x10)` 后 `Decrypt(len, mode1)` —— 即
-AES-256 + CBC、IV `sm_chain0`（`a0898b00000000009236923600000000`），key 来自 `QString::toStdString`。唯一调用者是
-`aesEncode2/aesDecode2/aesDecode2Ex/aesEncode2Ex`；`aesDecode/aesEncode` 的调用者含 `UpgradeNfzPack` lambda，其 key
-参数即16字节字面量。`aesDecode2Ex`（QByteArray key）已可 ctypes 直调且 key 生效。
+`RETRACTED`：C-331 将 `sm_chain0` 指针变量及相邻存储误记为 16 字节 IV，并把 NFZ helper 直接称为固件解密路径。
+精确样本中，`sm_chain0` 位于 `0x93a0e8`，存放指向 `0x8b89a0` 的指针；`MakeKey` 使用指针所指的 16 字节全零数据。
+AES-256-CBC helper 的存在和 `aesDecode2Ex` 可调用这一事实保留，不构成 WA150 STUE 路径归属证明。
 
-`NEGATIVE`：用真实 `aesDecode2Ex` 解2603 chunk（字面量 / 32字节池读 / 零 key）长度保持但 checksum 不中（C-332、N-65）。
-framing 已证明，故下一步只查“模块 key 是谁”——即 NfzPack 字面量之外，模块是否另有 key 来源或派生。
+`NEGATIVE`：C-332/N-65 的真实 helper 调用与候选 key 未命中记录保留。直接调用厂商函数会使用真实 IV，不能把文档的
+解引用错误推广为每次 native 调用都使用错误 IV。它只否定当时所试输入组合，不能推出“只剩模块 key 未知”。
 
-### 11.10 NfzPack lambda 内部：XOR pad 与调用方 key（C-333/C-334）
+### 11.10 NfzPack 输入与 key 的历史误判（C-333/C-334/C-444）
 
-`OBSERVED`：`UpgradeNfzPack` lambda 内，字面量 `1ff6…13a0` 是逐字节 XOR pad（`xorb (%rsi,%rbx), %r12b` 带索引），
-不是 CRijndael key。`aesDecode2` 的 key 实参是 r14 = rcx = lambda 的 `QByteArray const&` 形参（存于 -0x218，再按
-QByteArray/QString 共用的 d-pointer 布局重解释给 `toStdString`），解密后接 `pkcs7UnPadding`。
+`RETRACTED`：C-333 将输入 `QByteArray` 当成调用方供应的 key。该 callback 的输入数据与独立常量 `XsBuffer` key
+构造链应分开；已恢复的 NFZ key 不依赖模块 id、文件名或设备地址。
 
-`NEGATIVE`：按该真实管线（两序）配候选 key，明文 checksum 仍零命中（C-334、N-66）。缺的是调用方传入的模块
-`QByteArray` key。下一步沿 lambda 调用方回溯该 key，或找到其它直接给模块解密的路径。
+`NEGATIVE`：C-334/N-66 所记候选 key 与 AES/XOR 两序未命中，仅保留为历史试算；这些结果不能支持已撤回的 key 来源。
 
-### 11.11 NfzPack key 的现场派生（C-335/C-336）
+### 11.11 ostringstream 是摘要日志（C-335/C-336/C-444）
 
-`OBSERVED`：lambda 内建 `std::ostringstream`（-0x878/-0x880），从 -0x160 的输入 QByteArray 副本按 `std::hex` 逐字节喂入，
-`str()` 产出 std::string（-0x1d0），该指针作为 aesDecode2 的 key（rdx）并按 QString 重解释；MakeKey 只吃0x20 字节。
-即 key 是**现场派生的 hex 串**，不是任何外带常量。
+`RETRACTED`：C-335 的“现场 hex 派生 key”结论错误。输入摘要进入解码前 MD5 日志，输出摘要进入解码后日志；
+两者都没有成为该 callback 的 AES key。key 来自独立的常量容器变换链。
 
-`NEGATIVE`：大小写 hex、前16字节 hex、前32字节 raw 作 key 均零命中（C-336、N-67）。下一步是把喂入流的精确缓冲
-（XOR 前/后）与格式（大小写、宽度）对齐——0x68afc2 的 XOR 循环就在流构建之后，二者关系需精确判定。
+`NEGATIVE`：C-336/N-67 的大小写 hex、前缀 hex/raw 尝试保留为历史负结果，不再称为已确认 KDF 的格式枚举。
 
-### 11.12 key 的精确派生与 XOR pad 位移（C-337/C-338）
+### 11.12 MD5 KDF 结论撤回（C-337/C-338/C-339/C-444）
 
-`OBSERVED`：key 构造链已完整：`MD5(data,len)` 建于 -0x160，`digest()` 的16字节逐字节以 int 写入 ostringstream
-（`orl $0x8` 置 hex 基数、`movl $0x30` 置 fill `0`），`str()` 得32位小写补零 hex 串（-0x1d0），作为 aesDecode2 的 key。
-同时 XOR 循环的 pad 基址按 `subq %rcx, %rsi` 位移，故字面量索引不是干净的0..15 循环。
+`RETRACTED`：C-337 将 `MD5(data)` 的日志格式化链误认成 AES key 派生；该错误也影响原检查点与旧 B-23 收敛结论。
+C-338 的 pad 寻址观察是另一件事，不能为 MD5 KDF 提供支持。
 
-`NEGATIVE`：按该派生（含自洽变体）仍零命中（C-339、N-68）。剩余是流前缀/格式与位移 pad 的精确对齐。
+`NEGATIVE`：C-339/N-68 的 MD5 格式变体未命中记录保留；不再据此寻找日志前缀、大小写或补零细节。
 
-### 11.13 pad 位移的数学与位旋转（C-340/C-341）
+### 11.13 pad 周期与旋转的范围（C-340/C-341/C-342）
 
-`OBSERVED`：C-338 的位移不是随意的——索引乘 `0xF0F0F0F0F0F0F0F1`（除17魔数），取高半右移4再乘17，`subq` 后
-有效索引即 `rbx mod 17`；16字节字面量加尾 NUL 构成周期17、index16 为0x00。同一循环还用 `rbx&7`/`r14&7` 的
-`shrq`/`shl`+`orl` 跨相邻字节做位旋转，再与位移 pad 异或。
+`STATIC`：C-340 记录的周期 17 pad 用于 NFZ 常量缓冲变换。C-341 的跨字节配对猜测已由 C-343 的逐字节解释替代。
+`NEGATIVE`：C-342/N-69 的 MD5/旋转组合未命中只覆盖历史猜测；MD5 key 模型已由 C-444 撤回。
 
-`NEGATIVE`：按该模型组合各 key/data 与 post-XOR（le/be）仍零命中（C-342、N-69）。
-残差是旋转的精确配对与进入 aesDecode2 的实际缓冲。
+### 11.14 逐字节变换不建立 STUE 归属（C-343/C-344）
 
-### 11.14 旋转配对精确化（C-343/C-344）
+`STATIC`：C-343 的 `ror8(b, i&7)` 与周期 17 pad 描述 NFZ 缓冲的逐字节变换。
+`NEGATIVE`：C-344/N-70 的历史 MD5/输入变体未命中；它不能证明 WA150 chunk 经过这个 callback。
 
-`OBSERVED`：两个字节读取（r12/r13）其实是**同一**源字节——两次虚调用落在同一对象的同一 slot0x30、同一索引 rbx。
-配合 `%cl=rbx&7` 与 `%cl=r14&7`（r14 自0递减）得 `b>>(i&7)` 与 `b<<((8-i%8)&7)`，合并即 `ror8(b,i&7)`，随后异或 mod17 pad。
+### 11.15 key 字符串与 MD5 日志分开（C-345/C-346/C-444）
 
-`NEGATIVE`：按此精确变换、以及把 md5/hex-of-md5 施于多种输入当 key 套工具方案，仍零命中（C-344、N-70）。
-残差只剩“哪个缓冲进 aesDecode2”，以及“NfzPack 是否就是模块本体的路径”。
+`STATIC`：C-345 后来已识别 MD5 字符串只用于日志，AES key 来自变换输出。现进一步确认该输出固定为 32 字节、
+全部可打印且没有内嵌 NUL；C-345 边界中的密文来源猜测与数据相关截断已更正。
 
-### 11.15 key 实为变换缓冲的 C 字符串（C-345/C-346）
+`NEGATIVE`：C-346/N-71 把密文变换后截断作 key 的尝试保留为历史负结果；它不代表真实 NFZ key 构造。
 
-`OBSERVED`：transform 循环后，其 -0x208 对象数据被 memcpy 进 -0x42f 的 std::string，`strlen` 量长后经
-`QString::fromAscii_helper` 存入 -0x1d0 —— 这里 **-0x1d0 被覆盖**，成为 aesDecode2 的 rdx key；rsi 是 -0x218 原始
-QByteArray。此前 -0x1d0 的 MD5-hex 串只是 `nfz before decode md5: %1` 的日志值。key = 变换输出到首个 NUL，前0x20 字节生效。
+### 11.16 常量容器的正确读取（C-347/C-348/C-442）
 
-`NEGATIVE`：按此仍零命中（C-346、N-71）。残差：-0x208 是否逐字节等于密文（它由 XsBuffer append 链构建）与变换方向。
+`STATIC`：key 的来源是独立构造的 `XsBuffer` 数据区，输入密文另作 AES data。
+构造写入 33 个已初始化字节，其中 32 字节参与变换；本轮只公开长度、性质与哈希，不公开常量 key 或厂商代码。
+`NEGATIVE`：C-348/N-72 使用不完整 seed 的试算保留，不再把提取顺序当作待扫描的自由变量。
 
-### 11.16 变换源是构建的常量容器（C-347/C-348）
+### 11.17 旧常量列表解释撤回（C-349/C-350）
 
-`OBSERVED`：-0x208 并非密文，而是由 `XsBuffer::append` 加约20 个虚字段写入（立即数字节 dd d3 6e 81 …）构建出的
-seed 对象；变换循环随后经 vtable slot0x30/0x38 读它的 data/length。故派生 key 作用在 seed 上，而 aesDecode2 的
-data（rsi）始终是 -0x218 密文。
+`RETRACTED`：C-349 把分配大小、追加字节和虚调用混成固定块/负 map key 模型；它未正确恢复容器内容。
+正确结果见 C-442/C-444。C-350/N-73 的列表变体未命中保留为历史记录，不证明还缺随机字节。
 
-`NEGATIVE`：seed raw / transform(seed) 作 key 仍零命中（C-348、N-72）。残差是容器的序列化顺序与 data() 布局。
+### 11.18 调用分工与旧排序试算（C-351/C-352）
 
-### 11.17 seed 形状：0x22 固定块 + 可读前缀（C-349/C-350）
+`STATIC`：C-352 的数据与 key 分工可保留：密文是输入数据，key 来自独立变换后的常量缓冲。
+`NEGATIVE`：C-351/N-74 的负 key 排序尝试依赖错误容器模型，不能再作为恢复 key 的方向。
 
-`OBSERVED`：builder 先 `malloc(0x22)` 并写 0x74/0x59（ASCII `tY`），随后以负偏移 map key 继续写字段；提取的25字节
-常量表为 `22 74 59 2b dd d3 6e 81 ec d4 d2 ab e2 d3 d5 dd 7a 66 f8 3a 97 ab 95 3b e0` —— 一个固定0x22 字节块、
-带可读头。注意字段是以负 key 写入的，**发射顺序**未必等于列表顺序，这是当前残差。
+### 11.19 NfzPack 与普通固件路径的区别（C-353/C-354）
 
-`NEGATIVE`：各形状变体作 key 仍零命中（C-350、N-73）。下一步是按负 key 排序还原真实发射顺序。
+`STATIC`：C-353 识别的是远程 NFZ pack 的 URL 获取/回调路径。
+`NEGATIVE`：C-354/N-75 的普通 `UpgradeFirmPack` 函数范围内未发现直接 crypto 调用，是有界静态搜索；
+它既不证明 NFZ 路径适用，也不排除其他 helper 或设备侧处理。
 
-### 11.18 setter ABI 与调用点复核（C-351/C-352）
+### 11.20 ProcessUpgradeFirmPack 的 type 分派（C-355/C-356/C-445）
 
-`OBSERVED`：复核 0x68b109 调用，rdi=-0x310(sret)、rdx=-0x1d0(key)、rsi=-0x218(data)；-0x218 未被字段链触碰（链写的是另一个
--0x208 对象）。故 data=输入密文、key=变换后的 seed 字符串这一分工成立。
+`RETRACTED`：C-355 的“普通固件必经 NFZ，本地 chunk 可作代理”结论错误。
+`ProcessUpgradeFirmPack` 按 type 分派：case 0 为 `UpgradeFirmPack`，case 1 为 `UpgradeNfzPack`，
+case 8 为 `UpgradeFirmPackFromLocalFile`。存在 NFZ 分支不证明 WA150 IMaH STUE chunk 进入它。
+C-356/N-76 的 NFZ 函数范围内解码函数未命中，也不能把这条路径推广到普通固件。
 
-`NEGATIVE`：把负 key 排序并加/去前缀作 seed 仍零命中（C-351、N-74）。残余是 setter 链的 ABI 语义
-（`movl $IMM,%esi` 中 IMM 到底是 map key 还是 value）。
+### 11.21 vtable address point 更正（C-357/C-358/C-442）
 
-### 11.19 路径归属：NfzPack 是 URL 抓取包（C-353/C-354）
+`RETRACTED`：C-357 漏掉 Itanium C++ ABI vtable 头部 16 字节。表符号为 `0x8fba40`，对象实际 vptr 为 `0x8fba50`。
+相对实际 vptr，`+0x20` 是 append，`+0x28` 是字符指针转换，`+0x30` 是 get，`+0x38` 是 size。
+get 返回 `this+8` 保存的数据指针，循环没有把对象本身的 vptr/data/cap/len 当作 seed。
 
-`OBSERVED`：`DJIFirmUpgrader1::UpgradeNfzPack` 上游读 JSON `version`/`code`、本地读 `url`，并记录 strUrl 与抓取数据大小。
-因此之前分析的 md5/变换/xor key 方案属于一个**远程抓取的 nfz pack**，而非本地 `.fw.sig` —— 用它直接套本地模块 chunk
-可能是**类别错配**。
+`NEGATIVE`：C-358/N-77 的列表旋转未命中保留；它不能推出需要加入结构体指针。
 
-`NEGATIVE`：`UpgradeFirmPack`（模块路径）本体没有直接 aes/WAES/CRijndael/Imah 调用（C-354、N-75）。
-下一步应确认 FirmPack 是否经 std::function 间接路由到 NfzPack，或模块另有解密 helper。
+### 11.22 原地变换发生在数据区（C-359/C-360）
 
-### 11.20 FirmPack 确实路由到 nfz 方案（C-355/C-356）
+`STATIC`：C-360 的逐索引原地变换仍成立，索引对象应明确为 `XsBuffer` 的数据区。
+`NEGATIVE`：C-359/N-78 的公式变体未命中保留，但“下一步加入对象字段”的旧结论撤回。
 
-`OBSERVED`：`DJIUpgradeView::ProcessUpgradeFirmPack` 读 JSON VALUE/type/PACKAGE_VERSION/version，并经
-`DJIWebSocketHandler::GetSafeWriter` 调用 `DJIUpgradeMgr::UpgradeNfzPack` —— 模块路径**确实**走到 NfzPack 方案，
-而本地 `.fw.sig` 正是这样一份 pack 产物。故此前的类别错配担忧解除，本地 chunk 可作抓取 pack 的代理。
+### 11.23 运行时指针 key 模型撤回（C-361/C-362/C-442）
 
-`NEGATIVE`：两条 NfzPack 函数体内无 base64/hex 解码（C-356、N-76），pack 字节原样入 crypto。
-故 B-23 回到 seed/setter 的字节级精确性。
+`RETRACTED`：C-361 的字符指针转换尾调 append、返回对象本身的解释来自错位 vtable。
+真实 get 返回独立数据区；key 不含运行时堆指针或栈地址。
+`NEGATIVE`：C-362/N-79 的合成指针试算保留，不能作为真实 key 复杂性或地址依赖的证据。
 
-### 11.21 XsBuffer 布局与对象字节读（C-357/C-358）
+### 11.24 对象布局与变换输入不能混同（C-363/C-364）
 
-`OBSERVED`：`__ZTV8XsBufferIcE` 槽位为 0x10=aS 0x18=D1 0x20=D0 0x28=init 0x30=append(char) 0x38=cvPc 0x40=get。
-`append(char)` 返回 `this`，故链上的 `callq *0x20` 落在 D0（实参在 esi），而变换循环的 `movzbl (%rax,%rbx)` 是在
-**对象自身字节**上按 rbx 索引，而非 0x8(this) 的独立缓冲 —— 意味着发射的 seed 可能含结构体指针字节，不只是追加的字符。
+`STATIC`：C-363 的 32 字节对象布局仍为 vptr/data/capacity/length；撤回的是“这个对象范围就是变换输入”。
+`NEGATIVE`：C-364/N-80 的对象仿造与指针扫描只测试了错误模型，不再指向更多 cap/len 或地址枚举。
 
-`NEGATIVE`：全旋转/逆序组合仍零命中（C-358、N-77）。下一步应把结构体字段字节（0x0/0x8/0x10/0x18 指针低字节）纳入 seed。
+### 11.25 指针扫描与栈尾推论分开（C-365）
 
-### 11.22 变换是原地、逐索引（C-359/C-360）
+`NEGATIVE`：C-365/N-81 所记 6,144 组指针组合未命中保留为历史运行记录，本轮没有重新执行。
+`RETRACTED`：把循环读入解释为 32 字节对象再加 12 字节未初始化栈尾，依赖同一 ABI 错误，不能作为剩余解密问题。
 
-`OBSERVED`：`movzbl (%rax,%rbx)` 读与 `movb %r12b,(%rax,%rbx)` 写落在同一对象同一 rbx，说明是逐索引原地重写；两个
-累加载入（r12/r13）都是当前字节且在写之前完成。故不存在跨迭代进位，公式确为字节局部 —— 排除了“流式链”解释。
+### 11.26 attrib 位与 raw payload checksum（C-366/C-367）
 
-`NEGATIVE`：方向（rol/ror）、pad（mod17/mod16/逆序）、正逆序 seed 组合仍零命中（C-359、N-78）。
-下一步按 C-357 把对象结构字段字节纳入，而非继续改动公式。
+`STATIC`：四份本地 WA150 模块（0802/1200/2603/0806）均记录 header_version 2、`enc_key=STUE`、chunk attrib 0。
+`NEGATIVE`：历史 raw payload checksum 没有匹配各自 plain_cksum（C-367/N-82），不支持直接把 attrib 0 读作已解密明文。
+该结果不定位 key、cipher 路径或其他 attrib 位的含义。
 
-### 11.23 seed 实为结构体字节（含运行时指针）（C-361/C-362）
+### 11.27 strlen、栈尾和每轮 init 猜测撤回（C-368/C-369/C-370/C-442）
 
-`OBSERVED`：关键修正 —— `XsBuffer::cvPc` 是 `movq (%rdi),%rax; jmpq *0x30(%rax)`，即尾调 append 并返回 `this`；append 本身也
-返回 `this`。所以读写索引的是 **XsBuffer 对象自身字节**（0x0 为 vtable 指针低字节，0x8/0x10/0x18 为指针字段），追加的字符
-其实落在 0x8(this) 的 malloc 块，并未进入被索引的 seed。
-
-即 seed 内嵌**运行时地址低字节**：静态复现需近似或模拟分配；只有前0x20 字节影响 MakeKey。
-
-`NEGATIVE`：粗略指针近似仍零命中（C-362、N-79）。下一步改为模拟分配（固定地址/对齐）生成指针字节。
-
-### 11.24 XsBuffer 字段布局与结构体仿造（C-363/C-364）
-
-`OBSERVED`：XsBuffer::init 清零 0x8..0x20 与 0x18；append 从 0x18 读 len、0x10 读 cap、经 0x8 数据指针写入并自增 0x18。
-故活对象恰为32 字节：vtable 指针 / malloc 数据指针 / capacity / length —— 正是变换索引的范围。
-
-`NEGATIVE`：按该布局伪造 seed 并扫堆指针（0x7f 前缀，64×16）仍零命中（C-364、N-80）。
-下一步扫更多维度（cap/len、基址前缀、栈对象而非堆），或直接以地址无关方式重读该循环。
-
-### 11.25 指针密扫与尾字节残差（C-365）
-
-`NEGATIVE`：把指针维度密扫（6144 组合，进程内 CDLL）仍零命中（C-365、N-81）。
-
-关键认识：循环 `cmpq %rax,%rbx` 的上界是**长度0x2c（44）**，而结构体只有32 字节，故 seed 还含12 字节**相邻局部**；
-`-0x208+44` 落到 `-0x1dc`，正好压到邻近的 `-0x1d0` 区域。所以缺的正是这12 字节的尾部成分。
-下一步把邻近局部（-0x1d0 等）纳入，或改用地址无关重读。
-
-### 11.26 attrib 位语义复核（C-366/C-367）
-
-`OBSERVED`：四份本地 wa150 模块（0802/1200/2603/0806）一律 header_version2、enc_key STUE、chunk attrib0x0。
-但 `NEGATIVE`：对四者的原始 payload 直接算 checksum，无一命中 plain_cksum（C-367、N-82）。
-
-故 attrib 位0 在此**不能**读作明文 —— 它是工具侧的加密标志却为0，语义与工具不同；解密仍需执行。
-
-### 11.27 strlen 截断与尾字节近似（C-368/C-369）
-
-`OBSERVED`：key 是对变换缓冲做 `strlen` 得来；变换首字节是 vtable 低字节（40 ba 8f 00…），而 0x00 经 ror8 仍为 0，
-故 strlen 约在 index3 即停。MakeKey 随后从该指针读0x20 字节 —— **越过 NUL 进入对象尾部**，即 key 的实义字节大部分来自
-NUL 之后的属性存区域。
-
-`NEGATIVE`：tail/指针/cap/len 组合仍零命中（C-368、N-83）。下一步按“NUL 后即对象字段”这一事实重排：key 应从 index3 之后
-读取结构体剩余字段，而非把结构体字节当作被 strlen 截断的前缀。
+`RETRACTED`：C-369 的 vtable NUL 截断与 MakeKey 读入对象尾部结论错误；真实变换输出有 32 个可打印字节且无内嵌 NUL。
+“每轮 init 清零”也来自错位虚槽，不是当前未知项。
+`NEGATIVE`：C-368/N-83 的 tail 变体和 C-370/N-84 的 120,000 次合成尝试仅保留为历史负结果；
+不再支持随机指针/栈尾模型，本轮不重复这些扫描。
 
 ### 11.28 遥控器侧 RID 侦察（C-371/C-372）
 
@@ -524,8 +520,7 @@ AOSP/Chromium 类 —— 都不是 Remote ID。`DJI_FLY.apk` 仅以路径出现�
 映射（C-071 STATIC → `IsEuCeEnableC0Rid`）、`CccBroadcastSignalQuality`（C-077），并有针对性的负结果 C-072/C-078
 与 setter 搜索负结果 C-109。
 
-本轮新增的是**下层**：opcode 字节、handler 地址与汇编级注册、传输链、receiver 来源、rc331 路径；并**消解了 C-109**
-的"未找到 setter"。故下述 C-373 之后的内容应读作既有 C-071/C-133 之下的展开，而非首次发现。
+本轮补充了 handler 地址、注册和传输线索；但不能推翻 C-109 的 global RF Boolean 搜索边界。France EID setter 早已由 RID-003 单独记录。故下述 C-373 之后的内容应读作既有 C-071/C-133 之下的展开，而非首次发现。
 
 ### 11.29 遥控器侧：DJI Fly 的 RID 面（C-373/C-374/C-375）
 
@@ -545,9 +540,9 @@ OIDIdentifier37、IsEuCeEnableC0Rid18、RidWorkingStatusPush2、EU_CE_enable_c0_
 `/opt/homebrew/opt/openjdk@21`。以 `JAVA_HOME=... GHIDRA_INSTALL_DIR=...libexec libexec/support/analyzeHeadless ...` 可跑 headless。
 注意 `~/Library/ghidra/ghidra_12.1.2_PUBLIC` 只是用户配置目录（log/osgi/preferences），不是安装本体。
 
-### 11.31 遥控器侧命中 RID 开关处理器（C-377/C-378/C-379）
+### 11.31 遥控器侧 France EID 处理器（C-377/C-378/C-379）
 
-`OBSERVED`：Ghidra headless 定位到真正的 RID/EID 开关访问器 —— 自由处理器 `EIDSwitchGet`（0x04e12d44）与
+`OBSERVED`：Ghidra headless 定位到France EID 访问器 —— 自由处理器 `EIDSwitchGet`（0x04e12d44）与
 `EIDSwitchSet`（0x04e12f80），签名 (KeyHandlers*, Characteristics const&, shared_ptr<UavValue>, callback)；Set 会
 `__dynamic_cast` 校验类型、不匹配返回 -6。
 
@@ -556,9 +551,9 @@ OIDIdentifier37、IsEuCeEnableC0Rid18、RidWorkingStatusPush2、EU_CE_enable_c0_
 `uav_cmd_req_header::SetReceiverIndex`；Get 置 local_48=2、get/set 标志0，Set 由值头取 local_48、标志1。
 
 `OBSERVED`：`OIDIdentifierGet/Set`（0x04eabadc / 0x04eac2fc）为同级处理器，`ComplianceSerialNumberInit` 在 0x02e36740，
-即整套 RID 参数族都在遥控器侧（C-379）。
+这些是不同业务面的 SDK 处理器，不能合并成全球 RID 控制面（C-379/C-448）。
 
-下一步：解出各常量语义与值字节布局，形成可下发的 set 报文。
+这些静态线索尚未建立设备路由、读回、恢复或 RF 对应关系；目录工具只生成离线 hex。
 
 ### 11.32 eid_switch 请求语义解码（C-380/C-381/C-382）
 
@@ -570,7 +565,7 @@ uav_fc_handle_eid_switch, uav_fc_eid_switch_status>`，包装层调 `SendGetPack
 `OBSERVED`：EIDSwitchSet 的载荷是**单个启用字节** —— 它对 `shared_ptr<UavValue>` 做 `__dynamic_cast` 后读
 `*(undefined1 *)(lVar6 + 8)`（C-381）。Get 侧则硬编码 local_48=2。
 
-于是"关 RID"在报文层就是：对该 opcode 下发一个值为0 的 set。
+值 0 属于 France EID 的候选 SET 语义；它不是 FAA/global RID 关闭命令（RID-003、C-448）。
 
 ### 11.33 base_req 布局与 receiver/sender 分工（C-383/C-384）
 
@@ -581,7 +576,7 @@ uav_fc_handle_eid_switch, uav_fc_eid_switch_status>`，包装层调 `SendGetPack
 即：**sender index 自动派生**；`SetReceiverIndex` 为外部 thunk（0x0515dc90，经 PTR 解析），由包装层在填好 local_48（Get 为2、
 Set 为值字节）后调用 —— **receiver index 由调用方给**（C-384）。
 
-于是报文 = 该头部 + 载荷字节；关 RID 即 Set、值0、receiver 按调用方取。
+这里恢复的是进程内请求结构线索，不证明该结构可直接当作 USB/socket 上的最终线包。离线 hex 生成不构成发送能力。
 
 ### 11.34 receiver 来源与发送出口（C-385/C-386）
 
@@ -591,7 +586,7 @@ receiver 是**特征属性**、不是自由常量。
 `OBSERVED`：两个 Send 都以 `(**(code **)(*(long *)this + 0x128))(this, req, cb, 1)` 收尾 —— 发送走 concrete 抽象的
 虚槽 `0x128`；UAV77 类经 `FlightControllerAbstraction` 成员指针绑定。
 
-故报文全要素已定：cmd119/sub3/attr0x12/'IW'/timeout500/sender 自动/receiver=Characteristics+0x30/载荷1字节。
+这些字段与发送出口仍是静态记录；不能据此宣称运行期路由、最终线包、ACK 或 RF 效果已定。
 
 ### 11.35 传输出口命名（C-387）
 
@@ -609,7 +604,7 @@ receiver 是**特征属性**、不是自由常量。
 "EIDSwitch", element)`。
 
 即：App 是**按 SDK key 名**访问该开关（不是直接发 opcode）；characteristics 与 receiver 管线由这条 key 路径填充。
-这解释了 receiver（Characteristics+0x30）来自会话环境，而非固定常量 —— 连接前置就是"设备已连、key map 已插入"。
+key 注册不等于当前 product/session 准入；receiver、重试及 product-139 的精确边界以 RID-003 为准。
 
 ### 11.37 rc331 侧 native 佐证（C-392/C-393）
 
@@ -620,7 +615,7 @@ system.img 日志串显示 `hdvt_lte: inform djilink ...` / `failed to inform dj
 `OBSERVED`：system.img 的 launcher JSON 里有 `start dji_link` 与 `pkill -9 dji.go.v5`（在 download pretender 下），
 说明开机先起 djilink、再拉起 DJI Fly（C-393）。
 
-这坐实了连接前置的性质：报文最终经 App → djilink/dji_v1_protocol → 链路，而非直连飞机。
+这些镜像中的名称和配置支持链路组件存在，不证明当前实例的端到端路由可用。
 
 ### 11.38 dji_link 本地通道与路由表（C-394/C-395）
 
@@ -631,8 +626,7 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 `OBSERVED`：dji_link 串包含 `dji_link_init_localsocket_to_app`、`dji_link_send_stream_via_localsocket`，日志
 `app socket thread start ---- localsock_fd = %d, accept_fd = %d` —— 即 djilink **监听并 accept 来自 App 的本地 socket**。
 
-于是连接前置具体化：App 经本地 socket + `logic` 协议进程内递送到 djilink，再由 djilink 走 bulk/USB 到飞机。
-`SendData` 排入的就是这条链。
+配置支持 App/local/logic 与 bulk 路由的静态线索；`SendData` 到某一 WA150 请求的完整运行期路径尚未验证。
 
 ### 11.39 unix socket 命名与 whoami 语义（C-396）
 
@@ -640,7 +634,7 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 本地路由的 `direct_host` 为 `whoami`，同树源文件为 `hardware/dji/service/dji_link/src/dji_whoami.c`（即"本机自身"）；
 `vt_gnd` 是另一虚拟地面主机、用于其它本地路由。
 
-故 App 侧抽象 socket 名很可能就是 `direct_host` 值 `whoami`，而非新常量。
+将 `whoami` 当作 socket 字面名仍只是 H-37，未取得实际地址，不能作为连接或发送依据。
 
 ### 11.40 EU/CE 区域法规族与扫描器修正（C-398/C-399）
 
@@ -649,7 +643,7 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 构造键值结构（伴随 movk 常量）。
 
 `RETRACTED`：C-375 的"0 xref → 间接到达"读法收回（C-399、N-87）—— 真相是活 key，只是重定位形态不同。
-故 `EU_CE_enable_c0_rid_0` 是另一条与区域相关的 RID enable 键，值得后续比对 EIDSwitch。
+该静态键名不能覆盖 RID-009 的历史正对照负结果：所测 direct USB FLYC 表面未暴露该参数。
 
 ### 11.41 EUCeCxV1 注册类与区域 RID 键（C-400/C-401）
 
@@ -659,11 +653,11 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 `HeightLimitRange`、`HeightLimit`、`StaticDBVersion` 等；BindKey 另用 `EU_CE_Reg_120Height_Enable_0` 字面量。
 
 `OBSERVED`：`EU_CE_enable_c0_rid_0` 的50 处站点散布在大量不同函数中、均构造键值结构 —— 属**已注册的绑定键**，
-而非一次性局部。故它是与 `EIDSwitch` **并列的区域相关 RID enable 键**（C-401）。
+而非一次性局部。这支持静态注册/绑定线索，不证明它与 France EID 构成两个可用 RID 开关（C-401/C-448）。
 
-含义：若目标区服走 CE 路径，可优先用 `EU_CE_enable_c0_rid_0` 替代 EIDSwitch。属备选路径，不改主结论。
+`RETRACTED`：不能据此建议以该键替代 EIDSwitch。RID-009/C-227--C-229 已记录所测 direct USB 的参数缺失与成功正对照；当前仍没有可用 RID 控制路径（C-448）。
 
-### 11.42 发射器静态验证与偏移修正（C-402/C-403）
+### 11.42 离线生成器静态验证与偏移修正（C-402/C-403）
 
 `OBSERVED`：新增 `test_eid_switch_message.py`，对发射头部的每个偏移与 `uav_cmd_base_req` 构造函数的字面写入逐条断言
 （0=0x02770301、+1=0x0300000200000000、+0xc=0x57490000、+0x14=500、+0x10/+0x18=0、this[6]=sender），并校验 value/sender 槽，
@@ -737,7 +731,7 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 
 `NEGATIVE`：扁平 base 相减映射会错位（C-424、N-94），需按段映射。
 
-即：**id 0x37 密钥已取到**，位置载荷自此可完整复现（48 字节，两段）。
+这只定位了两个静态数据块。A-078 的 prefix/字段与密文缓冲组合仍有近似，尚未与官方输出逐字节匹配，不能称为可用坐标编辑器（C-449）。
 
 ### 11.50 ComplianceSerialNumber 是派生 listener（C-428/C-429）
 
@@ -755,15 +749,15 @@ RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一
 `NEGATIVE`：无任何 `SetSerialNumber`（C-431、N-96）。故序列号是身份而非可写字段，派生的 ComplianceSerialNumber
 （C-428、C-128）默认也不可写。UAS ID 若要改，除非存在上下文级 set。
 
-### 11.52 ADS-B 广播代理与高度 opcode（C-432/C-433/C-434）
+### 11.52 AirSense/ADS-B 与高度 opcode（C-432/C-433/C-434）
 
 在 pack 模板标签层面另找到三个此前未记的 opcode：
 
-- `uav_adsb_get_adsb_on_off_req/rsp` → cmd **12 (0x0C)** / sub17（ctor 0x02d6f14c）—— 广播代理开关查询
-- `uav_adsb_set_set_adsb_agent_switch_req/rsp` → cmd **55 (0x37)** / sub17（ctor 0x02da5140）—— 真正的广播代理 set
+- `uav_adsb_get_adsb_on_off_req/rsp` → cmd **12 (0x0C)** / sub17（ctor 0x02d6f14c）—— AirSense/ADS-B traffic receive 查询
+- `uav_adsb_set_set_adsb_agent_switch_req/rsp` → cmd **55 (0x37)** / sub17（ctor 0x02da5140）—— AirSense/ADS-B 配置 SET，非 RID 总开关
 - `uav_adsb_get_drone_dynamic_max_height_req/rsp` → cmd **80 (0x50)** / sub17（ctor 0x02cb9980）—— 动态最大高度，独立于位置 set
 
-这三条补齐了 B 段：广播代理开关 + 高度由此进入解码队列（载荷待取）。
+这些 opcode 属不同功能面；RID-002B 已将 `0x11/0x0C` 与 `0x11/0x37` 排除为 global RID 配置（C-135/C-448）。
 
 ### 11.53 动态最大高度 ctor 与匿名 handler（C-436/C-437）
 
@@ -786,4 +780,158 @@ RemoteControllerAbstraction/OPR38/56RCAbstraction 等）的具名访问器清一
 三标志（写入 +0x20/+0x21/+0x22）、byte1 的 bit0（+0x23）、+2 的 int 经 `GetAreaCodeStrByValue`、byte6 写 +0x40/+0x44，
 再以名称 `RidWorkingStatusPush` 与 pack `adsb_push_rid_working_status_pack` 经 `UpdateParamValueProxy` 发布。
 
-`OBSERVED`：该 handler 是 push-only 观察者、无 Send，故**不需发射器**；但其标志位给出实机确认 set 是否生效的读取路径（C-440）。
+`RETRACTED`：C-440 把 push-only observer 提升为 EID/ADS-B SET 的可靠 applied readback。该关联未建立，也没有主动 GET builder；历史外部 Binder listener 曾在真实 RID RF 存在时零回调。push/cache/ACK 均不能替代当前接收时间与独立 RF 观察（C-448/C-449、RID-002/RID-011C）。
+
+## 12. 修正后的 public-v2 试验与普通固件路径（C-450--C-453）
+
+`OBSERVED`：独立单候选工具 [imah_v2_key_probe.py](../host-tools/firmware-acquisition/imah_v2_key_probe.py)（A-082）
+与六项测试已完成；包含独立 OpenSSL 的混合加密/明文 chunk、gap、非零 padding 固定样例，整个目录 59/59 测试通过。
+它只校验候选，不导出 key 或明文，不提供刷写/设备路径。以下进展未解开 STUE。
+
+### 12.1 public IMaH-v2 模型与校验范围（C-450）
+
+该实现依据 [pinned dji_imah_fwsig.py](https://github.com/o-gs/dji-firmware-tools/blob/195692263c2684cf1ddc4995f2736be6c0fb135e/dji_imah_fwsig.py)。模型用 16/24/32 字节 KEK 对 16 字节 scram 做 AES-ECB decrypt，
+得到 16 字节 content key；也可直接输入 16 字节 content key。随后 AES-128-CTR 使用 12 字节零前缀与从 0 开始的
+32-bit big-endian counter，跨加密 chunk 连续。加密 chunk 的 stored size 向上对齐 32 字节；`attrib&1` 为真或
+`enc_key` 为空时按明文复制，不推进 counter，文件 gap 也不推进 counter。
+
+checksum 为 little-endian uint32 模 2^32 求和，末尾不足四字节补零。plain checksum 覆盖解密后的完整 chunk padding；
+加密 checksum 覆盖清零 checksum 字段的完整 header/chunk table 加完整 stored payload，取负，不包括 RSA signature。
+工具先验证 stored payload SHA-256 和加密 checksum，再测试候选。以上是公开模型的实现语义，STUE 的适用性仍未知；
+即使 checksum 命中，也还需要独立结构佐证和另行处理签名。
+
+### 12.2 三个有来源的候选均未命中（C-451）
+
+输入为 WA150 `01.00.0600/2603`，436,000 B，SHA-256
+`4a573ab95316de69137deb71249ead09c23325a28acbf9ee305a36410775f274`。
+header/signature/payload 分别为 224/384/435,392 B，逻辑 chunk 435,382 B；三次都通过 payload SHA-256 和加密 checksum。
+
+| 候选解释 | 求得的 plain checksum | 期望 | 结果 |
+| --- | --- | --- | --- |
+| 恢复的 32 字节 NFZ 常量作为 v2 KEK | `0x5fb4802c` | `0xd2f782ff` | 不匹配 |
+| WAES.decrypt(scram) 作为 content16 | `0x13169336` | `0xd2f782ff` | 不匹配 |
+| WAES.encrypt(scram) 作为 content16 | `0x6bd174f9` | `0xd2f782ff` | 不匹配 |
+
+`NEGATIVE` 仅覆盖这三个确定候选，不是任意 brute，也不否定所有 key 或整个模型。
+C-445 的 NFZ key+零 IV 直接 CBC 试验、C-447 的十个 fixed-WAES 组合与本组三个 v2 试验分开登记。
+
+### 12.3 Assistant method-4/register-upgrader 的静态数据流（C-452）
+
+对象仍为 x86_64 `libDJIUavService.dylib`，SHA-256
+`c55da41265f925f64c2d704deb68f65fcff44435c9681839cc8545cd07dd76a5`。本次只跟踪 method 4 所选的 register upgrader：
+
+| 环节 | 已检查的静态行为 |
+| --- | --- |
+| 方法选择 | `SetUpgradeMethod` (`0x4c01c0`) 的 method 4 构造 `DJIFirmRegisterUpgrader`；`UpgradeFirmPack` (`0x4cff10`) 的对应分支经过 `0x4d0a40`、`0x5c72d0` |
+| 下载 | `DownloadPack` (`0x5ae540`) 经 `GetProductFirmwareData` (`0x555fc0`)、`GetSingleFirmData` (`0x556690`)、`GetFirmwareFile` (`0x558730`)、`ApiGetfileFirmware` (`0x4660a0`) 到 `wGetBigFileUseCache` (`0x49db50`) |
+| 缓存与校验 | progress (`0x49e880`) 把 readAll buffer 原样写 cache 并更新 MD5；finish (`0x49cee0`) 处理 redirect/callback。callback (`0x562b30`) 检查 size/MD5；single callback (`0x561d30`) 写 buffer 或 rename cache |
+| 打包与发送 | `GenerateTarPack` (`0x59a130`) 经 `Tar::putFile` (`0x799e50`) 以 8,192 B 读取/写入同一缓冲并补 tar 的 512 B 对齐；`TransFirmDataByFtp` (`0x5afc70`) 将 QFile/MD5 交给 PutFile |
+
+这些已检查的边复制/缓存/包装输入字节；输入若是密文，所观察到的这条路径不会在这些边把它变为明文。
+未在这一范围恢复出 STUE decoder。该静态结果不覆盖整个 Assistant，不证明当前 WA150 在运行时选择 method 4，
+也不定位下游解密 owner、设备 key 或 TEE。当前没有设备，未执行下载升级链。
+
+### 12.4 有限公开源码检索（C-453）
+
+上游仍为 `195692263c2684cf1ddc4995f2736be6c0fb135e`，没有 STUE 条目。本轮列出 517 个 fork 的元数据，
+按 push 时间筛选 17 个默认分支并检查 8 个非默认分支；25 份 `dji_imah_fwsig.py` 都与固定上游逐字节相同，
+SHA-256 `534680d1fb0ced5f6425b276fcd421456a45a513cf625d73566b2150c2ed6760`。
+筛选条件是 push 时间晚于 2026-01-01，并排除三组已识别的上游同步时间；17 个默认分支并不全是实质 ahead。
+
+`NEGATIVE`：这批源码没有新增 STUE key/mapping/实现。没有检查全部 517 个 fork 的源码、所有非默认分支、
+删除或私有分支、独立仓库或整个网络，不能把这个结果写成全网 key 不存在。
+
+### 12.5 证据保留与处置
+
+只公开独立描述、原始源码和哈希。仓外 `correct-v2-candidate-results.json` SHA-256
+`f7837283f00b328fcb9cc989ab56dbc3bd4fa54ca442facb13d1e910bc3723ff`；59 项测试日志 SHA-256
+`601e287be6552a47111051bb4cb156817dd23589c353f7459a03d2f9484797ad`；有界检索 `report.json` SHA-256
+`7064dd1c31bfa72c17fe069f17011f7911cd97d08b1848a1c24ee0e874617ac8`。
+29 条原生证据的 `assistant-progress-evidence.json` 为 1,502,115 B，SHA-256
+`2a26f99f275e33d1a9783ce1bdc126bf242a6419c59ba4248b23ed679a96edb3`，快照和原始厂商分析内容不入仓。
+关键 Evidence IDs：
+
+- method selection：`ev_524f2d5da8d7c5400ccb30f67ffda1b55620e0bb4dfd87719c9f748739755816`
+- download：`ev_51170e9352a920d0e734635f468669e18ddbee09f50c499e4a0cfb2c6ae88b69`
+- callback：`ev_2db680254b9ec83cbbbdfe086d02631af2087fecdba12e2d08c7412572c24b2b`
+- cache progress：`ev_8e0b9a20dd256f63943179abdb9882c39f01e66f73092f9decd57d10c8548afa`
+- tar copy：`ev_85e7dd0923d9d305f989c33d53d5c32a911cc21557bb43e72fca9cb0a1d266f9`
+- FTP：`ev_c413b30b051b5043992ba68a86ec42c9ec751e93e21acf7828c7c518c4bb7a09`
+
+## 13. RC331 内层与 QSEE 静态派生链（C-454--C-457）
+
+本轮复用了已有固件，没有新下载或设备。0200 内层仍未解密；0205 OTA 提供了可验证的静态 QSEE 组件。
+具体进展是找到了 RC331 TBIE 的派生依赖，不是恢复 root key，也不是 WA150 STUE 明文。
+
+### 13.1 A-005 的两层 IMaH 必须分开（C-454）
+
+A-005 为 454,223,680 B，SHA-256 `d8a8fe5b418ee6461f6971d9dfad77bc4491d15160d47d5cf8f7481dc7113949`，
+MD5 `cc219b04c4fcf34d8b14569a7e55eae1`。外层 header/signature/payload 为 224/256/454,223,200 B，`enc_key` 为空；
+外层 plain checksum、encrypted checksum 和 payload SHA-256 均匹配。
+
+原文件 offset 480 开始第二层 IMaH v2：`enc_key=TBIE`、chunk `FLYA`，header/signature/payload 为
+224/256/454,222,720 B；逻辑 chunk 454,222,705 B，padding 15 B，实际密文 offset 960。
+内层 payload SHA-256 `5ec5414885733a276cfe28f429bd94298ce22ee3f2a9a772dd1b7ec8c4a07898` 与 encrypted checksum 均匹配。
+这还没有得到 FLYA 明文。C-319 收窄为外层观察，C-322 的“RC 全部明文”整体推论撤回。
+
+六个公开 TBIE 版本只做了 32 字节 prefix/magic 试探，未执行完整候选 checksum 验证；不能登记成六个已排除的 key。
+本轮完整性检查不冒充新的 RSA 验签。
+
+### 13.2 已有 OTA 与组件的完整性复核（C-455）
+
+A-004/0205 为 985,959,104 B，SHA-256 `f707cf3dc0be2894b111ce4973d0206e896a2c7e9c4ebe43de1040b528cf49ce`。
+ZIP 中 payload.bin SHA-256 `6579ebf096b01be4b03b12a1551052fee68625cf13c67847d8aa11db1eb27f9d` 与 FILE_HASH 匹配，
+metadata SHA-256 `bad6254d2a780bff5303ca5bbea3e0d7de0ddba677dc7b8cdc4c25d0867e220c` 与 METADATA_HASH 匹配。
+OTA 清单有 29 分区，以下缓存镜像的完整哈希与 `new_partition_info` 相同：
+
+| 分区 | 大小 | SHA-256 |
+| --- | --- | --- |
+| system | 867,598,336 B | `89c3721a58198e14872a67de1f078192d58b9961b695181c8b365ed96a013783` |
+| vendor | 1,293,729,792 B | `a6bba2d27e343df8ac2d9b1e7b9a5a7980d9f965843543ffbe3d59880f5fbf50` |
+
+system 提取出 `libtee_util.so`（A-084）与 `dji_decrypt`（A-085）。独立 `bw_secure` 分区（A-083）只需一个
+REPLACE_XZ operation：58,300 B 压缩 blob SHA-256 `70a579f9f1b32df61d7b0c51716e6f8b38cad69c51461bb041555b0f53705094`，
+172,032 B 最终分区 SHA-256 `ddae8ddd83efbc63480807e014a53fe1e660f8fb6eb49b5ed8d898f3ecbb7201`，二者均与清单匹配。
+三个 ELF64/AArch64 样本只作本地静态输入，从未运行；完整身份见[工件登记](11_ARTIFACT_REGISTER.md)。
+这一轮复算哈希/完整性，没有重跑旧 C-317 的 RSA 验证，也没有验证 live mounted bytes。
+
+### 13.3 固定 header 的 client→QSEE 链（C-456）
+
+`dji_decrypt` main（分析地址 `0x101048`）固定读取 `0x1e0`/480 B header，把 `header+0x30` 的 16 B scram 交给
+`qsee_data_dec_set_key`，随后分块调用 `qsee_data_dec`。`libtee_util` 中 set-key（`0x102470`）与 decrypt（`0x1024dc`）
+分别进入 `qsee_cmd_req`（`0x10213c`）的命令 `0x17` / `0x18`；它通过 QSEECom 启动 `bw_secure`，再发送请求。
+这两个命令的包数据中没有传递加密 FourCC。
+
+`bw_secure` dispatcher（`0x100470`）把 `0x17` 分派到 `init_payload_dec_key`（`0x104570`），把 `0x18` 分派到
+持有 cipher context 的 `firmware_dec`。这是静态调用链，不是已经执行的设备解密。
+客户端固定的 480 B 数据起点与 WA150 的 224 B header + 384 B signature = 608 B 不同，不能直接把现成二进制
+当成通用 STUE 解密器运行。
+
+### 13.4 TBIE 派生依赖 RPMB root 与 HUK（C-457）
+
+`init_payload_dec_key` 调 `rpmb_stor_derive_key(type=0x0c)`。该分支以 RPMB root 为输入，使用 CMAC KDF，
+label 为 `IMAGE ENC KEY`（13 B）、context 为 `TBIE`（4 B），派生 128-bit key；context 通过立即数 `0x45494254`
+组合构造，因而字面字符串搜索没有 TBIE 命中不代表此路径没有 TBIE。派生 key 再处理 16 B scram 并建立持久 payload
+cipher context。观察到 cipher mode 常数先 1 后 2、key 长度 16、zero IV；QSEE enum 名称尚未独立核对，不写死模式名。
+
+`read_root_key`（`0x10a128`）读取 protected partition `0xa001` 的 sector 0，检查 provisioning/encflag，再调用
+`decrypt_rootkey_with_HUK`。后者经 `qsee_kdf(NULL,0,label,context)` 获得用于存储块解封/认证的 key，解密并校验后
+返回 root。只有这份固件代码，尚无设备 RPMB 数据或 HUK 派生输出；静态依赖不是根密钥恢复。
+
+当前最具体缺口是 RC331 TBIE 的 root input，以及 STUE 自己的 owner/derivation。没有证据表明两者共享 key 或 scheme，
+也不能把本路缺失输入写成所有离线方法都不可能。
+
+### 13.5 证据引用与处置
+
+仓外 `handoff.json`（31,672 B）SHA-256 `3add0859cde61baa7e3a346967b83d1019d6d098001fc969f5d0adae44e9069b`
+保留完整性和提取元数据；其主机路径、厂商 strings/反编译、二进制与原生快照不复制入仓。关键 Evidence IDs：
+
+- client main：`ev_cbe5b97e992d853558d3d21c2d2303d8b70a2ab616e5bfa4933db9f99c52ab13`
+- set-key：`ev_ea1c5706d29589fc1a927c08cd1a528ebcbe709e2f6d5485f594642bc23b7237`
+- QSEE request：`ev_8784fedbfb866f6d5f336b97df8c41887533ba730d9f4a673ee994bf74f7ebea`
+- dispatcher：`ev_74ec7bce1c58954bf7a77c5414ca25b7434619d5123f92fd5b1bc650437e5d93`
+- payload init：`ev_8a55e89bbaaff31bc0e45964d0bac4f8c02f224e0c3d25c51ec82401ed16bd1c`
+- derivation：`ev_9bbc4b83ecc897a306815f04f155c5d16661adf6decf2c8a776aae03aebacd13`
+- assembled context：`ev_582a032c3ab48c4d4cfed09cfea523e4add043e2d48aa4261be53b8b70d19fd7`
+- root read：`ev_5d517d9b5eee1338532b37adef576bd3ce0fd6a42b3f734669e442a313361f76`
+- root/HUK：`ev_762ba19eeada4a181d17da9597c6406b90b6ada7a58bc7584efb402cb1efc19a`

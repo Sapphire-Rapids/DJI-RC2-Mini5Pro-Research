@@ -43,9 +43,14 @@ def _inner_python() -> Path:
 
 
 def build_mirror() -> Path:
-    """Create the mirrored tree with symlinked frameworks and an ad-hoc signed interpreter."""
+    """Create or reuse a completed mirror, without deleting an existing directory."""
     if MIRROR.exists():
-        shutil.rmtree(MIRROR)
+        if ((MIRROR / "MacOS/Python").is_file()
+                and (MIRROR / "MacOS/DJIServices/libDJIUavService.dylib").is_file()
+                and (MIRROR / "Frameworks").is_dir()):
+            return MIRROR
+        raise FileExistsError(f"mirror directory already exists and is incomplete: {MIRROR}")
+    MIRROR.mkdir(parents=True)
     (MIRROR / "MacOS/DJIServices").mkdir(parents=True)
     (MIRROR / "Frameworks").mkdir()
     for entry in FRAMEWORKS.iterdir():
@@ -78,7 +83,7 @@ print(run(enc if mode == "enc" else dec, data).hex())
 
 
 def _run(mode: str, data: bytes) -> bytes:
-    root = MIRROR if MIRROR.exists() else build_mirror()
+    root = build_mirror()
     out = subprocess.run(
         ["arch", "-x86_64", str(root / "MacOS/Python"), "-c", _WORKER, str(root), mode, data.hex()],
         capture_output=True, text=True, check=True,
@@ -115,8 +120,7 @@ def _ensure():
 
 
 def encrypt_block(data: bytes) -> bytes:
-    """Block encrypt. Uses the in-process loader when this interpreter is already x86_64,
-    otherwise one Rosetta subprocess per call (fine for a few blocks, slow for bulk)."""
+    """Use functions installed by load(), or one Rosetta subprocess per block."""
     if len(data) != 16:
         raise ValueError("whitebox AES works on one 16-byte block")
     if _ENC is not None:

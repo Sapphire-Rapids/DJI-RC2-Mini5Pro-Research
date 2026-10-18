@@ -1,10 +1,12 @@
-"""Try IMaH `STUE` decryption with DJI Assistant's baked whitebox AES.
+"""Probe fixed-WAES arrangements against an IMaH plaintext checksum.
 
 Byte ranges are validated independently through the recorded encrypted-checksum chain (negated
-additive form). `STUE` has no entry in the public key corpus, so this probe borrows the Assistant
-whitebox AES as the cipher primitive and enumerates the scheme variants the pinned tool supports.
+additive form). CTR, CBC and ECB use the Assistant's fixed whitebox block functions directly.
+This does not unwrap scram into a new AES key or test the upstream derived-key model. The fixed
+whitebox primitive has not been established as the module `STUE` cipher.
 
-It is a probe, not yet a verified decrypt: success is only the decrypted plaintext checksum.
+All candidates checksum the full decrypted, padded chunk ranges. A checksum hit is a candidate
+for further verification, not proof of a valid or flashable firmware image.
 """
 from __future__ import annotations
 
@@ -21,18 +23,18 @@ from wb_aes_bridge import build_mirror, decrypt_block, encrypt_block
 def _reexec_under_rosetta(path: str) -> None:
     if platform.machine() == "x86_64":
         return
+    if os.environ.get("FIND_UAS_ROSETTA_REEXEC") == "1":
+        raise RuntimeError("Rosetta restart did not select x86_64")
     os.environ["PYTHONHOME"] = sys.base_prefix
-    import site
-    os.environ["PYTHONPATH"] = os.pathsep.join(site.getsitepackages() + [str(Path(__file__).parent)])
+    os.environ["FIND_UAS_ROSETTA_REEXEC"] = "1"
     root = build_mirror()
-    os.execv(str(root / "MacOS/Python"), [str(root / "MacOS/Python"), __file__, path])
-
-
-import numpy as _np
+    os.execv("/usr/bin/arch", ["arch", "-x86_64", str(root / "MacOS/Python"),
+                             str(Path(__file__).resolve()), path])
 
 
 def _sum(buf: bytes) -> int:
-    return int(_np.frombuffer(buf, dtype="<u4").sum(dtype=_np.uint64)) & 0xFFFFFFFF
+    padded = buf + bytes((-len(buf)) % 4)
+    return sum(word[0] for word in struct.iter_unpack("<I", padded)) & 0xFFFFFFFF
 
 
 def _checksum(buf: bytes, start: int = 0, negate: bool = False) -> int:
@@ -55,69 +57,68 @@ def parse(sig: bytes) -> dict:
             "chunks": chunks, "header": sig[:192]}
 
 
+def _encrypted_chunks(sig: bytes, meta: dict) -> list[bytes]:
+    chunks = []
+    for coff, csize in meta["chunks"]:
+        start = meta["head_size"] + meta["sig_size"] + coff
+        size = csize + (-csize) % 32
+        chunk = sig[start:start + size]
+        if len(chunk) != size:
+            raise ValueError("truncated encrypted chunk")
+        chunks.append(chunk)
+    return chunks
+
+
 def validate_ranges(sig: bytes, meta: dict) -> bool:
     hdr = bytearray(meta["header"]); hdr[108:112] = b"\0\0\0\0"
     c = _checksum(bytes(hdr))
     for i in range(len(meta["chunks"])):
         base = 192 + i * 32
         c = _checksum(sig[base:base + 32], c)
-    enc = bytearray()
-    for coff, csize in meta["chunks"]:
-        start = meta["head_size"] + meta["sig_size"] + coff
-        pad = (32 - csize % 32) % 32
-        enc += sig[start:start + csize + pad]
-    return _checksum(bytes(enc), c, negate=True) == meta["encr_cksum"]
+    for chunk in _encrypted_chunks(sig, meta):
+        c = _checksum(chunk, c)
+    return (-c) & 0xFFFFFFFF == meta["encr_cksum"]
 
 
 def try_schemes(sig: bytes, meta: dict) -> list[str]:
-    enc = bytearray()
-    for coff, csize in meta["chunks"]:
-        start = meta["head_size"] + meta["sig_size"] + coff
-        pad = (32 - csize % 32) % 32
-        enc += sig[start:start + csize + pad]
-    enc = bytes(enc)
-    n = (len(enc) + 15) // 16
+    chunks = _encrypted_chunks(sig, meta)
+    enc = b"".join(chunks)
+    n = len(enc) // 16
     hits = []
 
-    def trim(dec: bytes) -> bytes:
-        out = bytearray(); p = 0
-        for _, csize in meta["chunks"]:
-            out += dec[p:p + csize]; p += csize + (32 - csize % 32) % 32
-        return bytes(out)
-
-    # keystreams do not depend on the crypt key: build once
-    streams = {}
+    # These are fixed-WAES hypotheses, not AES under an unwrapped scram key.
     for s_tag, s_fn in (("e", encrypt_block), ("d", decrypt_block)):
         for order in ("big", "little"):
-            streams[(s_tag, order)] = b"".join(
+            ks = b"".join(
                 s_fn(b"\0" * 12 + c.to_bytes(4, order)) for c in range(n))
-
-    for ck_tag, ck_fn in (("d", decrypt_block), ("e", encrypt_block)):
-        ck = ck_fn(meta["scram"])
-        for (s_tag, order), ks in streams.items():
             dec = bytes(a ^ b for a, b in zip(enc, ks))
-            if _checksum(trim(dec)) == meta["plain_cksum"]:
-                hits.append(f"ctr ck={ck_tag} stream={s_tag} order={order}")
-        for s_tag, s_fn in (("e", encrypt_block), ("d", decrypt_block)):
-            for iv_tag, iv in (("scram", meta["scram"]), ("zero", bytes(16))):
-                prev, dec = iv, bytearray()
-                for i in range(0, len(enc), 16):
-                    blk = enc[i:i + 16]
-                    dec += bytes(a ^ b for a, b in zip(s_fn(blk), prev)); prev = blk
-                if _checksum(bytes(dec)) == meta["plain_cksum"]:
-                    hits.append(f"cbc ck={ck_tag} stream={s_tag} iv={iv_tag}")
+            if _checksum(dec) == meta["plain_cksum"]:
+                hits.append(f"ctr primitive={s_tag} order={order}")
+        for iv_tag, iv in (("scram", meta["scram"]), ("zero", bytes(16))):
+            dec = bytearray()
+            for chunk in chunks:
+                prev = iv
+                for i in range(0, len(chunk), 16):
+                    blk = chunk[i:i + 16]
+                    dec += bytes(a ^ b for a, b in zip(s_fn(blk), prev))
+                    prev = blk
+            if _checksum(bytes(dec)) == meta["plain_cksum"]:
+                hits.append(f"cbc primitive={s_tag} iv={iv_tag}")
         dec = b"".join(s_fn(enc[i:i + 16]) for i in range(0, len(enc), 16))
         if _checksum(dec) == meta["plain_cksum"]:
-            hits.append(f"ecb ck={ck_tag}")
+            hits.append(f"ecb primitive={s_tag}")
     return hits
 
 
 def main(path: str) -> int:
     _reexec_under_rosetta(path)
-    wb_aes_bridge._ENC, wb_aes_bridge._DEC = wb_aes_bridge.load()
     sig = Path(path).read_bytes()
     meta = parse(sig)
-    print("encrypted checksum range validation:", "MATCH" if validate_ranges(sig, meta) else "NO")
+    if not validate_ranges(sig, meta):
+        raise ValueError("encrypted checksum range validation failed")
+    print("encrypted checksum range validation: MATCH")
+    wb_aes_bridge._ENC, wb_aes_bridge._DEC = wb_aes_bridge.load()
+    print("scope: 10 fixed-WAES candidates; derived-key models are not tested")
     hits = try_schemes(sig, meta)
     print("scheme hits:", hits if hits else "NONE")
     return 0

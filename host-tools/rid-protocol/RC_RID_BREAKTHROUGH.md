@@ -1,53 +1,22 @@
-# 遥控器侧 RID 突破口 — 总收口
+# 遥控器侧协议研究范围
 
-状态：`STATIC`，代码侧见底；唯一开放项是实机取值。**全程无刷写**。
+状态：`STATIC`。本轮无设备、未发送、未取得新的 ACK/readback/RF 证据。
+旧标题中的“突破口/总收口”不代表已能关闭 RID；C-397 的“只剩实机取值”结论已撤回（C-448/C-449）。
 
-## 1. 结论
+已记录的静态线索包括 EIDSwitchGet/Set、key 注册、请求结构、SendPack/SendData 名称及 rc331 的 local/logic/bulk
+配置（C-373--C-396）。它们不能合成一条已经验证可用的 App→飞机控制路径。
 
-Remote ID 的开关在遥控器侧可被定位并（协议上）关闭：
-
-- SDK key 名：**`EIDSwitch`**
-- 关闭动作：对该 key 执行 Set，值 0
-- 报文：cmd119(0x77)/sub3/attr0x12/'IW' 魔数/timeout500/1 字节载荷
-- 路径：App → 本地 socket + `logic` 协议 → djilink → bulk/USB → 飞机
-
-## 2. 证据链（已入 claim）
-
-| 环节 | 证据 |
+| 对象 | 已有边界 |
 | --- | --- |
-| DJI Fly RID 名称面 | C-373 |
-| 名称 xref 计数 | C-374 |
-| EIDSwitchGet/Set 本体 | C-377 |
-| 模板常量 cmd119/sub3/attr0x12 | C-380 |
-| 载荷 1 字节（value+8） | C-381 |
-| pack 类型 eid_switch_pack | C-382 |
-| base_req 头部布局 + sender 自动 | C-383 |
-| receiver 调用方给 | C-384 |
-| receiver = Characteristics+0x30 | C-385 |
-| 发送虚槽 0x128 | C-386 |
-| 传输 SendPack → SendData | C-387 |
-| 注册 InsertCharacteristics | C-390 |
-| rc331 native 守护进程 | C-392/C-393 |
-| local/logic 路由 | C-394 |
-| dji_link 本地 socket | C-395 |
-| unix socket 命名机制 | C-396 |
+| `EIDSwitch` / `0x03/0x77` | France EID 专用；不是 FAA/global RID。现有生成器没有传输实现 |
+| `ADSBSwitch` / `0x11/0x37` | AirSense/ADS-B 业务；不是 RID 广播总开关 |
+| `EU_CE_enable_c0_rid_0` | 静态映射存在；所测 direct USB 会话有成功正对照而目标未暴露 |
+| local/logic/socket | 固件配置与名称线索；实际 socket、owner、路由和请求生命周期未由本目录验证 |
+| `RidWorkingStatusPush` | push-only/cache 观察面；没有主动 GET 或已证明的 SET/RF 对应关系 |
 
-产物：A-071（EID 发射器）、A-072（OID 发射器）、A-073（验证手册）。
-推断：H-37（socket 名≈`whoami`）。阻塞：B-24（实机 socket/取值）。
+历史静态产物 A-071/A-072 是离线 hex 生成器；A-073 是验证说明。不能通过补一个 sender/receiver 就认定可发送、
+可逆或能关闭广播。恢复值必须来自真实 baseline，不能预设为 1。
 
-## 3. 唯一开放项
-
-需实机取：socket 字面名（`ss -x` / `/proc/net/unix`）、sender、receiver。
-取到后按 A-073 执行即可。
-
-## 3b. 区域备选键
-
-`EU_CE_enable_c0_rid_0`（EUCeCxV1 注册类）是与 EIDSwitch 并列的区域 RID enable 键（C-400/C-401）。
-若目标区服走 CE 路径，优先用它。
-
-## 4. 边界与风险
-
-- 值改了但广播不停 → 可能只是 RC 镜像，需回飞机侧（后备在 `AIRCRAFT_STUE_CHECKPOINT.md`）。
-- receiver/sender 是运行期值，勿照抄 0。
-- `0x02`/`0x03` 常量语义未证，照位置照抄。
-- 兄弟参数 OIDIdentifier（A-072, cmd214/sub17）与开关无关，勿混发。
+后续仍需要分别证明业务语义、实际 owner/路由、baseline、严格 readback、恢复、持久性与独立 RF 对应关系。
+当前工作保持离线；固件研究状态见[STUE 检查点](../firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md)。
+更高优先级边界见[RID 控制面](../../docs/05_RID_CONTROL_SURFACES.md) RID-002B、RID-003、RID-009、RID-011C。

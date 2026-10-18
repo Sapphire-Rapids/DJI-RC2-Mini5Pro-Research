@@ -701,15 +701,12 @@ key 家族已轮换到不可用。
 下一步不再是简单 brute，而是 whitebox 或等公开释放。
 
 
-## N-62 — STUE plaintext still misses under the recovered whitebox primitive (C-326)
+## N-62 — original public probe did not complete the claimed sweep (C-326/C-446)
 
-`NEGATIVE`：Assistant 服务 dylib 内嵌一套全局白盒 AES-128（`t_box_enc`/`t_box_dec` 在六个服务间逐字节一致），
-已在 Rosetta/ctypes 下打通并通过 roundtrip（C-325，A-067）。以该原语对2603 独立验证加密 checksum 字节范围
-（补码形式）**MATCH**，确认 offset/长度无误；随后枚举 crypt-key 方向（WAES enc/dec 作用于 scram）× stream 方向 ×
-CTR counter 端序/位置 × CBC iv/ECB，明文 checksum 仍 **NONE**。
-
-限定：字节范围已确认，只剩 key/mode 映射未定。未枚举的模式、另一处 key 来源、或“WAES 与 STUE 无关”均未否定。
-
+`RETRACTED`：旧 C-326 将加密 checksum MATCH 与完整白盒方案枚举混为一个已复现结果。加密范围检查保留；
+审计提交的探针对真实 2603 逻辑长度 435,382 B 在首个裁剪候选 checksum 上报错，派生 ck 又未用于候选计算、ECB 漏掉 encrypt。
+因此本版本不能支持“全枚举零命中”。仓外是否存在另一份可运行修订脚本未被本次审计判定。
+修复后的测试单独记录为 C-447，不追认旧枚举。
 
 ## N-63 — candidate key and whitebox emulation still miss STUE plaintext (C-328)
 
@@ -735,8 +732,7 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `NEGATIVE`：`aesDecode2Ex` 已可直接 ctypes 调用且 key 生效（不同 key 出不同结果），但用它解2603 STUE chunk，
 配字面量、32 字节池读值或全零 key，明文 checksum 均不命中（输出长度保持435,392）。
 
-限定：framing（CRijndael AES-256 CBC、IV `sm_chain0`）已由真实代码路径证明，故本阴性只指向“模块 key 是谁”，
-不否定 `aesDecode2` 本身。
+限定：直接调用真实 helper 使用它自己的 IV；文档 C-331 的解引用错误不否定这一调用事实。该结果只覆盖列出的候选，不建立 NFZ 到 STUE 的路径。
 
 
 ## N-66 — AES+XOR pipeline still misses with candidate keys (C-334)
@@ -744,23 +740,23 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `NEGATIVE`：按反汇编得到的真实管线（先 `aesDecode2Ex` 或先 XOR 字面量，两序）在2603 上试字面量、32字节池读值、
 全零 key，明文 checksum 全零命中。
 
-限定：管线模型本身未被否定；缺的是 lambda 调用方传入的 `QByteArray` 模块 key。
+限定：候选 key 与管线均是当时猜测。C-333 的调用方 key 模型已由 C-444 撤回，失败不支持它。
 
 
 ## N-67 — self-derivation key candidates still miss (C-336)
 
-`NEGATIVE`：按 C-335 的派生机制，试小写/大写 hex（密文）、密文前16字节 hex、前32字节 raw 作 key，配真实
+`NEGATIVE`：按当时 C-335 的错误派生猜测，试小写/大写 hex（密文）、密文前16字节 hex、前32字节 raw 作 key，配真实
 `aesDecode2Ex` 与两种 AES/XOR 顺序，2603 明文 checksum 全零命中。
 
-限定：都只是流输入/格式的猜测；机制（C-335）本身未被否定。
+限定：C-335 的 hex KDF 已由 C-444 撤回；这些候选未命中仅是历史试算结果。
 
 
 ## N-68 — MD5-derived key candidates still miss (C-339)
 
-`NEGATIVE`：按 C-337 的精确派生（md5hex/md5HEX/md5raw/md5hex16/hex-of-hex，以及自洽 XOR-then-md5）配真实
+`NEGATIVE`：按当时 C-337 的错误 MD5 派生猜测（md5hex/md5HEX/md5raw/md5hex16/hex-of-hex，以及自洽 XOR-then-md5）配真实
 `aesDecode2Ex`，在 pure/xor-first 两序下解2603，明文 checksum 全零命中。
 
-限定：都是流前缀/格式与位移 pad 输入的猜测；md5 机制（C-337）本身未被否定。
+限定：C-337 的 MD5 KDF 已由 C-444 撤回；MD5 实为日志摘要，不再有格式/补零 key 残差。
 
 
 ## N-69 — period17 pad plus rotate modelling still misses (C-342)
@@ -768,7 +764,7 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `NEGATIVE`：按 C-340 的 mod17 pad 与 C-341 的位移/旋转模型，组合 md5hex(enc)/md5hex(rotated) 两 key、enc/rotated
 两 data、以及整段 post-XOR（le/be），2603 明文 checksum 全零命中。
 
-限定：md5 key（C-337）与 mod17 pad（C-340）都未被否定；残差是精确的旋转配对与到底哪个缓冲进了 aesDecode2。
+限定：C-337 的 MD5 key 模型已撤回。pad 变换属于 NFZ 常量缓冲，不能由候选未命中建立 STUE 归属。
 
 
 ## N-70 — exact rotate transform and broad md5 keys still miss (C-343/C-344)
@@ -776,7 +772,7 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `NEGATIVE`：按精确公式 `out[i]=ror8(enc[i],i%8)^pad[i%17]` 变换，以及把 md5/hex-of-md5 施于 enc/scram/header/整sig/
 前若干字节当 key，套工具 ck/CTR/ECB 与 CBC 方案，2603 明文 checksum 全零命中。
 
-限定：md5 派生（C-337）与变换（C-343）均为静态得出；残差是喂入哪个缓冲，以及 NfzPack 是否就是模块路径。
+限定：MD5 key 模型已撤回；NFZ callback 不是已证明的普通固件路径。该结果只覆盖旧猜测。
 
 
 ## N-71 — C-string transform key still misses (C-346)
@@ -784,7 +780,7 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `NEGATIVE`：按 C-345，key = transform(enc) 截到首个 NUL 再取32字节（以及 t-32 raw），data=enc，含可选 post-XOR，
 2603 明文 checksum 全零命中。
 
-限定：C-345 机制未被否定；残差仅是“-0x208 是否逐字节等于密文”与变换方向。
+限定：真实 NFZ key 是固定 32 字节常量变换结果，来源不是密文；旧输入/截断模型已更正。
 
 
 ## N-72 — constant-seed key attempts still miss (C-348)
@@ -792,14 +788,14 @@ OFB/CFB，明文 checksum 仍全部零命中；从干净表手搭的 AES 仿真�
 `NEGATIVE`：按 C-347 提取的21字节常量 seed 作 raw 或经 transform，data=密文，含可选 post-XOR，2603 明文
 checksum 全零命中。
 
-限定：seed 提取是近似的（容器自身的 data() 可能重排/补全），C-347 的容器结论未被否定。
+限定：旧 seed 列表不完整；C-442/C-444 已恢复确定的缓冲结果，不再需要猜测容器重排。
 
 
 ## N-73 — seed-shape variants still miss (C-350)
 
 `NEGATIVE`：完整常量列表 raw/变换、去掉前导0x22、以及截到34字节，作 key 解密文，2603 明文 checksum 全零命中。
 
-限定：字段是以负偏移作 map key 写入的，其**输出顺序**未建模；C-349 的形状结论未被否定。
+限定：负 map key 的解释已撤回（C-349/C-442）；该未命中不能证明真实 seed 仍有未知顺序。
 
 
 ## N-74 — key-sorted seed orderings still miss (C-351)
@@ -807,7 +803,7 @@ checksum 全零命中。
 `NEGATIVE`：把负 key 字段按升/降序排序，并加/去 0x74 0x59 0x2b 前缀，作 raw 或变换 key 解密文，2603 明文 checksum
 全零命中。
 
-限定：setter 的 ABI（立即数究竟是 key 还是 value）仍是假设；排序发射本身未被否定。
+限定：排序试算依赖已撤回的容器/虚调用模型；保留历史结果，不再将该排序作为解密步骤。
 
 
 ## N-75 — UpgradeFirmPack has no direct crypto calls (C-354)
@@ -830,21 +826,21 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 
 `NEGATIVE`：对25字节常量表做全旋转 × 逆序 × raw/变换，作 key，2603 明文 checksum 全零命中。
 
-限定：列表内容（C-349）与对象形状（C-357）未被否定；可能还缺结构体指针字节这一成分。
+限定：C-357 的对象字节模型已撤回。列表未命中不能推出需要结构体指针。
 
 
 ## N-78 — transform direction and pad variants still miss (C-359)
 
 `NEGATIVE`：rol8/ror8 方向、pad mod17/mod16/逆序、seed 正/逆序的组合，2603 明文 checksum 全零命中。
 
-限定：mod17（C-340）与 ror8（C-343）是结构性推导出的形式；残差更可能在“对象字节成分”而非变换公式。
+限定：NFZ 字节变换与 STUE 路径是不同问题；“还缺对象字节”的推论已由 C-442 撤回。
 
 
 ## N-79 — pointer-approximated struct seeds still miss (C-362)
 
 `NEGATIVE`：用 vtable 指针字节+零、+缓冲、裸缓冲、裸 vtable 组 seed（raw/变换），2603 明文 checksum 全零命中。
 
-限定：malloc/栈地址的低字节未知，近似很粗；C-361 未被否定。
+限定：C-361 的运行时指针模型已撤回；合成 seed 未命中不说明真实 key 依赖地址。
 
 
 ## N-80 — mimicked struct seeds across a heap sweep still miss (C-364)
@@ -852,7 +848,7 @@ aes/WAES/CRijndael/Imah 的 callq —— crypto 未内联在此。
 `NEGATIVE`：按 C-363 布局伪造 seed（vt + 0x7f 前缀堆指针，64×16 扫描 + cap0x2b + len0x2c），raw/变换，2603 明文
 checksum 全零命中。
 
-限定：只扫了指针；vtable/cap/len 是固定猜测，可能仍有未建模字段或不同基址前缀。
+限定：C-363 的真实对象布局保留，但对象本身不是变换输入；此次扫描只覆盖错误模型。
 
 
 ## N-81 — systematic pointer brute still misses (C-365)
@@ -860,7 +856,7 @@ checksum 全零命中。
 `NEGATIVE`：进程内 aesDecode2Ex 扫6144 个合成堆指针（lo 0..0x10000 step16 × hi 0x00/0x7f/0x10，固定 vt/cap/len），
 raw/变换，2603 明文 checksum 全零命中。
 
-限定：指针已密扫；残差是32 字节结构之外的0x2c 尾字节，或字段角色配错。
+限定：6,144 组历史运行记录保留，本轮未重跑；12 字节栈尾推论已撤回，不能据此认定 STUE key 复杂。
 
 
 ## N-82 — raw payload checksum matches no module (C-367)
@@ -875,7 +871,7 @@ raw/变换，2603 明文 checksum 全零命中。
 
 `NEGATIVE`：tail 取零/ff/长度优先，三种指针基址，四种 cap 与两种 len，raw/变换，2603 明文 checksum 全零命中。
 
-限定：tail 是未初始化栈、只能近似；seed 模型未被否定。
+限定：未初始化栈尾模型已由 C-442 撤回。负结果仅覆盖这些合成输入，不再指向更多 tail 枚举。
 
 
 ## N-84 — 20000-iteration random seed sweep still misses (C-370)
@@ -883,7 +879,7 @@ raw/变换，2603 明文 checksum 全零命中。
 `NEGATIVE`：进程内 2 万随机 seed（随机48位指针 + 随机12字节尾 × 3 种 cap/len），raw/变换共12万次解密尝试，
 2603 明文 checksum 全零命中。
 
-限定：指针与尾已被随机密集覆盖；残差很可能是尚未判定的“`init` 每轮清零”问题 —— 若成立，seed 中段全零，空间彻底改变。
+限定：历史 120,000 次尝试记录保留，本轮未重跑；每轮 init 清零及随机指针/栈尾模型已撤回，不再构成研究方向。
 
 
 ## N-85 — rc331 partition RID hits are unrelated, Fly APK absent (C-371)
@@ -996,3 +992,62 @@ raw/变换，2603 明文 checksum 全零命中。
 `FUN_03bfbfe8`，且经计算指针到达（无 `s_` 符号出现）。故仍无专属命名 handler，线宽未闭合。
 
 限定：命中已足量，问题在归属层；不排除匿名 lambda。
+
+## N-99 — corrected NFZ key applied directly to 2603 still misses (C-445)
+
+`NEGATIVE`：对 SHA-256 `4a573ab95316de69137deb71249ead09c23325a28acbf9ee305a36410775f274` 的 2603 样本，
+以恢复的 32 字节 NFZ 常量 key 与真实全零 IV 做一次直接 AES-256-CBC 尝试。逻辑长度 435,382 B，填充范围 435,392 B；
+所得 plain checksum `0x6cbf5644` 不等于头部期望 `0xd2f782ff`。
+
+限定：只排除这个 key/IV 对该 chunk 的直接应用。普通固件分支与 NFZ 分支不同；不能推出所有 STUE 路径失败、
+STUE 无法解密或设备端行为。key 字节与原生证据保持私有。
+
+## N-100 — audited probe implementation invalidates its claimed coverage (C-446)
+
+`OBSERVED`：真实 2603 加密 checksum 匹配，但旧 A-068 的 NumPy 非整字 checksum 报错；改变派生 ck 的合成对照中，
+18 个候选明文逐字节不变；ECB encrypt-only 正例漏检。旧重启路径的子解释器仍为 arm64；600,000 B 输入转 hex 后
+超过本机 argv 限制并触发 Errno 7，而 2603 的 435,392 B 填充块没有达到此容量限制。
+
+限定：这些是审计提交的实现缺陷，不是 cipher 的负结果，也不否定直接 native helper 的既有最小测试。
+缺失 NumPy/架构依赖说明另见 F10；修复后验证为 C-447。
+
+## N-101 — three named public-v2 candidates miss real 2603 (C-451)
+
+`NEGATIVE`：真实 436,000 B WA150 2603 样本的 payload SHA-256 与加密 checksum 均通过。
+按 A-082 的公开 v2 模型，NFZ32-as-KEK、WAES.decrypt(scram)-as-content16、WAES.encrypt(scram)-as-content16
+分别得到 `0x5fb4802c`、`0x13169336`、`0x6bd174f9`，均不等于 `0xd2f782ff`。
+校验覆盖 435,392 B 解密 padding 范围，逻辑 chunk 为 435,382 B。
+
+限定：只有这三个候选，不是穷举；不能否定其他 key 或 STUE 模型，也不是签名验证。
+C-445 的直接 CBC 负结果与 C-447 的 fixed-WAES 组合保持独立；key/明文不公开、无设备操作。
+
+## N-102 — no STUE decoder recovered on the inspected method-4 path (C-452)
+
+`STATIC`：精确 Assistant x86_64 UavService 库中，method-4/register-upgrader 路径的网络缓存、size/MD5 校验、
+tar 打包与 FTP 传递均复制输入/缓存字节，未在已检查边恢复出 STUE decoder。
+
+限定：没有证明当前 WA150 运行时会选该路径，不能扩大为整个 Assistant 没有 decoder；其他方法、回调和下游 owner
+仍未由此排除。没有设备执行，完整路径与证据引用见固件记录第 12.3/12.5 节。
+
+## N-103 — bounded public source selection adds no STUE implementation (C-453)
+
+`NEGATIVE`：517 个 fork 元数据只用于筛选，实际检查 17 个默认分支和 8 个非默认分支的 IMaH 源码。
+25 份文件均与 pinned upstream 相同，SHA-256 `534680d1fb0ced5f6425b276fcd421456a45a513cf625d73566b2150c2ed6760`，无 STUE mapping。
+
+限定：没有检查全部 fork 的源码、所有分支或整个网络；不能据此认定公开或私下均无 key。
+固定上游与选择规则见固件记录第 12.4 节。
+
+## N-104 — RC331 0200 inner plaintext is still unavailable (C-454)
+
+`UNKNOWN`：外层 checksum/payload SHA 与内层 TBIE/FLYA 的 encrypted checksum/payload SHA 均匹配，内层仍未得明文。
+六个公开 TBIE 版本只检查了 32 B prefix/magic，不能作为六次完整 checksum 失败，也不能排除那些 key。
+
+更正：C-319 只描述外层，C-322 的 RC 全明文结论撤回。此轮没有新下载、设备执行或新 RSA 验证。
+
+## N-105 — static RC331 QSEE chain is not root-key recovery (C-456/C-457)
+
+`STATIC`：已恢复的 dji_decrypt/libtee_util/bw_secure 链依赖 RPMB root，经 HUK 支持的存储块处理获得 root input。
+当前只有固件，没有设备 RPMB 数据或 HUK 派生输出。mode 常数 1/2 的枚举语义尚未独立核对。
+
+限定：这是缺失输入与静态路径的边界，不是执行失败或所有离线方法不可行的证明。固定 480 B header 的 RC client
+也不能直接处理 WA150 的 608 B header+signature，不得称为已经可用的 STUE 解密器。

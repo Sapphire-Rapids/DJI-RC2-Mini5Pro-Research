@@ -994,7 +994,8 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：本地工具补一条 PKCS1-v1.5 回退（wa150 以 PKCS1 签名而工具默认 PSS）（C-321）。
 - `STATIC`：RC3310205 无 force 完整解密，三层校验全过；明文为 Android11 A/B OTA，dump 29 分区（C-317）。
 - `CORROBORATED`：重新提取 adbd（A-030）与 dpad_fuli.apk（A-031），与登记逐字节一致（C-318）。
-- `STATIC`：RC3310200 及聚合体模块 enc_key 为空、均为明文；确认 STUE 为飞机专属（C-319/C-322）。
+- 历史更正：C-319 只保留 RC3310200/聚合体外层 enc_key 为空的 `STATIC` 观察；C-322 的“RC 全明文/仅飞机受阻”
+  推论由 C-454 撤回，0200 内层 TBIE/FLYA 仍未解密。
 - `NEGATIVE`：WA150 三模块 enc_key=STUE，公开 corpus 无该 key；派生 key×mode×IV brute 对2603/0802零命中（C-320）。
 - `NEGATIVE`：0802 PRAK 3072-bit 验签在 PSS/PKCS1 与多哈希/salt 下失败（C-321）。
 - 结果与派生输入仅本地；未回写设备，无刷写。样本排除不入库。
@@ -1008,3 +1009,39 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：固化为 wb_aes_bridge.py（进程内 load + 三测）与 stue_plaintext_probe.py（A-067/A-068）。
 - `NEGATIVE`：探针先独立验证加密 checksum 字节范围（补码形式）MATCH，再枚举 ck/stream 方向、CTR 端序/位置、
   CBC iv、ECB；明文 checksum 仍 NONE（C-326）。
+
+
+### 2026-10-17 DeepSeek-Harness audit correction
+
+- `STATIC`：按精确 Assistant 库与保留的原生审计证据，修正 vtable address point、get 数据区、IV 解引用及 MD5 日志归属；
+  撤回 C-331/C-333/C-335/C-337/C-349/C-355/C-357/C-361/C-369 的错误前提（C-442--C-444）。
+- `STATIC`：确认 type 0/1/8 是普通固件/NFZ/本地固件分派；恢复的 NFZ 常量 key+零 IV 对 2603 一次直接尝试
+  `NEGATIVE`：checksum 不匹配，未解密 STUE（C-445）。key 仅登记长度与哈希。
+- `OBSERVED`：审计提交中的公开探针复现了 F05--F10 的实现/环境缺陷；C-326 的完成枚举结论撤回，历史 native helper
+  调用和错误模型下的未命中记录分别保留（C-446）。修复后测试另记 C-447。
+- `STATIC`：核对 docs/05 既有边界，将 France EID、AirSense 与 RID 分开，保留 direct USB EU_CE 正对照负结果；
+  将六个协议工具更名为离线 hex 生成器，位置编码组合继续标为未验证（C-448/C-449）。本轮没有设备操作。
+- `OBSERVED`：A-067/A-068/A-070 v2 的修复目录测试 53/53 通过；普通 arm64 启动真实 2603 后正常完成 Rosetta 路径，
+  加密 checksum MATCH、十个 fixed-WAES 候选 NONE。本机 AES-256 已知答案、600,000 B stdin 和真实 chunk 同长调用通过，
+  后者使用合成零 key，仅验证管线（C-447）。最终源码 hash/size 已复算并同步 CSV/Markdown；未连接设备。
+
+### 2026-10-17 public-v2 probe and bounded ordinary-firmware investigation
+
+- `OBSERVED`：新增 A-082 单候选 public-v2 checker；六项新增测试含独立 OpenSSL 混合 chunk/gap/非零 padding 样例。
+  retained firmware-acquisition suite 日志为 59/59 通过；本次文档登记未重复运行（C-450）。
+- `NEGATIVE`：真实 2603 的 NFZ32-as-KEK 与两个 WAES(scram)-as-content16 候选都通过加密完整性前置，但 plain checksum
+  分别为 `0x5fb4802c`、`0x13169336`、`0x6bd174f9`，均不等于 `0xd2f782ff`；仅三次，不是穷举（C-451）。
+- `STATIC`：沿精确 Assistant method-4/register-upgrader 读取方法选择、下载/cache、size/MD5、tar copy、FTP 路径。
+  已检查边保持输入字节，未恢复出 STUE decoder；不外推整个 Assistant 或当前 WA150 runtime（C-452）。
+- `NEGATIVE`：517 fork 元数据筛选后检查 17 个默认分支与 8 个非默认分支源码，25 份 IMaH 文件均与上游相同，无 STUE。
+  范围不覆盖全部 fork 或整个网络（C-453）。所有样本、key、明文候选与原生证据留在仓外；无设备操作。
+
+### 2026-10-17 RC331 protected inner layer and offline QSEE chain
+
+- `OBSERVED`：复核已有 A-005，确认外层完整性通过、内层 TBIE/FLYA 仍为密文；C-319 收窄为外层，C-322 整体推论撤回。
+  六个公开 TBIE 版本仅 prefix 试探，未登记成完整 checksum 负结果（C-454）。
+- `OBSERVED`：已有 A-004/0205 的 payload properties、system/vendor 完整哈希和 bw_secure REPLACE_XZ blob/输出均与清单匹配，
+  提取 A-083--A-085。未新下载、未运行厂商 ELF、未重跑 RSA 验签（C-455）。
+- `STATIC`：定位 dji_decrypt→libtee_util→QSEE bw_secure 的 0x17/0x18 链；client 固定 480 B header，不等于 WA150 的 608 B（C-456）。
+- `STATIC`：定位 type0x0c 的 TBIE CMAC 派生与 protected RPMB root/HUK 存储处理；无设备 root input、HUK 输出或恢复 key，
+  不外推 STUE 共用方案（C-457）。样本、厂商分析内容和本地路径保持仓外。

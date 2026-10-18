@@ -1,52 +1,32 @@
-# rid-protocol — 遥控器侧 RID 关闭（无刷写）
+# rid-protocol — 离线协议结构研究
 
-从 DJI Fly 静态恢复的 Remote ID 关闭路径。全程只发协议，不刷写。
+状态：`STATIC`，当前无设备。本目录六个 CLI 只生成 hex，没有 USB、socket 或其他设备传输实现。
+C-448/C-449 撤回此前“RID 关闭路径”“全条件成立”和“完整控制”的表述。静态结构与自检不构成实机能力。
 
-## 结论
-
-- 主键：SDK characteristic 名 **`EIDSwitch`**；关闭 = Set 值 0
-- 区域备选：`EU_CE_enable_c0_rid_0`（observer 绑定，非命名 handler）
-- 报文：cmd119(0x77)/sub3/attr0x12/'IW' 魔数/timeout500/1 字节载荷
-- 路径：App → 本地 socket + `logic` → djilink → bulk/USB → 飞机
-
-## 文件
-
-| 文件 | 作用 |
+| 文件 | 当前用途 |
 | --- | --- |
-| `EID_SWITCH_MESSAGE.md` | EID 报文规格（布局表、依据、边界） |
-| `eid_switch_message.py` | EID 发射器（A-071） |
-| `test_eid_switch_message.py` | EID 自检：对反编译 ctor 逐字节断言 |
-| `oid_identifier_message.py` | OIDIdentifier 发射器（A-072，RID-005B 对齐：18字节 pack、receiver 0x92） |
-| `OID_IDENTIFIER_MESSAGE.md` | OID 规格（RID-005B 对齐） |
-| `test_oid_identifier_message.py` | OID 自检 + 0x70 上限 |
-| `opid_message.py` | 操作者注册号 set/delete 发射器（A-076） |
-| `test_opid_message.py` | opid 自检 + 16 上限 |
-| `position_message.py` | 位置加密发射器（A-078） |
-| `test_position_message.py` | 位置自检 |
-| `adsb_switch_message.py` | ADS-B 代理开关发射器（A-079） |
-| `test_adsb_switch_message.py` | adsb switch 自检 |
-| `height_message.py` | 动态最大高度 GET 发射器（A-080） |
-| `test_height_message.py` | height 自检 |
-| `VERIFY_RUNBOOK.md` | 上手验证手册（A-073） |
-| `RC_RID_BREAKTHROUGH.md` | RC 线收口（A-074） |
-| `RID_CONTROL_CONSOLIDATION.md` | RID 控制面总收口（A-081） |
-| `RID_FIELD_MAP.md` | 字段控制地图（A-077） |
+| `eid_switch_message.py` / `EID_SWITCH_MESSAGE.md` | France EID 请求结构候选，A-071；不是 global RID 开关 |
+| `oid_identifier_message.py` / `OID_IDENTIFIER_MESSAGE.md` | 中国 UOM 标签的离线结构，A-072；不等于 Basic/UAS ID |
+| `opid_message.py` | EASA operator registration 候选结构，A-076 |
+| `position_message.py` | app-location 编码近似，A-078；prefix、字段与最终字节流未验证 |
+| `adsb_switch_message.py` | AirSense/ADS-B 配置候选，A-079；不是 RID 总开关 |
+| `height_message.py` | 动态最大高度 GET 结构候选，A-080；不是 RID 高度编辑器 |
+| `test_*_message.py` | 合成结构/确定性自检，不能替代官方输出或设备对照 |
+| `VERIFY_RUNBOOK.md` | 离线验证范围与尚缺证据，A-073 |
+| `RC_RID_BREAKTHROUGH.md` / `RID_CONTROL_CONSOLIDATION.md` | 更正后的静态研究范围，A-074/A-081 |
+| `RID_FIELD_MAP.md` | 业务面和验证缺口，A-077 |
 
-## 用法
+离线示例：
 
-```
-python3 eid_switch_message.py --sender <s> --receiver <r> --value 0   # 关
-python3 eid_switch_message.py --value 1                               # 回滚
+```sh
+python3 eid_switch_message.py --value 0
+python3 test_eid_switch_message.py
+python3 test_oid_identifier_message.py
 ```
 
-自检：
+这些命令只打印候选字节或测试结果。内部 request 对象布局不等于最终线包，sender/receiver、传输 framing 与当前 owner
+尚未由这些生成器验证。`EU_CE_enable_c0_rid_0` 在既有 direct USB 正对照会话中未暴露，不作为可用替代开关。
+`RidWorkingStatusPush` 没有主动 GET，也不能单独证明 EID/ADS-B SET 已应用或 RID RF 改变。
 
-```
-python3 test_eid_switch_message.py && python3 test_oid_identifier_message.py
-```
-
-## 边界
-
-- sender/receiver 是**运行期值**（sender 自动、receiver = Characteristics+0x30），静态默认 0。
-- socket 字面名未取（H-37 推断为 `whoami`，实机用 `ss -x` / `/proc/net/unix` 核对）。
-- 值改了但广播不停 → 可能只是 RC 镜像，回飞机侧后备 `AIRCRAFT_STUE_CHECKPOINT.md`。
+业务语义与历史实机边界以[RID 控制面](../../docs/05_RID_CONTROL_SURFACES.md)的 RID-002B、RID-003、RID-005C、
+RID-009 和 RID-011C 为准。位置源码仍含近似，不能当作可用坐标编辑器。

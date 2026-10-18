@@ -1,60 +1,25 @@
-# RID 控制面总收口
+# RID 相关协议研究汇总
 
-状态：`STATIC`，代码侧穷尽。无设备，未实发，**全程无刷写**。
+状态：`STATIC`。当前无设备，六个工具只生成离线 hex；没有设备发送实现。
+C-448/C-449 撤回旧版“完整控制 Remote ID”“路径全无条件成立”和“代码侧穷尽”的结论。
 
-## 1. 结论
-
-遥控器侧可从协议上完整控制 Remote ID 广播面：开关、标识、位置、高度、广播代理、ADS-B 量级。
-
-- 广播代理总开关：SDK key `ADSBSwitch` → cmd55/sub17，1 字节
-- RID/EID 开关：key `EIDSwitch` → cmd119/sub3，1 字节（0=关）
-- 操作者注册号/删除：key `OperatorRegistrationNumber` → cmd120/sub3，字符串 ≤16
-- 中国实名标签：`OIDIdentifier` → cmd0x11/0xD6，18 字节 pack（RID-005B 严格对齐）
-- 位置：`UploadMobileDevicePosition` → cmd67/sub17，AES-256-CBC + HMAC
-- 动态最大高度：GET cmd80/sub17
-- ADS-B on/off：GET cmd12/sub17
-
-## 2. 路径（全无条件成立）
-
-App → 本地 socket + `logic` 协议 → `djilink` → bulk/USB → 飞机。
-注册经 `BaseAbs::InsertCharacteristics`；传输 `SendSetPack → BaseAbstraction::SendPack(slot0x128) → UavCoreCancelation::SendData`。
-
-receiver 统一取 `Characteristics+0x30`，sender 由 `GlobalPacketStatus::GetGlobalSenderIndex()` 自动。
-
-## 3. 产物（发射器 + 自检）
-
-| 对象 | artifact | 自检 |
+| 表面 | 静态名称/命令 | 工具与当前边界 |
 | --- | --- | --- |
-| EID 开关 | A-071 | ✅ |
-| OIDIdentifier | A-072（RID-005B 对齐） | ✅ |
-| OperatorRegistrationNumber | A-076 | ✅ |
-| 位置（加密） | A-078 | ✅ |
-| ADS-B 代理开关 | A-079 | ✅ |
-| 动态最大高度 GET | A-080 | ✅ |
+| France EID | `EIDSwitch` / `0x03/0x77` | A-071；法国专用，不是 global RID |
+| 中国 UOM 标签 | `OIDIdentifier` / `0x11/0xD6` | A-072；18 字节 pack，不等于 Basic/UAS ID |
+| EASA registration | `OperatorRegistrationNumber` / `0x03/0x78` | A-076；身份面，不是 RF 开关 |
+| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078；字段/prefix/密文缓冲仍有近似，不是坐标编辑器 |
+| AirSense/ADS-B | `ADSBSwitch` / `0x11/0x37`，receive enable `0x11/0x0C` | A-079；不能作 RID 总开关 |
+| 动态最大高度 | GET `0x11/0x50` | A-080；静态结构候选，不是 RID 高度写入 |
 
-规格文档：`EID_SWITCH_MESSAGE.md`、`OID_IDENTIFIER_MESSAGE.md`；手册 `VERIFY_RUNBOOK.md`。
+`EU_CE_enable_c0_rid_0` 的静态映射不能覆盖所测 direct USB 的正对照负结果；不能推荐为 EID 的可用替代。
+`ComplianceSerialNumber`/`SerialNumber` 的命名访问器未恢复出可用写路径，不能由派生关系或名称缺失推断其他路径绝不存在。
 
-## 4. 验证通道
+App→local/logic→djilink→bulk/USB 是静态组件线索。注册成功、内部请求结构、候选 hex 与自检均不证明端到端路由、
+设备 capability、baseline、readback、恢复或 RF 效果。源码自检验证的是合成结构和确定性，未与官方 wire 输出逐字节对照。
 
-`RidWorkingStatusPush`（push-only，C-439/C-440）给出一读路径：先读它确认基线，再发 set，复读确认。
+`RidWorkingStatusPush` 是 push-only 观察面，没有主动 GET；尚未证明其 flags 对应 EID/ADS-B SET 的 applied 状态。
+历史外部 Binder listener 在真实 RID RF 存在时曾零回调，不能把无回调读作关闭。保留缓存也需要接收时间语义和独立 RF 对照。
 
-## 5. 明确不可写
-
-- `ComplianceSerialNumber`：派生 listener，无 Get/Set（C-428/C-429）
-- `SerialNumber`（底层 SN）：Get-only，164 处引用无 Set（C-430/C-431）
-- 四 capability flag、RIDRegistedInfo(action)、RIDImportResult(getter)：非可写字段
-
-## 6. 残差（含负结果）
-
-- `CccBroadcastSignalQuality`：camera 族、计算指针到达、无命名 handler（C-413/C-438、N-90/N-98）
-- `RidImportModule`：仅 opcode（C-409），载荷未解
-- `dynamic_max_height`：handler 匿名（C-437、N-97）
-- 全部 `STATIC`；live inventory/键存在性/ACK 待实机
-- 飞机侧 STUE 后备在 `AIRCRAFT_STUE_CHECKPOINT.md`
-
-## 7. 风险
-
-- 值改了但广播不停 → 可能只是 RC 镜像，转飞机侧
-- receiver/sender 是运行期值，勿照抄 0
-- `0x02`/`0x03`/`0x05` 常量语义未证，照位置照抄
-- OID 与 EID 勿混发；opid 空载荷=删除
+依据：[RID 控制面](../../docs/05_RID_CONTROL_SURFACES.md) RID-002B、RID-003、RID-005B、RID-005C、RID-009、RID-011C；
+[字段地图](RID_FIELD_MAP.md)；[离线验证说明](VERIFY_RUNBOOK.md)；[STUE 检查点](../firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md)。

@@ -2,7 +2,27 @@
 
 ## Start here
 
-Latest continuation (C-310--C-315): B6 started and A060 completed once. Baseline/read/independent
+Latest continuation (2026-10-17, C-454--C-457): A-005's outer clear container contains encrypted TBIE/FLYA;
+C-319 is outer-only and C-322 is retracted. Existing OTA integrity/provenance is rechecked, and A-083 bw_secure,
+A-084 libtee_util and A-085 dji_decrypt are extracted but never executed. The static chain reaches protected
+RPMB-root/HUK-backed TBIE derivation; root inputs and WA150 STUE's own owner/derivation are still unknown.
+The fixed480-byte client is not a drop-in decoder for WA150's608-byte header/signature layout. No device is available.
+
+Prior continuation (C-450--C-453): A-082 implements the pinned public-v2 single-key model, with six new
+checks and the full 59-test suite passing. Three named hypotheses on real 2603 all miss. The inspected Assistant
+method-4/register path preserves downloaded bytes through cache/tar/FTP; no STUE decoder was recovered within that
+path. The 25 selected public-source copies add no STUE implementation. Method choice, downstream owner and STUE
+applicability remain unproven; there is no device. See the final continuation section before selecting another route.
+
+Prior correction (C-442--C-449): STUE remains unresolved; the Assistant vtable/IV/MD5/NFZ premises
+are corrected. A-067/A-068/A-070 v2 passed the recorded offline checks, including ten fixed-WAES misses on 2603.
+Read the [corrected checkpoint](../host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md) and the final audit
+handoff section before continuing. There is no device available; the protocol CLIs are offline hex generators,
+France EID/AirSense are not global RID control, and position composition remains unverified.
+
+The following live-session continuation is retained history:
+
+Historical continuation (C-310--C-315): B6 started and A060 completed once. Baseline/read/independent
 cleanup all returned0, the10907-byte export and permanent receipts passed strict validation,
 and PID/UID/APK stayed stable. All41 rows are nonempty;36 unique signed payloads verify with
 the retained A057 point. These reduce to25 signed header/body messages and six whole-body
@@ -675,7 +695,8 @@ control flow instead of reusing runtime-state/registration enum numbers as polic
 
 Six current modules were fetched over the official Assistant path and matched official size/MD5 plus
 registered SHA-256 (C-316). RC331 `0205` decrypts fully and is byte-identical to A-030/A-031
-(C-317/C-318); RC331 `0200` and RC331 aggregate modules are plaintext (C-319/C-322). WA150 modules
+(C-317/C-318). C-319 describes only outer clear headers; A-005/0200 contains encrypted inner TBIE/FLYA (C-454),
+and C-322's all-RC-plaintext inference is retracted. WA150 modules
 are `enc_key=STUE`; no public key, derived/mode/IV/v1-v2 brute is zero-hit (C-320), and the wa150
 3072-bit PRAK is absent (C-321). A local PKCS1-v1.5 fallback was needed because wa150 signs PKCS1
 while header_version2 makes the tool assume PSS.
@@ -688,3 +709,57 @@ existing key, and do not treat decrypt as live mounted or flash admission.
 Next for this lane: obtain `STUE` (whitebox/TEE extraction or later public release) per B-23/H-34,
 then decrypt `0802` and locate the RID broadcaster owner/enable parameter in plaintext before any
 protocol validation. RC-side static work is unblocked and can run in parallel.
+
+## 2026-10-17 audit correction handoff (C-442--C-449)
+
+Start with the corrected [STUE checkpoint](../host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md).
+The original address-dependent seed, MD5 KDF, nonzero IV and ordinary-firmware-to-NFZ claims are retracted.
+The confirmed NFZ key is a constant 32-byte buffer, published only by length/hash, and its IV is zero.
+One direct application to the exact 2603 chunk failed checksum; ordinary firmware dispatch must be traced independently.
+Do not resume random pointer/tail sweeps or promote the NFZ helper to STUE without a concrete data-flow edge.
+
+C-446 records the audited probe defects; C-447 records corrected implementation validation separately. A passing test or
+fix does not retroactively validate the old C-326 sweep. Artifact size/hash and Markdown/CSV state must agree before handoff.
+Raw binaries, key bytes, vendor disassembly and private evidence remain excluded.
+
+The current user has no device. France EID, AirSense, EU C0 policy and app-location are separate surfaces; the old
+"complete control"/"all preconditions met"/"only hardware values remain" wording is withdrawn. The six protocol CLIs generate
+offline hex only, position encoding remains approximate, and WorkingStatusPush has no proven SET-to-applied/RF relationship.
+Use docs/05 RID-002B, RID-003, RID-005C, RID-009 and RID-011C as the established semantic and live-evidence boundaries.
+
+## 2026-10-17 public-v2 and method-4 continuation (C-450--C-453)
+
+A-082 is a single-candidate checker, not a key search or plaintext exporter. It reads raw candidate key bytes from stdin,
+verifies payload SHA256/encrypted checksum first, then tests the pinned AES-ECB-unwrap/AES-128-CTR model. Clear chunks
+and storage gaps do not advance CTR; plain checksum includes decrypted padding. There is no signature check.
+Its six new tests include an independent frozen OpenSSL mixed-chunk fixture; the retained full-suite log is 59/59.
+
+Do not repeat C-451's three candidates without new input: NFZ32-as-KEK, WAES-decrypt(scram)-as-content16 and
+WAES-encrypt(scram)-as-content16 all miss the exact 2603 checksum. Keep C-445 direct CBC and C-447 fixed-WAES results
+separate. A checksum miss only excludes the tested interpretation; no valid STUE plaintext has been obtained.
+
+C-452 follows only method 4 / DJIFirmRegisterUpgrader in the exact x86_64 UavService library: download callbacks
+preserve/cache the buffer, size/MD5 checks retain it, tar packaging copies it, and FTP consumes it. New investigation
+must establish an actual consumer edge or inspect an already available offline receiver sample; this does not prove
+WA150 method selection, all-Assistant absence or a specific RC/aircraft/TEE key owner. Raw evidence stays excluded.
+
+C-453 screened 517 fork metadata rows but inspected only 17 selected default-branch and 8 nondefault IMaH source
+files; all are byte-identical to the pinned upstream and lack STUE. Do not present it as all-fork or whole-web coverage.
+The current protocol/RID work remains offline, with the C-448/C-449 boundaries unchanged.
+
+## 2026-10-17 RC331 protected-chain continuation (C-454--C-457)
+
+The search for the RC331 components is complete: A-083/A-084/A-085 are identified, extracted from verified local
+OTA inputs and statically traced. Do not list finding bw_secure as the next step. No new download, vendor binary run,
+RSA reverification or live mounted identity was performed. The artifact register contains their exact identities.
+
+A-005 has clear outer header/payload integrity and an encrypted TBIE/FLYA inner layer beginning at480 with ciphertext
+at960. No FLYA plaintext is available. The six public-TBIE prefix probes were not full checksum exclusions.
+The dji_decrypt client passes header scram through QSEE commands0x17/0x18 but assumes a480-byte header; current WA150
+uses608. Do not execute the extracted client as a general STUE decoder.
+
+The trusted-app key init reaches RPMB derivation type0x0c, CMAC label IMAGE ENC KEY/context TBIE and a protected
+root read with HUK-backed unwrap/authentication. The TBIE context is assembled as an immediate, explaining the absent
+literal-string hit. No device RPMB block, HUK output, root key or usable payload key was recovered. Mode constants1/2
+are not independently named. Continue only from concrete available inputs or a separate STUE consumer edge; do not
+assume RC/WA150 keys or schemes match, or infer that all offline methods are impossible.

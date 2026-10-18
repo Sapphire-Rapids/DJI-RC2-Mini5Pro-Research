@@ -451,67 +451,67 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-316 | `OBSERVED` | Six current modules fetched over official Assistant metadata/CDN; size/MD5 matched and SHA-256 matched the register | Network acquisition, not a device read; A-029 is local archive, not this fetch |
 | C-317 | `STATIC` | RC331 `0205` decrypts with no force; all three checksum/signature layers pass; plaintext is Android11 A/B OTA; 29 partitions dumped | Not live mounted, not flash admission; version maps via register only |
 | C-318 | `CORROBORATED` | Recovered `adbd` (A-030) and `dpad_fuli.apk` (A-031) are byte-identical to their identities | Restores offline input; not installed/mounted facts or A-032 admission |
-| C-319 | `STATIC` | RC331 `0200` and all RC331 aggregate modules have empty `enc_key` and decrypt to plaintext | No inner container decrypt; not an executable DJI Fly image |
-| C-320 | `NEGATIVE` | WA150 modules are `enc_key=STUE`; no public key, derived-key/mode/IV/v1-v2 brute gives zero plaintext-checksum hits | Covers public corpus only; aircraft-only; not an unbreakable-key proof |
+| C-319 | `STATIC` | Examined RC331 outer headers have empty enc_key; A-005 outer integrity passes | Outer layer only; encrypted TBIE/FLYA inner layer confirmed by C-454 |
+| C-320 | `NEGATIVE` | WA150 modules are `enc_key=STUE`; no public key, derived-key/mode/IV/v1-v2 brute gives zero plaintext-checksum hits | Covers the tested corpus/WA150 samples only; not an unbreakable-key proof |
 | C-321 | `NEGATIVE` | WA150 3072-bit PRAK absent; PSS/PKCS1 across hash/salt/zeroed-field variants all fail | Does not affect the STUE payload path; records a lagging public auth corpus |
-| C-322 | `STATIC` | RC331 plaintext vs WA150 `STUE` across the fetched and decrypted set | Two-product sample; RC ownership of RID not established by this |
+| C-322 | `RETRACTED` | RC331-all-plaintext versus aircraft-only blocker inference withdrawn | C-454 distinguishes outer clear container from protected TBIE/FLYA inner data |
 | C-323 | `OBSERVED` | WA150 `1200` fetched as a cheap STUE oracle; MD5/size matched | Manual lock injection; same STUE boundary, no plaintext |
 | C-324 | `NEGATIVE` | No plain16-byte STUE constant in Assistant dylibs or Fly native data; Assistant embeds four2048-bit plain PRAK each | Plain constants only; whitebox/runtime/device paths remain |
 | C-325 | `OBSERVED` | Assistant whitebox AES pair recovered as a callable Rosetta/ctypes primitive; tables identical across services | Fixed Assistant artifact; not proven as the STUE key, no live fact |
-| C-326 | `NEGATIVE` | Encrypted-checksum ranges validate but the STUE plaintext checksum misses across enumerated whitebox schemes | Only key/mode unresolved; unenumerated modes or another key source remain |
+| C-326 | `RETRACTED` | Original public-probe enumeration claim is retracted | Real nonword chunk crashes; unused ck and missed ECB direction; corrected results C-447 |
 | C-327 | `OBSERVED` | Whitebox tables decomposed (affine in `InvSbox(x^k)`, coeff1) and a unique candidate key recovered | HYPOTHESIS key; constant encoding means plain AES is not the whitebox |
-| C-328 | `NEGATIVE` | Candidate key via plain AES and a hand-built emulation both still miss the plaintext | Structure/encoding mapping open; key derivation itself validated |
+| C-328 | `NEGATIVE` | Candidate key via plain AES and a hand-built emulation both still miss the plaintext | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
 | C-329 | `OBSERVED` | WAES callers are GetPublic/PrivateValue; firmware path uses `aesDecode2` with a QString key and a16-byte literal is located | Caller identity does not prove module ownership; literal may be RC/SDK or a passphrase |
 | C-330 | `NEGATIVE` | The literal as raw/derived key does not decrypt STUE across schemes | Guessed derivations/modes only; `aesDecode` inner framing not yet reversed |
-| C-331 | `OBSERVED` | Firmware crypto is CRijndael AES-256 CBC with IV sm_chain0 via aesDecode2; real helper callable | NfzPack JSON key, not proven module key |
-| C-332 | `NEGATIVE` | Calling the real aesDecode2Ex with candidate keys still misses the STUE chunk | Only module-key question open; framing proven by real code |
-| C-333 | `OBSERVED` | The literal is a streaming XOR pad; the AES key is a QByteArray lambda parameter | Key is caller-supplied, origin unknown |
-| C-334 | `NEGATIVE` | AES+XOR pipeline with candidate keys still misses | Covered keys are guesses; caller key not identified |
-| C-335 | `OBSERVED` | NfzPack key is derived on the fly as a hex stream of a local buffer via ostringstream | Stream input/format not yet exact |
-| C-336 | `NEGATIVE` | Self-derivation key candidates still miss | Guesses of stream input/format; mechanism not impugned |
-| C-337 | `OBSERVED` | NfzPack key is exactly zero-padded lowercase hex of MD5(data) | Read statically; prefix/zero-pad not byte-verified |
+| C-331 | `RETRACTED` | Old IV bytes and broad firmware framing retracted | Actual NFZ helper IV is zero; direct native callability retained (C-443) |
+| C-332 | `NEGATIVE` | Calling the real aesDecode2Ex with candidate keys still misses the STUE chunk | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-333 | `RETRACTED` | Caller-supplied key model retracted | NFZ uses an independent constant buffer (C-444) |
+| C-334 | `NEGATIVE` | AES+XOR pipeline with candidate keys still misses | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-335 | `RETRACTED` | Hex-stream KDF model retracted | The stream is MD5 logging (C-444) |
+| C-336 | `NEGATIVE` | Self-derivation key candidates still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-337 | `RETRACTED` | MD5(data) KDF model retracted | Before/after digest logs do not supply the AES key (C-444) |
 | C-338 | `OBSERVED` | XOR pad pointer is shifted, alignment not a clean16-byte cycle | Shift source/period unresolved |
-| C-339 | `NEGATIVE` | MD5-derived key candidates still miss | Guesses of format/pad input; md5 mechanism not impugned |
+| C-339 | `NEGATIVE` | MD5-derived key candidates still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
 | C-340 | `OBSERVED` | XOR pad index is modulo17 via a divide-by-17 magic | Replaces C-338 approximation; static only |
 | C-341 | `OBSERVED` | XOR loop is a bit-packed rotate across adjacent bytes | Exact pairing modelled approximately |
-| C-342 | `NEGATIVE` | Period17 pad plus rotate modelling still misses | Residual is rotate pairing and fed buffer |
+| C-342 | `NEGATIVE` | Period17 pad plus rotate modelling still misses | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
 | C-343 | `OBSERVED` | Rotate pairing is a single-byte self-rotate `ror8(b,i&7)` | r14-negative framing inferred; not executed |
-| C-344 | `NEGATIVE` | Exact transform and broad md5 keys still miss | Residual is fed buffer; NfzPack may not be the module path |
-| C-345 | `OBSERVED` | aesDecode2 key is the transformed buffer as a C string, not the MD5 hex | -0x208 object identity assumed; NUL truncation data-dependent |
-| C-346 | `NEGATIVE` | C-string transform key still misses | Mechanism not impugned; residual is -0x208 identity/transform direction |
-| C-347 | `OBSERVED` | Transform source is a built container of hardcoded constants, not the ciphertext | Serialization order/layout not emulated |
-| C-348 | `NEGATIVE` | Constant-seed key attempts still miss | Seed extraction approximate; container layout not impugned |
-| C-349 | `OBSERVED` | Seed container begins with a0x22 malloc size and `tY` ASCII prefix | Emitted order from negative map keys not modelled |
-| C-350 | `NEGATIVE` | Seed-shape variants still miss | Emitted order not modelled; shape not impugned |
-| C-351 | `NEGATIVE` | Key-sorted seed orderings still miss | Setter ABI assumed; sorted emission not impugned |
-| C-352 | `OBSERVED` | aesDecode2 data/key assignment re-verified at the call site | ABI reading only; setter role still assumed |
-| C-353 | `OBSERVED` | UpgradeNfzPack is a URL-fetched pack path reading JSON `url` | Scope note; scheme may still transfer to the module |
+| C-344 | `NEGATIVE` | Exact transform and broad md5 keys still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-345 | `STATIC` | AES key is the independent transformed constant buffer | 32 printable bytes without embedded NUL; ciphertext/NUL assumptions corrected |
+| C-346 | `NEGATIVE` | C-string transform key still misses | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-347 | `STATIC` | NFZ key comes from constructed buffer data | 33 initialized bytes; 32 transformed; old incomplete list superseded |
+| C-348 | `NEGATIVE` | Constant-seed key attempts still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-349 | `RETRACTED` | Negative-map-key and block-shape interpretation retracted | Correct buffer recovery C-442/C-444 |
+| C-350 | `NEGATIVE` | Seed-shape variants still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-351 | `NEGATIVE` | Key-sorted seed orderings still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-352 | `STATIC` | Input data and transformed-constant key remain distinct | ABI fact only; no STUE path attribution |
+| C-353 | `STATIC` | Recovered URL callback is NFZ-specific | Ordinary firmware dispatch is separate |
 | C-354 | `NEGATIVE` | UpgradeFirmPack has no direct aes/IMaH calls | Indirect routing not excluded |
-| C-355 | `OBSERVED` | ProcessUpgradeFirmPack routes into UpgradeNfzPack, so the scheme applies to the pack | Websocket/JSON indirection; local chunk is a proxy |
+| C-355 | `RETRACTED` | Ordinary-firmware-to-NFZ routing claim retracted | Type 0/1/8 are distinct branches (C-445) |
 | C-356 | `NEGATIVE` | No base64/hex decode in the NfzPack chain | Decode may live in a callee |
-| C-357 | `OBSERVED` | XsBuffer vtable mapped; loop reads object bytes at rbx | D0-as-arg unusual; seed may include struct pointer bytes |
-| C-358 | `NEGATIVE` | All seed rotations/reversals still miss | Missing struct-pointer ingredient possible |
-| C-359 | `NEGATIVE` | Transform direction/pad variants still miss | Residual is the object-byte ingredient |
-| C-360 | `OBSERVED` | Transform reads and writes the same object index (in-place, byte-local) | Confirms byte-local formula |
-| C-361 | `OBSERVED` | cvPc/append return this, so the seed is struct bytes incl. runtime pointers | Static replay must approximate/emulate allocation |
-| C-362 | `NEGATIVE` | Pointer-approximated struct seeds still miss | Pointer low bytes unknown; approximation coarse |
-| C-363 | `OBSERVED` | XsBuffer field layout is vtable0x0/dataptr0x8/cap0x10/len0x18 | Live 32 bytes exactly the indexed range |
-| C-364 | `NEGATIVE` | Mimicked struct seeds across a heap-pointer sweep still miss | Only pointer swept; other fields are fixed guesses |
-| C-365 | `NEGATIVE` | Systematic 6144-combo pointer brute still misses | Residual is the0x2c tail bytes or field-role eviction |
+| C-357 | `RETRACTED` | Vtable/object-byte seed model retracted | Actual address point is symbol+16; get returns data pointer |
+| C-358 | `NEGATIVE` | All seed rotations/reversals still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-359 | `NEGATIVE` | Transform direction/pad variants still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-360 | `STATIC` | Transform is byte-local and in place in buffer data | Does not index object fields or establish STUE ownership |
+| C-361 | `RETRACTED` | Runtime pointer seed model retracted | Char-pointer conversion targets get; no heap-address key input |
+| C-362 | `NEGATIVE` | Pointer-approximated struct seeds still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-363 | `STATIC` | XsBuffer object layout is vptr/data/capacity/length | Object layout retained; object-as-transform-input withdrawn |
+| C-364 | `NEGATIVE` | Mimicked struct seeds across a heap-pointer sweep still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-365 | `NEGATIVE` | Systematic 6144-combo pointer brute still misses | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
 | C-366 | `OBSERVED` | All four wa150 modules are hdr_v2 STUE attrib0x0 yet still encrypted | attrib bit0 role differs; not plaintext |
 | C-367 | `NEGATIVE` | Raw payload checksum matches plain_cksum in none of the four modules | Decryption genuinely required |
-| C-368 | `NEGATIVE` | Tail/pointer/cap/len seed variants still miss | Tail uninitialised, approximated |
-| C-369 | `OBSERVED` | strlen truncates at the vtable NUL so the key is short and MakeKey reads past it | Byte past NUL is the object tail |
-| C-370 | `NEGATIVE` | 20000-iteration random struct-seed sweep still misses | Residual is the unjudged init-per-iteration question |
+| C-368 | `NEGATIVE` | Tail/pointer/cap/len seed variants still miss | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
+| C-369 | `RETRACTED` | Vtable NUL and object-tail key model retracted | Correct output is 32 printable bytes without embedded NUL |
+| C-370 | `NEGATIVE` | 20000-iteration random struct-seed sweep still misses | Historical attempted candidates only; invalid model/coverage deductions corrected by C-442--C-446 |
 | C-371 | `OBSERVED` | rc331 RID hits are unrelated; Fly APK bytes are absent from the OTA | App lives in /data/app, so use an external Fly dump |
 | C-372 | `OBSERVED` | DJI Fly package dji.go.v5 is referenced across five rc331 partitions | Refs may be incidental; no owner identified |
 | C-373 | `OBSERVED` | DJI Fly libsdk_jni.so exposes the RID surface (EIDSwitch, IsEuCeEnableC0Rid, handler names) | Prior repo tooling lists the same names |
 | C-374 | `OBSERVED` | Per-symbol direct xref counts recovered; IsEuCeEnableC0Rid/RidWorkingStatusPush most focused | Counts are direct-ref only |
 | C-375 | `NEGATIVE` | EU_CE_enable_c0_rid_0 has zero direct ADRP+ADD xrefs | Indirect table/computed name not excluded |
 | C-376 | `OBSERVED` | Local Ghidra 12.1.2 + JDK21 headless decompilation is available | The ~/Library/ghidra dir is only user settings |
-| C-377 | `OBSERVED` | EIDSwitchGet/EIDSwitchSet are the RC-side RID enable key handlers | Type-checked setter; -6 on mismatch |
+| C-377 | `STATIC` | France EID accessors located statically | Not global RID; route/capability/RF unproven |
 | C-378 | `OBSERVED` | EID handlers build uav_cmd with cmd0x77/attr0x12 and a get/set flag | Constant meanings inferred; value layout unresolved |
-| C-379 | `OBSERVED` | OIDIdentifier and ComplianceSerialNumber are sibling RID handlers | Opcodes not yet read |
+| C-379 | `STATIC` | Sibling SDK handlers exist on distinct business planes | Not one complete writable RID family |
 | C-380 | `OBSERVED` | eid_switch template decodes to cmd119/sub3/attr0x12, tag uav_fc_handle_eid_switch | First arg/receiver index unbound; no live send yet |
 | C-381 | `OBSERVED` | EID set value is one byte read from the value object at +8 | Typeinfo target not named |
 | C-382 | `OBSERVED` | Dedicated pack type uav::core::eid_switch_pack with an RspType | Field layout beyond the value byte unenumerated |
@@ -521,25 +521,25 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-386 | `OBSERVED` | Outward send is BaseAbstraction virtual slot +0x128 | Concrete transport symbol not named |
 | C-387 | `OBSERVED` | Slot0x128 is BaseAbstraction::SendPack; core transport is UavCoreCancelation::SendData | Inventory naming only; no live call |
 | C-388 | `OBSERVED` | OIDIdentifier handlers use a different opcode pair cmd214/sub17 | Only EID switch decoded so far |
-| C-389 | `OBSERVED` | OIDIdentifier payload is a 0x70-capped string with header 01 11 D6 02 | Variable-length, unlike the EID byte |
+| C-389 | `RETRACTED` | OID 0x70 length interpretation retracted | Product-139 has an 18-byte pack and at most 8 copied bytes |
 | C-390 | `OBSERVED` | EIDSwitch is registered by name via BaseAbs::InsertCharacteristics | App reaches it by SDK key name, not raw opcode |
-| C-391 | `OBSERVED` | Operator runbook for the no-flash RID-off verification | Runbook only; not yet executed on hardware |
+| C-391 | `RETRACTED` | Old RID-off runbook maturity is retracted | Replaced with offline validation; no CLI transport |
 | C-392 | `OBSERVED` | rc331 carries native link daemons djilink and dji_v1_protocol | Socket address not recovered |
 | C-393 | `OBSERVED` | system.img launcher JSON starts dji_link and restarts dji.go.v5 | Boot-ordering evidence only |
 | C-394 | `OBSERVED` | Vendor route table defines a local/logic channel to the mobile App | App hop is local+logic, not USB |
 | C-395 | `OBSERVED` | dji_link opens and accepts a local socket to the App | Listen/accept strings only |
 | C-396 | `OBSERVED` | dji_link creates a named unix listening socket; whoami denotes self | Name is config/source driven, not a literal |
-| C-397 | `OBSERVED` | RC-side breakthrough consolidated into one doc | Consolidation only; open item is hardware values |
+| C-397 | `RETRACTED` | RC end-to-end control closure is retracted | Missing evidence is broader than sender/receiver values |
 | C-398 | `OBSERVED` | EU_CE_enable_c0_rid_0 has 50 ADRP+LDR references | Key is live, not dead |
 | C-399 | `RETRACTED` | C-375 under-counted by only scanning ADRP+ADD | Correct reading is live key via a different form |
 | C-400 | `OBSERVED` | EUCeCxV1 class registers the EU/CE regulatory key family | Registration via CreateCharacteristics/BindKey |
-| C-401 | `OBSERVED` | EU_CE_enable_c0_rid_0 is a bound key literal across many sites | Region-dependent RID enable key parallel to EIDSwitch |
+| C-401 | `STATIC` | EU_CE key has static registration/binding evidence | Not a usable alternative; tested direct USB target absence remains |
 | C-402 | `OBSERVED` | EID emitter statically verified byte-for-byte against the ctor | Decompilation-anchored, not device-anchored |
 | C-403 | `RETRACTED` | First emitter put the 'IW' magic at 0x0c instead of 0x0e | Corrected both emitters and re-hashed A-071/A-072 |
 | C-404 | `OBSERVED` | OID emitter has a mirroring self-check plus a cap test | Decompilation-anchored |
 | C-405 | `NEGATIVE` | EU_CE_enable_c0_rid_0 has no dedicated Get/Set handler symbol | Bound via observer pattern, not a named handler |
 | C-406 | `OBSERVED` | rid-protocol gained a directory README | Index/usage only |
-| C-407 | `OBSERVED` | Wire decode sits under pre-existing characteristic-level RID claims | Overlap is name-layer only; opcode bytes are new |
+| C-407 | `RETRACTED` | Claim to resolve global-RID setter absence is retracted | France EID was already known and is separate from C-109 |
 | C-408 | `OBSERVED` | OperatorRegistrationNumberSet is an action at cmd120/sub3, 16-char string payload | Delete likely = empty payload, unproven |
 | C-409 | `OBSERVED` | RidImportModule set/info paths use cmd75/sub17 with a 0x4b sub-field | Japan registration channel |
 | C-410 | `OBSERVED` | RID broadcast field-control map enumerates the writable surface | Map only; C/D sections still open |
@@ -555,22 +555,53 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-420 | `OBSERVED` | Whitebox keychain is a static pointer table addressed by id | Entry 0x37 -> 0x7daaa0, stride 0x18 |
 | C-421 | `OBSERVED` | Keychain entry 0x37 is a 48-byte key slot with zeroed pointer fields | qword[1]=0x30 length; ptrs 0 |
 | C-422 | `NEGATIVE` | Entry pointer fields are zero in-file | Resolution is relocation/base-relative |
-| C-423 | `OBSERVED` | Keychain id 0x37 resolves to two 48-byte static blobs | File offs 0x740b30 / 0x73a600 |
+| C-423 | `STATIC` | Keychain id 0x37 resolves to static data blocks | Does not validate position payload composition |
 | C-424 | `NEGATIVE` | A flat base-subtract mapping mismatches the Ghidra read | Per-segment delta is 0x102000 there |
-| C-425 | `OBSERVED` | Position emitter with the resolved 0x37 key is added | AES/HMAC/prefix combination is H-38 |
+| C-425 | `STATIC` | Position tool generates approximate offline candidate hex | No transport or official byte match; not a coordinate editor |
 | C-426 | `OBSERVED` | AES256Encrypt is AES-CBC with PKCS#7-style padding | Key length caller-supplied; confirmed not assumed |
 | C-427 | `OBSERVED` | HmacEncode writes the full digest over ct+blob | Not truncated to the key length |
 | C-428 | `OBSERVED` | ComplianceSerialNumberInit is a listen registration deriving from SerialNumber | Derived listener, not its own opcode |
 | C-429 | `NEGATIVE` | No ComplianceSerialNumberGet/Set symbol | UAS ID not directly settable via its own key |
 | C-430 | `OBSERVED` | SerialNumber is heavily referenced with Get-only accessors | 164 refs; no SetSerialNumber |
 | C-431 | `NEGATIVE` | No SerialNumber setter exists | Compliance/SN are identities, not writable fields |
-| C-432 | `OBSERVED` | ADS-B agent on/off get is cmd12/sub17 | Query only; payload not decoded |
-| C-433 | `OBSERVED` | ADS-B agent switch set is cmd55/sub17 | Actual broadcast-agent set |
+| C-432 | `STATIC` | AirSense/ADS-B receive query is 0x11/0x0C | Non-RID business surface per C-135/RID-002B |
+| C-433 | `STATIC` | AirSense/ADS-B switch SET is 0x11/0x37 | Not a global RID broadcast switch |
 | C-434 | `OBSERVED` | Drone dynamic max height get is cmd80/sub17 | Distinct from the position set |
-| C-435 | `OBSERVED` | SetADSBSwitch is a 1-byte boolean set at cmd55/sub17 on adsb_switch_pack | Payload is a single byte |
+| C-435 | `STATIC` | ADSBSwitch has a Boolean-shaped SET handler | AirSense semantics; no new device or RF observation |
 | C-436 | `OBSERVED` | Height ctor confirms cmd0x50/sub0x11, standard header, empty payload | Plain GET |
 | C-437 | `NEGATIVE` | No named handler for the height opcode | Call site unnamed |
 | C-438 | `OBSERVED` | ccc is reached via ADRP+LDR inside a large camera registration | 133/29 hits; computed pointers, no s_ symbol |
 | C-439 | `OBSERVED` | WorkingStatusPush payload parses as flags, area code and a value byte | Parse-only observer |
-| C-440 | `OBSERVED` | WorkingStatusPush is push-only, i.e. the verification channel | No emitter needed; confirm sets from it |
-| C-441 | `OBSERVED` | RID control surface consolidated into one doc | Consolidation only; residuals listed |
+| C-440 | `RETRACTED` | Push as reliable SET/RF verification channel is retracted | No active GET or established applied-state correspondence |
+| C-441 | `RETRACTED` | Complete-control consolidation claim retracted | Six offline generators; transport, position composition and RF still unverified |
+
+## 2026-10-17 audit corrections and bounded verification
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-442 | `STATIC` | XsBuffer actual vptr is symbol+16 and get returns buffer data | Pointer/stack-tail/init/strlen models retracted; no device |
+| C-443 | `STATIC` | NFZ helper IV is the 16 zero bytes behind sm_chain0 | Pointer storage was misread; actual native calls remain distinct |
+| C-444 | `STATIC` | NFZ key is a constant 32-byte printable buffer; MD5 is logging | Only length/hash public; not an STUE key attribution |
+| C-445 | `NEGATIVE` | Distinct type dispatch; one corrected NFZ-key/zero-IV 2603 attempt misses | 0x6cbf5644 vs 0xd2f782ff; rejects only that direct hypothesis |
+| C-446 | `OBSERVED` | Original probe reproduces F05--F10 code/environment defects | C-326 full coverage is retracted; no claim about uncommitted scripts |
+| C-447 | `OBSERVED` | v2 helpers: 53 tests pass; real 2603 fixed-WAES probe exits with ten misses | KAT/stdin/size checks pass; no derived-key coverage, STUE plaintext or RF |
+| C-448 | `STATIC` | France EID/AirSense/known EU_CE live limits override global-control summaries | No current device or new live capability |
+| C-449 | `STATIC` | Six CLIs are offline hex generators; position composition remains approximate | No admitted sender, coordinate editor or SET/RF verification channel |
+
+## 2026-10-17 public-v2 probe and ordinary-firmware path
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-450 | `OBSERVED` | A-082 implements one public IMaH-v2 candidate check; six new tests and the 59-test suite passed | Key/stdout privacy, mixed-chunk counter and checksum boundaries verified; no signature or STUE proof |
+| C-451 | `NEGATIVE` | NFZ-as-KEK and two WAES-derived content keys all miss real 2603 plain checksum | Exactly three hypotheses; encrypted integrity passes; separate from direct CBC and fixed WAES |
+| C-452 | `STATIC` | Inspected Assistant method-4/register path copies/cache-packs/transmits stored input without a recovered STUE decoder | No live WA150 method selection; not an all-Assistant or downstream-owner conclusion |
+| C-453 | `NEGATIVE` | 25 selected public IMaH source copies match the pinned upstream and lack STUE | 517 fork metadata rows screened; not all fork sources or the whole web |
+
+## 2026-10-17 RC331 inner container and protected derivation
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-454 | `OBSERVED` | A-005 outer integrity passes; nested TBIE/FLYA ciphertext starts at offset 960 | C-319 narrowed and C-322 retracted; no inner plaintext or full-checksum exclusion of six public keys |
+| C-455 | `OBSERVED` | Existing OTA/property/partition hashes match; A-083--A-085 extracted and identified | No new download, vendor execution, live hashes or repeated RSA verification |
+| C-456 | `STATIC` | dji_decrypt -> libtee_util -> QSEE bw_secure uses commands 0x17/0x18 | Fixed 480-byte header differs from WA150's 608; not a direct STUE decryptor |
+| C-457 | `STATIC` | RC331 TBIE CMAC derivation uses a protected RPMB root with HUK-backed stored-root handling | No root/RPMB/HUK output recovered; cipher enum names and STUE shared ownership unproven |

@@ -1,16 +1,15 @@
 """Call DJI Assistant's own CRijndael-based `aesDecode2Ex` from the dylib.
 
-Framing (static): `aesDecode2` builds a CRijndael, `MakeKey(key, sm_chain0, 0x20, 0x10)`, then
-`Decrypt(len, mode1)` — AES-256 CBC with the fixed IV `sm_chain0`. Key arrives as QString for
-aesDecode2 and as QByteArray for aesDecode2Ex (simpler ABI, used here). Builds on wb_aes_bridge's
-mirror tree and Rosetta runner.
+Framing (static): `aesDecode2Ex` builds a CRijndael, `MakeKey(key, *sm_chain0, 0x20, 0x10)`, then
+`Decrypt(len, mode1)` — AES-256 CBC with a zero IV. The sm_chain0 symbol holds a pointer to that IV.
+Key arrives as a QByteArray; this wrapper requires all 32 bytes read by MakeKey. Builds on
+wb_aes_bridge's mirror tree and Rosetta runner, carrying key and ciphertext through binary stdin.
 
-Boundary: this is Assistant's local utility. Whether its key literal is the module `STUE` key is
+Boundary: this is Assistant's local utility. Whether a supplied key is the module `STUE` key is
 separate and unproven.
 """
 from __future__ import annotations
 
-import ctypes
 import os
 import subprocess
 import sys
@@ -37,10 +36,13 @@ def data_of(q):
     off = ctypes.c_size_t.from_address(d + 0x10).value
     return ctypes.string_at(d + off, size)
 
-data = bytes.fromhex(sys.argv[2]); key = bytes.fromhex(sys.argv[3])
+key = sys.stdin.buffer.read(32)
+data = sys.stdin.buffer.read()
+if len(key) != 32 or len(data) % 16:
+    raise ValueError("expected a 32-byte key followed by whole ciphertext blocks")
 out = ctypes.create_string_buffer(8)
 aesd(out, qba_of(data), qba_of(key))
-print(data_of(out).hex())
+sys.stdout.buffer.write(data_of(out))
 '''
 
 
@@ -48,24 +50,34 @@ _ROOT = None
 
 
 def decode2ex(data: bytes, key: bytes) -> bytes:
+    if len(key) != 32:
+        raise ValueError("aesDecode2Ex requires exactly 32 key bytes")
+    if len(data) % 16:
+        raise ValueError("aesDecode2Ex requires whole 16-byte ciphertext blocks")
     global _ROOT
     if _ROOT is None:
         _ROOT = wb_aes_bridge.build_mirror()
     root = _ROOT
     out = subprocess.run(
-        ["arch", "-x86_64", str(root / "MacOS/Python"), "-c", _WORKER, str(root), data.hex(), key.hex()],
-        capture_output=True, text=True, check=True,
+        ["/usr/bin/arch", "-x86_64", str(root / "MacOS/Python"), "-c", _WORKER, str(root)],
+        input=key + data, capture_output=True, check=True,
         env={**os.environ, "PYTHONHOME": sys.base_prefix},
     )
-    return bytes.fromhex(out.stdout.strip())
+    return out.stdout
 
 
 if __name__ == "__main__":
+    import argparse
     import struct
-    sig = Path(sys.argv[1]).read_bytes()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("sigfile", type=Path)
+    parser.add_argument("--key-file", required=True, type=Path,
+                        help="local binary file containing exactly 32 key bytes")
+    args = parser.parse_args()
+    sig = args.sigfile.read_bytes()
     head = struct.unpack_from("<I", sig, 16)[0]
     ssz = struct.unpack_from("<I", sig, 20)[0]
     coff = struct.unpack_from("<I", sig, 196)[0]
     csize = struct.unpack_from("<I", sig, 200)[0]
-    enc = sig[head + ssz + coff: head + ssz + coff + csize]
-    print(len(decode2ex(enc, bytes.fromhex("1ff6b8ca503b47ad8d04d8686dcb13a0"))))
+    enc = sig[head + ssz + coff: head + ssz + coff + csize + (-csize) % 32]
+    print(len(decode2ex(enc, args.key_file.read_bytes())))

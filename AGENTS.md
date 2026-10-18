@@ -397,17 +397,52 @@ Later retractions override earlier progress summaries.
     the RC3310205 then decrypted with no force and all three layers passed. Its plaintext is an
     Android11 A/B OTA (`pre-device rc331`, post-build `V00.01.14.99`),29 partitions were dumped,
     and the recovered adbd (A-030) and dpad_fuli.apk (A-031) are byte-identical to their identities.
-    RC3310200 and every RC331 aggregate module have empty `enc_key` and are plaintext; every WA150
-    module uses `STUE`, so RC-side reversing is available while only aircraft is blocked. `STUE` is
+    C-319 records empty `enc_key` only in examined RC331 outer headers. C-454 confirms that A-005/0200 contains a
+    TBIE/FLYA encrypted inner container at offset480, with ciphertext at960; C-322's all-RC-plaintext inference is
+    retracted. Readable 0205 system samples remain available, but 0200 inner plaintext is still missing. WA150
+    samples use `STUE`; do not turn this two-product outer-header comparison into an aircraft-only blocker. `STUE` is
     absent from the pinned public corpus and its forks; a brute over all16-byte keys with derived
     variants,3 modes,3 IV sources and v1/v2 semantics gave zero plaintext-checksum hits on2603/0802.
     The wa1503072-bit PRAK is also absent (PSS/PKCS1 plus SHA256/384/512, salt and zeroed-field
-    variants all fail). Bodies are therefore kept as ciphertext (A-065); `STUE` is aircraft-only and
-    a public unknown for WA234/WA341. Do not repeat the brute without new key material, do not
+    variants all fail). Bodies are therefore kept as ciphertext (A-065); the observed WA150 STUE identity does not
+    imply that RC331 has no protected inner content or establish a product-family rule. Do not repeat the brute without new key material, do not
     alias `STUE` onto an existing key, and do not mutate or flash anything. Derivation is offline
     only; exact signature success covers RC modules but is not a live mounted fact or flash
     admission. Samples and derived outputs stay excluded; only hashes/structure are public.
     B-23/H-34 hold the gate and the whitebox-or-release hypothesis.
+
+51. C-442--C-446 override the 2026-10-16 Assistant/STUE derivation notes. The XsBuffer vtable address point is symbol+16;
+    get returns its data buffer. Do not resume pointer, stack-tail or per-iteration-init sweeps. The NFZ callback uses
+    a deterministic 32-byte constant key and a zero IV; MD5 is before/after logging. Publish only key length/hash.
+    ProcessUpgradeFirmPack dispatches ordinary firmware, NFZ and local firmware separately; no NFZ-to-STUE edge has
+    been established. One corrected direct NFZ-key attempt failed the 2603 plaintext checksum; this is a narrow negative.
+    C-326's old public-probe coverage is retracted for reproducible implementation defects. Keep original test results,
+    corrected implementation checks (C-447), and future decrypt results separate.
+52. C-448/C-449 retract the RID completeness claims in the later protocol notes. France EID is France-specific;
+    ADSBSwitch/0x11-0x37 and 0x11-0x0C are AirSense/ADS-B surfaces, not a global RID switch. The tested direct-USB
+    EU_CE_enable_c0_rid_0 absence with positive controls remains authoritative. The six rid-protocol CLIs only generate
+    offline hex and have no device transport; position encoding still contains approximations. A push/cache or internal
+    request layout does not establish applied state or RF effect. There is no device available for this correction run.
+
+53. C-450/A-082 implements one pinned public IMaH-v2 hypothesis, not a proven STUE algorithm. Raw keys enter via
+    stdin only; publish only candidate source/length/hash and checksums, never key/plaintext bytes. Preserve CTR
+    continuity across encrypted chunks, no advance for clear chunks/gaps, stored align32 and checksum-before-trim.
+    Payload SHA256/encrypted checksum must pass first; no signature verification or device capability is implied.
+    C-451 is exactly three failed named candidates, separate from C-445 direct CBC and C-447 fixed-WAES tests.
+54. C-452 covers only the inspected Assistant method-4/register-upgrader path. Its cache/tar/FTP copying does not
+    prove live WA150 method selection, all-Assistant decoder absence, or a particular downstream/TEE key owner.
+    Continue only from concrete call edges or available offline receiver samples; do not revive pointer/tail models.
+55. C-453 screened 517 public fork metadata rows but inspected 17 selected default and 8 nondefault IMaH source
+    files. The 25 copies match the pinned upstream without STUE. Never label this all-fork or whole-web coverage.
+
+56. C-454 overrides the RC331-all-plaintext inference: A-005 has a clear outer IMaH container and encrypted inner
+    TBIE/FLYA. Six public-TBIE prefix probes were not full-checksum key exclusions. C-455 is cached-OTA integrity and
+    extraction, not new acquisition, live installed identity or a rerun of RSA verification. A-083--A-085 stay local.
+57. C-456/C-457 recover a static RC331 dji_decrypt/libtee_util/bw_secure chain and a protected RPMB-root/HUK dependency,
+    not usable root or payload keys. The client assumes a480-byte header, unlike WA150's608. Do not execute it as a
+    general STUE decoder; do not name cipher modes from unverified QSEE enum constants1/2. The TBIE context is assembled
+    as an immediate, so a missing literal-string match is not absence. RC331 TBIE root input and STUE's own owner/
+    derivation remain unresolved; do not claim all offline approaches impossible or both products share keys.
 
 ## Privacy and redaction
 
