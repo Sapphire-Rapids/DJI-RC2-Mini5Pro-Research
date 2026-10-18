@@ -104,3 +104,9 @@ connect to the native position boundary; valid Android/default altitude has a co
 The inspected method has no hasAltitude check and can mix newer network coordinates/time with older GPS altitude.
 New message timestamps do not prove fresh fixes. This is static app-location evidence, not original DEX/firmware
 recovery, STUE decryption or actual device/RF control. Existing firmware/root-input blockers are unchanged.
+
+## Packaged RC331 sec_type2 boundary (C-475)
+
+The selected packaged-config edge resolves to a dji_verify command and the inspected same-name signature/extraction
+implementation, not a STUE decoder. Live config/mount/PATH selection is unknown; dynamic payload offset coexists with
+fixed256-byte RSA length. A-100--A-103 were never executed. C-456/C-457 and STUE/root-input blockers remain separate.

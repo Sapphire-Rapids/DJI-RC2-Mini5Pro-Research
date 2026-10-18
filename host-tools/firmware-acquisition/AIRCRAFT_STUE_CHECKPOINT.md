@@ -78,3 +78,9 @@ C-468/C-469已纠正receiver/重载和五个CLI，只有离线片段/payload证�
 选定 Java 链连上两层缓存和 native 三标量接口。Android/default 的米/WGS84 椭球契约以 altitude 有效为条件；
 所查方法不检查 hasAltitude，还可混合较新 network 坐标/时间和较旧 GPS 高度，新消息不证明 fresh fix。
 实际 provider、owner、读回/恢复和 RF 仍未验证，STUE/TBIE 缺口不变。
+
+## 包内签名检查支线（C-475）
+
+RC331 包内 sec_type2 经完整 APS2 表绑定到 dji_verify 命令，所查包内同名实现固定 RSA256，选定模式仅摘要/复制。
+payload 起点按 header_size+signature_size，不能由可跳过608 B称支持 WA150384 B签名/STUE。vendor 配置与 init 的 system
+路径不同，live 配置/挂载/PATH 未验证；这条边与 dji_decrypt/QSEE/TBIE 分开，没有补齐 root input 或 STUE owner/derivation。

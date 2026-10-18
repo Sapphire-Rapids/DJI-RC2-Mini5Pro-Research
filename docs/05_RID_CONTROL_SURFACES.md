@@ -808,19 +808,20 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ### RID-011：`dji_fly_rid_cloud_control_v2` 是 opaque set-only policy
 
-- **证据状态：STATIC**
-- **对象/版本：** DJI Fly 1.21.10 app/native path。
-- **前提与路线：** area/product selector 选择 opaque hex data 或 `DEFAULT`，再封装为 generic
-  `CloudControlData` 并通过 command `0xDD` 的 set-only handler 发送。
-- **事实：** product 139 以 numeric product value 参与选择；`block_device` 命中会选择 DEFAULT，而不是
-  表示 RID off。native writer 是 `set_cloud_control_data_pack`，命令为 `0x00/0xDD`。只有 transport
-  result 为零且 response 首字节 ACK 为零时才报告成功，并以原请求值更新本地 cache；ACK 不回显
-  飞机实际配置。该 key 没有 GET/listen readback，payload schema、signature rule、WA150 sample 和
-  `0x11/0x1C` 状态 correlation 都未闭合。
-- **边界/不证明：** generic `0xDD` 和 receiver tuple 不能识别成 RID switch。不得猜测、重放、持久化
-  或公开 opaque blob。
-- **公开依据：** 前述公开 state/firmware research。
-- **隐私/分发：** 不保存或发布 cloud response、installation identity 或 blob。
+- **证据状态：STATIC**（C-474；版本边界见 C-286/C-287/C-291）
+- **对象/版本：** DJI Fly1.21.10 的选定 app/native 路径；实际 toggle/provider 绑定未观察。
+- **前提与路线：** exact Java `UAVRidCloudControlLogic.v` 读 AircraftDeviceInfo.getDeviceId，默认 0L。
+  所查 V1 supplier 从 KeyConnectedDevice 列表第一个 AIRCRAFT 取 DeviceInfo.device_id 并转 Long，缺失为0；
+  selector 将该值与 block_device 比较，保留 first-area/DEFAULT 回退、空字符串过滤及 distinct 去重。
+- **事实：** exact caller `M` 原样构造 CloudControlData(18,4,string)；native generic writer
+  set_cloud_control_data_pack 仍为 `0x00/0xDD`、value-routed、SET-only。transport result 与 ACK 均为0才报告
+  成功，并以请求值更新 cache；没有 applied GET/readback，ACK 不回显飞机实际配置。
+- **版本限定：** C-286/C-287 的 ProductType selector 来源/离线工具明确为 Fly1.19.4，C-291 的实机 ProductType139
+  和 receiver18/4 保留。本轮没有证明 DeviceId 与 ProductType 数值相等或不同，不能无声把旧工具迁为1.21.10模型。
+- **边界/不证明：** 所查方法没有恢复 signed inner13/26 B policy body parser、新控制字段或飞机 consumer；不是全包阴性。
+  caller18/4 不是 key metadata 或 live owner。没有实际选择/写入、readback/restore/persistence 或 RF 验证。
+  不猜测、重放、持久化或公开 opaque blob；静态细节见[固件记录第21节](07_FIRMWARE_TRUST_BOUNDARY.md)。
+- **隐私/分发：** 只登记独立摘要/hash/offset；cloud response、installation identity、blob 与厂商代码不入仓。
 
 ### RID-011A：中国 OID report gate 是网络提交开关，不是 RF 开关
 
@@ -860,15 +861,16 @@ Java incompatibility 与 generic existing-ID switch 为 `C-183`--`C-187`。
 
 ### RID-011C：当前 app 层不存在可准入的主动 RID 状态查询
 
-- **证据状态：STATIC / NEGATIVE**（C-115--C-118）
+- **证据状态：STATIC / NEGATIVE**（C-115--C-118；C-474 补 exact caller）
 - **闭合事实：** product-139 `RidImportModule` 是当前 `0x11/0x1C` 状态 owner，但只注册 push
   observer；`dji_fly_rid_cloud_control_v2` 走另一个 `0x00/0xDD` set-only writer。
 - **writer 路由：** `KeyCloudControlData` 为 SET-only、无 GET element，也没有 characteristic-level
   host override。writer 从 `CloudControlData` value 本身取 receiver type/index 与 hex payload；
-  current native 没有固定 tuple。相邻业务 caller 使用的 `(18,4)` 是调用值，不是 key metadata。
+  current native 没有固定 tuple。C-474 已核对 exact Fly1.21.10 RID caller 使用 `(18,4)` 和原字符串；
+  这是调用值，不是 key metadata、运行期已选择的 route 或 readback。
 - **阴性结果：** 没有找到 `KeyRidWorkingStatusPush` GET builder、CloudControlData GET/readback、
-  Reset/Disable/Debug、SET ACK 与 working-status 的 correlation，或一个静态固定且可安全复用的
-  receiver tuple。所谓 `ResetCloudControlSetting` 实际重置三种飞行模式的云控最大速度；
+  Reset/Disable/Debug、SET ACK 与 working-status 的 correlation，或一个经运行期验证且可安全复用的
+  live receiver tuple。C-474 的 exact caller 常量不解除这一准入缺口。所谓 `ResetCloudControlSetting` 实际重置三种飞行模式的云控最大速度；
   `GNSSCloudControlDataAction` 与 `IsEuCeEnableC0Rid` 也是不同表面。
 - **结论：** 当前唯一可准入的读取方式是被动观察官方 owner 已订阅后自然出现的
   `0x11/0x1C` push；它不是 query，不能为了“读一下”主动发送猜测包。`0x00/0xDD` 的 success

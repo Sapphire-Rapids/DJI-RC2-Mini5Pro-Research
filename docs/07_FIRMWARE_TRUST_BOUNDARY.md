@@ -6,7 +6,7 @@
 
 状态标签遵循 [AGENTS.md](../AGENTS.md)。后续记录与本文冲突时，较新的精确工件审计和带恢复读回的实机证据优先；相邻版本静态证据不能自动升级为当前设备事实。
 
-最新进展见第16--20节（C-466--C-473）：Android upgrade限定负结果、位置producer语义、条件HostID/纯payload修复，以及
+最新进展见第16--22节（C-466--C-475）：Android upgrade限定负结果、位置producer语义、条件HostID/纯payload修复，以及
 A-0661200复核/A-0921100新检查。没有STUE明文、实际控制面板或RF成功。第15节保留36+4项parser/payload主机验证。
 RC331 固件支线见第 13 节（C-454--C-457）：0200 内层 TBIE/FLYA 仍加密；已从现有 0205 OTA 验证并提取三个 QSEE 组件，
 静态链指向受保护 RPMB root/HUK 输入，尚未恢复 key。第 12 节的三个 v2 候选均未命中，STUE 仍未解密。
@@ -1300,3 +1300,87 @@ InstantValue。TimerCache 在调用时以 uptime delta 大于 duration 触发刷
 - `target_segment_reconstruction.json`：6,882 B；SHA-256 `1cb4720b2fcc26566923f9350e2686b8a77b5491eb12b71119dba6f61be87533`。
 - `report.txt`：8,448 B；SHA-256 `82c7808c7b007f68c3c73a439dac107cc47c884ddddc7602696772326a7e5f6c`。
 - `findings.json`：7,533 B；SHA-256 `c9ba314da61b934dd616a95fdfe95c78ec66e1b4b1a342738c5e21ca7a10010f`。
+
+## 21. Fly 1.21.10 RID selector 的 DeviceId 输入（C-474）
+
+选定同版本 Java 方法体将 RID policy selector 的第三输入收窄为 `AircraftDeviceInfo.getDeviceId()`，不能继续直接称为
+ProductType139。C-286/C-287 明确属于 Fly1.19.4 源码证据/离线模型，C-291 的实机 ProductType139 与 cache receiver18/4
+观察照旧；本节不撤回这些历史结果，也没有证明 DeviceId 与 ProductType 的数值相等或不同。
+
+新输入只有 A-099：carrier base `0xb79a00c`，10,024,504 B，SHA-256
+`9480d22214c12c7d3e48ee4616ed427be87a88b72c47ab248e504193a0d583ac`。未改动的 A-094 公开工具完成生成：40,790 strings
+通过结构/编码约束检查，8,050 个未改动的 string-ID 尾项与重建 offset 匹配，相对 `0x20000` 后字节全部原样保留。它与既有
+A-096/A-097 支撑本节；仍含第20节的 synthetic-header 假设，不是原始 DEX 或解密成果。独立 class_data 解码定位 13 个方法，
+其 code offsets 与 JADX API 自动比对一致；IDs/prototypes 保留作定位，未逐项独立比对全部 ID/原型。关键 FALLBACK 分支已人工核对；
+method hash 范围仅为原始 code_item header + instructions，不含 exception tables。
+
+`UAVRidCloudControlLogic.v` 读取模型 `getDeviceId()`，缺失默认 0L。所查 generated getter 解引用 lazy ToggleFlyObservable；
+其 V1 supplier 读取 compiled `KeyConnectedDevice` 标签，从列表中第一个 type 为 AIRCRAFT 的 DeviceInfo 取 `device_id`，
+把 Integer widening 为 Long，缺项/null 时返回 0。实际 1.21.10 toggle/provider 绑定和连接设备列表没有运行期观察；名称匹配的
+native GetConnectedDevice 未建立该 key 的绑定，不用它解释 device_id 的含义。
+
+selector 将此 Long 与所选行 `block_device` 比较；保留第一个 exact-area 行、第一个 DEFAULT 行及缺失/blocked 时 DEFAULT 回退，
+然后过滤空字符串、distinct 去重。lifecycle-start 组合 cloud rows/area/deviceId，断开时清理 CompositeDisposable。
+`M` 原样把字符串放入 `CloudControlData(18,4,string)` 并通过 compiled `KeyCloudControlData` 标签调用；18/4 是这个 exact
+caller 的字面量，不是 generic key 的固定 metadata、已证实的 live route 或飞机 policy owner。
+
+| Selected method | Carrier code_item start |
+| --- | --- |
+| RID combiner `a` | `0xabab154` |
+| `UAVRidCloudControlLogic.M` | `0xabab5a0` |
+| `UAVRidCloudControlLogic.v` | `0xabab85c` |
+| `AircraftDeviceInfoModelImpl.getDeviceId` | `0xbe510f8` |
+| V1 supplier `j` / mapper `k` | `0xbf309fc` / `0xbf30a6c` |
+
+所查 selector 传递 opaque string，未在这些方法恢复 signed inner 13/26 B policy body parser、新控制字段、飞机 consumer 或
+STUE key。RidInnerManager 名称候选在所查 body 只是两字段 holder，不能升格为全包阴性或新控制成果。没有 Android/lifecycle
+执行、实际 policy 选择/写入、readback/restore/persistence 或 RF；generic KeyCloudControlData 仍 value-routed、SET-only、无 GET。
+
+## 22. RC331 包内 sec_type2 到 dji_verify 的限定静态边（C-475）
+
+A-100--A-103 来自 C-455 同一已核验 RC331 `10.00.0700/0205` system image。system 为 867,598,336 B，SHA-256
+`89c3721a58198e14872a67de1f078192d58b9961b695181c8b365ed96a013783`；本次证据记录再次匹配该镜像身份。
+A-100/A-101 复用已提取的 libupgrade_upgrade.so/dji_verify，A-102/A-103 是同镜像的 libupgrade_product.so/libupgrade_init.so；
+各输入大小/hash 见 [artifact register](11_ARTIFACT_REGISTER.md)。全部只作静态分析，未执行厂商或 Android 代码。
+
+包内 `vendor/etc/upgrade.json` 的 SHA-256 为 `9f1e5d60b350c6a22e10ddb074f5ab5751b113231d5d0d977f14dd29719d7b73`，
+其中 sec_type 为字符串 2。其 vendor image 在 C-455 已核验为 1,293,729,792 B / SHA-256
+`a6bba2d27e343df8ac2d9b1e7b9a5a7980d9f965843543ffbe3d59880f5fbf50`。关键路径缺口是：init service 指向
+`/system/etc/upgrade.json`，而当前 system image 该精确成员 listing 无条目。未追 boot 生成、重定向或挂载，不能声称 live
+设备读取了这份 vendor 配置或实际选择 type2。以下调用链只在该包内配置条件下成立。
+
+| Static edge | Exact ELF location / observation |
+| --- | --- |
+| init JSON parser → setter | A-103 `0x95a4` 以十进制 strtoul 解析；A-100 setter `0x32974` 存入参数低8位 |
+| manager → sec-op table | A-100 `0x2ffa0` → `0x46900`，按 type×0x40 选择表项并复制七个函数槽 |
+| type2 verify binding | table `0x4e2d8`，relocation `0x4e360` → `rk3399_up_sec_verify` `0x48004` |
+| selected ordinary nonstream branch | verify-image `0x2f350` → unsign wrapper `0x2d6d4` → sec_op+8 |
+| CLI verifier | A-101 main `0x2c0c` → update `0x22a8` → image update `0x2434` → crypto_update `0x204c` |
+
+函数表依据完整 APS2 解析：VA `0x8350` 的 988 B stream 全部消费，共 144 条 relocation；Ghidra 缺少 packed-relocation xref
+不是 absence。type2 的其他六槽只登记绑定，未展开成研究分支。`rk3399` 是符号名，不据此推断实际 CPU。
+所选普通/非stream 路径传入 signed input、unsigned output 和 module/index；secure-module 或 stream 分支跳过此普通 unsign。
+verify wrapper 构造命令名 dji_verify，未写绝对路径；失败重试仍构造该命令，日志里的 dji_fw_verify 文字不证明换了程序。
+本节只检查包内同名 dji_verify 的实现，实际 PATH 解析/绑定未知；所选 wrapper 分支没有调用 dji_decrypt。
+
+所查包内同名 dji_verify 的 main 固定 flags `0x601`，crypto 初始化模式固定 `0x11000000`。首次 update 至少需要 480 B，检查单 chunk、调用方
+指定 chunk id、声明总长和 image name 等条件；实际 payload 起点按 `header_size + signature_size` 计算，不能称它固定在 480。
+认证从 auth_key 字段查公钥，所查 RSA 调用 signature length 固定 256 B、digest length 32 B。该模式的 crypto_update 仅摘要
+更新并 memmove 输入到输出，没有按 STUE/enc-key/scram 选择 decoder，也没有接到 libtee_util/QSEE。能按字段跳过 608 B
+不等于支持 WA150 384 B 签名或 STUE 解密；未执行验证器、RSA 验签、key trial 或导出明文。
+
+A-102 的 selected pre_init `0x13604`、misc_pre_init `0x1b038`、post_init `0x13d0c` 与直接符号检查未恢复 sec-op/type/verify
+覆写边。它只限定这几个入口，不是完整 writer 清单、全调用图或运行期无覆写证明；secure-access callback 也不能当作固件 decoder。
+C-456/C-457 的 dji_decrypt→QSEE/TBIE 是独立入口，其 root/HUK 缺口及既有结论保留；本节不合并两链，也不改变 WA150 owner/derivation
+未知、没有设备/实际控制面板/RF 结果的状态。
+
+本批保存 25 条 REA evidence 和四份 snapshots，全部 session 已关闭。原始 ELF、反编译/listing、本地路径只留仓外。
+选定证据 ID：init parser `ev_c916b3496a7abffe9cad73fa2da269ddc2e99d009060ec9e0920bac4f6eee95b`；
+verify wrapper `ev_0a73de58970e87ab26d83e7d7e47a2c33ac245ddc3c2bb65e4e043a7bb1a3383`；
+crypto_update `ev_4b52e5276cc2c2666503a6cf24ba79d55d1e148c071a1c80c1dd52b37b9be757`。
+
+仓外摘要身份（只公开长度/hash）：
+
+- `rid-java/findings.json`：12,880 B；SHA-256 `991d073e63656c9ff396788ee9934a36ee7fa3c21554b29065214f55f8bd7982`。
+- `rid-java/selected-methods.json`：8,376 B；SHA-256 `1f8c9b8690076bec5c31b02c7c3d332466e1694fc3370f32f6110191e1b83596`。
+- `offline-next-edge/report.json`：15,166 B；SHA-256 `e4b05486cbab3b7350eba4b6d87e9290cdf7ee7bd6da60d01c6e38593c82af80`。

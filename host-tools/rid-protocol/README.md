@@ -67,6 +67,7 @@ C-467区分40 B SDK MobileDevicePositionMsg、handler22 B和encrypted84 B。prod
 ```sh
 python3 fly_dex_view.py path/to/libdatajar.so --output-dir path/to/new-private-view
 python3 fly_dex_view.py path/to/libdatajar.so --base 0xd0100c --output-dir path/to/another-new-private-view
+python3 fly_dex_view.py path/to/libdatajar.so --base 0xb79a00c --output-dir path/to/device-info-view
 ```
 
 输入必须匹配 A-093 的 SHA-256，输出目录必须不存在。默认 base 是 `0x689f00c`；工具验证 22 条目录/map 后只生成
@@ -81,3 +82,8 @@ python3 fly_dex_view.py path/to/libdatajar.so --base 0xd0100c --output-dir path/
 C-473 的 Java provider 可读缓存和 last-known 位置。Android/default 方法没有 hasAltitude 检查，可保留 newer network
 坐标/时间而换入 older GPS 高度；AMap 基准和实际 runtime 选择未验证。来源 time/accuracy 未随三标量传入 native，
 构造时 epoch 秒不等于 fix age。A-078 继续要求显式 22 B，没有新增坐标编辑 API 或设备传输。
+
+C-474 另以未改动的 A-094 生成 A-099 device-info view；40,790 strings 通过结构/编码约束，8,050 个未改动 string-ID 尾项
+与重建 offset 匹配，0x20000 后字节原样保留。
+选定 Fly1.21.10 RID 链读 DeviceId 并以 caller18/4 传原字符串；数值是否等同 ProductType 和实际 provider 绑定未知。
+这不改变 C-286/C-287 的1.19.4工具或 C-291 实机记录，也未恢复 body parser、generic GET、设备 owner 或 RF 控制。

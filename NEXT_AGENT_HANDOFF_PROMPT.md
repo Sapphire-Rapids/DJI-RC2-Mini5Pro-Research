@@ -1,7 +1,7 @@
 # Current next-agent handoff
 
 Continue the complete DJI RC 2 / Mini 5 Pro Remote ID research objective from the reviewed repository state.
-This handoff is based on HEAD `6e0f9a9` with committed claims through C-470; the working record now includes C-471--C-473 through 2026-10-18. Inspect current HEAD
+This handoff is based on HEAD `e25c4aa` with committed claims through C-473; the working record now includes C-474/C-475 through 2026-10-18. Inspect current HEAD
 and the working tree first; if newer work exists, preserve it and use the later evidence. Do not reset to this hash.
 
 ## Objective and current operating context
@@ -23,11 +23,11 @@ work instead of treating an old session or old mounted identity as current.
 ## Read first
 
 1. [AGENTS.md](AGENTS.md), especially the current corrections and evidence/distribution rules.
-2. The current opening and C-442--C-473 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
+2. The current opening and C-442--C-475 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
 3. [AIRCRAFT_STUE_CHECKPOINT.md](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md).
-4. Claims C-442--C-473 in [evidence/claims.csv](evidence/claims.csv), mirrored in
+4. Claims C-442--C-475 in [evidence/claims.csv](evidence/claims.csv), mirrored in
    [docs/02_EVIDENCE_REGISTER.md](docs/02_EVIDENCE_REGISTER.md).
-5. Sections 12--20 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
+5. Sections 12--22 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
    [negative results](docs/09_NEGATIVE_RESULTS.md), [unknowns](docs/10_HYPOTHESES_AND_UNKNOWNS.md) and
    [current blockers](docs/12_CURRENT_BLOCKERS.md).
 6. Verify each selected sample/tool in [evidence/artifacts.csv](evidence/artifacts.csv) and
@@ -38,7 +38,20 @@ The current unavailable-device condition and later retractions govern the next a
 [docs/03_TIMELINE.md](docs/03_TIMELINE.md) and [docs/23_RC2_LIVE_RUNTIME.md](docs/23_RC2_LIVE_RUNTIME.md) for history,
 not as a queue of unfinished operator instructions.
 
-## Latest continuation (2026-10-18, C-471--C-473)
+## Latest continuation (2026-10-18, C-474/C-475)
+
+C-474 uses new A-099 plus existing views to resolve selected Fly1.21.10 RID DeviceId input and exact caller18/4.
+The inspected V1 supplier selects the first AIRCRAFT DeviceInfo.device_id; actual toggle/provider binding and numerical
+DeviceId/ProductType equivalence remain unknown. Keep C-286/C-287 and live C-291 explicitly at Fly1.19.4; no selector bug
+or retraction follows. No signed-body parser, device owner, readback or RF control was recovered.
+
+C-475 traces a packaged RC331 sec_type2 condition through APS2 to the command name dji_verify and the packaged
+same-name implementation. Its selected mode hashes/copies payload with fixed256-byte RSA length. The init service
+names /system/etc/upgrade.json but the available config is vendor/etc/upgrade.json; the exact system member is absent
+from the inspected image listing. Live config/mount/PATH binding is unknown. Do not merge this edge with C-456/C-457
+or call variable header offsets WA150 signature/STUE support. A-100--A-103 remain excluded, never executed inputs.
+
+## Prior continuation (2026-10-18, C-471--C-473)
 
 A-093 is the exact Fly1.21.10 carrier. Its22 directory entries match independent DEX maps and page-rounded storage.
 A-094 generates one analysis-only view per explicit invocation; four checked views A-095--A-098 change only relative

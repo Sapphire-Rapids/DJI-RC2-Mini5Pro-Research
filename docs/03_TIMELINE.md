@@ -1099,3 +1099,11 @@ work when a report did not contain a more precise timestamp.
   单位是条件结论；方法无 hasAltitude guard，可混用不同 fix 高度/时间，cache 与新 epoch 秒不证明 fresh fix（C-473）。
 - 未运行 Android/vendor Java、ART verifier 或设备；没有原始 DEX 身份恢复、STUE 明文、实际控制面板操作或 RF 成功。
   A-093/A-095--A-098 排除不分发，A-078 保持显式 22 B 输入；旧测试不重复运行。
+
+### 2026-10-18 exact RID selector and packaged upgrade edge
+
+- `STATIC`：未改动 A-094 生成 A-099；独立 class_data 解码定位13个方法，code offsets 与 JADX API 一致；IDs/prototypes 保留定位，关键 FALLBACK 核对通过。
+  Fly1.21.10 所查 DeviceId supplier、block_device selector 和 literal caller18/4 闭合，1.19.4历史记录不变（C-474）。
+- `STATIC`：A-100--A-103 来自 C-455 已核验 system image；988 B APS2/144 relocation 解析将包内 type2 指向 dji_verify 命令。
+  所查同名实现固定 RSA256、动态 payload offset、摘要/复制模式；配置路径和 live/PATH 绑定保留未知（C-475）。
+- 保存25条 REA evidence/四份 snapshots，session全部关闭；未执行厂商/Android、RSA、key trial 或设备，无 STUE/控制/RF 成功。

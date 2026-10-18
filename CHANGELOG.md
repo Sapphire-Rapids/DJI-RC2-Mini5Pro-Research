@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.08 - 2026-10-18
+
+- Recorded exact Fly1.21.10 selected RID DeviceId input and caller18/4 with a new analysis-only A-099 view and13 independently located methods whose code offsets match JADX (C-474). Kept Fly1.19.4 C-286/C-287/C-291 unchanged; numeric equivalence and runtime binding remain unknown.
+- Traced packaged RC331 sec_type2 through APS2 to a dji_verify command and the same-name signature/extraction implementation (C-475, A-100--A-103). Config/PATH selection is unobserved; dynamic payload offset does not establish WA150384-byte signature or STUE support.
+- Preserved the separate dji_decrypt/QSEE/TBIE result and all device/RF acceptance gaps; no vendor execution, RSA/key trial or new control capability.
+
 ## 0.5.07 - 2026-10-18
 
 - Registered the pinned Fly carrier and22 directory/map matches (C-471, A-093).

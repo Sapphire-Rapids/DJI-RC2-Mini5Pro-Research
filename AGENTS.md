@@ -490,6 +490,16 @@ Later retractions override earlier progress summaries.
     and new message epoch seconds do not bound source-fix age or establish a1Hz producer. Actual provider, altitude
     validity, owner/readback/restore/persistence/RF remain unproven; A-078 stays explicit22-byte input without a new editor.
 
+67. C-474 resolves selected Fly1.21.10 RID DeviceId input and literal CloudControlData(18,4,string) caller. Do not
+    label that input ProductType139 or assert DeviceId/ProductType numerical equality or difference. Actual toggle/
+    provider binding is unobserved. C-286/C-287 and live C-291 remain Fly1.19.4 evidence; do not retract them or silently
+    migrate their tool. Caller literals are not generic key metadata, applied readback, body-parser or RF evidence.
+68. C-475 follows only a packaged RC331 sec_type2 condition. The available vendor config differs from the init service's
+    /system/etc/upgrade.json path; its exact system-image member is absent, and live config/mount/PATH selection is unknown.
+    The wrapper constructs dji_verify by name; only the packaged same-name implementation is inspected. Header+signature
+    payload offset is dynamic, but RSA length is fixed256 and selected crypto mode only digests/copies. Do not infer WA150
+    STUE support or CPU from rk3399 symbols. Keep C-456/C-457 dji_decrypt/QSEE separate and product-entry negatives bounded.
+
 ## Privacy and redaction
 
 Never commit:

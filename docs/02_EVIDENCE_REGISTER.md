@@ -656,3 +656,10 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-471 | `STATIC` | Exact carrier has 22 BE directory entries matching independent DEX maps and page-rounded storage | Unknown metadata/protection; no original header, loader, device or STUE recovery |
 | C-472 | `OBSERVED` | Four analysis-only views pass string/table/suffix/unchanged-byte checks; public CLI default digest reproduced; 30 method mappings independently checked | Synthetic header assumptions; five protected-type segments unrecovered; no original DEX identity, ART/Android or all-app decode |
 | C-473 | `STATIC` | Selected Java provider/cache chain reaches native location; default Android valid-altitude contract is conditional | No hasAltitude guard; possible mixed GPS altitude/network time; on-demand caches do not bound fix age; actual provider/validity/device/RF unknown |
+
+## 2026-10-18 exact RID selector and packaged upgrade edge
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-474 | `STATIC` | Fly1.21.10 selected DeviceId supplier/selector and exact caller18/4 resolved; A-099 view checked;13 independently located methods have code offsets matching JADX | C-286/C-287/C-291 Fly1.19.4 evidence retained; DeviceId/ProductType equivalence and actual binding unknown; no body parser/readback/RF |
+| C-475 | `STATIC` | RC331 packaged sec_type2 maps through full APS2 decode to dji_verify; selected mode hashes/copies outer payload, RSA length256 | Config path/live selection unknown; separate from dji_decrypt/QSEE; no STUE/key/runtime/RF result or whole-process absence |

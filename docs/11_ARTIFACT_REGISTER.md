@@ -494,7 +494,7 @@ France EID 是法国专用，ADSBSwitch 是 AirSense/ADS-B；位置组合仍有�
 | A-072 | `oid_identifier_message.py` / oid-identifier-message-v3 | 1056 B | `c35744f4974a814a1775acb24c8b6f1eaffd5f3c742f00852563ed3a7962d35b` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
 | A-073 | `VERIFY_RUNBOOK.md` / verify-runbook-v3 | 2025 B | `4e9625ab6042fcfb113f1d15c80e8e369e4fee3f5d35308f48bbc3aeb8d0f063` | `STATIC`；offline-doc-current-producer-routing-payload-scope | source-local-only |
 | A-074 | `RC_RID_BREAKTHROUGH.md` / rc-rid-breakthrough-v2 | 1696 B | `56f93678169a08d8fdb3bb4c6c5b11eb80a1b15b42d33193b1878fa84e175022` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
-| A-075 | `README.md` / rid-protocol-readme-v6 | 6119 B | `cf707edb59cfd9bb160fdd3c72211e59ffc96ae1f4bec08ebb576d584eb62458` | `STATIC`；offline-doc-current-java-provider-analysis-view-scope | source-local-only |
+| A-075 | `README.md` / rid-protocol-readme-v7 | 6698 B | `0043b3886d443a7c4f67932ee65ea8574609fb2987a887fb426610b8f94b367c` | `STATIC`；offline-doc-current-java-selector-view-scope | source-local-only |
 | A-076 | `opid_message.py` / opid-message-v2 | 1527 B | `ae8cad428d28cc6cd3570337af02781bf7d2a4c6bd00f7c2450ec1ddc8f6965e` | `OBSERVED`；offline-payload-only-schema-cli-checked-no-device | source-local-only |
 | A-077 | `RID_FIELD_MAP.md` / rid-field-map-v6 | 3173 B | `8c16500656dacdf125b9934ebea3ec15d09e810af4fc30f83e6fc330fe9e5390` | `STATIC`；offline-doc-current-java-provider-analysis-view-scope | source-local-only |
 | A-078 | `position_message.py` / position-message-v3 | 1886 B | `43b410778c3dfa3d0346fcf27fc7fc6df8ddcff1fddf91208289e8159ae9f635` | `OBSERVED`；offline-payload-model-native-components-checked-no-device | source-local-only |
@@ -640,3 +640,18 @@ header/version/link/checksum 含明确假设；五个受保护 type 表段未恢
 原始 DEX 身份、ART/Android、runtime provider 和 RF 未验证；A-078 及其显式 22 B 接口未修改。
 
 A-075/A-077/A-081 升为 v6 并同步 hash，记录当前 Java/default-provider、cache/mixed-fix 与分析视图边界。
+
+## A-099--A-103：RID Java 与 RC331 sec_type2 固定输入（C-474/C-475）
+
+| ID | Name / kind / subject_version | Size | SHA-256 | audit_state / device_use_state / disposition / privacy |
+| --- | --- | ---: | --- | --- |
+| A-099 | Fly device-info derived analysis-only DEX view / input-sample / DJI-Fly-1.21.10-analysis-view-base0xb79a00c | 10024504 B | `9480d22214c12c7d3e48ee4616ed427be87a88b72c47ab248e504193a0d583ac` | `STATIC` / offline-generated-analysis-only-jadx-static-no-android-or-device / excluded-derived-do-not-distribute / public-hash-only |
+| A-100 | RC331 sec_type2 libupgrade_upgrade.so static input / input-sample / RC331-10.00.0700-0205-libupgrade_upgrade.so | 321608 B | `ef1af625cd2559685fbe14275673da2535a97c1b078f6d3232b1522a673e3aa9` | `STATIC` / offline-extracted-static-analysis-never-run / excluded-derived-do-not-distribute / public-hash-only |
+| A-101 | RC331 sec_type2 dji_verify static input / input-sample / RC331-10.00.0700-0205-dji_verify | 22800 B | `a3a9a4e825c85826402a7d39c6e79b0975a79d2bbd93aa571ded30412069118c` | `STATIC` / offline-extracted-static-analysis-never-run / excluded-derived-do-not-distribute / public-hash-only |
+| A-102 | RC331 sec_type2 libupgrade_product.so static input / input-sample / RC331-10.00.0700-0205-libupgrade_product.so | 128792 B | `fd982e51117f9a73757bca41b4139be925fd3c3a9150ad8e182b7c037b92aa38` | `STATIC` / offline-extracted-static-analysis-never-run / excluded-derived-do-not-distribute / public-hash-only |
+| A-103 | RC331 sec_type2 libupgrade_init.so static input / input-sample / RC331-10.00.0700-0205-libupgrade_init.so | 53072 B | `cf5222ed46efd24b3961fb92560d57880ac5e8940cc46bdc500f69c893f875f4` | `STATIC` / offline-extracted-static-analysis-never-run / excluded-derived-do-not-distribute / public-hash-only |
+
+A-099 由未改动的 A-094 从 A-093 生成；40,790 strings 通过结构/编码约束，8,050 个未改动 string-ID 尾项与重建 offset 匹配，相对 0x20000 后字节原样保留。
+它是含 synthetic header 假设的派生分析输入，不是原始 DEX 或解密成果；仅此新 view 用于 C-474，不登记额外名称候选为成果。
+A-100/A-101 复用已提取成员，A-102/A-103 从 C-455 同一已核验 system image 提取；均未执行。配置来自此前已核验 vendor image。
+两镜像与配置身份、静态调用范围见固件记录第22节；没有 live 配置选择、RSA/key trial 或 WA150 STUE 解密。全部厂商字节/listing 排除不分发。

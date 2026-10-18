@@ -1,6 +1,8 @@
 # Current blockers and dependency gates
 
-2026-10-18 current state: there is no device for this work. C-471--C-473 add four analysis-only views and selected Java
+2026-10-18 current state: there is no device for this work. C-474 resolves selected Fly1.21.10 DeviceId/caller18/4
+without proving runtime binding or altering Fly1.19.4 evidence. C-475 resolves a packaged sec_type2 verify/extract edge;
+live config/PATH selection, STUE ownership and device/RF control remain unknown. C-471--C-473 add four analysis-only views and selected Java
 provider/cache semantics with conditional default-altitude units and mixed-fix/freshness limits. Actual provider/valid
 altitude, original DEX identity and device/RF control remain unverified. C-466--C-470 add bounded Android-upgrade/producer/routing/
 payload and small-container evidence; none establishes STUE plaintext or an actual device/RF control panel. C-463--C-465 complete the minimum-prefix parser fixes and

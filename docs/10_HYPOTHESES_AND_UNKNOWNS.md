@@ -595,3 +595,10 @@ Java `clientLocation():byte[]` 边界和构造时 epoch秒。finite越界/abs双
 四个结构一致的分析视图也不等于原始 DEX 身份、原始 header 解密或 ART 执行；五个受保护 type 表段未恢复。
 
 C-470仅更新容器可用性：A-0661200复核、A-092 wa140bat1100新检查，剩余五个1100未知。没有新明文或STUE consumer，不改变owner/derivation缺口。
+
+## Version and runtime bindings after C-474/C-475
+
+`UNKNOWN`：Fly1.21.10 的实际 toggle/provider 绑定、DeviceId 与 ProductType 数值关系、实际 block_device 选择及 signed inner
+body 的消费语义未建立；C-286/C-287/C-291 的1.19.4结果不因此改变。RC331 sec_type2 只是包内配置条件：live 配置来源、
+挂载和 dji_verify 命令 PATH 解析未知。可变 payload offset 不解决固定256 B RSA 与 WA150384 B签名/STUE 的差别。
+已有 dji_decrypt/QSEE/TBIE 链保留独立结论；新的短链没有补齐 root input、飞机 owner 或逐项 RF 控制。

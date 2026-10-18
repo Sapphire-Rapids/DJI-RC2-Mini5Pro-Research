@@ -2,7 +2,13 @@
 
 ## Start here
 
-Latest continuation (2026-10-18, C-471--C-473): 22 carrier directory/map records and four analysis-only views are
+Latest continuation (2026-10-18, C-474/C-475): selected Fly1.21.10 RID bodies read DeviceId and construct caller18/4;
+DeviceId/ProductType equivalence and actual binding are unknown. Fly1.19.4 C-286/C-287/C-291 remain unchanged.
+RC331 packaged sec_type2 maps to a dji_verify command and the inspected same-name signature/extraction implementation;
+live config/PATH binding is unknown. This is separate from dji_decrypt/QSEE and supplies no STUE key or device/RF control.
+Details and exact evidence boundaries are in firmware topics21/22.
+
+Prior continuation (2026-10-18, C-471--C-473): 22 carrier directory/map records and four analysis-only views are
 checked. Selected Java bodies connect cached client-location to native serialization; valid Android/default altitude
 has a conditional meters/WGS84 contract. The inspected branch has no hasAltitude check and can mix newer network
 coordinates/time with older GPS altitude. New message times do not prove fresh fixes. Actual provider/valid altitude,
@@ -870,3 +876,16 @@ Existing JADX1.5.6 performed selected static decoding/API reads; the Java review
 A-078 remains explicit22-byte input. Continue only from new concrete provider, owner or field/RF evidence; these static paths
 do not admit device controls. Carrier/views/vendor code remain excluded. No device, STUE plaintext, actual control-panel
 operation or RF success occurred; GitHub synchronization stays paused. Detailed offsets and limits are in firmware topic20.
+
+## 2026-10-18 selector version and packaged verify continuation (C-474/C-475)
+
+C-474 is an exact-version source distinction, not a numeric DeviceId/ProductType inequality or a bug in the historical
+Fly1.19.4 tool. A-099 is the only new view used for this conclusion. Independent class_data decoding locates13 methods;
+their code offsets match JADX API, while IDs/prototypes are retained for location.
+The literal caller18/4 does not change generic KeyCloudControlData's value routing or add GET/applied/RF evidence.
+
+C-475's package configuration condition does not establish live type2 selection: vendor config differs from the init
+service's system path, whose exact member is absent in the inspected image listing. The wrapper uses a command name;
+PATH resolution is also unobserved. Selected same-name dji_verify uses dynamic header+signature payload offset but a
+fixed256-byte RSA call and digest/copy mode. Product-entry negatives stay bounded. C-456/C-457, STUE/root gaps and full
+per-control readback/restore/persistence/RF requirements remain unchanged; no vendor execution or new device instruction. In continuing this work, use a new concrete input or call edge rather than repeating this closed static inspection.
