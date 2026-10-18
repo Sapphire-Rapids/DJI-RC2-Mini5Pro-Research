@@ -1,10 +1,11 @@
 package com.finduas.rc2ridadmin;
 
+import java.util.Arrays;
 import java.util.Locale;
 
-/** Strict parser for DJI's seven-byte {@code 0x11/0x1C} RID working-status push. */
+/** Parses the seven-byte {@code 0x11/0x1C} status prefix and retains unknown trailing bytes. */
 final class RidWorkingStatus {
-    static final int PAYLOAD_LENGTH = 7;
+    static final int MIN_PAYLOAD_LENGTH = 7;
 
     private final int flags;
     private final boolean eidSupported;
@@ -13,6 +14,7 @@ final class RidWorkingStatus {
     private final boolean ridNormal;
     private final int areaCode;
     private final int failureCode;
+    private final byte[] trailingBytes;
 
     private RidWorkingStatus(
             int flags,
@@ -21,7 +23,8 @@ final class RidWorkingStatus {
             boolean eidNormal,
             boolean ridNormal,
             int areaCode,
-            int failureCode) {
+            int failureCode,
+            byte[] trailingBytes) {
         this.flags = flags;
         this.eidSupported = eidSupported;
         this.ridSupported = ridSupported;
@@ -29,15 +32,16 @@ final class RidWorkingStatus {
         this.ridNormal = ridNormal;
         this.areaCode = areaCode;
         this.failureCode = failureCode;
+        this.trailingBytes = trailingBytes;
     }
 
     static RidWorkingStatus parse(byte[] payload) {
         if (payload == null) {
             throw new ProtocolException("RID working-status payload is null");
         }
-        if (payload.length != PAYLOAD_LENGTH) {
+        if (payload.length < MIN_PAYLOAD_LENGTH) {
             throw new ProtocolException(
-                    "RID working-status payload length is " + payload.length + ", expected 7");
+                    "RID working-status payload length is " + payload.length + ", expected at least 7");
         }
 
         int flags = unsigned(payload[0]) | (unsigned(payload[1]) << 8);
@@ -52,7 +56,8 @@ final class RidWorkingStatus {
                 (flags & (1 << 9)) != 0,
                 (flags & (1 << 8)) != 0,
                 areaCode,
-                unsigned(payload[6]));
+                unsigned(payload[6]),
+                Arrays.copyOfRange(payload, MIN_PAYLOAD_LENGTH, payload.length));
     }
 
     int getFlags() {
@@ -81,6 +86,11 @@ final class RidWorkingStatus {
 
     int getFailureCode() {
         return failureCode;
+    }
+
+    /** Unknown extension data; not interpreted or included in display output. */
+    byte[] getTrailingBytes() {
+        return trailingBytes.clone();
     }
 
     String compatibilityState() {

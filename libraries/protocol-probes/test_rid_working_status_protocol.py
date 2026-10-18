@@ -71,6 +71,28 @@ class RidFieldLayoutTests(unittest.TestCase):
         self.assertTrue(result.is_rid_normal)
         self.assertEqual(result.area_code_value, 156)
         self.assertEqual(result.failure_code, 2)
+        self.assertEqual(result.trailing_bytes, b"")
+
+    def test_extended_payload_retains_tail_without_changing_prefix_or_output(self):
+        prefix = status_payload(flags=0x2303, area_code=-2, failure_code=2)
+        base = protocol.parse_rid_working_status_frame(build_frame(prefix))
+        for tail in (b"\xff", b"\x00\x80\x55"):
+            with self.subTest(tail_length=len(tail)):
+                extended = protocol.parse_rid_working_status_frame(build_frame(prefix + tail))
+                self.assertEqual(extended.trailing_bytes, tail)
+                self.assertEqual(extended, base)
+                self.assertEqual(repr(extended), repr(base))
+                self.assertEqual(
+                    protocol.deidentified_summary(extended),
+                    protocol.deidentified_summary(base),
+                )
+
+    def test_trailing_bytes_are_an_immutable_copy(self):
+        frame = bytearray(build_frame(status_payload() + b"\x55"))
+        result = protocol.parse_rid_working_status_frame(frame)
+        frame[18] = 0
+        self.assertIsInstance(result.trailing_bytes, bytes)
+        self.assertEqual(result.trailing_bytes, b"\x55")
 
     def test_each_primary_flag_is_independent(self):
         cases = (
@@ -160,11 +182,12 @@ class StrictFrameValidationTests(unittest.TestCase):
                 with self.assertRaisesRegex(protocol.RidProtocolError, "route"):
                     protocol.parse_rid_working_status_frame(changed)
 
-    def test_short_and_extended_payload_variants_fail_closed(self):
-        for payload in (self.payload[:-1], self.payload + b"\x00"):
+    def test_every_short_payload_variant_fails_closed(self):
+        for length in range(7):
+            payload = self.payload[:length]
             with self.subTest(length=len(payload)):
                 with self.assertRaisesRegex(
-                    protocol.RidProtocolError, "seven-byte layout"
+                    protocol.RidProtocolError, "seven-byte prefix"
                 ):
                     protocol.parse_rid_working_status_frame(build_frame(payload))
 

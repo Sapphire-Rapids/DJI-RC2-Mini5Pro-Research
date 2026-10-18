@@ -73,3 +73,15 @@ reverification occurred. The static client/QSEE chain reaches protected RPMB-roo
 root input and STUE's own owner/derivation remain unknown. Cipher mode constants1/2 are not independently named.
 The fixed480-byte client does not directly fit WA150's608-byte header/signature layout. This is no STUE decoder or
 root-key recovery, and does not rule out all other offline approaches.
+
+## Separate SDK/position work (C-458--C-462)
+
+The pinned SDK Get(0x37) now runs in isolated ARM64 emulation and returns a32-byte value checked by roundtrips and
+rewrap. This disproves A-078 v2's direct ciphertext-prefix key choice. C-464/C-465 later recover22-byte input/84-byte
+payload composition and repair v3 with4 passing host tests plus controlled native components/fragments; no full handler,
+transport or RF execution follows. It remains separate from the static bw_secure position-envelope branch.
+The inspected GPS-update transfer path and bounded independent-source survey add no STUE consumer within their
+scopes. The control-panel objective retains full per-control device/RF acceptance; no device is currently available.
+
+The2026-10-18 status-parser validation is a separate36-host-test run (C-463); together with4 position tests this batch
+has40 host tests. The earlier59 firmware tests (C-450) were not rerun or merged into a single larger run.

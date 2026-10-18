@@ -1,0 +1,2 @@
+pycryptodome==4.0.1
+unicorn==2.1.4

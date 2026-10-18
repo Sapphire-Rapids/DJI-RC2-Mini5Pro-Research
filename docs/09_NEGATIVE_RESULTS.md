@@ -930,22 +930,15 @@ raw/变换，2603 明文 checksum 全零命中。
 限定：缺失来自函数名清单，不排除匿名 lambda。
 
 
-## N-91 — no lib defines GetWhiteBoxKeyChainString (C-417)
+## N-91 — no-provider finding was withdrawn (C-417/C-458)
 
-`NEGATIVE`：在抽取的全部208 个 arm64 库中，无任何动态或全符号表定义 `GetWhiteBoxKeyChainString` —— 每次出现都是 import
-或名字引用。故该 whitebox keychain 本体无法仅凭这些库解析。
+`RETRACTED`：旧“抽取库没有 GetWhiteBoxKeyChainString 定义”结论不成立。
+C-458 从 PT_DYNAMIC 虚拟地址经 PT_LOAD 映射读取真正动态表，得到 defined whitebox/crypto Get 与 WAES 符号。
 
-限定：只覆盖已抽取库；白盒可能由未抽取/其它 ABI 或 assets 提供。
+## N-92 — earlier stripped-provider explanation superseded (C-418/C-419/C-458)
 
-
-## N-92 / 修正 — C-417 的"无定义"过强（C-418/C-419）
-
-`RETRACTED`：C-417 断言无库定义 `GetWhiteBoxKeyChainString`。该结论只对 nm 可见符号成立；
-`libsdk_base.so` 被 strip，却内嵌了 whitebox/crypto 的 mangled 名表（连同 `WAES_decrypt_real`、`WAES_encrypt_real`、
-`shift_rows`、`SHA256`）。
-
-正解：provider 是被 strip 的库，而非不存在。白盒本体极可能就在 libsdk_base.so，可用 Ghidra 直接打开分析。
-
+`RETRACTED`：provider 确实是 libsdk_base.so，但“只有嵌入名字、没有实际符号表”的解释错误。
+无 section 表和 nm 无输出不等于没有 loader 使用的动态符号。当前函数定位和实际 Get 模拟已完成，不能再把这项列为缺失 provider。
 
 ## N-93 — keychain entry pointers are zero in-file (C-422)
 
@@ -960,7 +953,7 @@ raw/变换，2603 明文 checksum 全零命中。
 `NEGATIVE`：用 `Ghidra_va - 0x100000` 的扁平映射读密钥，字节与 Ghidra 内存读不一致；只有对原始文件搜索 Ghidra 的 hex
 才定位到真偏移（`0x740b30` / `0x73a600`，该处 delta 为 `0x102000`）。
 
-限定：这是映射方法学问题，不否定密钥存在（C-423）。
+限定：这是存储映射问题；C-423 的存储块需通过 C-459 的 Get 解封，不能直接当作 key。
 
 
 ## N-95 — no ComplianceSerialNumber Get/Set (C-429)
@@ -1051,3 +1044,33 @@ tar 打包与 FTP 传递均复制输入/缓存字节，未在已检查边恢复�
 
 限定：这是缺失输入与静态路径的边界，不是执行失败或所有离线方法不可行的证明。固定 480 B header 的 RC client
 也不能直接处理 WA150 的 608 B header+signature，不得称为已经可用的 STUE 解密器。
+
+## N-106 — ciphertext prefix is not the returned position key (C-459)
+
+`OBSERVED`：完整 Get(0x37) 的隔离模拟返回 32 B，与表项密文前 32 B 不同；同 WAES CBC 重封装精确还原 48 B stored blob。
+A-078 v2 取 `ciphertext[:32]` 的做法已被证伪；该历史负结论保留。C-465 后续修为显式 key 输入的 v3，
+不追认 v2。正确 keychain 结果仍只按长度/哈希登记。
+
+限定：这解决的是 keychain 返回值，不是完整 JNI caller、wire、飞机应用状态或 RF 位置控制。
+
+## N-107 — GPS file-transfer path supplies no STUE decoder evidence (C-461)
+
+`STATIC`：A-088 已检查的属性→文件校验→XMODEM 路径保持 loader/firmware 文件内容，只增加 transfer framing/CRC/padding，
+没有恢复出 IMaH/STUE 解密边。没有运行该 ELF 或写 UART。
+
+限定：不覆盖未知输入 producer、全部固件或 WA150 GNSS 实际路径；Unicore 文档仅提供候选上下文。
+
+## N-108 — bounded independent-source survey adds no target decryption material (C-462)
+
+`NEGATIVE`：本次固定 dji_rev 旧 v1/CBC 文件、WA341 battery DUML/UART 文件和实际打开的官方材料中，没有新 STUE key、
+匹配 target PRAK 或目标解密 consumer。具体来源与访问失败见固件记录第 14 节。
+
+限定：没有全网、全部 SDK 或所有私有/未索引源码覆盖；GitHub 搜索 API 403 与某 PDF 访问失败不是源码不存在的证明。
+
+## N-109 — old position prefix/output-size model retracted (C-414/C-425/C-464)
+
+`RETRACTED`：旧 A-078 v2 将 AES 参数 0x100 当作 256 B output，添加 16 B plaintext prefix 与伪 32 B request header，
+还把第三个 double 当作 int。精确 caller 的 success payload 是 84 B，见 C-464；v3 已移除这些猜测。
+
+限定：C-465 验证离线 encoder 和原生组件/指令片段，未执行完整 handler、SendSetPack、transport 或 RF。
+不能把修复称为实机位置编辑器，不能自行赋予 raw fields 经纬度单位。

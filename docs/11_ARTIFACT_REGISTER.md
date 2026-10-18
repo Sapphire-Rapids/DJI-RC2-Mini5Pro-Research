@@ -494,17 +494,18 @@ France EID 是法国专用，ADSBSwitch 是 AirSense/ADS-B；位置组合仍有�
 | A-072 | `oid_identifier_message.py` / oid-identifier-message-v2 | 2338 B | `d53fb2aa3af242b6d9e84fb0511399a393e6ce860b843a01b5661f87ed791b0e` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
 | A-073 | `VERIFY_RUNBOOK.md` / verify-runbook-v2 | 1508 B | `34d7cc63d1a58be70af1883cd1e6b356ad510a1623112b0da4ba817c0fed6b10` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
 | A-074 | `RC_RID_BREAKTHROUGH.md` / rc-rid-breakthrough-v2 | 1696 B | `56f93678169a08d8fdb3bb4c6c5b11eb80a1b15b42d33193b1878fa84e175022` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
-| A-075 | `README.md` / rid-protocol-readme-v2 | 2071 B | `df94fd4108ae4ab5ca0dd226cbe2d77396f5f84d34b9a3268f588caf9fffe1a7` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-075 | `README.md` / rid-protocol-readme-v4 | 3461 B | `5252592de70c992fbbb8cd7d18b94d54d44f5368fc58fc98624c7a7e6cd8da5a` | `STATIC`；offline-doc-current84byte-payload-no-device | source-local-only |
 | A-076 | `opid_message.py` / opid-message-v1 | 1711 B | `627a655d88da0a66ede42d15af9f73b34e51ec6e73acad01aa8a84de6b38048e` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-077 | `RID_FIELD_MAP.md` / rid-field-map-v2 | 2061 B | `8a0bf8a40952fc78bfca643f23acac5f2aa45837e7e603027f81dbfda53a4b25` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
-| A-078 | `position_message.py` / position-message-v2 | 3708 B | `7ad3489788f01e06cf0859d28e9f0a3254492ec9bfa817933c0c408f4fec1fd3` | `STATIC`；offline-hex-only-approximate-no-official-byte-match | source-published-static-reconstruction |
+| A-077 | `RID_FIELD_MAP.md` / rid-field-map-v4 | 2217 B | `6e56f74249cd07495e8db1f9aa674ddc7136d06237602b172b4acd1927620c83` | `STATIC`；offline-doc-current84byte-payload-no-device | source-local-only |
+| A-078 | `position_message.py` / position-message-v3 | 1886 B | `43b410778c3dfa3d0346fcf27fc7fc6df8ddcff1fddf91208289e8159ae9f635` | `OBSERVED`；offline-payload-model-native-components-checked-no-device | source-local-only |
 | A-079 | `adsb_switch_message.py` / adsb-switch-message-v1 | 1374 B | `9303eeab3191a12ff45049574b3e75e95590bac91e175b0022e82abbd4f04bad` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
 | A-080 | `height_message.py` / height-message-v1 | 1107 B | `5bb042d00559bd32ff1a0b5e0da611ee016f95c4758430710ce375c60d110f24` | `STATIC`；offline-hex-only-no-device-transport | source-published-static-reconstruction |
-| A-081 | `RID_CONTROL_CONSOLIDATION.md` / rid-control-consolidation-v2 | 2144 B | `56f12d975e496bf900e80312a44696576d436cb11c9076befc3071b30f28c696` | `STATIC`；offline-corrected-doc-no-device | source-local-only |
+| A-081 | `RID_CONTROL_CONSOLIDATION.md` / rid-control-consolidation-v4 | 2429 B | `4cee8108f990da41c6c0e1ca4d5197260f18335fcbf6ebb5913a50123771a4db` | `STATIC`；offline-doc-current84byte-payload-no-device | source-local-only |
 
 A-073 替换了不能执行的 RID-off 手册；A-074/A-075/A-077/A-081 撤回完整控制/真实发射/全条件成立的表述。
 A-072 的 product-139 UOM 语义为 18 字节 pack、最多复制 8 字节；其本地零尾 GET 不是已验证的官方逐字节行为。
-A-076 是 EASA 身份面，A-078 不是可用坐标编辑器，A-080 仅为动态最大高度 GET 结构候选。
+A-076 是 EASA 身份面。A-078 v2 的错误 key/布局保持 RETRACTED 历史；C-465 更新为 v3 offline payload model，
+其当前身份见表和下节。A-080 仅为动态最大高度 GET 结构候选；位置完整 handler/transport/设备/RF 能力仍未验证。
 旧说明的历史由 C-391/C-397/C-407/C-440/C-441 及更正记录保留；当前无设备、无 ACK/readback/restore/RF 新证据。
 
 ## A-082：公开 IMaH-v2 单候选校验器（C-450/C-451）
@@ -537,3 +538,38 @@ A-083 从独立 `bw_secure` 分区的一个 REPLACE_XZ operation 得到：压缩
 `70a579f9f1b32df61d7b0c51716e6f8b38cad69c51461bb041555b0f53705094`，blob 与最终分区哈希均匹配清单。
 A-084/A-085 来自 system 中的 `libtee_util.so` 与 `dji_decrypt`。这只闭合来源与静态调用链，不恢复 RPMB root/HUK 输入，
 也不证明 STUE 使用这些组件。A-005 身份不变：其外层完整性可验证，但内层 TBIE/FLYA 仍为密文（C-454）。
+
+## A-086--A-088：固定 SDK 模拟与 GNSS transfer 候选（C-458--C-462）
+
+| Artifact | 对象/版本 | 大小 | SHA-256 | 状态/使用 | 处置 |
+| --- | --- | --- | --- | --- | --- |
+| A-086 | Pinned Fly1.21.10 libsdk_base whitebox provider / DJI-Fly-1.21.10-arm64-libsdk_base | 7720240 B | `e5b290ebc6aa6e409e116cc0d3b84fb4e49c70f6c552feffacd5b15c7c83e873` | `OBSERVED`；isolated-function-emulation-only-no-os-or-device-run | excluded-do-not-distribute；public-hash-only |
+| A-087 | Pinned SDK keychain isolated ARM64 probe / sdk-keychain-probe-v1 | 7695 B | `0ea0afcd4ca47236a58c47bccddd662f34fb95e6aa8d7cb1343e79223ae0b5b6` | `OBSERVED`；offline-isolated-get37-roundtrip-and-rewrap-pass | source-local-only；public-source |
+| A-088 | RC331 dji_gps_update GNSS file-transfer candidate / RC331-10.00.0700-0205-dji_gps_update | 32800 B | `2bf9cd3e24b32256134213d047f33106e03009cebc6d58a246bd13cf3b1d7aa9` | `STATIC`；offline-static-analysis-never-run-no-hardware-write | excluded-derived-do-not-distribute；public-hash-only |
+
+A-086 与既有 official Fly1.21.10 APK 的 arm64 libsdk_base 成员 hash 一致；只模拟所选 CPU 函数，不运行 Android loader/OS 或设备。
+A-087 依赖 Unicorn2.1.4，固定输入 hash/offset，执行完整 Get(0x37)、三组 block roundtrip 和 ciphertext 重封装检查；
+只输出 key 长度/hash/比较结果，不含厂商代码、key 或 ciphertext blob。复现说明见 rid-protocol README。
+A-088 从已匹配 system 镜像提取，ELF64/AArch64，未运行、未写 UART；已检查 transfer 路径不构成 STUE 解密实现。
+这些记录不闭合 JNI caller/final wire、SDK/TEE key 相等或真实 RF 控制。
+
+## A-078 v3 与 A-089：84 B payload 模型及精确 JNI 输入（C-464/C-465）
+
+A-078 当前源码 `position_message.py` 为 1886 B，SHA-256 `43b410778c3dfa3d0346fcf27fc7fc6df8ddcff1fddf91208289e8159ae9f635`，版本 `position-message-v3`。
+状态 `OBSERVED`，使用状态 `offline-payload-model-native-components-checked-no-device`，处置 `source-local-only`。
+显式输入 serialized22/key32/IV16，仅生成 84 B payload，不生成 transport frame、不解释坐标单位；4 项 host tests 及
+受控原始片段/helper 对照通过。完整 handler/SendSetPack/Android constructor/设备/RF 未执行。
+
+旧 v2 为 3,708 B、SHA-256 `7ad3489788f01e06cf0859d28e9f0a3254492ec9bfa817933c0c408f4fec1fd3`；
+其 stored-key prefix、fake headers 和 256 B ct 布局保持 `RETRACTED`，不被新测试追认。
+当前 test_position_message.py 为 2,256 B，SHA-256 `d93f8c535b701b4738a3f96d5a61d8c879018170571cb368f910196302fe13fc`；
+requirements.txt 为 35 B，SHA-256 `a6f5e2b352c22076eac35f9fd82126e49843a1d46ccbd822c8c96ef29283400f`，
+固定 pycryptodome4.0.1/unicorn2.1.4。测试使用独立 synthetic OpenSSL fixture，不包含厂商 key/IV。
+
+| Artifact | 对象/版本 | 大小 | SHA-256 | 状态/使用 | 处置 |
+| --- | --- | --- | --- | --- | --- |
+| A-089 | libsdk_jni.so / DJI-Fly-1.21.10-arm64-libsdk_jni | 87313856 B | `5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188075ada61f5a7b46286` | `STATIC`；offline-static-and-controlled-instruction-fragments-no-device | excluded-do-not-distribute；public-hash-only |
+
+A-089 与已有 official Fly1.21.10 APK 的 arm64 member 流式 hash 一致；只公开哈希和高层结构。
+选定函数原始 2,356 B 的 SHA-256 为 `afa49f1b9c7c050bac1a065336be9b30d686e75604a7469756e7205d1e9656b9`。
+厂商 listing、模拟输入/脚本和 key bytes 保持仓外。C-463 的四份 parser 源码直接按源文件/报告登记，没有新的 APK artifact。

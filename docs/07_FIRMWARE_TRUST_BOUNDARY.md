@@ -6,7 +6,9 @@
 
 状态标签遵循 [AGENTS.md](../AGENTS.md)。后续记录与本文冲突时，较新的精确工件审计和带恢复读回的实机证据优先；相邻版本静态证据不能自动升级为当前设备事实。
 
-最新进展见第 13 节（C-454--C-457）：0200 内层 TBIE/FLYA 仍加密；已从现有 0205 OTA 验证并提取三个 QSEE 组件，
+最新进展见第 15 节（2026-10-18，C-463--C-465）：双端状态 parser 最小长度修复，A-078 v3 为 84 B 离线 payload encoder；
+36+4 项主机测试及分段/helper 对照通过，完整 handler、transport 与 RF 未验证。第 14 节保留 SDK keychain 更正来源。
+RC331 固件支线见第 13 节（C-454--C-457）：0200 内层 TBIE/FLYA 仍加密；已从现有 0205 OTA 验证并提取三个 QSEE 组件，
 静态链指向受保护 RPMB root/HUK 输入，尚未恢复 key。第 12 节的三个 v2 候选均未命中，STUE 仍未解密。
 
 ## 2026-10-17 审计更正与当前边界（C-442--C-449）
@@ -683,55 +685,39 @@ target `whoami`、channel **`local`**、protocol **`logic`**，并有 `local.dir
 `NEGATIVE`：`CccBroadcastSignalQuality` 无专属 handler 符号（C-413、N-90），其字面量落在通用 FC 注册与静态字符串表中，
 线宽仍不闭合。
 
-### 11.45 位置载荷结构（C-414/C-415）
+### 11.45 旧位置布局解释已更正（C-414/C-415/C-464）
 
-`OBSERVED`：`UploadMobileDevicePositionSet` 在 `local_78` 构造 22 字节明文并作为 0x16 Buffer 传入 —— 偏移 +8、+0xc 取字节，
-+0x10/+0x18 的两个 double 各自截断成 int，+0x20 取 int，+0x28 取时间戳。随后 `AES256Encrypt` 到 0x100 缓冲，再对该密文
-构造 Buffer、append 常量 blob `0x5366cbc`、`HmacEncode`，最终发送 16 字节拷贝头 + 16 字节常量 + 密文/HMAC 尾部。
+`RETRACTED`：C-414 将第三个 double 当作 int、把 AES 参数 `0x100` 当作输出长度，并猜测 plaintext prefix 与更长 ciphertext 字段。
+C-464 的精确 JNI bytes 确认：两个 u32 的低字节、三个 double→整数及 timestamp 序列化成 22 B；`0x100` 是 256 key bits。
+成功 payload 为 LE32(80)+ciphertext32+原始 constant IV16+HMAC32，共 84 B，没有额外内部 request header。
 
-`OBSERVED`：`GetWhiteBoxKeyChainString(local_c8, 0x37)` 的同一字符串同时供 AES 与 HMAC 使用；长度为0 时以 `-0x1df` 提前返回（C-415）。
+C-415 的同一 key 字符串供 AES/HMAC 使用的事实保留。此处不解释坐标单位，也不声称完整 handler、SendSetPack、transport 或 RF 执行。
 
-即位置不是明文可拼字段，需复现 whitebox 密钥 + AES + HMAC 才能构造。
+### 11.46 白盒库清单的旧负结论撤回（C-416/C-417/C-458）
 
-### 11.46 白盒密钥链的库分布（C-416/C-417）
+原库清单未恢复 `GetWhiteBoxKeyChainString` 的定义；C-417 的“208 库均无 provider”结论已撤回。
+C-458 证明 `libsdk_base.so` 有真实动态符号定义，不能把 section/nm 缺失推广为库中无实现。
 
-`OBSERVED`：官方 Fly APK 的 `lib/arm64-v8a` 有208 项。`libflightrestrictcore.so` **import** 了
-`uav::whitebox::GetWhiteBoxKeyChainString`；`libwaes.so` 导出 `Java_com_uav_tools_security_WhiteBoxAES_decryptFromWhiteBox`；
-其余（libdatajar/libsdk_base/libsdk_common/libsdk_jni/libupgrade_core）只是名字引用。
+### 11.47 sectionless ELF 仍有完整动态符号（C-418/C-419/C-458）
 
-`NEGATIVE`：全部208 库中**没有**任何库定义/导出该函数（C-417、N-91）。故位置所需的 id 0x37 密钥无法仅凭这些库复现；
-白盒本体可能由未抽取/其它 ABI 或 assets 提供。
+`RETRACTED`：C-418/C-419 将名字解释为 stripped 库中的嵌入字符串表，证据不足。
+精确 ELF 的 PT_DYNAMIC 文件偏移指向短表，但虚拟地址经 PT_LOAD 映射后给出完整动态表及 14,944 个符号。
+provider 的事实保留；动态符号和函数已定位，不再以“需要寻找白盒 body”作为待办。
 
-### 11.47 libsdk_base 是被 strip 的白盒提供者（C-418/C-419）
+### 11.48 表项长度是密文长度（C-420/C-421/C-422/C-459）
 
-`OBSERVED`：`libsdk_base.so` 内嵌 mangled 名表 —— `uav::whitebox::GetWhiteBoxKeyChainString(UAVWhiteBoxKeyChainInfoIndex)`、
-`uav::crypto::GetWhiteBoxKeyChainString(...)`，以及 `WAES_decrypt_real`、`WAES_encrypt_real`、`shift_rows`、`SHA256`。
-该库无 symtab（strip），故名字落在内嵌表而非符号表。
+`STATIC`：C-420 的三字段表结构与 0x37 槽定位保留，原始指针需重定位。
+`RETRACTED`：C-421 将 `0x30` 当作返回 key 长度；它实际是 stored ciphertext 长度 48 B。
+完整 Get(0x37) 经固定 WAES CBC 解封和 padding 去除后返回 32 B，见 C-459。
 
-`RETRACTED`：C-417 的"无库定义"读法过强（C-419、N-92）—— 真相是**被 strip 的 provider**，不是缺失。
-下一步：用 Ghidra 打开 libsdk_base.so 直接分析白盒 body。
+### 11.49 存储块不是可直接使用的位置 key（C-423/C-424/C-425/C-459）
 
-### 11.48 白盒密钥链表位置与 0x37 槽（C-420/C-421/C-422）
+`STATIC`：C-423 的存储位置观察保留，第一指针是 48 B 密文，第三指针的前 16 B 是解封 IV。
+C-424 的分段地址映射边界仍成立；不能用单一 base 相减替代 PT_LOAD 映射。
 
-`OBSERVED`：`uav::whitebox::GetWhiteBoxKeyChainString` 与 `uav::crypto::GetWhiteBoxKeyChainString` 均转到
-`get_key_chain_info_for_index(_csdk)` —— 先以 `get_key_chain_size()` 做边界检查，再调 `get_key_chain_info`。
-后者读 `0x7da578`、步长 0x18 的表，拷出三个 qword（`[ptr, len, ptr]`）。故 id 0x37 选中表项 `0x7daaa0`。
-
-`OBSERVED`：0x37 表项原始为 `qword1=0x30`（48，密钥长度）、qword0/qword2=0；兄弟项 0x0/0x1/0x2 同形，长度 0x20/0x30/0x20（C-421）。
-
-`NEGATIVE`：表项指针在文件中为0，字节位置需按重定位/基址相对解析（C-422、N-93）。
-
-即：**0x37 是一把 48 字节密钥**，出处已定位；只差把重定位后的指针解出来。
-
-### 11.49 0x37 密钥已解析（C-423/C-424）
-
-`OBSERVED`：Ghidra 导入时会应用重定位，故表项 `0x7daaa0` 的原始零值在 Ghidra 内变为真实指针 `0x842b30`(qword0) /
-`0x83c600`(qword2)，qword1=0x30 为长度。Ghidra 内存读出两段48 字节随机块；其真实文件偏移分别为 `0x740b30` 与
-`0x73a600`（该处 Ghidra→文件 delta 为 `0x102000`）。两段均为静态常量。
-
-`NEGATIVE`：扁平 base 相减映射会错位（C-424、N-94），需按段映射。
-
-这只定位了两个静态数据块。A-078 的 prefix/字段与密文缓冲组合仍有近似，尚未与官方输出逐字节匹配，不能称为可用坐标编辑器（C-449）。
+`OBSERVED`：C-459 的完整 Get 模拟返回 32 B，与密文前 32 B 不同，且重封装逐字节还原 stored ciphertext。
+`RETRACTED`：C-425/A-078 v2 直接使用 `ciphertext[:32]` 的 key 选择已证伪。C-464/C-465 后续恢复 22 B 输入/84 B payload，
+并将 Python 修为 A-078 v3 离线 payload encoder；旧模型不追认。完整 handler、最终传输 frame 和 RF 仍未验证。
 
 ### 11.50 ComplianceSerialNumber 是派生 listener（C-428/C-429）
 
@@ -935,3 +921,159 @@ cipher context。观察到 cipher mode 常数先 1 后 2、key 长度 16、zero 
 - assembled context：`ev_582a032c3ab48c4d4cfed09cfea523e4add043e2d48aa4261be53b8b70d19fd7`
 - root read：`ev_5d517d9b5eee1338532b37adef576bd3ce0fd6a42b3f734669e442a313361f76`
 - root/HUK：`ev_762ba19eeada4a181d17da9597c6406b90b6ada7a58bc7584efb402cb1efc19a`
+
+## 14. SDK keychain 与位置路径分支（C-458--C-462）
+
+SDK keychain0x37 的返回值已在隔离 ARM64 内存中得到并通过重封装对照，但完整位置消息/设备/RF 尚未验证。
+STUE 仍未解密。新的结果必须与 RC331 TBIE、SDK app-location 和 TEE 位置封装分开解释。
+
+### 14.1 正确动态表映射与样本身份（C-458）
+
+A-086 `libsdk_base.so` 为 7,720,240 B，SHA-256
+`e5b290ebc6aa6e409e116cc0d3b84fb4e49c70f6c552feffacd5b15c7c83e873`，与已有官方 DJI Fly 1.21.10 APK 中
+`lib/arm64-v8a/libsdk_base.so` 成员逐字节哈希一致。该 ELF 没有 section 表；PT_DYNAMIC.p_offset=`0x75cae0` 指向
+仅含 NEEDED/SONAME 的短表，而 p_vaddr=`0x718500` 经 PT_LOAD 映射到 file `0x717500`，得到完整 SYMTAB/STRTAB/
+GNU_HASH/RELA。正确读取后有 14,944 个动态符号，whitebox/crypto Get 与 WAES 确有定义。
+
+分析地址：whitebox Get `0x44d640`、crypto Get `0x3ebacc`、WAES decrypt/encrypt real `0x44e0f8` / `0x44ddfc`。
+C-418/C-419 的嵌入名字/strip-only 解释撤回；provider 的事实保留，C-417 的无定义结论不恢复。
+
+### 14.2 完整 Get(0x37) 的受控模拟（C-459）
+
+A-087 用 Unicorn 2.1.4 在隔离 ARM64 内存执行完整 whitebox Get。它经 `uav_white_box_decrypt` (`0x44d4c8`) 用
+第一表指针的 48 B ciphertext、第三指针前 16 B IV，执行固定 WAES CBC 解封并去 padding，返回 std::string。
+实际外部替代只有 malloc 2 次、memcpy 1 次、free 1 次；没有 Android loader/OS 或设备执行。
+
+结果为 32 B，SHA-256 `6deb71ae64dd7f305c107c2f6986d35a591025778c3791516a58215f1154f6ac`。
+padding 为 16 个 `0x10`，结果不同于 ciphertext 前 32 B。三组 synthetic block 加/解 roundtrip 通过；
+将返回值和 padding 按同一 WAES CBC 重封装，与原 48 B ciphertext 逐字节相同。
+
+只公布长度、哈希与 PASS/比较结果，不发布 key、cipher blob 或厂商代码。该批发现 A-078 v2 错误地取 ciphertext 前 32 B；
+C-421 的 48 B key、C-423/C-425 的直接可用 key 解释已更正。后续 C-464/C-465 单独闭合静态 22 B 输入/84 B payload 并修复
+A-078 v3；这不把本次 keychain 模拟扩展为完整 handler、transport 或 RF 结果。
+
+### 14.3 bw_secure 的独立 key/position 分支（C-460）
+
+A-083 的命令 `0x16` 进入 `dji_handle_uav_key` (`0x104ac8`)，使用 derive type `0x0b` 作为 16 B AES key。
+命令 `0x14` 进入 `dji_handle_pos` (`0x104d0c`)；`distinguish_rootkey` (`0x104bec`) 用 type `0x0f` 派生 key，
+对 16 个 `0x09` 求 CMAC 并匹配三项指纹，选择对应 32 B 密文并解出 32 B 位置 key。
+
+被检查的输入长度小于 128，做 PKCS7 padding；每次产生 16 B random IV，ciphertext 后附 IV，再由 HMAC routine
+（算法数值 2、输出 32 B）覆盖 ciphertext+IV；外层 LE32 length 再加 4。TA 没有执行，QSEE cipher/hash enum
+没有独立映射，因此此处不写成 CBC/SHA256。不能据此归为 STUE，不能假定 SDK 与 TEE key 相同，也不能推断 RF 位置可控。
+
+### 14.4 GPS updater 只闭合本条 transfer 路径（C-461）
+
+A-088 `dji_gps_update` 从已 hash 匹配的 system 镜像提取，32,800 B，SHA-256
+`2bf9cd3e24b32256134213d047f33106e03009cebc6d58a246bd13cf3b1d7aa9`，ELF64/AArch64，未运行。
+main (`0x1057f4`) 读取 `persist.dji.gps_update.loader`、`firmware`、`latestVer`；check_file (`0x103eb0`)
+验证 32 B header CRC16 与 data 的 LE-word checksum。upgrade 将两个文件交给 xmodem_send (`0x1043ac`)，
+后者以 1,024 B fread、复制数据、添加 XMODEM 头/CRC，末帧用 `0x1a` 填充后写 UART。
+
+已检查的边没有恢复出 IMaH/STUE 解密，不覆盖其他 firmware producer 或 WA150 GNSS 是否采用此路径；无硬件写入。
+
+### 14.5 有限独立公开调查（C-462）
+
+- [fvantienen/dji_rev 固定提交](https://github.com/fvantienen/dji_rev/tree/64d3551e3087c56268506674b7f56fdd51189bdf)：
+  检查 `tools/derive_key.py`、`tools/image.py`、`symbols/headers.h`，是旧 v1/CBC 与需要调用方 key 的派生逻辑，未提供目标 STUE 解密。
+- [WA341 battery tester 固定提交](https://github.com/danusha2345/dji-mavic4-battery-tester/tree/eb5429aed4ec11b2f89073b8371f0b95abcaa749)：
+  检查 `PROTOCOL.md` / `duml.py`，是电池 DUML/UART，不是 IMaH/STUE consumer。
+- Unicore 的 [UC6580 产品页](https://en.unicore.com/products/dual-band-gps-chip-uc6580/)与
+  [datasheet](https://en.unicore.com/uploads/file/uc6580-datasheet-en-r1-1.pdf)提供 GNSS 芯片和 loader 接口背景，
+  [PRODUCTINFO](https://en.unicore.com/uploads/file/UFB2%20Protocol/UFBII%20Protocol%20Specification%20EN/Unicore%20Messages/General%20Messages/03-2-2%20PRODUCTINFO.html)与
+  [CFGFWCHECK](https://en.unicore.com/uploads/file/UFB2%20Protocol/UFBII%20Protocol%20Specification%20EN/Unicore%20Messages/Configuration%20Messages/03-3-21%20CFGFWCHECK.html)
+  说明身份/校验接口；这些只引出 A-088 候选，不提供 DJI STUE key 或确切 board placement。
+- [DJI 白皮书入口](https://www.dji.com/trust-center/resource/white-paper)、
+  [独立评估摘要](https://terra-1-g.djicdn.com/851d20f7b9f64838a34cd02351370894/OnDefend/DJI%20Technology%20Inc.%20-%20Security%20Assessment%20-%20Executive%20Report.pdf)与
+  [Payload SDK 页面](https://developer.dji.com/payload-sdk/documentation/quickstart/porting.html)在实际打开范围内没有给出目标 key/PRAK/decoder。
+  白皮书 PDF 获取失败，GitHub 部分 repository-search API 返回 403；这些访问失败不算源码阴性。
+
+没有重查全部 fork、全 SDK 或整个网络；这里只记录列出的固定文件与已打开材料。未发现新 STUE key、匹配 PRAK 或目标 consumer。
+
+### 14.6 证据处置
+
+仓外 keychain-result.json SHA-256 `a0382eb8e110e31a9cff56faf34e91682ec32618330a679f28f5dc0b6d126cff`；
+17 条 SDK native 证据包 SHA-256 `6552fd8bb0bdb0b89ecaca22a024b2588059a8d89ed6629fcf5b278e7514d488`；
+bw_secure 位置分支 snapshot（23 条）SHA-256 `9564757668bbe13d87cb387a906e3a3d7e554aca20b6f4405cf11a1151d4cc82`；
+GPS snapshot（5 条）SHA-256 `b14dd7502d18cbe63890cb6a2f41932c95b047846bf760e5023243cca08d1a00`；
+本轮独立公开调查 report.json SHA-256 `85d622f0d281138530f4fd2784f094579efdaac529f3107495fa523b96231b1c`。
+这些原始证据和厂商内容不入仓；公开探针只读取本地固定 hash 输入并输出哈希/结果。
+
+关键 Evidence IDs：ELF/provider `ev_305d8336d0b5463071629ab2ad1dc049ff172b02c2944645ef17134561f380be`；
+Get `ev_161f95c5798725c113434870497698014ccbe24c5d9c9fe59077f65dc3b83585`；
+Get ABI `ev_e1728f728a564d2eaca6343b49a3187548a8b57ac07d2cf6141e879154f8ff36`；
+unwrap `ev_0ec1bf7c63ed57e9a41969f0674aa81a8d4897e6160468a14bca3ed1771afd77`；
+TEE key `ev_19a3629dec329e9c2c4ba4df690da25fbd1078c2d86dfa014c58e85e0982b2ef`；
+TEE position `ev_da4d441af369ff63b11ae7a54af0079a0c877e66a04643c5f0d7d44048b8d516`；
+root selection `ev_420e68697b4ad269e0e1677968b7e233e440e4479966509e244aefb52d1ffd3a`；
+GPS main `ev_a0387210e1fb5ed6933dc166cb99181652ec48d85451975549914aab65a64fcb`；
+GPS file check `ev_efddf15c06b89499b51c4ae5d9f26b62ce68a1b31504bbfeb9f9353c76df97fc`；
+XMODEM `ev_f5f2bb9261f2027d9324786a2d0304a87fe4f562248db15ccb11e97be117ac7e`；
+upgrade `ev_b80e0781b9e298e05a05d9f7150fd2bf9d244c1cc2b27e5dfb7672df4726174c`。
+
+## 15. 2026-10-18 状态 parser 与位置 payload 验证（C-463--C-465）
+
+本批修正两处可复现实现问题：状态 parser 接受至少 7 B，位置 encoder 生成 84 B 离线 payload。
+共 36 项 parser 主机测试和 4 项 position 主机测试通过。原 C-450 的 59 项 firmware 测试是另一批已有记录，本批没有重跑或合并。
+仍未解密 STUE，没有完整 JNI handler/SendSetPack、设备传输或 RF 验收。
+
+### 15.1 双端状态 parser 的最小长度（C-463）
+
+依据 C-147 和 RID-002 的官方 parser 前缀，Java/Python 同时拒绝 null/少于 7 B，接受 7/8/10 B。
+Java 将尾部复制保存，getter 返回 clone；Python 使用 immutable `bytes trailing_bytes`，`repr=False, compare=False`。
+未知尾部既不解释也不输出。已知 flags/area/failure、display/脱敏摘要、DUML CRC/route/type/command 和 sender gates 均不变。
+C-148 是 license 消费证据，不能当作长度来源。
+
+Java parser 与未改的 timeline 共 15 项 JVM 测试通过，Python direct-module 共 21 项通过；未构建/安装 APK、未部署设备。
+同范围引用检查没有发现其他 Java `PAYLOAD_LENGTH` consumer。四份源文件身份见对应仓外验证报告；没有生成新的 APK artifact。
+
+### 15.2 精确 JNI caller 的静态布局（C-464）
+
+A-089 为 87,313,856 B，SHA-256 `5abd990c86bcd00c9a652a21e329ad4580a20ec9f80188075ada61f5a7b46286`，
+与已有官方 Fly 1.21.10 APK 的 `lib/arm64-v8a/libsdk_jni.so` 成员流式 hash 一致。`UploadMobileDevicePositionSet`
+的 ELF VA 为 `0x4d23260`，2,356 B，原始函数 bytes SHA-256
+`afa49f1b9c7c050bac1a065336be9b30d686e75604a7469756e7205d1e9656b9`。
+整库 REA 未返回可用证据后已关闭；这里用 Capstone 解码精确原始 bytes，并按真实动态符号/PLT relocation 标定调用，不猜测失败原因。
+
+| 输入/操作 | 已核对的含义 |
+| --- | --- |
+| typed object `+8` / `+0xc` | 两个 u32 各取低 byte |
+| `+0x10` / `+0x18` / `+0x20` | 三个 double 各转整数，连同前两 byte 与 `+0x28` timestamp 组成 22 B |
+| output Buffer resize | `0x4d23344` 附近将 ciphertext buffer resize 到 `0x20`/32 B |
+| AES call 参数 | `0x4d23384` 的 `w1=0x100` 表示 key bits 256，不是 256 B output |
+| HMAC algorithm | SDK base ELF `0x32254c` 起的 map 初始化把 0 绑定 EVP_sha256，后续 1/2/3 分别 sha512/sha1/md5 |
+| success payload | resize `macLen+0x34`=84 B；写 LE32(`macLen+0x30`)=80，ct32 在 +4，原始 IV16 在 +36，digest32 在 +52 |
+
+没有额外 plaintext16 prefix、伪 SDK request32 header 或补到 256 B 的 ciphertext 字段。
+坐标单位尚未确定，不把这些 raw typed 值称为经纬度 degrees。SDK 使用原始 constant IV，不能与 C-460 的 QSEE random IV 路径混同。
+
+### 15.3 分段模拟与原生 helper 对照（C-465）
+
+原始 JNI instruction fragments 在受控寄存器、synthetic buffer 和 memcpy hook 下得到 22 B marshalling 与 84 B packing。
+执行范围为 ELF `0x4d232e0`--`0x4d23324`、`0x4d23694`--`0x4d236c8`，不是完整 handler 或 SendSetPack。
+
+另在隔离 SDK CPU 模拟中使用 keychain 实际返回的 32 B key（仍只公布既有 hash）与 synthetic 22 B 数据：
+`AES256Encrypt`（分析地址 `0x422154`）输出 32 B，与 CommonCrypto CBC 逐字节一致；`HmacEncode`（`0x421d74`）
+输出 32 B，与 stdlib SHA256 HMAC 一致。其 SHA256 lookup node 是受控输入，没有执行 Android 全局 constructor；
+algorithm 0 映射由第 15.2 节原始初始化指令另行支持。只补了实际遇到的 realloc 内存 hook，其余 crypto 函数按原指令运行。
+
+### 15.4 A-078 v3 的实现范围
+
+`build(plaintext22, key32, iv16)` 输出 `LE32(80) + AES-256-CBC ct32 + IV16 + HMAC-SHA256(ct+IV)32`。
+caller 显式提供已序列化字段、已解封 key 与 IV；CLI 从三个明确文件读取。移除旧 `KEY48[:32]`、伪内部请求头、
+猜测的 lat/lon 转换和 256 B ciphertext 填充。工具不生成 DUML/设备 transport frame，也不建立坐标单位。
+
+4 项主机测试包括独立 OpenSSL 固定 synthetic fixture、长度/解密/HMAC 范围、拒绝旧 48 B key 和不同 IV 对照。
+依赖固定为 `pycryptodome==4.0.1` 与 `unicorn==2.1.4`。当前状态只到 offline payload model / native components checked，
+不称完整官方输出、完整 handler 或实机可用。A-078 v2 的错误与失败历史保持撤回。
+
+### 15.5 验证记录与公开边界
+
+仓外 `rid-status-parser-check.json` SHA-256 `71cd9bb0968599ba8f307e433b08176f47d69a7234e439b8f313a6a68b8f05e6`，
+Java 测试日志 SHA-256 `b9259c995adfae127fac5cda5e2b16cd83b7f70560ec282a38e13ba647ad3617`；
+`jni-apk-member-identity.json` SHA-256 `7e1a1a89fde7b75c991a0f9416f55eafaa230ef2577c62e8682ec83fe580906f`；
+`position-packing-result.json` SHA-256 `13433f0c68b3ea6f808d6aa737572d9fbdcc8b5d671b2c4446599fd98e4b6642`；
+`position-native-result.json` SHA-256 `4290f1f6cb1a9686880b047616d2ed70f583367bb129db2d9cd9858253cfd165`。
+私有 helper/packing 实验脚本 SHA-256 分别为 `0cd2185a45424e32c97236cbf88590b8365414a7f260f06d343d423240a78266`、
+`3e0132129e8bb0b601362e7f059105ee84878e709cc32a708573c9858be11b3e`。
+厂商 listing、输入样本、key bytes 和这些原生实验脚本保持仓外；仓库只保留自写 encoder/tests 和高层证据。

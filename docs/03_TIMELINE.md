@@ -1045,3 +1045,26 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：定位 dji_decrypt→libtee_util→QSEE bw_secure 的 0x17/0x18 链；client 固定 480 B header，不等于 WA150 的 608 B（C-456）。
 - `STATIC`：定位 type0x0c 的 TBIE CMAC 派生与 protected RPMB root/HUK 存储处理；无设备 root input、HUK 输出或恢复 key，
   不外推 STUE 共用方案（C-457）。样本、厂商分析内容和本地路径保持仓外。
+
+### 2026-10-17 SDK keychain and position-path separation
+
+- `STATIC`：固定 A-086 与 official APK 成员 hash 一致；正确 PT_DYNAMIC/PT_LOAD 映射恢复 14,944 动态符号，
+  撤回 embedded-only/strip 解释并保留 provider 事实（C-458）。
+- `OBSERVED`：Unicorn 2.1.4 完整 Get(0x37) 隔离模拟返回 32 B；三组 roundtrip 与 48 B 重封装逐字节对照通过。
+  仅保留长度/hash，A-078 v2 的 ciphertext[:32] 已证伪，当时尚未修复；后续 v3 与 payload 结果另见 C-464/C-465。
+- `STATIC`：A-083 key/position 分支显示 root-derived 选择及 ciphertext/IV/HMAC envelope，未执行 TA；算法 enum、
+  SDK/TEE key 对应和 RF 控制不作结论（C-460）。
+- `STATIC`：A-088 检查文件后做 XMODEM/UART copy/framing，所追路径无 STUE decoder，未运行或写硬件（C-461）。
+- `NEGATIVE`：固定独立公开源码与实际打开官方材料没有新增目标 key/PRAK/consumer，仅覆盖列出范围（C-462）。
+  当前目标同步为 Remote ID 开关及广播参数控制面板；完整设备/RF 验收要求不变。
+
+### 2026-10-18 status prefix and position payload verification
+
+- `OBSERVED`：Java/Python 同步最小 7 B parser，保存但不解释/输出 unknown tail；Java parser+未改 timeline 15 项、
+  Python 21 项通过。依据 C-147，CRC/route/type/command/display/gates 不变，未建/装 APK或部署设备（C-463）。
+- `STATIC`：A-089 与官方 APK member hash 一致；按精确函数 bytes 和 symbols/PLT 重定位核对 22 B marshalling、
+  256 key bits、HMAC0=SHA256 及 84 B success payload，撤回 C-414 的旧布局/第三值解释（C-464）。
+- `OBSERVED`：原始 marshalling/packing 片段在受控输入下输出 22/84 B；官方 AES/HMAC helper 与独立实现一致。
+  A-078 v3 移除错误 key、fake header/prefix/256 B field，4 项 synthetic/OpenSSL 对照测试通过（C-465）。
+- 本批为 36+4 项主机测试，已有 C-450 的 59 项 firmware tests 未重跑或合并。未执行完整 handler、SendSetPack、
+  Android global constructor、transport 或 RF；坐标单位、实机控制与 STUE 问题仍未闭合。

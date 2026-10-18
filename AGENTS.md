@@ -10,7 +10,8 @@ repository and evidence rules.
 For an immediate takeover of the current research state, use
 [`NEXT_AGENT_HANDOFF_PROMPT.md`](NEXT_AGENT_HANDOFF_PROMPT.md).
 
-The current research objective includes the real-aircraft RID switch, Basic/UAS ID, aircraft
+The current research objective includes a Remote ID switch and broadcast-parameter control panel, backed by the
+real-aircraft RID switch, Basic/UAS ID, aircraft
 position and operator position. Keep Operator ID separate from both Basic/UAS ID and operator
 position. Each control needs an independent owner/baseline/readback/restore/RF evidence chain;
 the scope extension does not admit a field editor. Synthetic OpenDroneID codecs remain offline.
@@ -443,6 +444,27 @@ Later retractions override earlier progress summaries.
     general STUE decoder; do not name cipher modes from unverified QSEE enum constants1/2. The TBIE context is assembled
     as an immediate, so a missing literal-string match is not absence. RC331 TBIE root input and STUE's own owner/
     derivation remain unresolved; do not claim all offline approaches impossible or both products share keys.
+
+58. C-458 corrects the sectionless SDK ELF mapping: read the full dynamic table from PT_DYNAMIC.p_vaddr through
+    PT_LOAD. The defined whitebox symbols are real; C-417 remains retracted and the embedded-only explanation is
+    withdrawn. C-459's isolated full Get(0x37) returns32 bytes after unwrap, not the stored ciphertext's first32.
+    A-078 v2's key choice is known wrong; C-465 replaces it with v3 explicit-input offline payload encoding. Do not
+    retroactively validate v2 or advertise v3 as a real-aircraft position editor.
+    A-087 exposes only length/hash and controlled-emulation comparisons, never key bytes or vendor blobs/code.
+59. C-460's bw_secure position/key branches are static only. Do not name QSEE cipher/hash enums from numeric values,
+    equate SDK and TEE keys, or infer STUE/RF control. C-461 covers one checked GPS file/XMODEM path; C-462 is a bounded
+    independent-source survey. Neither excludes all producers or the whole web. C-464/C-465 subsequently establish
+    typed22-byte input and84-byte payload composition, but not a full handler, transport frame or RF control.
+
+60. C-463 implements the C-147 minimum7-byte RID status prefix in both Java and Python. Preserve unknown trailing
+    bytes privately without interpreting, displaying or allowing them to affect existing summaries/routes/gates.
+    Java returns a clone; Python uses immutable bytes excluded from repr/equality. The36 host tests do not imply
+    an APK build, deployment or live status/RF observation; C-148 is not the length evidence.
+61. C-464/C-465 define A-078 v3 only as an offline84-byte payload model with explicitly supplied serialized22-byte
+    input, decoded key32 and IV16. AES0x100 is256 key bits; no fake request header, plaintext prefix or256-byte ct.
+    Native comparisons cover helper calls and controlled original instruction fragments, not the complete handler,
+    SendSetPack, Android constructors, transport or RF. Coordinate units stay unknown. This batch has36 parser plus4
+    position host tests; C-450's59 firmware tests are an earlier separate run, not a combined99-test claim.
 
 ## Privacy and redaction
 

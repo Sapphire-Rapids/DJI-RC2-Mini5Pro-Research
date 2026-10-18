@@ -3,26 +3,45 @@
 [![Validate research archive](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml/badge.svg)](https://github.com/Sapphire-Rapids/DJI-RC2-Mini5Pro-Research/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-08-31 的实机观察、
+这是一个独立、非官方的 DJI RC 2 / Mini 5 Pro 研究档案。记录截至 2026-10-18 的历史实机观察、
 固定版本静态分析、公开资料交叉验证、阴性结果、被撤回的路线、明确假设和未解决问题，并逐步
 纳入可复现的自研 APK 源码、host tools、tests 和合成 fixtures。
 
 档案中的产品名称只用于说明研究对象。项目不是 DJI 官方产品，无隶属或背书关系；实验室的
 授权声明与非官方产品身份分开记录。
 
-**最新进展：[2026-08-31 时间线](docs/03_TIMELINE.md#2026-08-31)** ·
-[实机环境与当前操作](docs/23_RC2_LIVE_RUNTIME.md)。每次取得新结果后同步更新。
-既有进度已按用户一次性请求推送至 `2f31394`；本轮新进度继续在本地更新、验证和提交。
+最新工作记录为 **C-442--C-465**，本次接手基线 HEAD 为 `449961d`。当前用户没有设备，研究继续使用已有样本和离线工具；
+WA150 STUE 尚未解密，未实现经真实 RF 验收的控制。先读[当前接手说明](docs/13_HANDOFF.md)和
+[STUE 检查点](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md)；历史动作见[时间线](docs/03_TIMELINE.md)。
+GitHub 推送仍暂停；本地更新、验证和提交按当前授权继续。
 
 新建或接续 Codex 任务时，请使用
 [`CODEX_PROJECT_PROMPT.md`](CODEX_PROJECT_PROMPT.md) 中的精简提示词。它把本项目准确界定为
 用户自有实验设备上的 Remote ID 控制研究，并一次写清允许动作、硬性禁区和实证完成标准。
-当前目标包括真机 RID 开关、Basic/UAS ID、飞机位置和操作者位置；Operator ID 单独记录。
+当前目标是实现并验证 Remote ID 开关及广播参数控制面板，覆盖真机 RID 开关、Basic/UAS ID、飞机位置和操作者位置；
+Operator ID 单独记录。面板功能必须连接经过独立验证的真实控制路径。
 各字段须分别闭合 owner、基线、读回、恢复及独立 RF 证据，不能用合成 codec 代替真机结果。
 已有研究的快速接手请直接复制
 [`NEXT_AGENT_HANDOFF_PROMPT.md`](NEXT_AGENT_HANDOFF_PROMPT.md)。
 
-## 研究对象快照
+## 当前进展
+
+- C-463--C-465（2026-10-18）修复 Java/Python 状态 parser 的至少 7 B 前缀，并把 A-078 v3 修为 84 B 离线位置 payload encoder。
+  36 项 parser 与 4 项 position 主机测试通过，另有原始 JNI 片段/helper 对照；没有完整 handler、设备传输或 RF 验证。
+- C-458--C-462 更正 SDK 动态符号映射与 keychain0x37 的 32 B 返回值；旧 key/布局错误保持撤回，坐标单位仍未知。
+
+- C-442--C-449 修正了 Assistant ABI、IV、MD5 和 NFZ 路径误读；旧指针/栈尾模型与完整 RID 控制结论已撤回。
+- C-450--C-453 登记单候选 public IMaH-v2 工具与 59 项通过的测试。真实 2603 的三个有来源候选均未命中；
+  Assistant method-4 和公开源码检索结论都仅覆盖已检查范围。
+- C-454--C-457 确认 RC331 0200 外层可读、内层 TBIE/FLYA 仍加密；已提取并定位
+  `dji_decrypt → libtee_util → bw_secure` 静态链及其 RPMB root/HUK 依赖。尚未恢复 root/key，不能外推 STUE 共用方案。
+- 当前缺口是 RC331 TBIE 的 root input 和 WA150 STUE 自己的 owner/derivation。六个协议 CLI 只生成离线 hex，
+  France EID/AirSense 不是 global RID 开关，位置工具仅验证离线 payload。详见[固件记录](docs/07_FIRMWARE_TRUST_BOUNDARY.md)。
+
+项目完成仍要求每个控制独立具备 baseline、受限变化、读回、原值恢复、最终读回、重连/重启持久性分类，
+以及操作者控制电机时的独立标准 RID 接收机 RF A-B-A 验收。软件不启动电机；离线结果不能替代这些实证。
+
+## 历史研究对象快照
 
 | 对象 | 记录值 | 证据边界 |
 | --- | --- | --- |
@@ -30,7 +49,7 @@
 | 飞机 | DJI Mini 5 Pro；固件 `01.00.0600`；静态候选 WA150 / product 139 | 固件为操作者确认（C-220）；product/route 仍需 live session 重新确认；`01.00.0600` 落在 CVE-2026-78306/77812 受影响窗口 |
 | DJI Fly | 实机 `1.19.4` / code `3113157`，ARMv7；另保留 `1.21.10` 对照 | 实机 APK/库已回传并校验；1.21.10 的模拟器结果保留原版本标签（C-238/C-239） |
 | MSDK | 重点交叉验证 5.18.0 | schema/handler 证据不等于消费级产品支持 |
-| 主机 | macOS；飞机与 RC 2 分别枚举为 DJI USB 设备 | 序列号、端口位置和私人数据不公开 |
+| 主机 | macOS；飞机与 RC 2 曾分别枚举为 DJI USB 设备 | 序列号、端口位置和私人数据不公开 |
 
 ## 状态词
 
@@ -46,7 +65,11 @@
 
 `unavailable` 不等于 `off`、`unsupported`、`absent` 或 `empty`。
 
-## 当前结论摘要
+## 历史结果索引
+
+以下保留既有研究摘要供追溯，措辞中的“当前”或“下一步”属于当时记录，不是本轮设备操作指令。
+历史事实和后续更正以[时间线](docs/03_TIMELINE.md)、[实机主题](docs/23_RC2_LIVE_RUNTIME.md)及 claim 登记为准；
+本轮从上面的 C-442--C-465 接续。
 
 - **标准 RID 已观察（C-207）**：操作者用已验证的标准 Remote ID 检测装置 + FindUAS 上位机确认，
   Mini 5 Pro 起桨时广播明文标准 Remote ID，Basic ID 可读。确切 BLE/Wi-Fi bearer 与电机
@@ -62,7 +85,7 @@
   C-207 完整时序原件，不能据此称其丢失，应先核对旧任务输出或既有应用历史。
 - **实机回传已完成（C-235--C-238）**：A-039 v0.12 报告为 `COMPLETE`；实机 Fly
   `1.19.4` APK 与三份库的版本、签名、哈希核对通过。独立 RID 状态读取链已定位（C-240）。
-- **当前实机进展（C-301--C-305）**：A057已取回实际匹配策略与DEFAULT，各97字节。
+- **历史实机进展（C-301--C-305）**：A057已取回实际匹配策略与DEFAULT，各97字节。
   内部结构为20字节头、13字节正文、64字节签名；两份均通过同一P-256验证点的SHA-256
   核验。正文首字节1/0是启停候选，字段语义继续追飞机端00/DD。采集、文件清理和回执
   已核验，接收端保留。详见[实际策略结构](docs/23_RC2_LIVE_RUNTIME.md#A057实机采集与内部结构)。
@@ -115,7 +138,7 @@
   removable-SD MTP fresh size/full readback SHA 匹配。它尚未复制到 internal storage、chmod 或执行，
   没有通过 A-032 获得 ADB shell。开发助手 Shell 身份及父目录读取另由 C-246/C-247 闭合。
   A-032 保留为备选；B1 自动诊断及 F4 严格报告已收到，AMS PID 稳定、目标 proc 读取受限（C-266/C-267），
-  操作入口统一见 [实机主题](docs/23_RC2_LIVE_RUNTIME.md#下一步)。
+  历史操作记录见[实机主题](docs/23_RC2_LIVE_RUNTIME.md)，本轮入口见[当前接手说明](docs/13_HANDOFF.md)。
 - 当前 Android probe 为 v0.12（A-039），文件名 `Download/FindUAS_A039_V012.apk`。
   首次 COMPLETE 报告及实机样本已回传并校验（C-237/C-238）；安装后复测也已收到 COMPLETE
   报告（C-245），Fuli 原版 hash/版本/signer 保持一致、updated-system=true。v0.11/A-038 已归档。
@@ -198,14 +221,14 @@
   [same-process query experiment](experiments/jvmti/jvmti_flysafe_inprocess_query/README.md)：
   success callback 独立解析嵌入式 license group，核对 count，识别 MSDK-compatible field-7
   type-6 candidate，只输出 count/level/status，license ID 只保留在内存。五个 synthetic host cases
-  与 helper DEX/AArch64 agent build 通过（C-191）。下一步是为 RC 2 准入 same-process loader，
-  不再继续猜 external Binder route。
+  与 helper DEX/AArch64 agent build 通过（C-191）。后来的 RC 2 loader 结果见 C-273--C-275 和
+  [实机主题](docs/23_RC2_LIVE_RUNTIME.md)，不再把该历史准入步骤作为待办。
 - Same-process loader 的三个捷径已在 disposable emulator 关闭：普通 `/data/app/...==/...so`
   会在首个 `=` 被 agent-spec parser 截断；delimiter-free `trace_data_file` 在 canary 前结束 target，
   但相同 bytes 从 delimiter-free `apk_data_file` 能稳定派发并回调；uncommitted PackageInstaller
   `apk_tmp_file` 又被 target search deny，session 已 abandon（C-208--C-210）。下一步是 exact RC 2
   caller/target domain 与合法共享可执行路径/descriptor 的交集，两个新 APK 源码仅作为阴性记录，
-  不是上机候选（C-211）。
+  不是上机候选（C-211）；该段后续进展见[实机主题](docs/23_RC2_LIVE_RUNTIME.md)。
 - 2026-08-28 实机 direct F7 已完成：RC 2 routed 和 aircraft-direct 两路对
   `0x3CBD864F` 均返回 one-byte `03`，且同会话已知参数正对照正常。raw USB modern route
   连 height control 也 timeout；A-023 的 Binder target 同样 timeout，但没有同路由正对照。
@@ -320,7 +343,7 @@
 可审阅的自研 APK/host-tool 源码和测试。源码公开不代表相应路线已通过实机验证；每个项目必须
 保留 `OBSERVED`、`NOT ADMITTED`、`RETRACTED` 或 `UNKNOWN` 状态边界。
 
-本项目目标是实现并验证可控的 Mini 5 Pro Remote ID 开关，以及具有独立证据链的 Basic/UAS ID、
+本项目目标是实现并验证 Mini 5 Pro Remote ID 开关及广播参数控制面板，以及具有独立证据链的 Basic/UAS ID、
 飞机位置、操作者位置实验控制；Operator ID 保持独立。合成 codec 仅供离线验证，不添加 RF
 发射后端。实验室声明已获得 DJI 及低空经济相关部门授权；因保密要求，授权材料不进入仓库，
 也不在实机上注册。

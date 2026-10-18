@@ -3,12 +3,13 @@
 This module is deliberately read-only: it contains no request builder and has
 no USB dependency.  A payload is interpreted only after the complete DUML
 frame, route, command type, checksums, and the currently proven seven-byte
-layout have all been validated.
+prefix have all been validated. Unknown trailing payload bytes are retained
+without interpretation or inclusion in summaries.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import struct
 
 
@@ -20,7 +21,7 @@ DUML_PROTOCOL_VERSION = 1
 CMD_TYPE_PUSH_PLAINTEXT = 0x00
 CMD_SET_ADSB = 0x11
 CMD_ID_RID_WORKING_STATUS = 0x1C
-RID_PAYLOAD_LENGTH = 7
+RID_PAYLOAD_LENGTH = 7  # Minimum length of the known prefix.
 
 CRC8_SEED = 0x77
 CRC8_POLYNOMIAL_REFLECTED = 0x8C
@@ -46,6 +47,7 @@ class RidWorkingStatus:
     is_rid_normal: bool
     area_code_value: int
     failure_code: int
+    trailing_bytes: bytes = field(default=b"", repr=False, compare=False)
 
 
 def calc_crc8(data: bytes) -> int:
@@ -156,9 +158,9 @@ def parse_rid_working_status_frame(frame: bytes) -> RidWorkingStatus:
         raise RidProtocolError("DUML route is not ADS-B 0x11/0x1C")
 
     payload = frame[11:-2]
-    if len(payload) != RID_PAYLOAD_LENGTH:
+    if len(payload) < RID_PAYLOAD_LENGTH:
         raise RidProtocolError(
-            "RID working-status payload is not the proven seven-byte layout"
+            "RID working-status payload is shorter than the seven-byte prefix"
         )
 
     flags = int.from_bytes(payload[:2], "little")
@@ -173,6 +175,7 @@ def parse_rid_working_status_frame(frame: bytes) -> RidWorkingStatus:
         is_rid_normal=bool(flags & (1 << 8)),
         area_code_value=struct.unpack("<i", payload[2:6])[0],
         failure_code=payload[6],
+        trailing_bytes=bytes(payload[RID_PAYLOAD_LENGTH:]),
     )
 
 

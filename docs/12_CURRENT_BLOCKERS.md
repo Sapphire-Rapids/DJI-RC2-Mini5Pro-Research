@@ -1,6 +1,8 @@
 # Current blockers and dependency gates
 
-2026-10-17 current state: there is no device for this work. C-454--C-457 distinguish RC331 0200's encrypted inner layer
+2026-10-18 current state: there is no device for this work. C-463--C-465 complete the minimum-prefix parser fixes and
+84-byte offline payload model with36+4 host tests and controlled native-component checks; full handler/transport/RF
+and coordinate units remain unverified. C-454--C-457 distinguish RC331 0200's encrypted inner layer
 from the readable OTA components and recover a static TBIE/QSEE/RPMB-root/HUK dependency. Root input and STUE's own
 owner/derivation remain unresolved. C-450--C-453 record the three-candidate and bounded method-4/public-source checks. C-442--C-449 correct the Assistant/STUE premises and
 RID capability claims. Use the final current B-23/B-24 section and the corrected STUE checkpoint; earlier live records
@@ -907,3 +909,24 @@ Assistant method 4 的已检查路径传递输入/缓存字节，未恢复出 ST
 
 现有固件可支持继续定向静态分析，但无设备 RPMB 数据或 HUK 结果。不能宣称恢复了 root key，也不能泛称所有离线方法不可能。
 后续判断应来自新的具体输入或调用边；RID 的真实控制、readback/restore 与 RF 证据仍未建立。
+
+## 2026-10-17 SDK position/control-panel dependency after C-458--C-462
+
+已完成固定 SDK ELF 动态表定位、Get(0x37) 的隔离函数模拟和重封装对照；不要再寻找一个仅有名字的 provider。
+该批发现 A-078 v2 的 ciphertext[:32] key 选择错误；后续 C-464/C-465 已恢复 22 B 输入/84 B payload 并修复 v3。
+当前仍缺完整 handler/transport、字段单位与 RF 对应，不能由 keychain 或 payload 成功代替。
+
+控制面板是完整目标的一部分；界面不能把 France EID/AirSense 或错误位置生成器包装成已验证功能。每个控制仍需
+真实 owner、baseline/readback/restore、持久性和独立 RF 验收。当前用户无设备，继续可独立开展的离线工作。
+
+bw_secure 的位置分支未执行，算法枚举与 SDK/TEE key 对应未知。GPS updater 的已检查 transfer 路径没有提供 STUE decoder，
+独立公开调查也只在列出范围内无新增材料；STUE owner/derivation 与 TBIE root input 的缺口继续保留。
+
+## 2026-10-18 current parser/payload boundary (C-463--C-465)
+
+最小 7 B parser 修复和 A-078 v3 的 84 B payload 实现已完成，不再列为待修。36 项 parser 与 4 项 position 主机测试通过，
+原始 JNI 片段/helper 对照支持已登记的模型；没有构建/部署 APK或执行完整 handler/SendSetPack/transport/RF。
+
+剩余位置控制缺口是 typed values 的单位/业务语义、真实 runtime owner 与完整发送/应用/恢复/RF 对应。
+界面可以按已证实的范围实现，但不能把 offline payload model 标成已验证坐标编辑器。STUE owner/derivation 与
+RC331 TBIE root input 没有被本次位置验证解决。当前无设备，独立离线工作继续，真实 RF 验收不降低。

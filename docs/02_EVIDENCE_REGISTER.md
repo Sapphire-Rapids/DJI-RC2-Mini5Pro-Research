@@ -544,22 +544,22 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-409 | `OBSERVED` | RidImportModule set/info paths use cmd75/sub17 with a 0x4b sub-field | Japan registration channel |
 | C-410 | `OBSERVED` | RID broadcast field-control map enumerates the writable surface | Map only; C/D sections still open |
 | C-411 | `OBSERVED` | OID emitter realigned to exact RID-005B schema | Static; no live ACK |
-| C-412 | `OBSERVED` | UploadMobileDevicePositionSet is an AES-encrypted set at cmd67/sub17 | Whitebox key id 0x37; payload layout not yet decoded |
+| C-412 | `STATIC` | App-location0x11/0x43 calls keychain, AES and HMAC | C-464 corrects0x100 to256 key bits, not an output buffer length |
 | C-413 | `NEGATIVE` | No dedicated CccBroadcastSignalQuality handler symbol found | Literal sits in generic registration/string tables |
-| C-414 | `OBSERVED` | Position plaintext is a 22-byte struct then AES-0x100 + HMAC + constant prefix | Doubles truncated to ints; blob semantics unknown |
+| C-414 | `RETRACTED` | Old position layout/output-size interpretation withdrawn | C-464:22-byte serialized input,256 key bits,84-byte payload; third numeric value also double |
 | C-415 | `OBSERVED` | One whitebox keychain id 0x37 feeds both the position AES and HMAC | Shared key; derivation body external |
 | C-416 | `OBSERVED` | APK has 208 arm64 libs; whitebox name is only an import | libwaes exposes a JNI whitebox AES entry |
-| C-417 | `NEGATIVE` | No lib defines or exports GetWhiteBoxKeyChainString | Body unresolved from these libs alone |
-| C-418 | `OBSERVED` | libsdk_base.so embeds the whitebox/crypto symbol-name table | Stripped lib; names not in symtab |
-| C-419 | `RETRACTED` | C-417 absolute no-definition framing is too strong | Provider is stripped, not absent |
-| C-420 | `OBSERVED` | Whitebox keychain is a static pointer table addressed by id | Entry 0x37 -> 0x7daaa0, stride 0x18 |
-| C-421 | `OBSERVED` | Keychain entry 0x37 is a 48-byte key slot with zeroed pointer fields | qword[1]=0x30 length; ptrs 0 |
+| C-417 | `RETRACTED` | No-provider claim remains withdrawn | C-458 recovers actual defined dynamic symbols in libsdk_base |
+| C-418 | `RETRACTED` | Embedded-names-only/strip explanation withdrawn | Sectionless ELF still has a full mapped dynamic symbol table |
+| C-419 | `RETRACTED` | Provider correction retained; its stripped-only rationale superseded | C-458 establishes real definitions; C-417 not restored |
+| C-420 | `STATIC` | Keychain table location/stride retained | Getter unwraps stored bytes; table is not directly the key |
+| C-421 | `RETRACTED` | 48-byte returned-key interpretation withdrawn | 48 bytes are stored ciphertext; actual Get(0x37) returns32 |
 | C-422 | `NEGATIVE` | Entry pointer fields are zero in-file | Resolution is relocation/base-relative |
-| C-423 | `STATIC` | Keychain id 0x37 resolves to static data blocks | Does not validate position payload composition |
+| C-423 | `STATIC` | Storage pointers locate ciphertext and IV data | Direct-key interpretation withdrawn by controlled Get emulation |
 | C-424 | `NEGATIVE` | A flat base-subtract mapping mismatches the Ghidra read | Per-segment delta is 0x102000 there |
-| C-425 | `STATIC` | Position tool generates approximate offline candidate hex | No transport or official byte match; not a coordinate editor |
-| C-426 | `OBSERVED` | AES256Encrypt is AES-CBC with PKCS#7-style padding | Key length caller-supplied; confirmed not assumed |
-| C-427 | `OBSERVED` | HmacEncode writes the full digest over ct+blob | Not truncated to the key length |
+| C-425 | `RETRACTED` | A-078 v2 wrong-key/guessed-layout model remains withdrawn | Replaced by v3 offline payload model in C-465; no full handler or RF proof |
+| C-426 | `STATIC` | AES helper is CBC with PKCS7 padding and a bit-count argument | 0x100 means256 key bits;22-byte input gives32-byte ciphertext |
+| C-427 | `OBSERVED` | HmacEncode emits a full digest; algorithm0 maps to SHA256 | Original map init static; helper comparison uses a controlled lookup node |
 | C-428 | `OBSERVED` | ComplianceSerialNumberInit is a listen registration deriving from SerialNumber | Derived listener, not its own opcode |
 | C-429 | `NEGATIVE` | No ComplianceSerialNumberGet/Set symbol | UAS ID not directly settable via its own key |
 | C-430 | `OBSERVED` | SerialNumber is heavily referenced with Get-only accessors | 164 refs; no SetSerialNumber |
@@ -605,3 +605,21 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-455 | `OBSERVED` | Existing OTA/property/partition hashes match; A-083--A-085 extracted and identified | No new download, vendor execution, live hashes or repeated RSA verification |
 | C-456 | `STATIC` | dji_decrypt -> libtee_util -> QSEE bw_secure uses commands 0x17/0x18 | Fixed 480-byte header differs from WA150's 608; not a direct STUE decryptor |
 | C-457 | `STATIC` | RC331 TBIE CMAC derivation uses a protected RPMB root with HUK-backed stored-root handling | No root/RPMB/HUK output recovered; cipher enum names and STUE shared ownership unproven |
+
+## 2026-10-17 SDK keychain and position-path progress
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-458 | `STATIC` | Correct PT_DYNAMIC/PT_LOAD mapping yields14944 symbols and actual SDK whitebox definitions | Exact A-086; not an embedded-names-only provider |
+| C-459 | `OBSERVED` | Isolated Get(0x37) returns32 bytes and rewraps to48 stored bytes | Key hash only; A-078 v2 defect later repaired by C-465, no full wire/RF |
+| C-460 | `STATIC` | bw_secure key/position commands use root-derived key selection and a ciphertext/IV/HMAC envelope | No TA execution, verified enum names, STUE attribution or SDK/TEE key equivalence |
+| C-461 | `STATIC` | Inspected GPS-update path validates files and copies them into XMODEM/UART | No recovered IMaH/STUE decoder within this path; no binary/hardware execution |
+| C-462 | `NEGATIVE` | Listed independent public sources add no target key/PRAK/decoder | Bounded files/documents and observed access limits; not whole-web absence |
+
+## 2026-10-18 RID parser and position payload verification
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-463 | `OBSERVED` | Java/Python status parsers preserve a7-byte minimum prefix and private unknown tail;36 host tests pass | C-147 is the source; routes/gates/display unchanged; no APK or deployment |
+| C-464 | `STATIC` | Exact JNI bytes show22-byte marshalling and84-byte success payload; HMAC0 is SHA256 | Typed values' units unknown; raw-byte/static call evidence, no full handler or transport |
+| C-465 | `OBSERVED` | A-078 v3's4 tests and isolated native helper/packing comparisons pass | Offline payload model only;40 host tests in this batch, prior59 firmware tests separate |

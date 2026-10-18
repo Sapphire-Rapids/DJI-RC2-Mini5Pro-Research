@@ -2,7 +2,13 @@
 
 ## Start here
 
-Latest continuation (2026-10-17, C-454--C-457): A-005's outer clear container contains encrypted TBIE/FLYA;
+Latest continuation (2026-10-18, C-463--C-465): both status parsers accept a7-byte minimum prefix with private tails;
+36 host tests pass. Exact JNI bytes establish22-byte marshalling/84-byte success payload, and A-078 v3 is corrected
+with explicit inputs; its4 tests and controlled native components/fragments pass. No complete handler, transport,
+APK deployment or RF validation occurred. The control-panel goal and unavailable-device condition remain unchanged.
+See the final continuation section; prior59 firmware tests are separate from this36+4 batch.
+
+Prior continuation (2026-10-17, C-454--C-457): A-005's outer clear container contains encrypted TBIE/FLYA;
 C-319 is outer-only and C-322 is retracted. Existing OTA integrity/provenance is rechecked, and A-083 bw_secure,
 A-084 libtee_util and A-085 dji_decrypt are extracted but never executed. The static chain reaches protected
 RPMB-root/HUK-backed TBIE derivation; root inputs and WA150 STUE's own owner/derivation are still unknown.
@@ -763,3 +769,35 @@ root read with HUK-backed unwrap/authentication. The TBIE context is assembled a
 literal-string hit. No device RPMB block, HUK output, root key or usable payload key was recovered. Mode constants1/2
 are not independently named. Continue only from concrete available inputs or a separate STUE consumer edge; do not
 assume RC/WA150 keys or schemes match, or infer that all offline methods are impossible.
+
+## 2026-10-17 SDK keychain and position continuation (C-458--C-462)
+
+The full goal includes a Remote ID switch and broadcast-parameter control panel, with unchanged per-control device/RF
+acceptance. A-086's mapped dynamic table contains actual definitions, correcting the old embedded-only account.
+A-087 uses Unicorn2.1.4 to run the complete Get(0x37) in isolated CPU memory:32-byte result, padding removal,
+three block roundtrips and exact48-byte CBC rewrap pass. Only result length/hash is public; no Android OS/device runs.
+
+At C-459, A-078 v2 selected the wrong key from ciphertext[:32]. That history remains retracted. C-464/C-465 later
+establish22-byte marshalling and84-byte payload, and repair v3; no full handler, transport or RF validation follows. C-460 is a static bw_secure key/position envelope with unconfirmed numeric
+algorithm enums; SDK/TEE key equivalence and RF position control are unproven.
+
+A-088's inspected file-check/XMODEM path yields no STUE consumer; C-462's pinned independent sources and opened
+official documents add no key/PRAK/decoder within their bounded coverage. No TA, updater or hardware request was run.
+Keep these observations distinct from WA150 STUE and RC331 TBIE root-input gaps, which remain open.
+
+## 2026-10-18 parser and payload-model continuation (C-463--C-465)
+
+C-463 implements C-147's minimum7-byte status prefix in Java and Python. Unknown tails are copied/immutable and
+excluded from display, repr or Python equality; existing fields, CRC/routes and sender gates are unchanged.
+The Java parser/timeline15 tests and Python21 tests pass; no APK build/install or device action occurred.
+
+A-089 matches the official APK member. Exact function bytes, mapped dynamic calls and original HMAC-map init show
+22-byte marshalling,256 AES key bits,32-byte ciphertext and a final84-byte payload: LE32(80), ct32, originalIV16,
+SHA256-HMAC32 over ct+IV. C-464 corrects C-414; C-415/C-426/C-427 helper facts are retained with key-bit units clarified.
+Raw coordinate units remain unknown. This SDK fixed-IV path is separate from the QSEE random-IV branch.
+
+C-465/A-078 v3 now accepts serialized22/key32/IV16 explicitly, removes v2's stored-key prefix, fake headers and256-byte
+ct field, and passes4 independent/synthetic host tests. Original marshalling/packing instruction fragments and official
+AES/HMAC helpers were separately checked under controlled buffers/registers/map input. No full handler, SendSetPack,
+Android constructor or transport ran. Continue from concrete full-path/field-semantics evidence; an offline encoder is
+not a device editor. Total host tests for this batch are36+4; C-450's59 tests are prior independent evidence.

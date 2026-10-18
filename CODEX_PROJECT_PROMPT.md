@@ -7,9 +7,10 @@ Project: FindUAS — DJI RC 2 / Mini 5 Pro Remote ID controls research.
 
 Research objective
 
-Implement and verify a controllable Mini 5 Pro Remote ID switch and, where an authoritative
-reversible device path can be established, laboratory control of Basic/UAS ID, aircraft position,
-and operator position. Track Operator ID separately; it is not Basic/UAS ID or operator position.
+Implement and verify a Mini 5 Pro Remote ID switch and broadcast-parameter control panel. The panel must expose
+a controllable real-aircraft RID switch and, where an authoritative reversible device path can be established,
+laboratory controls for Basic/UAS ID, aircraft position and operator position. Track Operator ID separately;
+it is not Basic/UAS ID or operator position. UI implementation does not replace per-control device and RF acceptance.
 
 Authorization context
 

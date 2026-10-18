@@ -1,10 +1,12 @@
 package com.finduas.rc2ridadmin;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import org.junit.Test;
 
 public final class RidWorkingStatusTest {
@@ -24,6 +26,7 @@ public final class RidWorkingStatusTest {
         assertEquals(0x12345678, status.getAreaCode());
         assertEquals(0, status.getFailureCode());
         assertEquals("WORKING", status.compatibilityState());
+        assertArrayEquals(new byte[0], status.getTrailingBytes());
     }
 
     @Test
@@ -62,13 +65,43 @@ public final class RidWorkingStatusTest {
     }
 
     @Test
-    public void rejectsNullShortAndExtendedPayloads() {
+    public void rejectsNullAndEveryShortPayload() {
         assertThrows(RidWorkingStatus.ProtocolException.class,
                 () -> RidWorkingStatus.parse(null));
-        assertThrows(RidWorkingStatus.ProtocolException.class,
-                () -> RidWorkingStatus.parse(new byte[6]));
-        assertThrows(RidWorkingStatus.ProtocolException.class,
-                () -> RidWorkingStatus.parse(new byte[8]));
+        for (int length = 0; length < 7; length++) {
+            byte[] payload = new byte[length];
+            assertThrows(RidWorkingStatus.ProtocolException.class,
+                    () -> RidWorkingStatus.parse(payload));
+        }
+    }
+
+    @Test
+    public void acceptsExtendedPrefixesWithoutInterpretingOrDisplayingTail() {
+        byte[] prefix = {0x03, 0x03, 0x78, 0x56, 0x34, 0x12, 0x02};
+        RidWorkingStatus base = RidWorkingStatus.parse(prefix);
+        for (byte[] tail : new byte[][] {{(byte) 0xff}, {0x00, (byte) 0x80, 0x55}}) {
+            byte[] payload = Arrays.copyOf(prefix, prefix.length + tail.length);
+            System.arraycopy(tail, 0, payload, prefix.length, tail.length);
+            RidWorkingStatus extended = RidWorkingStatus.parse(payload);
+
+            assertArrayEquals(tail, extended.getTrailingBytes());
+            assertEquals(base.getFlags(), extended.getFlags());
+            assertEquals(base.getAreaCode(), extended.getAreaCode());
+            assertEquals(base.getFailureCode(), extended.getFailureCode());
+            assertEquals(base.display(), extended.display());
+        }
+    }
+
+    @Test
+    public void trailingBytesAreCopiedOnInputAndOutput() {
+        byte[] payload = {0x01, 0x01, 0, 0, 0, 0, 0, 0x55};
+        RidWorkingStatus status = RidWorkingStatus.parse(payload);
+        payload[7] = 0;
+        assertArrayEquals(new byte[] {0x55}, status.getTrailingBytes());
+
+        byte[] exposed = status.getTrailingBytes();
+        exposed[0] = 0;
+        assertArrayEquals(new byte[] {0x55}, status.getTrailingBytes());
     }
 
     private static RidWorkingStatus status(int flags, int failure) {

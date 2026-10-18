@@ -8,9 +8,12 @@ C-448/C-449 撤回旧版“完整控制 Remote ID”“路径全无条件成立�
 | France EID | `EIDSwitch` / `0x03/0x77` | A-071；法国专用，不是 global RID |
 | 中国 UOM 标签 | `OIDIdentifier` / `0x11/0xD6` | A-072；18 字节 pack，不等于 Basic/UAS ID |
 | EASA registration | `OperatorRegistrationNumber` / `0x03/0x78` | A-076；身份面，不是 RF 开关 |
-| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078；字段/prefix/密文缓冲仍有近似，不是坐标编辑器 |
+| App 位置 | `UploadMobileDevicePosition` / `0x11/0x43` | A-078 v3 修为 84 B 离线 payload；单位、完整 handler/transport/RF 未验证，不是坐标编辑器 |
 | AirSense/ADS-B | `ADSBSwitch` / `0x11/0x37`，receive enable `0x11/0x0C` | A-079；不能作 RID 总开关 |
 | 动态最大高度 | GET `0x11/0x50` | A-080；静态结构候选，不是 RID 高度写入 |
+
+C-459/A-087 只验证 keychain；C-464/C-465 后续恢复 22 B 输入/84 B payload，并通过原始片段/helper 与独立 fixture 对照。
+这没有执行完整 handler/SendSetPack/transport 或 RF，不能视作已验证位置编辑功能。
 
 `EU_CE_enable_c0_rid_0` 的静态映射不能覆盖所测 direct USB 的正对照负结果；不能推荐为 EID 的可用替代。
 `ComplianceSerialNumber`/`SerialNumber` 的命名访问器未恢复出可用写路径，不能由派生关系或名称缺失推断其他路径绝不存在。

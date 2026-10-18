@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.05 - 2026-10-18
+
+- Fixed the Java/Python minimum7-byte RID status parsers with private unknown tails;36 host tests pass and routes/gates/display stay unchanged, without APK build/deployment (C-463).
+- Registered A-089 exact JNI caller evidence and corrected C-414:22-byte marshalling,256 key bits and84-byte payload, with SHA256 mapped to HMAC0 (C-464).
+- Corrected A-078 v3 as an explicit-input offline payload encoder;4 host tests and isolated original-fragment/helper comparisons pass (C-465). No full handler, transport, coordinate-unit or RF validation is claimed; prior59 firmware tests remain a separate run.
+
+## 0.5.04 - 2026-10-17
+
+- Corrected SDK dynamic-table mapping and recorded isolated full Get(0x37) emulation with32-byte output/hash, block roundtrips and exact rewrap (C-458/C-459, A-086/A-087). A-078's raw ciphertext key choice is wrong and remains unrepaired.
+- Recorded separate static bw_secure position/key and GPS transfer paths, plus bounded independent public-source negatives (C-460--C-462, A-088); no STUE, complete wire or RF success claimed.
+- Added the requested Remote ID switch/broadcast-parameter control panel to the current objective without relaxing real-device/RF acceptance.
+
 ## 0.5.03 - 2026-10-17
 
 - Corrected RC331 0200 outer/inner scope: C-319 is outer-only and C-322 is retracted; nested TBIE/FLYA remains encrypted (C-454).

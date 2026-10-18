@@ -40,6 +40,14 @@ C-319 只保留外层事实，C-322 的 RC 全明文推论撤回。六个公开 
 TBIE CMAC 派生使用受保护 RPMB root；存储 root 的解封/认证依赖 HUK-backed qsee_kdf。无设备 RPMB 数据或 HUK 输出，
 未恢复 root/key，QSEE mode 常数 1/2 的名称未独立核对。所有厂商 ELF 均未运行。
 
+## 独立 SDK/位置支线（C-458--C-462）
+
+C-458/C-459 已恢复固定 SDK 的真实动态符号，并以 A-087 完整 Get(0x37) 隔离模拟得到 32 B 返回值；
+roundtrip/重封装一致只验证 keychain。A-078 v2 的错误已由 C-464/C-465 后续修为 v3：22 B 显式输入生成 84 B payload，
+原始片段/helper 与 4 项测试支持模型；完整 handler/transport/RF 和坐标单位仍未闭合。C-460 的 TEE 位置 envelope 是另一静态路径，算法 enum 与 SDK/TEE key 对应未确认。
+A-088 GPS updater 的已检查 transfer 路径和独立公开调查没有新增 STUE consumer，不覆盖所有输入 producer 或全网。
+这些结果服务于 Remote ID 开关及广播参数控制面板目标，不代表 STUE 解密或设备控制成功。
+
 ## 下一步与判据
 
 当前具体缺口是 RC331 TBIE 的 root input，以及 STUE 自己的 owner/derivation；不再把“找到 bw_secure”列为下一步。

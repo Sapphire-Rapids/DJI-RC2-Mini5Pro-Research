@@ -528,12 +528,13 @@ Assistant/DJI Fly native 的可提取常量中。
 推断：App↔djilink 的抽象 socket 名为 `whoami`（或由 direct_host 拼出）。
 待实机以 `ss -x` / `/proc/net/unix` 核对。
 
-## H-38：位置编码组合仍未验证（C-425/C-449）
+## H-38：旧位置组合撤回，当前缺口为语义与设备对应（C-464/C-465）
 
-`HYPOTHESIS`：位置编码器的字段、prefix、ciphertext 缓冲和 key/HMAC 组合仍需逐字节验证。
-C-426/C-427 只提供 helper 的 AES-CBC/padding 与完整 HMAC 摘要语义，不能把整个组合提升为 `CORROBORATED`。
-当前源码还保留近似 prefix、固定缓冲填充和坐标整数截断；自检只验证自身结构与确定性。
-没有官方输入/输出对照，也没有证明 app location 对应 WA150 广播中的操作手或飞机位置，因此不能称为坐标编辑器。
+`RETRACTED`：旧 ciphertext-prefix key、额外 plaintext prefix 和 256 B ciphertext 解释已撤回。
+C-464 静态恢复了 22 B typed marshalling 和 84 B payload；C-465 的原始片段/helper 对照及 v3 synthetic tests 支持这个离线模型。
+
+`UNKNOWN`：typed values 的坐标单位、完整 handler/runtime 选择、transport 和真实广播字段对应仍未验证。
+不能把正确离线 payload 解释为已可编辑飞机/操作者位置；每个字段仍需独立 owner/readback/restore/RF 证据。
 
 ## H-39 — public IMaH-v2 model applicability to STUE
 
@@ -562,3 +563,11 @@ C-453 的公开检索仅覆盖 25 份筛选后的 IMaH 源码。H-34 中 whitebo
 
 若后续出现可选离线样本或新的明确调用边，应检查其 owner 和 key 输入；此处不预设设备访问或认定所有离线路径已穷尽。
 QSEE mode 常数的语义仍需独立确认，不能从数值 1/2 猜成已证明的 AES 模式。
+
+## H-42 — component validation does not execute the full position path
+
+`STATIC`：C-464 的原始 JNI bytes 和 HMAC map 初始化指令解释了 success payload 的 84 B 布局，AES 参数是 256 key bits。
+`OBSERVED`：C-465 在受控输入下检查原始 marshalling/packing 片段及官方 AES/HMAC helper；A-078 v3 的 4 项 synthetic tests 通过。
+
+`UNKNOWN`：完整 handler、SendSetPack、Android 初始化/owner、传输 frame 与 RF 行为没有执行。HMAC lookup node 是受控输入，
+不能写成完成了全局 constructor。C-460 的 TEE random-IV envelope 与 SDK constant-IV 路径保持独立；key/owner 对应仍未知。
