@@ -516,6 +516,17 @@ Later retractions override earlier progress summaries.
     built or admitted. Do not generalize this transport or E0-E3 into target RID support,or assume a re-signed
     main APK passes the stock RedFly installer's fixed signer/payload checks.
 
+71. C-483--C-488 complete a bounded RedFly functional static inventory, not all inherited Fly algorithms or runtime
+    validation. The37-root graph scans32 DEX/1063288 method bodies and has113 host-to-custom references; reflection,
+    obfuscated/native modifications and cross-ABI patch attribution remain incomplete. Preserve current-menu versus
+    retained-old-page distinctions. GNSS page entry can SET SNR; cached-before ownership and cleanupfalse are not
+    original-state restore. Telemetry catalog membership/age and LAN Ready are not device or RF evidence.
+72. Native SandPlain is a framed plaintext formatting/write path in the pinned A-105 sdk_base, separate from Java
+    enc_logs and flight-record UIMap export. Default-on RedFly launch diagnostics, local Probe42 and UTMiSS authorization
+    are separate from Broadcast RID. Regional LTE guards do not prove hardware/service activation. The recommended
+    independent module/host adapter remains an engineering proposal; no APK patch/sign/install or admitted controller
+    was produced by this review. Keep the completed RE inventory separate from the unfulfilled RID/RF objective.
+
 ## Privacy and redaction
 
 Never commit:

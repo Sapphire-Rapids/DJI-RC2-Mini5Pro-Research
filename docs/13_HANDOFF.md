@@ -2,7 +2,14 @@
 
 ## Start here
 
-Latest continuation (2026-10-18, C-474/C-475): selected Fly1.21.10 RID bodies read DeviceId and construct caller18/4;
+Latest continuation (2026-10-18, C-483--C-488): the agreed RedFly functional static review is complete. Read
+[the report](26_REDFLY_FUNCTIONAL_REVERSE_ENGINEERING.md), [feature index](../evidence/redfly-full-functional-review.json)
+and [matrix](../evidence/redfly-feature-matrix.csv). It covers A-104 outer UI and A-105 identified modifications/necessary
+host dependencies, reusing C-476--C-482. Device support, readback/restore/persistence and RF remain unverified where stated;
+no module was built or deployed. Do not repeat the closed menu/inventory work without a new version or concrete gap.
+Use the existing findings to scope an independent module and fixed-version adapter if implementation is requested.
+
+Prior continuation (2026-10-18, C-474/C-475): selected Fly1.21.10 RID bodies read DeviceId and construct caller18/4;
 DeviceId/ProductType equivalence and actual binding are unknown. Fly1.19.4 C-286/C-287/C-291 remain unchanged.
 RC331 packaged sec_type2 maps to a dji_verify command and the inspected same-name signature/extraction implementation;
 live config/PATH binding is unknown. This is separate from dji_decrypt/QSEE and supplies no STUE key or device/RF control.

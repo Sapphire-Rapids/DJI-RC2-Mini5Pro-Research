@@ -1,7 +1,7 @@
 # Current next-agent handoff
 
 Continue the complete DJI RC 2 / Mini 5 Pro Remote ID research objective from the reviewed repository state.
-This handoff is based on HEAD `e25c4aa` with committed claims through C-473; the working record now includes C-474/C-475 through 2026-10-18. Inspect current HEAD
+The RedFly functional review started at HEAD `52addef`; the record now includes claims through C-488 as of 2026-10-18. Inspect current HEAD
 and the working tree first; if newer work exists, preserve it and use the later evidence. Do not reset to this hash.
 
 ## Objective and current operating context
@@ -9,8 +9,8 @@ and the working tree first; if newer work exists, preserve it and use the later 
 Implement and verify a Mini 5 Pro Remote ID switch and broadcast-parameter control panel. Its real-aircraft controls
 cover the RID switch and, where an authoritative reversible path can be established, Basic/UAS ID, aircraft position
 and operator position. UI completion does not replace per-control device/RF acceptance. Keep Operator ID
-separate from Basic/UAS ID and operator position. The full objective remains active; offline findings are progress,
-not completion. The lab's confidential authorization context and scope are recorded in
+separate from Basic/UAS ID and operator position. This overall objective remains unfulfilled; the separate RedFly
+static-RE inventory is complete and must not be confused with device/RF completion. The lab's confidential authorization context and scope are recorded in
 [CODEX_PROJECT_PROMPT.md](CODEX_PROJECT_PROMPT.md) and [AGENTS.md](AGENTS.md).
 
 The user currently has no aircraft or controller available. Continue useful work with existing selected local
@@ -23,9 +23,10 @@ work instead of treating an old session or old mounted identity as current.
 ## Read first
 
 1. [AGENTS.md](AGENTS.md), especially the current corrections and evidence/distribution rules.
-2. The current opening and C-442--C-475 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md).
+2. The current opening and C-442--C-488 continuation sections of [docs/13_HANDOFF.md](docs/13_HANDOFF.md), then
+   [RedFly functional review](docs/26_REDFLY_FUNCTIONAL_REVERSE_ENGINEERING.md) and its per-feature evidence/matrix.
 3. [AIRCRAFT_STUE_CHECKPOINT.md](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md).
-4. Claims C-442--C-475 in [evidence/claims.csv](evidence/claims.csv), mirrored in
+4. Claims C-442--C-488 in [evidence/claims.csv](evidence/claims.csv), mirrored in
    [docs/02_EVIDENCE_REGISTER.md](docs/02_EVIDENCE_REGISTER.md).
 5. Sections 12--22 of [docs/07_FIRMWARE_TRUST_BOUNDARY.md](docs/07_FIRMWARE_TRUST_BOUNDARY.md), then the relevant
    [negative results](docs/09_NEGATIVE_RESULTS.md), [unknowns](docs/10_HYPOTHESES_AND_UNKNOWNS.md) and

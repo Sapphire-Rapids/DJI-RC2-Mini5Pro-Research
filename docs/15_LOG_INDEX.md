@@ -300,3 +300,12 @@ selected JADX source and ARM ELF symbol/PLT observations. Installer and GPS/flig
 local evidence files. No actual flight logs,device traffic or execution output were collected. Only independently
 written findings and redacted artifact/method metadata enter [the public index](../evidence/redfly-build245-static.json);
 all vendor APK/DEX/SO,raw decompilation and local paths remain excluded.
+## RedFly full-review excluded analysis family (2026-10-18)
+
+The C-483--C-488 review retains private JADX sources/fallbacks, all-DEX reference TSVs, selected method-location
+metadata, native REA pseudocode/instructions and ELF call bindings for A-104/A-105. These derived vendor materials
+remain outside the repository; no raw runtime/aircraft logs were generated. The repository carries only the
+independently written [functional index](../evidence/redfly-full-functional-review.json),
+[matrix](../evidence/redfly-feature-matrix.csv) and [report](26_REDFLY_FUNCTIONAL_REVERSE_ENGINEERING.md).
+Native sdk_base has SHA-256 `98fa8163170c5f7d3cb4a1c3c84bc6f10a6f7b5416d193dae1a243b5a09b63e1`; its private REA records
+establish selected formatting/write paths only, with provider/load-address and symbol-range limits retained.

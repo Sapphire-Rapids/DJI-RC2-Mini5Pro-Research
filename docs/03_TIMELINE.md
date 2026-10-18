@@ -1120,3 +1120,10 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：读取用户给出的官网及其公开前端，installer摘要匹配A-104；保留单独Fly236摘要差异和文本下载403，不推测私有源码或作者授权（C-480）。
 - `STATIC`：参数编辑器E0/E1/E2/E3流程、同进程DataBase/ServiceManager通信与独立回读已跟通；恢复首项失败停止由fallback核对。可写属性、完整范围、身份绑定和无回滚边界一并记录（C-481）。
 - `STATIC`：核对应用/native初始化依赖与安装器签名/payload校验，形成独立源码模块加少量宿主适配的工程建议（C-482）。未构建、修改、签名、安装APK或执行设备命令。
+## 2026-10-18 — RedFly full functional static review (C-483--C-488)
+
+- Completed the user-requested inventory of A-104 outer UI and A-105 identified mod functions, reusing C-476--C-482 rather than repeating closed RID/installer/parameter work.
+- Scanned32 DEX/1063288 method bodies for37 custom roots; reconciled113 host references with current menus, manifest startup components and the pinned public feature declarations.
+- Traced flight controls, radio/LTE/maps, telemetry/GNSS, readouts/profiles/Clean-FPV, LAN streaming and system/background behavior. Added explicit retained-old-UI and unverified-runtime boundaries.
+- Followed native initialization to the SandPlain logger, inspected formatting/instructions and the direct file writer; vendor binaries/source and raw REA output remain excluded.
+- Produced a report, per-feature evidence index and CSV matrix. No APK/vendor execution, build/re-sign/install, embedded API request, device command, RF observation or firmware decryption occurred. Local records were synchronized; pushes remain paused.

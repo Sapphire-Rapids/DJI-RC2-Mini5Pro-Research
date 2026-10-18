@@ -684,3 +684,18 @@ Detailed source boundaries and offsets: [RedFly review](24_REDFLY_BUILD245_STATI
 | C-482 | `STATIC` | SDK/native/startup dependencies and installer fixed signer/payload checks identified | Independent module plus adapter is a proposed engineering direction,no build/re-sign/install or proven device access |
 
 Details: [development assessment](25_REDFLY_DEVELOPMENT_PATH.md).
+
+## 2026-10-18 RedFly functional reverse engineering
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-483 | `STATIC` | All32 DEX method bodies scanned for37 identified roots/813 custom classes;113 host references; current menu/manifest/site and outer launcher reconciled | Bounded functional inventory,not all inherited algorithms/reflection/native patches or runtime acceptance |
+| C-484 | `STATIC` | RTH/landing/VPS/mode/button/LED/shutdown/calibration paths have individual state/readback/restore records;500m is UI range behavior and waypoint-lite is rendering | Some old toggles/helpers lack current entry;quick routes differ in confirmation;no aircraft/RF test |
+| C-485 | `STATIC` | Region/FCC/LTE/APN and map/offline/resource functions traced;regional LTE guards are distinct from auto-HYBRID;resource business-error success path identified | No RF/EIRP/4G activation or model support;APN shortcut reachability and SDK/service conditions remain bounded |
+| C-486 | `STATIC` | Telemetry has5200 catalog items plus2 local entries;cache/GET/listen and explicit push requests separated;GNSS page/HTTP/raw/diagnostic ownership traced | Catalog is not support proof;page can enable SNR;cached baseline/cleanupfalse are not restoration;no device data trial |
+| C-487 | `STATIC` | Current UI/readouts/Profile/Clean-FPV and LAN H264/telemetry paths traced;defaults,old-entry gaps,HTTP access and disposal semantics recorded | No rendered UI/stream/profile-interruption test;Ready/cache/display edits are not device-state confirmation |
+| C-488 | `STATIC` | Startup/coexist/update/log/no-login/diagnostic/UTMiSS/Developer Tools paths traced;native SandPlain formats framed text and writes it unchanged | No root/install/network/device execution;native path is not all-log coverage,historical log decrypt or firmware decrypt |
+
+Read [the complete report](26_REDFLY_FUNCTIONAL_REVERSE_ENGINEERING.md),
+[per-feature evidence](../evidence/redfly-full-functional-review.json) and
+[comparison matrix](../evidence/redfly-feature-matrix.csv). The agreed static-RE goal is complete; the RID/RF objective is not.

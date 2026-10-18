@@ -1145,3 +1145,19 @@ RF readback in the RID option, and no new privilege-escalation implementation in
 code-scope findings, not failed device trials or whole-app absence claims. Its flight-record module exports UI-map
 data through native parsers; it does not establish a firmware decoder. Unrelated native internals and full main-app
 behavior remain outside the review. No new send,install,root,key or decrypt trial was performed.
+
+## RedFly full-review boundaries (C-483--C-488)
+
+The later [functional review](26_REDFLY_FUNCTIONAL_REVERSE_ENGINEERING.md) expands the first-pass scope to identified
+mod families and necessary host/native dependencies. It is not a failed runtime trial. Current Menu does not call
+the old tabAdvanced/tabSafety pages; selected helpers/APN shortcuts have no observed external direct caller. Those
+bounded reference results do not exclude all dynamic reflection. Old control code/defaults can still exist separately.
+
+GNSS page entry and manual telemetry push requests are active diagnostic controls; SDK cache, ACK and retained packet
+values do not establish fresh results or saved-state restoration. LAN Ready is hotspot readiness, and its inspected
+server lacks authentication. Native SandPlain is framed plaintext output, not a decoder for historical encrypted
+logs, DAT, TBIE or STUE. FCC/LTE guards, fixed no-login identity and update suppression do not establish standard RID
+control, RF power, subscription/hardware support, root access or complete OTA/NFZ removal.
+
+No new real-device or RF test was performed. The per-feature matrix records remaining product, lifecycle, restoration
+and runtime questions without converting them to unsupported/off/absent results.

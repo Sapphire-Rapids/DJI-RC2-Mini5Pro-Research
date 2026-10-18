@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.11 - 2026-10-18
+
+- Completed the agreed RedFly functional static inventory, covering the outer installer, current mod UI/lifecycle entries and necessary host/native dependencies (C-483--C-488).
+- Added a per-feature evidence index and comparison matrix; scanned all32 DEX method bodies for37 identified custom roots and reconciled menu, manifest and pinned website declarations.
+- Distinguished active device requests from display/cache behavior, current entry points from retained old pages, and ACKs from independent readback/restoration.
+- Traced native SandPlain formatting and file output, default launch diagnostics, GNSS push ownership, regional LTE guards, and configuration/profile lifecycles.
+- No APK/vendor execution, patch/sign/install, device command, RF observation or firmware decryption; vendor material remains excluded and pushes remain paused.
+
 ## 0.5.10 - 2026-10-18
 
 - Matched A-104 to the public RedFly frontend's installer hash; recorded the distinct standalone-main hash and bounded source-availability check (C-480).

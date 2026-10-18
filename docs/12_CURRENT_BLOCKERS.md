@@ -1,5 +1,11 @@
 # Current blockers and dependency gates
 
+RedFly update (2026-10-18, C-483--C-488): functional static inventory and reuse assessment are complete for the declared
+scope. [The feature matrix](../evidence/redfly-feature-matrix.csv) separates implemented paths, retained/unconnected UI,
+confirmation and restoration. It supplies no deployed module, actual RC2/Mini5Pro acceptance or RF control result.
+The next engineering dependency is a repeatable fixed-host module/adapter and known-read provenance, followed by each
+control's own baseline/readback/restore/RF chain. No new device action is implied while devices are unavailable.
+
 2026-10-18 current state: there is no device for this work. C-474 resolves selected Fly1.21.10 DeviceId/caller18/4
 without proving runtime binding or altering Fly1.19.4 evidence. C-475 resolves a packaged sec_type2 verify/extract edge;
 live config/PATH selection, STUE ownership and device/RF control remain unknown. C-471--C-473 add four analysis-only views and selected Java
