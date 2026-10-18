@@ -674,3 +674,13 @@ Details: [RC2 runtime](23_RC2_LIVE_RUNTIME.md), [control surfaces](05_RID_CONTRO
 | C-479 | `STATIC` | Host location_mode,aircraft FCGPSEnabled and FR UIMap parser/export are distinct;RC2 GPS sender does not await ACK | No aircraft/RF or real-log decrypt result;FR map export does not establish TBIE/STUE capability |
 
 Detailed source boundaries and offsets: [RedFly review](24_REDFLY_BUILD245_STATIC_REVIEW.md).
+
+## 2026-10-18 RedFly development-path assessment
+
+| Claim | Status | Result | Boundary |
+| --- | --- | --- | --- |
+| C-480 | `STATIC` | Public frontend installer hash matches A-104;author declares incomplete RID disabling and in-Fly integration;no source entry in inspected surfaces | Standalone-main hash differs;two text downloads403;no private-source absence,legal or runtime conclusion |
+| C-481 | `STATIC` | Parameter editor gets device metadata,checks expected-before,writes and independently reads E2 through existing DataBase/ServiceManager | Hardcoded write attribute,bounded completeness,weak session/snapshot binding,no durable baseline/rollback;no aircraft/RID trial |
+| C-482 | `STATIC` | SDK/native/startup dependencies and installer fixed signer/payload checks identified | Independent module plus adapter is a proposed engineering direction,no build/re-sign/install or proven device access |
+
+Details: [development assessment](25_REDFLY_DEVELOPMENT_PATH.md).

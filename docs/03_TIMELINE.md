@@ -1114,3 +1114,9 @@ work when a report did not contain a more precise timestamp.
 - `STATIC`：核实默认开启的云控guard、连接hook、legacy mask/EID调用和缺失的原值恢复；同包ARM EID setter的PLT/GOT绑定确认03/77（C-477）。
 - `STATIC`：核实外层root/property前提、A-031同一性与APK恢复范围；分开RC定位、飞机GPS和FR MapDetailData导出（C-478/C-479）。
 - 保存独立文字/hash/offset索引，原始APK/DEX/SO及反编译代码留在仓库外。未安装、启动、连接设备或调用native；没有TBIE/STUE明文或标准RID RF结果。
+
+### 2026-10-18 RedFly 二次开发评估
+
+- `STATIC`：读取用户给出的官网及其公开前端，installer摘要匹配A-104；保留单独Fly236摘要差异和文本下载403，不推测私有源码或作者授权（C-480）。
+- `STATIC`：参数编辑器E0/E1/E2/E3流程、同进程DataBase/ServiceManager通信与独立回读已跟通；恢复首项失败停止由fallback核对。可写属性、完整范围、身份绑定和无回滚边界一并记录（C-481）。
+- `STATIC`：核对应用/native初始化依赖与安装器签名/payload校验，形成独立源码模块加少量宿主适配的工程建议（C-482）。未构建、修改、签名、安装APK或执行设备命令。

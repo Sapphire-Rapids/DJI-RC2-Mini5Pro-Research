@@ -1,0 +1,571 @@
+{
+  "schema": "redfly-development-static/v1",
+  "status": "STATIC",
+  "date": "2026-10-18",
+  "input_artifacts": [
+    "A-104",
+    "A-105"
+  ],
+  "website": {
+    "checked_date": "2026-10-18",
+    "script_url": "https://redfly.app/assets/app-e60230e963.js",
+    "script_sha256": "e60230e963b892da29c56213f2e3dda81c99a7333a16e778a2a0afa830c25465",
+    "script_bytes": 613399,
+    "installer_sha256_published": "49e5d5c93851baf377bd7a288ec013d2e632f5c81738d133deb379fe7ba8ebe7",
+    "installer_matches_A104": true,
+    "standalone_main_sha256_published": "94a85f5d2099b19d9245de37739a6e7fe163a113a06552b7190e205cf201acae",
+    "embedded_main_sha256_computed": "94a85f5d2099b19d9241de37739a6e7fe163a113a06552b7190e205cf201acae",
+    "standalone_published_hash_matches_embedded": false,
+    "differing_hash_character_positions_zero_based": [
+      19
+    ],
+    "standard_rid_claim": "Does not fully disable DroneID or RID.",
+    "architecture_claim": "Features run inside Fly, using its SDK and existing aircraft connection.",
+    "source_listing_scope": "Read root navigation, download metadata, legal text and public frontend literal URLs; no repository/source distribution or source-code license found. Not a whole-web/private-source absence claim.",
+    "download_text_status": {
+      "SHA256SUMS.txt": 403,
+      "ADB-NOTICE.txt": 403
+    },
+    "no_binary_download": true,
+    "no_api_post": true,
+    "no_author_contact": true
+  },
+  "integration": {
+    "status": "STATIC",
+    "apk_artifact": "A-105",
+    "apk_sha256": "94a85f5d2099b19d9241de37739a6e7fe163a113a06552b7190e205cf201acae",
+    "manifest": {
+      "package": "dji.go.v6",
+      "application": "com.dji.component.application.DJIApplication",
+      "extractNativeLibs": true,
+      "debuggable_explicit_true": false,
+      "sharedUserId": null
+    },
+    "entry_observations": [
+      "Manifest names direct DJIApplication,not the retained AppGuard QLVRK wrapper",
+      "UAVApplication.attachBaseContext uses MultiDex and ApplicationLike;onCreate configures services before ApplicationLike",
+      "JNIKeyValue loads LibraryLoader and calls native_get/native_get_sync/native_set",
+      "UAVSDKManager.i/k initialize JNISdk and DataLinkManager/network/bluetooth/handlers;copying one UI class does not supply that runtime state"
+    ],
+    "selected_method_locations": [
+      {
+        "method": "uav.sdk.UAVSDKManager.i",
+        "args": "[android.content.Context, uav.jni.value.InitializeInfo, uav.sdk.UAVSDKManager$ProductConnectionCallback]",
+        "code_item_offset": "0x4e8634",
+        "dex": "classes12.dex"
+      },
+      {
+        "method": "uav.sdk.UAVSDKManager.k",
+        "args": "[android.content.Context, uav.jni.value.InitializeInfo, uav.sdk.UAVSDKManager$ProductConnectionCallback]",
+        "code_item_offset": "0x4e849c",
+        "dex": "classes12.dex"
+      },
+      {
+        "method": "uav.sdk.jni.LibraryLoader.b",
+        "args": "[]",
+        "code_item_offset": "0x4f46d0",
+        "dex": "classes12.dex"
+      },
+      {
+        "method": "com.uav.component.application.UAVApplication.attachBaseContext",
+        "args": "[android.content.Context]",
+        "code_item_offset": "0x4f364c",
+        "dex": "classes20.dex"
+      },
+      {
+        "method": "com.uav.component.application.UAVApplication.onCreate",
+        "args": "[]",
+        "code_item_offset": "0x4f3708",
+        "dex": "classes20.dex"
+      },
+      {
+        "method": "com.uav.component.application.UAVApplication.onCreate$lambda$3",
+        "args": "[com.uav.component.application.UAVApplication, org.koin.core.KoinApplication]",
+        "code_item_offset": "0x4f3528",
+        "dex": "classes20.dex"
+      },
+      {
+        "method": "com.uav.component.application.UAVApplication.onCreate$lambda$3$lambda$2",
+        "args": "[com.uav.component.application.UAVApplication, org.koin.core.module.Module]",
+        "code_item_offset": "0x4f3584",
+        "dex": "classes20.dex"
+      },
+      {
+        "method": "com.uav.component.application.UAVApplication.onCreate$lambda$3$lambda$2$lambda$1",
+        "args": "[com.uav.component.application.UAVApplication, org.koin.core.scope.Scope, org.koin.core.parameter.ParametersHolder]",
+        "code_item_offset": "0x4f361c",
+        "dex": "classes20.dex"
+      }
+    ],
+    "installer_constraints": {
+      "package_fixed": "dji.go.v6",
+      "expected_signer_sha256": "4e1971daed82fe2025dd7f3e3bd5a493c9d79c00c1fb70845d623ee63a17e781",
+      "trustedRed_sha256_equality": true,
+      "coexist_requires_version_marker": "Fly coexist r1",
+      "payload_installed_apk_hash_check": true,
+      "implication": "Re-signing or changing the main APK requires a deliberate own-package/install/update strategy; existing wizard trust and payload checks cannot be assumed to accept it."
+    },
+    "limitations": [
+      "No source Gradle project recovered",
+      "Selected static startup paths,not complete startup/anti-tamper audit",
+      "No repackaging,signing,installation or live transport trial",
+      "Existing framework does not identify standard RID controls or prove Mini5Pro capability"
+    ]
+  },
+  "parameter_editor": {
+    "analysis_scope": [
+      "paramedit.Editor (including Page and callbacks)",
+      "paramedit.KnownGroups",
+      "paramedit.Param",
+      "paramedit.RestorePlan",
+      "paramedit.Wire",
+      "specific dependencies: gimcal.Sdk, apptelemetry.Target, modsettings160.Warning, DataBase, SendPack, DataBaseProcessor"
+    ],
+    "execution": {
+      "apk": false,
+      "vendor_java_or_native": false,
+      "flight_commands": false,
+      "device": false,
+      "network": false
+    },
+    "dex_inputs": [
+      {
+        "entry": "classes12.dex",
+        "bytes": 7545116,
+        "sha256": "de28a206cb90b40e9df8b2c4523880a71311db7497fd85f20e07ce1c07cda845"
+      },
+      {
+        "entry": "classes27.dex",
+        "bytes": 7470624,
+        "sha256": "2732a7632827fbdfe4cc6b452b0ad086484835f48e1577e61a1aec844cd84d16"
+      }
+    ],
+    "known_groups": {
+      "role": "display category labels, not authoritative parameter metadata",
+      "entries": 1165,
+      "unique_names": 1165,
+      "categories": 15,
+      "declared_source_sha256": "bdf5ad396882d57358146b2ca9fbb82d2ef5fa4fd19df5219ead49fa78004e12",
+      "declared_source_origin_verified": false
+    },
+    "metadata_source": {
+      "count": "remote table responses via Wire E0",
+      "name_type_size_min_max_default": "remote item responses via Wire E1",
+      "attribute": "hardcoded 1 in Param.fromInfo",
+      "group_label": "embedded KnownGroups or name-prefix fallback",
+      "scan_tables": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "per_table_cap": 4096,
+      "total_cap": 8192
+    },
+    "readback_chain": [
+      "Editor.Page.verifiedWrite",
+      "Wire.call(E2) with new Wire instance",
+      "DataBase.start",
+      "DataBaseProcessor.l/k",
+      "ServiceManager.getInstance().sendmessage",
+      "RecvPack matching command set, command id and sequence",
+      "DataBase.setRecData",
+      "Wire callback.getRecData",
+      "Param.readValue",
+      "typed comparison; only then Param.value update"
+    ],
+    "backup_limits": {
+      "manual_durable_dhp": true,
+      "automatic_baseline_before_write": false,
+      "export_values_refreshed_at_export": false,
+      "export_identity_refreshed_at_export": true,
+      "atomic_rollback": false,
+      "stop_after_first_restore_failure": true,
+      "backup_identity_mismatch_hard_block": false,
+      "name_matching_ignores_saved_index_and_table": true
+    },
+    "portability": "Wire is a DataBase subclass using the host Fly ServiceManager singleton; it does not create a second socket or export cross-process IPC. Pure value/restore planning logic is separable; live transport and SDK identity/state reads depend on host classes and initialization.",
+    "method_offsets": [
+      {
+        "method": "paramedit.Editor.entry",
+        "arguments": "[android.content.Context]",
+        "jadx_method_code_offset": "0x6c1790",
+        "code_item": {
+          "offset": "0x6c1790",
+          "instructions_offset": "0x6c17a0",
+          "instruction_code_units": 107
+        }
+      },
+      {
+        "method": "paramedit.Editor.open",
+        "arguments": "[android.content.Context]",
+        "jadx_method_code_offset": "0x6c1878",
+        "code_item": {
+          "offset": "0x6c1878",
+          "instructions_offset": "0x6c1888",
+          "instruction_code_units": 4
+        }
+      },
+      {
+        "method": "paramedit.Editor.openUnchecked",
+        "arguments": "[android.content.Context]",
+        "jadx_method_code_offset": "0x6c1890",
+        "code_item": {
+          "offset": "0x6c1890",
+          "instructions_offset": "0x6c18a0",
+          "instruction_code_units": 63
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.build",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6c0f30",
+        "code_item": {
+          "offset": "0x6c0f30",
+          "instructions_offset": "0x6c0f40",
+          "instruction_code_units": 722
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.confirmWrite",
+        "arguments": "[paramedit.Param, java.math.BigDecimal]",
+        "jadx_method_code_offset": "0x6bee2c",
+        "code_item": {
+          "offset": "0x6bee2c",
+          "instructions_offset": "0x6bee3c",
+          "instruction_code_units": 101
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.edit",
+        "arguments": "[paramedit.Param]",
+        "jadx_method_code_offset": "0x6bef08",
+        "code_item": {
+          "offset": "0x6bef08",
+          "instructions_offset": "0x6bef18",
+          "instruction_code_units": 732
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.executeRestore",
+        "arguments": "[java.util.ArrayList<paramedit.RestorePlan$Change>, paramedit.Editor$Page$Identity]",
+        "jadx_method_code_offset": "0x6bf550",
+        "code_item": {
+          "offset": "0x6bf550",
+          "instructions_offset": "0x6bf560",
+          "instruction_code_units": 99
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.export",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6bf628",
+        "code_item": {
+          "offset": "0x6bf628",
+          "instructions_offset": "0x6bf638",
+          "instruction_code_units": 81
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.previewRestore",
+        "arguments": "[java.io.File]",
+        "jadx_method_code_offset": "0x6bf8cc",
+        "code_item": {
+          "offset": "0x6bf8cc",
+          "instructions_offset": "0x6bf8dc",
+          "instruction_code_units": 39
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.readAll",
+        "arguments": "[int, java.util.ArrayList<paramedit.Param>]",
+        "jadx_method_code_offset": "0x6bf92c",
+        "code_item": {
+          "offset": "0x6bf92c",
+          "instructions_offset": "0x6bf93c",
+          "instruction_code_units": 170
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.readBackup",
+        "arguments": "[java.io.File]",
+        "jadx_method_code_offset": "0x6bfaa0",
+        "code_item": {
+          "offset": "0x6bfaa0",
+          "instructions_offset": "0x6bfab0",
+          "instruction_code_units": 317
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.readIdentity",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6bfd38",
+        "code_item": {
+          "offset": "0x6bfd38",
+          "instructions_offset": "0x6bfd48",
+          "instruction_code_units": 93
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.safeToWrite",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6bff84",
+        "code_item": {
+          "offset": "0x6bff84",
+          "instructions_offset": "0x6bff94",
+          "instruction_code_units": 59
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.same",
+        "arguments": "[java.math.BigDecimal, java.math.BigDecimal, int]",
+        "jadx_method_code_offset": "0x6c001c",
+        "code_item": {
+          "offset": "0x6c001c",
+          "instructions_offset": "0x6c002c",
+          "instruction_code_units": 63
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.scanTables",
+        "arguments": "[int]",
+        "jadx_method_code_offset": "0x6c00ac",
+        "code_item": {
+          "offset": "0x6c00ac",
+          "instructions_offset": "0x6c00bc",
+          "instruction_code_units": 371
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.select",
+        "arguments": "[paramedit.Param]",
+        "jadx_method_code_offset": "0x6c044c",
+        "code_item": {
+          "offset": "0x6c044c",
+          "instructions_offset": "0x6c045c",
+          "instruction_code_units": 37
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.showRestorePreview",
+        "arguments": "[java.io.File, paramedit.Editor$Page$Backup, paramedit.Editor$Page$Identity, paramedit.RestorePlan]",
+        "jadx_method_code_offset": "0x6c04a8",
+        "code_item": {
+          "offset": "0x6c04a8",
+          "instructions_offset": "0x6c04b8",
+          "instruction_code_units": 957
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.startScan",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6c14e4",
+        "code_item": {
+          "offset": "0x6c14e4",
+          "instructions_offset": "0x6c14f4",
+          "instruction_code_units": 116
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.stop",
+        "arguments": "[boolean]",
+        "jadx_method_code_offset": "0x6c15dc",
+        "code_item": {
+          "offset": "0x6c15dc",
+          "instructions_offset": "0x6c15ec",
+          "instruction_code_units": 85
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.verifiedWrite",
+        "arguments": "[paramedit.Param, java.math.BigDecimal]",
+        "jadx_method_code_offset": "0x6c0c6c",
+        "code_item": {
+          "offset": "0x6c0c6c",
+          "instructions_offset": "0x6c0c7c",
+          "instruction_code_units": 258
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.write",
+        "arguments": "[paramedit.Param, java.math.BigDecimal]",
+        "jadx_method_code_offset": "0x6c0ebc",
+        "code_item": {
+          "offset": "0x6c0ebc",
+          "instructions_offset": "0x6c0ecc",
+          "instruction_code_units": 50
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.31.run",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6bdcb8",
+        "code_item": {
+          "offset": "0x6bdcb8",
+          "instructions_offset": "0x6bdcc8",
+          "instruction_code_units": 279
+        }
+      },
+      {
+        "method": "paramedit.Editor.Page.32.run",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6be018",
+        "code_item": {
+          "offset": "0x6be018",
+          "instructions_offset": "0x6be028",
+          "instruction_code_units": 472
+        }
+      },
+      {
+        "method": "paramedit.Param.encode",
+        "arguments": "[java.math.BigDecimal]",
+        "jadx_method_code_offset": "0x6c201c",
+        "code_item": {
+          "offset": "0x6c201c",
+          "instructions_offset": "0x6c202c",
+          "instruction_code_units": 184
+        }
+      },
+      {
+        "method": "paramedit.Param.fromInfo",
+        "arguments": "[int, int, byte[]]",
+        "jadx_method_code_offset": "0x6c1c1c",
+        "code_item": {
+          "offset": "0x6c1c1c",
+          "instructions_offset": "0x6c1c2c",
+          "instruction_code_units": 123
+        }
+      },
+      {
+        "method": "paramedit.Param.group",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6c220c",
+        "code_item": {
+          "offset": "0x6c220c",
+          "instructions_offset": "0x6c221c",
+          "instruction_code_units": 65
+        }
+      },
+      {
+        "method": "paramedit.Param.number",
+        "arguments": "[byte[], int, int, int]",
+        "jadx_method_code_offset": "0x6c1df8",
+        "code_item": {
+          "offset": "0x6c1df8",
+          "instructions_offset": "0x6c1e08",
+          "instruction_code_units": 125
+        }
+      },
+      {
+        "method": "paramedit.Param.readValue",
+        "arguments": "[byte[]]",
+        "jadx_method_code_offset": "0x6c22a0",
+        "code_item": {
+          "offset": "0x6c22a0",
+          "instructions_offset": "0x6c22b0",
+          "instruction_code_units": 43
+        }
+      },
+      {
+        "method": "paramedit.Param.valid",
+        "arguments": "[java.math.BigDecimal]",
+        "jadx_method_code_offset": "0x6c2318",
+        "code_item": {
+          "offset": "0x6c2318",
+          "instructions_offset": "0x6c2328",
+          "instruction_code_units": 51
+        }
+      },
+      {
+        "method": "paramedit.Param.width",
+        "arguments": "[int]",
+        "jadx_method_code_offset": "0x6c1f8c",
+        "code_item": {
+          "offset": "0x6c1f8c",
+          "instructions_offset": "0x6c1f9c",
+          "instruction_code_units": 42
+        }
+      },
+      {
+        "method": "paramedit.Param.writable",
+        "arguments": "[]",
+        "jadx_method_code_offset": "0x6c2390",
+        "code_item": {
+          "offset": "0x6c2390",
+          "instructions_offset": "0x6c23a0",
+          "instruction_code_units": 10
+        }
+      },
+      {
+        "method": "paramedit.RestorePlan.build",
+        "arguments": "[java.util.List<paramedit.Param>, java.util.List<paramedit.RestorePlan$Saved>]",
+        "jadx_method_code_offset": "0x6c2434",
+        "code_item": {
+          "offset": "0x6c2434",
+          "instructions_offset": "0x6c2444",
+          "instruction_code_units": 270
+        }
+      },
+      {
+        "method": "paramedit.RestorePlan.same",
+        "arguments": "[java.math.BigDecimal, java.math.BigDecimal, int]",
+        "jadx_method_code_offset": "0x6c2660",
+        "code_item": {
+          "offset": "0x6c2660",
+          "instructions_offset": "0x6c2670",
+          "instruction_code_units": 63
+        }
+      },
+      {
+        "method": "paramedit.Wire.call",
+        "arguments": "[int, byte[], long]",
+        "jadx_method_code_offset": "0x6c27a0",
+        "code_item": {
+          "offset": "0x6c27a0",
+          "instructions_offset": "0x6c27b0",
+          "instruction_code_units": 54
+        }
+      },
+      {
+        "method": "paramedit.Wire.send",
+        "arguments": "[uav.midware.interfaces.UAVDataCallBack]",
+        "jadx_method_code_offset": "0x6c28cc",
+        "code_item": {
+          "offset": "0x6c28cc",
+          "instructions_offset": "0x6c28dc",
+          "instruction_code_units": 35
+        }
+      },
+      {
+        "method": "paramedit.KnownGroups.lookup",
+        "arguments": "[java.lang.String]",
+        "jadx_method_code_offset": "0x6c1a58",
+        "code_item": {
+          "offset": "0x6c1a58",
+          "instructions_offset": "0x6c1a68",
+          "instruction_code_units": 152
+        }
+      }
+    ],
+    "limitations": [
+      "Static code only, no observation of aircraft acceptance or persistence across reboot",
+      "Parent classes and selected dependencies only; no full app enumeration",
+      "JADX source is not buildable project source; critical restore control flow checked in fallback output",
+      "Metadata parser follows this APK interpretation; not independently validated against a device protocol specification"
+    ],
+    "completion_flag_limits": {
+      "metadataComplete": "Only all indices of accepted E0 tables decoded successfully; ignored/unanswered E0 tables are not counted as errors",
+      "valuesComplete": "All accepted decoded Param rows have read values; can be true when metadataComplete is false",
+      "restore_precondition": "valuesComplete and nonempty rows; metadataComplete is not mandatory"
+    },
+    "session_and_state_check_limits": {
+      "generation": "UI task generation, not aircraft link-session identity",
+      "single_write": "Connection, IsFlying, AreMotorsOn fetched sequentially once at verifiedWrite entry; no ongoing state subscription or per-item serial comparison",
+      "restore": "Compares current identity with preview identity once before loop; each item then uses verifiedWrite",
+      "readback": "Immediate protocol value readback; not power-cycle persistence or whole-batch session validation"
+    }
+  },
+  "proposal_status": "Engineering recommendation only; no module,patch APK,signing,deployment or device/RF verification implemented in this review",
+  "document": "docs/25_REDFLY_DEVELOPMENT_PATH.md",
+  "privacy": "Independent facts,metadata and locations only; all vendor code/binaries and downloaded front-end code remain excluded"
+}

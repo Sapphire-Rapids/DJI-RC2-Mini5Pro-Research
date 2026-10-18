@@ -509,6 +509,13 @@ Later retractions override earlier progress summaries.
     state/data restoration. Do not turn these STATIC paths into deployment instructions or reopen closed routes
     without new owner/baseline/readback/restore evidence. No new firmware key/decrypt or RF result is established.
 
+70. C-481's parameter editor is separate from C-477's RID loop: it rereads metadata/expected-before and uses a
+    separate E2 readback,through the same-process DataBase/ServiceManager owner. Attribute1 is hardcoded,not
+    recovered write permission;complete flags are bounded to discovered rows. Snapshot identity/session binding,
+    durable original-state capture and rollback remain incomplete. C-482's proposed small host module is not
+    built or admitted. Do not generalize this transport or E0-E3 into target RID support,or assume a re-signed
+    main APK passes the stock RedFly installer's fixed signer/payload checks.
+
 ## Privacy and redaction
 
 Never commit:

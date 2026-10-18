@@ -902,3 +902,13 @@ aircraft GPS parameters and flight-record UI-map export are separate; the latter
 Use these exact classes for targeted comparisons with unresolved original methods. Do not repeat the completed
 inventory or reopen closed legacy senders from names alone. No app installation or modified-app deployment was requested
 or performed. Vendor inputs/derived source stay outside the repository; GitHub synchronization remains paused.
+
+## RedFly development-path follow-up (C-480--C-482)
+
+The user wants to borrow the implementation or develop on top of it and supplied redfly.app; no source project is
+available yet. The [assessment](25_REDFLY_DEVELOPMENT_PATH.md) recommends independently maintained module source and
+a small same-process host adapter. This is a proposed next build,not a completed module or admitted controller.
+Parameter metadata and E2 readback paths are now located;do not repeat the whole-app inventory. Keep hardcoded
+attribute1,limited completeness,non-atomic identity/state checks and missing durable baseline/rollback explicit.
+Re-signing needs its own package/install/update strategy because the existing wizard fixes signer and payload hashes.
+Use pinned A-105;the site's standalone hash is different and that file was not acquired. GitHub remains paused.

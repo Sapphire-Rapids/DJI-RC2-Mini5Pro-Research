@@ -324,3 +324,13 @@ Public code and documentation provide schemas, names, and precedent. They do not
 current product/version identity, a live route, readback, restoration, or independent RF evidence.
 Vendor binaries analyzed locally are listed only by identity in the artifact register and are not
 redistributed.
+
+## RedFly project website (2026-10-18)
+
+[RedFly](https://redfly.app/?lang=en) and its directly referenced [frontend](https://redfly.app/assets/app-e60230e963.js)
+are used only for project declarations,navigation/download metadata and the A-104 published hash comparison (C-480).
+The frontend SHA-256 is `e60230e963b892da29c56213f2e3dda81c99a7333a16e778a2a0afa830c25465`.
+Its claims do not prove runtime capability;the standalone-main hash differs from A-105 and was not independently downloaded.
+The inspected surfaces contain no source distribution entry;this is not a whole-web/private-source absence claim.
+[Android signing considerations](https://developer.android.com/studio/publish/app-signing#considerations) support the
+same-package certificate/update distinction used in C-482. No signing key or vendor code is included.

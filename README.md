@@ -10,7 +10,7 @@
 档案中的产品名称只用于说明研究对象。项目不是 DJI 官方产品，无隶属或背书关系；实验室的
 授权声明与非官方产品身份分开记录。
 
-最新工作记录为 **C-442--C-479**，本次接手基线 HEAD 为 `e25c4aa`。当前用户没有设备，研究继续使用已有样本和离线工具；
+最新工作记录为 **C-442--C-482**，本次接手基线 HEAD 为 `e25c4aa`。当前用户没有设备，研究继续使用已有样本和离线工具；
 WA150 STUE 尚未解密，未实现经真实 RF 验收的控制。先读[当前接手说明](docs/13_HANDOFF.md)和
 [STUE 检查点](host-tools/firmware-acquisition/AIRCRAFT_STUE_CHECKPOINT.md)；历史动作见[时间线](docs/03_TIMELINE.md)。
 GitHub 推送仍暂停；本地更新、验证和提交按当前授权继续。
@@ -26,6 +26,8 @@ Operator ID 单独记录。面板功能必须连接经过独立验证的真实�
 
 ## 当前进展
 
+- C-480--C-482 核对官网样本身份并追通参数编辑器的同进程通信、写前校验、E2 回读和恢复边界。
+  [二开方向](docs/25_REDFLY_DEVELOPMENT_PATH.md)建议独立维护源码模块及宿主适配；当前未构建或部署修改版。
 - C-476--C-479 分析用户新提供的 [RedFly build-245](docs/24_REDFLY_BUILD245_STATIC_REVIEW.md)：得到可读改版 Java、RID 云控拦截入口和安装前提。
   默认开启的 RID 选项还调用 legacy DroneID/EID，缺少原值恢复；GPS UI 和日志导出也各有明确边界。未安装或证明标准 RID 关闭。
 - C-474 将 Fly1.21.10 所查 RID selector 输入明确为 DeviceId，并核对 exact caller18/4。这不证明它与 ProductType 数值

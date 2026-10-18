@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.10 - 2026-10-18
+
+- Matched A-104 to the public RedFly frontend's installer hash; recorded the distinct standalone-main hash and bounded source-availability check (C-480).
+- Traced the parameter editor through device metadata, same-process DataBase/ServiceManager transport, independent E2 readback and partial restore behavior (C-481).
+- Recorded native SDK/startup dependencies and fixed installer signer/payload checks; recommended an independently maintained module with a small host adapter (C-482).
+- No module build, APK modification/signing, installation or device/RF verification was performed.
+
 ## 0.5.09 - 2026-10-18
 
 - Registered the user-supplied RedFly installer and nested modified Fly APK (A-104/A-105), checked 32 DEX headers and traced selected code paths (C-476).
